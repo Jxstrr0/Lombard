@@ -15,7 +15,7 @@ You own a pawn shop (a *lombard*) on a canal in Mostograd, a Russian river city,
 
 ## Setting
 
-**City:** Mostograd ("bridge city"), a fictional river city modeled on St Petersburg: canals, drawbridges that open at night and strand people on the wrong bank, 19th-century facades, a Soviet-era outer ring. The shop is in a canal-side district, ground floor of an old building, one room plus a back office door.
+**City:** Mostograd ("bridge city"), a fictional river city modeled on St Petersburg: canals, drawbridges that open at night and strand people on the wrong bank, 19th-century facades, a Soviet-era outer ring. The shop is in a canal-side district, ground floor of an old building, one room plus a small storeroom behind the counter, where pledges wait out their loans.
 
 **Player character:** you bought a failing pawn shop cheap and are starting over. Who you were before is never specified (no name, face, or history beyond this). The shop came cheap for a reason: the previous owner left town in a hurry, and some of the regulars, one creditor, and at least one man in a leather jacket still think the shop owes them something. This is the seed for the first week's warmth and the Protection arc; it is told in one short intro scene and through what customers say, never in a lore dump.
 
@@ -135,7 +135,7 @@ Shrinkage: shoplifting is a thing. Cheap items on open shelves disappear if repu
 - Start: ~80,000 ₽ cash after buying the shop, a near-empty shop with a few leftover items from the previous owner, loupe + scale + magnet, basic reference book.
 - Expenses: rent (monthly), utilities, specialist retainers, protection "insurance" if you accept it, employee wages later.
 - Upgrades: tools, better cases (visibility + security), lighting, a sign, a security camera (deters theft, also records evidence), a second counter (hire an appraiser).
-- Employee: one appraiser hire mid-game. They handle overflow customers with their own accuracy stat; mistakes are yours to eat.
+- Employee: one appraiser hire mid-game. They handle overflow customers with their own accuracy stat; mistakes are yours to eat. They're a visible person in the shop, moving between the storeroom, the counter and the floor.
 - Category demand drifts by season (electronics before school year, gold when the ruble wobbles, medals around Victory Day).
 
 Failure: cash below negative rent for 2 months = eviction (game over, career stats shown). The mob and police can also end a career. No permadeath mid-day; it's a slow slide you can see coming.

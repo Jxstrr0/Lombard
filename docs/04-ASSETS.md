@@ -30,7 +30,7 @@ Goal: as realistic as free-and-open content allows, on a phone. The strategy is 
 
 Built in Blender (free) by script, never by hand, exported to `shop.glb`:
 - Room: 6 m × 8 m, high ceiling (old building), one large street window with canal backdrop as a lit card or small cube-mapped exterior.
-- Counter with glass top case, two wall cases, glass shelves on brackets, a safe door, a back-office door, counter lamp, ceiling pendants, a radiator, a worn parquet or linoleum floor.
+- Glass showcase counter, a low glass case to its left, a freestanding glass case on the floor, two tall wall cases, glass shelves on brackets, a safe door, a storeroom through a doorway in the right wall (shelving, workbench, bare bulb), counter lamp, ceiling pendants, a radiator, a worn parquet floor (linoleum in the storeroom).
 - Materials from Poly Haven / ambientCG: dark wood, scuffed laminate, plaster with stains, brass trim, glass.
 - Lighting baked in Cycles to a single 2048 lightmap (4096 on desktop high tier) covering the static room. Dynamic items get lit by the env map plus the counter lamp.
 - Export: glTF with Draco; textures to KTX2 via `gltf-transform`. Target under 8 MB total for the shop.
@@ -41,9 +41,9 @@ Built in Blender (free) by script, never by hand, exported to `shop.glb`:
 
 Everything runs headless; no one opens the Blender UI.
 
-**Run it from a phone:** GitHub app → repo → Actions → **bake** → Run workflow → quality `preview` (default) or `full` → Run. A preview takes ~5 minutes including the Blender download on a cold cache; the result is committed and deployed automatically, and the build number in the game's corner then ends in `bake preview <commit>` (or `bake full …`). The two Cycles renders from the player's eye land in `bake/out/preview.jpg` (portrait) and `bake/out/preview-wide.jpg`; open them in the repo to judge layout and mood. Add `?nobake=1` to the game URL to see the old procedural grey box for comparison.
+**Run it from a phone:** GitHub app → repo → Actions → **bake** → Run workflow → quality `preview` (default) or `full` → Run. A preview takes ~5 minutes including the Blender download on a cold cache; the result is committed and deployed automatically, and the build number in the game's corner then ends in `bake preview <commit>` (or `bake full …`). The Cycles renders from the player's eye land in `bake/out/preview.jpg` (portrait), `bake/out/preview-wide.jpg`, and `preview-left.jpg` / `preview-right.jpg` (head turned towards the wing case and the storeroom); open them in the repo to judge layout and mood. Add `?nobake=1` to the game URL to see the old procedural grey box for comparison.
 
-1. `bake/layout.json` describes the room in three.js coordinates (metres, y up): room size, every object (box / cylinder / cone / sphere / torus for the grey box, glb props later) with position, rotation, material, optional `repeat` and seeded `jitter`, plus the light rig (ceiling pendants, counter lamp, overcast sky through window and door portals), and the two preview cameras.
+1. `bake/layout.json` describes the room in three.js coordinates (metres, y up): room size (plus `annexes`, extra boxes such as the storeroom whose faces survive the outside-the-room culling), every object (box / cylinder / cone / sphere / torus for the grey box, glb props later) with position, rotation, material, optional `repeat` and seeded `jitter`, plus the light rig (ceiling pendants, counter lamp, overcast sky through window and door portals), and the two preview cameras.
 2. `bake/materials.py` is the single source for static materials: colour, roughness, metalness, and a `kind`:
    - `baked`: diffuse, gets the lightmap; drawn as `MeshBasicMaterial` + lightmap at runtime so the two real-time lights (there for the item and the customer) don't light the room twice;
    - `dynamic`: metals; not in the lightmap, lit at runtime by the env map and the two lights (they still cast shadows in the bake);

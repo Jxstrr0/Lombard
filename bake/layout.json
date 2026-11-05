@@ -1,25 +1,40 @@
 {
   "$comment": "Shop layout for the Blender bake. Three.js coordinates (metres, y up, x across the shop, z from the back wall at -4 to the street wall at +4; the player stands at z ~ -3.2 looking towards +z). Rotations are XYZ Euler in degrees. Shapes: box size [w,h,d]; cylinder radius/radiusTop/height (along y); cone radius/height (apex up, openEnded); sphere radius; torus radius/tube (in the xy plane). 'repeat' copies an object count times, offset by step, cycling through 'materials' if given. 'jitter' nudges position (m) and yaw (deg) by a seeded amount so nothing looks grid-perfect. Keep in step with src/render/scene.ts (anchors: counter top 0.94, mat at z -2.13, lamp light, eye).",
-  "version": 1,
+  "version": 2,
   "seed": 1907,
-  "room": { "halfW": 3, "halfD": 4, "height": 4.2 },
+  "room": { "halfW": 3, "halfD": 4, "height": 4.2,
+    "annexes": [
+      { "name": "back_room", "min": [3.0, 0, -4.0], "max": [6.0, 3.2, -1.6], "$comment": "extra volume outside the main shell whose faces survive culling (x from the right wall's inner face so the doorway reveals stay)" }
+    ]
+  },
   "world": { "color": "#a9b8c6", "strength": 0.35, "$comment": "overcast canal-side daylight; reaches the room only through the window and door portals" },
   "lights": [
     { "name": "pendant_back", "type": "point", "position": [0, 2.8, -1.6], "radius": 0.05, "kelvin": 2700, "power": 12 },
     { "name": "pendant_front", "type": "point", "position": [0, 2.8, 1.4], "radius": 0.05, "kelvin": 2700, "power": 12 },
     { "name": "counter_lamp", "type": "spot", "position": [1.02, 1.27, -2.38], "target": [0.35, 0.94, -2.15], "radius": 0.03, "kelvin": 3000, "power": 22, "spotSize": 110, "spotBlend": 0.6 },
     { "name": "window_portal", "type": "portal", "position": [-1, 2.05, 3.98], "size": [3.0, 2.4] },
-    { "name": "door_portal", "type": "portal", "position": [1.7, 1.475, 3.98], "size": [0.9, 1.15] }
+    { "name": "door_portal", "type": "portal", "position": [1.7, 1.475, 3.98], "size": [0.9, 1.15] },
+    { "name": "back_room_bulb", "type": "point", "position": [4.4, 2.68, -2.8], "radius": 0.04, "kelvin": 3300, "power": 9 },
+    { "name": "counter_case_0", "type": "point", "position": [-0.8, 0.86, -2.2], "radius": 0.02, "kelvin": 3600, "power": 1.2 },
+    { "name": "counter_case_1", "type": "point", "position": [0.8, 0.86, -2.2], "radius": 0.02, "kelvin": 3600, "power": 1.2 },
+    { "name": "wing_case_light", "type": "point", "position": [-2.7, 0.86, -3.05], "radius": 0.02, "kelvin": 3600, "power": 0.8 },
+    { "name": "island_case_light", "type": "point", "position": [-1.15, 1.12, 0.75], "radius": 0.02, "kelvin": 3600, "power": 1.0 }
   ],
   "cameras": [
     { "name": "preview", "position": [0, 1.62, -3.2], "target": [0, 0.62, -0.9], "verticalFov": 62, "width": 720, "height": 1280 },
-    { "name": "preview-wide", "position": [0, 1.62, -3.2], "target": [0, 1.0, -0.9], "verticalFov": 50, "width": 1280, "height": 720 }
+    { "name": "preview-wide", "position": [0, 1.62, -3.2], "target": [0, 1.0, -0.9], "verticalFov": 50, "width": 1280, "height": 720 },
+    { "name": "preview-right", "position": [0, 1.62, -3.2], "target": [3.0, 1.35, -3.15], "verticalFov": 50, "width": 1280, "height": 720 },
+    { "name": "preview-left", "position": [0, 1.62, -3.2], "target": [-3.0, 0.9, -1.7], "verticalFov": 50, "width": 1280, "height": 720 }
   ],
   "objects": [
     { "name": "floor", "shape": "box", "size": [6, 0.1, 8], "position": [0, -0.05, 0], "material": "parquet" },
     { "name": "ceiling", "shape": "box", "size": [6, 0.1, 8], "position": [0, 4.25, 0], "material": "ceiling" },
     { "name": "wall_left", "shape": "box", "size": [0.1, 4.2, 8], "position": [-3.05, 2.1, 0], "material": "plaster" },
-    { "name": "wall_right", "shape": "box", "size": [0.1, 4.2, 8], "position": [3.05, 2.1, 0], "material": "plaster" },
+    { "name": "wall_right_a", "shape": "box", "size": [0.1, 4.2, 0.35], "position": [3.05, 2.1, -3.825], "material": "plaster" },
+    { "name": "wall_right_b", "shape": "box", "size": [0.1, 4.2, 1.15], "position": [3.05, 2.1, -2.175], "material": "plaster" },
+    { "name": "wall_right_c", "shape": "box", "size": [0.1, 4.2, 5.6], "position": [3.05, 2.1, 1.2], "material": "plaster" },
+    { "name": "wall_right_lintel", "shape": "box", "size": [0.1, 1.15, 0.9], "position": [3.05, 2.675, -3.2], "material": "plaster" },
+    { "name": "wall_right_top", "shape": "box", "size": [0.1, 0.95, 0.9], "position": [3.05, 3.725, -3.2], "material": "plaster" },
     { "name": "wall_back", "shape": "box", "size": [6.2, 4.2, 0.1], "position": [0, 2.1, -4.05], "material": "plaster" },
     { "name": "wall_front_left", "shape": "box", "size": [0.5, 4.2, 0.1], "position": [-2.75, 2.1, 4.05], "material": "plaster" },
     { "name": "wall_front_sill", "shape": "box", "size": [3.0, 0.85, 0.1], "position": [-1, 0.425, 4.05], "material": "plaster" },
@@ -27,40 +42,96 @@
     { "name": "wall_front_pier", "shape": "box", "size": [0.6, 4.2, 0.1], "position": [0.8, 2.1, 4.05], "material": "plaster" },
     { "name": "wall_front_overdoor", "shape": "box", "size": [1.2, 1.8, 0.1], "position": [1.7, 3.3, 4.05], "material": "plaster" },
     { "name": "wall_front_right", "shape": "box", "size": [0.7, 4.2, 0.1], "position": [2.65, 2.1, 4.05], "material": "plaster" },
-
     { "name": "dado_left", "shape": "box", "size": [0.01, 1.15, 8], "position": [-2.995, 0.575, 0], "material": "dado" },
-    { "name": "dado_right", "shape": "box", "size": [0.01, 1.15, 8], "position": [2.995, 0.575, 0], "material": "dado" },
+    { "name": "dado_right_a", "shape": "box", "size": [0.01, 1.15, 0.3], "position": [2.995, 0.575, -3.85], "material": "dado" },
+    { "name": "dado_right_b", "shape": "box", "size": [0.01, 1.15, 6.7], "position": [2.995, 0.575, 0.65], "material": "dado" },
     { "name": "dado_back", "shape": "box", "size": [6, 1.15, 0.01], "position": [0, 0.575, -3.995], "material": "dado" },
     { "name": "rail_left", "shape": "box", "size": [0.03, 0.04, 8], "position": [-2.985, 1.15, 0], "material": "dado_rail" },
-    { "name": "rail_right", "shape": "box", "size": [0.03, 0.04, 8], "position": [2.985, 1.15, 0], "material": "dado_rail" },
+    { "name": "rail_right_a", "shape": "box", "size": [0.03, 0.04, 0.3], "position": [2.985, 1.15, -3.85], "material": "dado_rail" },
+    { "name": "rail_right_b", "shape": "box", "size": [0.03, 0.04, 6.7], "position": [2.985, 1.15, 0.65], "material": "dado_rail" },
     { "name": "skirt_left", "shape": "box", "size": [0.03, 0.14, 8], "position": [-2.985, 0.07, 0], "material": "skirting" },
-    { "name": "skirt_right", "shape": "box", "size": [0.03, 0.14, 8], "position": [2.985, 0.07, 0], "material": "skirting" },
+    { "name": "skirt_right_a", "shape": "box", "size": [0.03, 0.14, 0.3], "position": [2.985, 0.07, -3.85], "material": "skirting" },
+    { "name": "skirt_right_b", "shape": "box", "size": [0.03, 0.14, 6.7], "position": [2.985, 0.07, 0.65], "material": "skirting" },
     { "name": "skirt_back", "shape": "box", "size": [6, 0.14, 0.03], "position": [0, 0.07, -3.985], "material": "skirting" },
-
     {
       "name": "counter", "position": [0, 0, -2.25],
       "children": [
-        { "name": "counter_base", "shape": "box", "size": [3.2, 0.66, 0.7], "position": [0, 0.33, 0], "material": "counter_wood" },
-        { "name": "counter_felt", "shape": "box", "size": [3.14, 0.02, 0.64], "position": [0, 0.67, 0], "material": "felt" },
-        { "name": "case_wall_back", "shape": "box", "size": [3.2, 0.28, 0.03], "position": [0, 0.8, -0.335], "material": "counter_wood" },
-        { "name": "case_wall_front", "shape": "box", "size": [3.2, 0.28, 0.03], "position": [0, 0.8, 0.335], "material": "counter_wood" },
-        { "name": "case_wall_l", "shape": "box", "size": [0.03, 0.28, 0.64], "position": [-1.585, 0.8, 0], "material": "counter_wood" },
-        { "name": "case_wall_r", "shape": "box", "size": [0.03, 0.28, 0.64], "position": [1.585, 0.8, 0], "material": "counter_wood" },
-        { "name": "case_glass", "shape": "box", "size": [3.14, 0.008, 0.64], "position": [0, 0.934, 0], "material": "glass" },
-        { "name": "rim_back", "shape": "box", "size": [3.21, 0.02, 0.032], "position": [0, 0.94, -0.35], "material": "brass" },
-        { "name": "rim_front", "shape": "box", "size": [3.21, 0.02, 0.032], "position": [0, 0.94, 0.35], "material": "brass" },
-        { "name": "rim_l", "shape": "box", "size": [0.032, 0.02, 0.71], "position": [-1.6, 0.94, 0], "material": "brass" },
-        { "name": "rim_r", "shape": "box", "size": [0.032, 0.02, 0.71], "position": [1.6, 0.94, 0], "material": "brass" },
-        { "name": "cap_l", "shape": "box", "size": [0.02, 0.86, 0.02], "position": [-1.6, 0.51, 0.35], "material": "brass" },
-        { "name": "cap_r", "shape": "box", "size": [0.02, 0.86, 0.02], "position": [1.6, 0.51, 0.35], "material": "brass" },
-        { "name": "ring", "shape": "torus", "radius": 0.035, "tube": 0.007, "position": [0.08, 0.69, 0.14], "rotation": [-90, 0, 0], "material": "gold",
-          "repeat": { "count": 5, "step": [0.09, 0, 0] }, "jitter": { "position": 0.02, "yaw": 25 } },
-        { "name": "watch", "shape": "cylinder", "radius": 0.03, "height": 0.012, "position": [-0.1, 0.687, 0.16], "material": "steel",
-          "repeat": { "count": 3, "step": [-0.13, 0, 0.0] }, "jitter": { "position": 0.025, "yaw": 0 } },
+        { "name": "counter_plinth", "shape": "box", "size": [3.14, 0.1, 0.62], "position": [0, 0.05, 0], "material": "skirting" },
+        { "name": "counter_body", "shape": "box", "size": [3.2, 0.36, 0.7], "position": [0, 0.28, 0], "material": "counter_wood" },
+        { "name": "counter_deck", "shape": "box", "size": [3.16, 0.02, 0.66], "position": [0, 0.47, 0], "material": "felt" },
+        { "name": "counter_glass_front", "shape": "box", "size": [3.17, 0.48, 0.008], "position": [0, 0.7, 0.344], "material": "glass" },
+        { "name": "counter_glass_back", "shape": "box", "size": [3.17, 0.48, 0.008], "position": [0, 0.7, -0.344], "material": "glass" },
+        { "name": "counter_glass_l", "shape": "box", "size": [0.008, 0.48, 0.67], "position": [-1.594, 0.7, 0], "material": "glass" },
+        { "name": "counter_glass_r", "shape": "box", "size": [0.008, 0.48, 0.67], "position": [1.594, 0.7, 0], "material": "glass" },
+        { "name": "counter_glass_top", "shape": "box", "size": [3.17, 0.008, 0.67], "position": [0, 0.934, 0], "material": "glass" },
+        { "name": "counter_rim_f", "shape": "box", "size": [3.21, 0.02, 0.032], "position": [0, 0.94, 0.35], "material": "brass" },
+        { "name": "counter_rim_b", "shape": "box", "size": [3.21, 0.02, 0.032], "position": [0, 0.94, -0.35], "material": "brass" },
+        { "name": "counter_rim_l", "shape": "box", "size": [0.032, 0.02, 0.71], "position": [-1.6, 0.94, 0], "material": "brass" },
+        { "name": "counter_rim_r", "shape": "box", "size": [0.032, 0.02, 0.71], "position": [1.6, 0.94, 0], "material": "brass" },
+        { "name": "counter_strip", "shape": "box", "size": [3.14, 0.008, 0.012], "position": [0, 0.92, 0.32], "material": "bulb" },
+        { "name": "counter_post_lb", "shape": "box", "size": [0.02, 0.48, 0.02], "position": [-1.6, 0.7, -0.35], "material": "brass" },
+        { "name": "counter_post_lf", "shape": "box", "size": [0.02, 0.48, 0.02], "position": [-1.6, 0.7, 0.35], "material": "brass" },
+        { "name": "counter_post_rb", "shape": "box", "size": [0.02, 0.48, 0.02], "position": [1.6, 0.7, -0.35], "material": "brass" },
+        { "name": "counter_post_rf", "shape": "box", "size": [0.02, 0.48, 0.02], "position": [1.6, 0.7, 0.35], "material": "brass" },
+        { "name": "counter_shelf", "shape": "box", "size": [3.15, 0.008, 0.36], "position": [0, 0.7, 0.1], "material": "glass" },
+        { "name": "ring", "shape": "torus", "radius": 0.035, "tube": 0.007, "position": [0.12, 0.716, 0.12], "rotation": [-90, 0, 0], "material": "gold", "repeat": {"count": 6, "step": [0.1, 0, 0]}, "jitter": {"position": 0.02, "yaw": 25} },
+        { "name": "ring_b", "shape": "torus", "radius": 0.03, "tube": 0.006, "position": [-0.35, 0.716, 0.14], "rotation": [-90, 0, 0], "material": "gold", "repeat": {"count": 5, "step": [-0.11, 0, 0]}, "jitter": {"position": 0.02, "yaw": 25} },
+        { "name": "watch", "shape": "cylinder", "radius": 0.03, "height": 0.012, "position": [-0.2, 0.487, -0.05], "material": "steel", "repeat": {"count": 6, "step": [-0.17, 0, 0]}, "jitter": {"position": 0.03, "yaw": 0} },
+        { "name": "watch_b", "shape": "cylinder", "radius": 0.032, "height": 0.012, "position": [0.3, 0.487, -0.08], "material": "gold", "repeat": {"count": 5, "step": [0.18, 0, 0]}, "jitter": {"position": 0.03, "yaw": 0} },
+        { "name": "counter_box", "shape": "box", "size": [0.1, 0.06, 0.1], "position": [0.95, 0.51, 0.15], "material": "box_dark", "repeat": {"count": 3, "step": [0.16, 0, 0], "materials": ["box_dark", "box_grey"]}, "jitter": {"position": 0.02, "yaw": 15} },
         { "name": "counter_mat", "shape": "box", "size": [0.46, 0.006, 0.32], "position": [0, 0.947, 0.12], "material": "mat_rubber" }
       ]
     },
-
+    {
+      "name": "wing_case", "position": [-2.7, 0, -3.05], "rotation": [0, 90, 0],
+      "children": [
+        { "name": "wing_case_plinth", "shape": "box", "size": [1.34, 0.1, 0.47], "position": [0, 0.05, 0], "material": "skirting" },
+        { "name": "wing_case_body", "shape": "box", "size": [1.4, 0.36, 0.55], "position": [0, 0.28, 0], "material": "counter_wood" },
+        { "name": "wing_case_deck", "shape": "box", "size": [1.36, 0.02, 0.51], "position": [0, 0.47, 0], "material": "felt" },
+        { "name": "wing_case_glass_front", "shape": "box", "size": [1.37, 0.48, 0.008], "position": [0, 0.7, 0.269], "material": "glass" },
+        { "name": "wing_case_glass_back", "shape": "box", "size": [1.37, 0.48, 0.008], "position": [0, 0.7, -0.269], "material": "glass" },
+        { "name": "wing_case_glass_l", "shape": "box", "size": [0.008, 0.48, 0.52], "position": [-0.694, 0.7, 0], "material": "glass" },
+        { "name": "wing_case_glass_r", "shape": "box", "size": [0.008, 0.48, 0.52], "position": [0.694, 0.7, 0], "material": "glass" },
+        { "name": "wing_case_glass_top", "shape": "box", "size": [1.37, 0.008, 0.52], "position": [0, 0.934, 0], "material": "glass" },
+        { "name": "wing_case_rim_f", "shape": "box", "size": [1.41, 0.02, 0.032], "position": [0, 0.94, 0.275], "material": "brass" },
+        { "name": "wing_case_rim_b", "shape": "box", "size": [1.41, 0.02, 0.032], "position": [0, 0.94, -0.275], "material": "brass" },
+        { "name": "wing_case_rim_l", "shape": "box", "size": [0.032, 0.02, 0.56], "position": [-0.7, 0.94, 0], "material": "brass" },
+        { "name": "wing_case_rim_r", "shape": "box", "size": [0.032, 0.02, 0.56], "position": [0.7, 0.94, 0], "material": "brass" },
+        { "name": "wing_case_strip", "shape": "box", "size": [1.34, 0.008, 0.012], "position": [0, 0.92, 0.245], "material": "bulb" },
+        { "name": "wing_case_post_lb", "shape": "box", "size": [0.02, 0.48, 0.02], "position": [-0.7, 0.7, -0.275], "material": "brass" },
+        { "name": "wing_case_post_lf", "shape": "box", "size": [0.02, 0.48, 0.02], "position": [-0.7, 0.7, 0.275], "material": "brass" },
+        { "name": "wing_case_post_rb", "shape": "box", "size": [0.02, 0.48, 0.02], "position": [0.7, 0.7, -0.275], "material": "brass" },
+        { "name": "wing_case_post_rf", "shape": "box", "size": [0.02, 0.48, 0.02], "position": [0.7, 0.7, 0.275], "material": "brass" },
+        { "name": "wing_case_shelf", "shape": "box", "size": [1.35, 0.008, 0.26], "position": [0, 0.7, 0.06], "material": "glass" },
+        { "name": "wing_watch", "shape": "cylinder", "radius": 0.032, "height": 0.012, "position": [-0.5, 0.487, 0.0], "material": "steel", "repeat": {"count": 7, "step": [0.16, 0, 0], "materials": ["steel", "gold", "steel"]}, "jitter": {"position": 0.03, "yaw": 0} },
+        { "name": "wing_chain", "shape": "torus", "radius": 0.06, "tube": 0.004, "position": [-0.45, 0.716, 0.06], "rotation": [-90, 0, 0], "material": "gold", "repeat": {"count": 5, "step": [0.2, 0, 0]}, "jitter": {"position": 0.02, "yaw": 0} }
+      ]
+    },
+    {
+      "name": "island_case", "position": [-1.15, 0, 0.75], "rotation": [0, 90, 0],
+      "children": [
+        { "name": "island_case_plinth", "shape": "box", "size": [1.24, 0.1, 0.52], "position": [0, 0.05, 0], "material": "skirting" },
+        { "name": "island_case_body", "shape": "box", "size": [1.3, 0.45, 0.6], "position": [0, 0.325, 0], "material": "counter_wood" },
+        { "name": "island_case_deck", "shape": "box", "size": [1.26, 0.02, 0.56], "position": [0, 0.56, 0], "material": "felt" },
+        { "name": "island_case_glass_front", "shape": "box", "size": [1.27, 0.65, 0.008], "position": [0, 0.875, 0.294], "material": "glass" },
+        { "name": "island_case_glass_back", "shape": "box", "size": [1.27, 0.65, 0.008], "position": [0, 0.875, -0.294], "material": "glass" },
+        { "name": "island_case_glass_l", "shape": "box", "size": [0.008, 0.65, 0.57], "position": [-0.644, 0.875, 0], "material": "glass" },
+        { "name": "island_case_glass_r", "shape": "box", "size": [0.008, 0.65, 0.57], "position": [0.644, 0.875, 0], "material": "glass" },
+        { "name": "island_case_glass_top", "shape": "box", "size": [1.27, 0.008, 0.57], "position": [0, 1.194, 0], "material": "glass" },
+        { "name": "island_case_rim_f", "shape": "box", "size": [1.31, 0.02, 0.032], "position": [0, 1.2, 0.3], "material": "brass" },
+        { "name": "island_case_rim_b", "shape": "box", "size": [1.31, 0.02, 0.032], "position": [0, 1.2, -0.3], "material": "brass" },
+        { "name": "island_case_rim_l", "shape": "box", "size": [0.032, 0.02, 0.61], "position": [-0.65, 1.2, 0], "material": "brass" },
+        { "name": "island_case_rim_r", "shape": "box", "size": [0.032, 0.02, 0.61], "position": [0.65, 1.2, 0], "material": "brass" },
+        { "name": "island_case_strip", "shape": "box", "size": [1.24, 0.008, 0.012], "position": [0, 1.18, 0.27], "material": "bulb" },
+        { "name": "island_case_post_lb", "shape": "box", "size": [0.02, 0.65, 0.02], "position": [-0.65, 0.875, -0.3], "material": "brass" },
+        { "name": "island_case_post_lf", "shape": "box", "size": [0.02, 0.65, 0.02], "position": [-0.65, 0.875, 0.3], "material": "brass" },
+        { "name": "island_case_post_rb", "shape": "box", "size": [0.02, 0.65, 0.02], "position": [0.65, 0.875, -0.3], "material": "brass" },
+        { "name": "island_case_post_rf", "shape": "box", "size": [0.02, 0.65, 0.02], "position": [0.65, 0.875, 0.3], "material": "brass" },
+        { "name": "island_case_shelf", "shape": "box", "size": [1.25, 0.008, 0.5], "position": [0, 0.9, 0.0], "material": "glass" },
+        { "name": "island_cam", "shape": "box", "size": [0.14, 0.09, 0.07], "position": [-0.45, 0.6, 0.0], "material": "prop_slate", "repeat": {"count": 4, "step": [0.3, 0, 0], "materials": ["prop_slate", "box_dark"]}, "jitter": {"position": 0.03, "yaw": 20} },
+        { "name": "island_box", "shape": "box", "size": [0.1, 0.07, 0.1], "position": [-0.4, 0.95, 0.05], "material": "box_grey", "repeat": {"count": 4, "step": [0.27, 0, 0], "materials": ["box_grey", "prop_plum", "prop_brown"]}, "jitter": {"position": 0.03, "yaw": 20} }
+      ]
+    },
     {
       "name": "case_a", "position": [-2.76, 0, 0.2],
       "children": [
@@ -69,8 +140,7 @@
         { "name": "case_a_top", "shape": "box", "size": [0.48, 0.06, 1.52], "position": [0, 2.03, 0], "material": "case_wood" },
         { "name": "case_a_shelf_low", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.2, 0], "material": "glass" },
         { "name": "case_a_shelf_high", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.6, 0], "material": "glass" },
-        { "name": "case_a_box", "shape": "box", "size": [0.12, 0.08, 0.16], "position": [0, 0.84, -0.5], "material": "box_dark",
-          "repeat": { "count": 4, "step": [0, 0, 0.32], "materials": ["box_dark", "box_grey"] }, "jitter": { "position": 0.03, "yaw": 12 } }
+        { "name": "case_a_box", "shape": "box", "size": [0.12, 0.08, 0.16], "position": [0, 0.84, -0.5], "material": "box_dark", "repeat": {"count": 4, "step": [0, 0, 0.32], "materials": ["box_dark", "box_grey"]}, "jitter": {"position": 0.03, "yaw": 12} }
       ]
     },
     {
@@ -81,26 +151,20 @@
         { "name": "case_b_top", "shape": "box", "size": [0.48, 0.06, 1.52], "position": [0, 2.03, 0], "material": "case_wood" },
         { "name": "case_b_shelf_low", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.2, 0], "material": "glass" },
         { "name": "case_b_shelf_high", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.6, 0], "material": "glass" },
-        { "name": "case_b_box", "shape": "box", "size": [0.12, 0.08, 0.16], "position": [0, 0.84, -0.5], "material": "box_grey",
-          "repeat": { "count": 4, "step": [0, 0, 0.32], "materials": ["box_grey", "box_dark"] }, "jitter": { "position": 0.03, "yaw": 12 } }
+        { "name": "case_b_box", "shape": "box", "size": [0.12, 0.08, 0.16], "position": [0, 0.84, -0.5], "material": "box_grey", "repeat": {"count": 4, "step": [0, 0, 0.32], "materials": ["box_grey", "box_dark"]}, "jitter": {"position": 0.03, "yaw": 12} }
       ]
     },
-
     {
       "name": "shelves_right", "position": [2.8, 0, 1.2],
       "children": [
-        { "name": "shelf_glass", "shape": "box", "size": [0.36, 0.012, 2.4], "position": [0, 1.0, 0], "material": "glass", "repeat": { "count": 3, "step": [0, 0.45, 0] } },
-        { "name": "bracket_a", "shape": "box", "size": [0.3, 0.03, 0.015], "position": [0.03, 0.98, -1.0], "material": "brass", "repeat": { "count": 3, "step": [0, 0.45, 0] } },
-        { "name": "bracket_b", "shape": "box", "size": [0.3, 0.03, 0.015], "position": [0.03, 0.98, 1.0], "material": "brass", "repeat": { "count": 3, "step": [0, 0.45, 0] } },
-        { "name": "shelf1_prop", "shape": "box", "size": [0.12, 0.1, 0.12], "position": [-0.02, 1.058, -0.9], "material": "prop_brown",
-          "repeat": { "count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.1, 0.16, 0.22, 0.1] }, "jitter": { "position": 0.04, "yaw": 20 } },
-        { "name": "shelf2_prop", "shape": "box", "size": [0.12, 0.16, 0.12], "position": [-0.02, 1.538, -0.9], "material": "prop_brown",
-          "repeat": { "count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.16, 0.22, 0.1, 0.16] }, "jitter": { "position": 0.04, "yaw": 20 } },
-        { "name": "shelf3_prop", "shape": "box", "size": [0.12, 0.22, 0.12], "position": [-0.02, 2.018, -0.9], "material": "prop_brown",
-          "repeat": { "count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.22, 0.1, 0.16, 0.22] }, "jitter": { "position": 0.04, "yaw": 20 } }
+        { "name": "shelf_glass", "shape": "box", "size": [0.36, 0.012, 2.4], "position": [0, 1.0, 0], "material": "glass", "repeat": {"count": 3, "step": [0, 0.45, 0]} },
+        { "name": "bracket_a", "shape": "box", "size": [0.3, 0.03, 0.015], "position": [0.03, 0.98, -1.0], "material": "brass", "repeat": {"count": 3, "step": [0, 0.45, 0]} },
+        { "name": "bracket_b", "shape": "box", "size": [0.3, 0.03, 0.015], "position": [0.03, 0.98, 1.0], "material": "brass", "repeat": {"count": 3, "step": [0, 0.45, 0]} },
+        { "name": "shelf1_prop", "shape": "box", "size": [0.12, 0.1, 0.12], "position": [-0.02, 1.058, -0.9], "material": "prop_brown", "repeat": {"count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.1, 0.16, 0.22, 0.1]}, "jitter": {"position": 0.04, "yaw": 20} },
+        { "name": "shelf2_prop", "shape": "box", "size": [0.12, 0.16, 0.12], "position": [-0.02, 1.538, -0.9], "material": "prop_brown", "repeat": {"count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.16, 0.22, 0.1, 0.16]}, "jitter": {"position": 0.04, "yaw": 20} },
+        { "name": "shelf3_prop", "shape": "box", "size": [0.12, 0.22, 0.12], "position": [-0.02, 2.018, -0.9], "material": "prop_brown", "repeat": {"count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.22, 0.1, 0.16, 0.22]}, "jitter": {"position": 0.04, "yaw": 20} }
       ]
     },
-
     {
       "name": "window", "position": [0, 0, 4],
       "children": [
@@ -125,16 +189,13 @@
         { "name": "door_handle", "shape": "box", "size": [0.04, 0.2, 0.06], "position": [-0.45, 1.05, -0.04], "material": "brass" }
       ]
     },
-
-    { "name": "radiator_fin", "shape": "box", "size": [0.05, 0.55, 0.09], "position": [-1.65, 0.455, 3.88], "material": "radiator", "repeat": { "count": 14, "step": [0.1, 0, 0] } },
-
+    { "name": "radiator_fin", "shape": "box", "size": [0.05, 0.55, 0.09], "position": [-1.65, 0.455, 3.88], "material": "radiator", "repeat": {"count": 14, "step": [0.1, 0, 0]} },
     { "name": "pendant_back_cord", "shape": "cylinder", "radius": 0.006, "height": 1.2, "position": [0, 3.6, -1.6], "material": "cord", "segments": 6 },
     { "name": "pendant_back_shade", "shape": "cone", "radius": 0.22, "height": 0.2, "openEnded": true, "position": [0, 2.9, -1.6], "material": "shade" },
     { "name": "pendant_back_bulb", "shape": "sphere", "radius": 0.05, "position": [0, 2.82, -1.6], "material": "bulb" },
     { "name": "pendant_front_cord", "shape": "cylinder", "radius": 0.006, "height": 1.2, "position": [0, 3.6, 1.4], "material": "cord", "segments": 6 },
     { "name": "pendant_front_shade", "shape": "cone", "radius": 0.22, "height": 0.2, "openEnded": true, "position": [0, 2.9, 1.4], "material": "shade" },
     { "name": "pendant_front_bulb", "shape": "sphere", "radius": 0.05, "position": [0, 2.82, 1.4], "material": "bulb" },
-
     {
       "name": "counter_lamp", "position": [1.15, 0.94, -2.4],
       "children": [
@@ -143,8 +204,60 @@
         { "name": "lamp_head", "shape": "cone", "radius": 0.08, "height": 0.12, "openEnded": true, "position": [-0.1, 0.38, 0.02], "rotation": [0, 0, 51.6], "material": "lamp_metal" }
       ]
     },
-
     { "name": "safe", "shape": "box", "size": [0.9, 1.2, 0.12], "position": [-1.8, 0.6, -3.94], "material": "safe" },
-    { "name": "office_door", "shape": "box", "size": [0.9, 2.1, 0.06], "position": [1.6, 1.05, -3.97], "material": "office_door" }
+    { "name": "pinboard", "shape": "box", "size": [0.9, 0.6, 0.02], "position": [1.3, 1.55, -3.99], "material": "cork" },
+    { "name": "pin_note", "shape": "box", "size": [0.1, 0.14, 0.004], "position": [1.0, 1.6, -3.978], "material": "tag_paper", "repeat": {"count": 5, "step": [0.15, 0, 0]}, "jitter": {"position": 0.04, "yaw": 0} },
+    {
+      "name": "back_room",
+      "children": [
+        { "name": "br_floor", "shape": "box", "size": [2.9, 0.1, 2.4], "position": [4.55, -0.05, -2.8], "material": "lino" },
+        { "name": "br_ceiling", "shape": "box", "size": [3.0, 0.1, 2.5], "position": [4.55, 3.25, -2.8], "material": "ceiling" },
+        { "name": "br_wall_e", "shape": "box", "size": [0.1, 3.2, 2.6], "position": [6.05, 1.6, -2.8], "material": "plaster_back" },
+        { "name": "br_wall_n", "shape": "box", "size": [3.1, 3.2, 0.1], "position": [4.55, 1.6, -4.05], "material": "plaster_back" },
+        { "name": "br_wall_s", "shape": "box", "size": [3.1, 3.2, 0.1], "position": [4.55, 1.6, -1.55], "material": "plaster_back" },
+        { "name": "br_skirt_e", "shape": "box", "size": [0.02, 0.1, 2.4], "position": [5.99, 0.05, -2.8], "material": "skirting" },
+        { "name": "br_skirt_n", "shape": "box", "size": [2.9, 0.1, 0.02], "position": [4.55, 0.05, -3.99], "material": "skirting" },
+        { "name": "br_skirt_s", "shape": "box", "size": [2.9, 0.1, 0.02], "position": [4.55, 0.05, -1.61], "material": "skirting" },
+        { "name": "br_cord", "shape": "cylinder", "radius": 0.006, "height": 0.5, "position": [4.4, 2.95, -2.8], "material": "cord", "segments": 6 },
+        { "name": "br_bulb", "shape": "sphere", "radius": 0.045, "position": [4.4, 2.68, -2.8], "material": "bulb" },
+        { "name": "br_bulb_cap", "shape": "cylinder", "radius": 0.02, "height": 0.05, "position": [4.4, 2.73, -2.8], "material": "shade", "segments": 10 },
+        { "name": "br_upright_0a", "shape": "box", "size": [0.03, 2.2, 0.03], "position": [5.5, 1.1, -3.75], "material": "shelf_metal" },
+        { "name": "br_upright_0b", "shape": "box", "size": [0.03, 2.2, 0.03], "position": [5.94, 1.1, -3.75], "material": "shelf_metal" },
+        { "name": "br_upright_1a", "shape": "box", "size": [0.03, 2.2, 0.03], "position": [5.5, 1.1, -2.8], "material": "shelf_metal" },
+        { "name": "br_upright_1b", "shape": "box", "size": [0.03, 2.2, 0.03], "position": [5.94, 1.1, -2.8], "material": "shelf_metal" },
+        { "name": "br_upright_2a", "shape": "box", "size": [0.03, 2.2, 0.03], "position": [5.5, 1.1, -1.85], "material": "shelf_metal" },
+        { "name": "br_upright_2b", "shape": "box", "size": [0.03, 2.2, 0.03], "position": [5.94, 1.1, -1.85], "material": "shelf_metal" },
+        { "name": "br_shelf_0", "shape": "box", "size": [0.48, 0.025, 1.95], "position": [5.72, 0.15, -2.8], "material": "shelf_metal" },
+        { "name": "br_shelf_1", "shape": "box", "size": [0.48, 0.025, 1.95], "position": [5.72, 0.7, -2.8], "material": "shelf_metal" },
+        { "name": "br_shelf_2", "shape": "box", "size": [0.48, 0.025, 1.95], "position": [5.72, 1.25, -2.8], "material": "shelf_metal" },
+        { "name": "br_shelf_3", "shape": "box", "size": [0.48, 0.025, 1.95], "position": [5.72, 1.8, -2.8], "material": "shelf_metal" },
+        { "name": "br_box_0", "shape": "box", "size": [0.36, 0.28, 0.3], "position": [5.72, 0.3125, -3.55], "material": "cardboard", "repeat": {"count": 5, "step": [0, 0, 0.38], "materials": ["cardboard", "box_grey", "cardboard", "prop_sand"], "heights": [0.28, 0.224, 0.308, 0.196, 0.28]}, "jitter": {"position": 0.03, "yaw": 6} },
+        { "name": "br_tag_0", "shape": "box", "size": [0.004, 0.06, 0.08], "position": [5.535, 0.22, -3.55], "material": "tag_paper", "repeat": {"count": 5, "step": [0, 0, 0.38]}, "jitter": {"position": 0.02, "yaw": 0} },
+        { "name": "br_box_1", "shape": "box", "size": [0.36, 0.22, 0.3], "position": [5.72, 0.8325, -3.55], "material": "cardboard", "repeat": {"count": 5, "step": [0, 0, 0.38], "materials": ["cardboard", "box_grey", "cardboard", "prop_sand"], "heights": [0.22, 0.176, 0.242, 0.154, 0.22]}, "jitter": {"position": 0.03, "yaw": 6} },
+        { "name": "br_tag_1", "shape": "box", "size": [0.004, 0.06, 0.08], "position": [5.535, 0.77, -3.55], "material": "tag_paper", "repeat": {"count": 5, "step": [0, 0, 0.38]}, "jitter": {"position": 0.02, "yaw": 0} },
+        { "name": "br_box_2", "shape": "box", "size": [0.36, 0.3, 0.3], "position": [5.72, 1.4225, -3.55], "material": "cardboard", "repeat": {"count": 5, "step": [0, 0, 0.38], "materials": ["cardboard", "box_grey", "cardboard", "prop_sand"], "heights": [0.3, 0.24, 0.33, 0.21, 0.3]}, "jitter": {"position": 0.03, "yaw": 6} },
+        { "name": "br_tag_2", "shape": "box", "size": [0.004, 0.06, 0.08], "position": [5.535, 1.32, -3.55], "material": "tag_paper", "repeat": {"count": 5, "step": [0, 0, 0.38]}, "jitter": {"position": 0.02, "yaw": 0} },
+        { "name": "br_box_3", "shape": "box", "size": [0.36, 0.2, 0.3], "position": [5.72, 1.9225, -3.55], "material": "cardboard", "repeat": {"count": 5, "step": [0, 0, 0.38], "materials": ["cardboard", "box_grey", "cardboard", "prop_sand"], "heights": [0.2, 0.16, 0.22, 0.14, 0.2]}, "jitter": {"position": 0.03, "yaw": 6} },
+        { "name": "br_tag_3", "shape": "box", "size": [0.004, 0.06, 0.08], "position": [5.535, 1.87, -3.55], "material": "tag_paper", "repeat": {"count": 5, "step": [0, 0, 0.38]}, "jitter": {"position": 0.02, "yaw": 0} },
+        { "name": "br_bench_top", "shape": "box", "size": [1.4, 0.05, 0.6], "position": [4.15, 0.9, -3.68], "material": "counter_wood" },
+        { "name": "br_bench_leg", "shape": "box", "size": [0.05, 0.875, 0.05], "position": [3.5, 0.4375, -3.43], "material": "shelf_metal", "repeat": {"count": 2, "step": [1.3, 0, 0]} },
+        { "name": "br_bench_leg_back", "shape": "box", "size": [0.05, 0.875, 0.05], "position": [3.5, 0.4375, -3.93], "material": "shelf_metal", "repeat": {"count": 2, "step": [1.3, 0, 0]} },
+        { "name": "br_bench_shelf", "shape": "box", "size": [1.3, 0.02, 0.5], "position": [4.15, 0.25, -3.68], "material": "counter_wood" },
+        { "name": "br_ledger", "shape": "box", "size": [0.3, 0.04, 0.22], "position": [4.0, 0.945, -3.62], "material": "prop_plum", "rotation": [0, 12, 0] },
+        { "name": "br_cashbox", "shape": "box", "size": [0.3, 0.1, 0.2], "position": [4.55, 0.975, -3.75], "material": "safe" },
+        { "name": "br_kettle", "shape": "box", "size": [0.14, 0.2, 0.14], "position": [3.6, 1.025, -3.8], "material": "radiator" },
+        { "name": "br_chair_seat", "shape": "box", "size": [0.42, 0.04, 0.42], "position": [4.1, 0.46, -3.05], "material": "counter_wood", "rotation": [0, -14, 0] },
+        { "name": "br_chair_back", "shape": "box", "size": [0.42, 0.45, 0.03], "position": [4.15, 0.7, -2.86], "material": "counter_wood", "rotation": [0, -14, 0] },
+        { "name": "br_chair_leg", "shape": "box", "size": [0.03, 0.44, 0.03], "position": [3.93, 0.22, -3.22], "material": "shelf_metal", "repeat": {"count": 2, "step": [0.38, 0, -0.08]} },
+        { "name": "br_chair_leg_b", "shape": "box", "size": [0.03, 0.44, 0.03], "position": [3.98, 0.22, -2.84], "material": "shelf_metal", "repeat": {"count": 2, "step": [0.38, 0, -0.08]} },
+        { "name": "br_calendar", "shape": "box", "size": [0.32, 0.45, 0.005], "position": [4.6, 1.75, -3.995], "material": "tag_paper" },
+        { "name": "br_bucket", "shape": "box", "size": [0.25, 0.3, 0.25], "position": [3.45, 0.15, -1.85], "material": "prop_slate" },
+        { "name": "br_jamb_a", "shape": "box", "size": [0.04, 2.18, 0.08], "position": [2.98, 1.09, -3.69], "material": "office_door" },
+        { "name": "br_jamb_b", "shape": "box", "size": [0.04, 2.18, 0.08], "position": [2.98, 1.09, -2.71], "material": "office_door" },
+        { "name": "br_head", "shape": "box", "size": [0.04, 0.08, 1.06], "position": [2.98, 2.14, -3.2], "material": "office_door" },
+        { "name": "br_door_leaf", "shape": "box", "size": [0.9, 2.05, 0.04], "position": [3.555, 1.025, -2.7], "material": "office_door", "rotation": [0, -10, 0] },
+        { "name": "br_door_knob", "shape": "box", "size": [0.05, 0.05, 0.1], "position": [3.92, 1.0, -2.68], "material": "brass", "rotation": [0, -10, 0] }
+      ]
+    }
   ]
 }

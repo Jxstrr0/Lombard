@@ -10,6 +10,16 @@ import { createButton, el, setButtonLabel, setText } from '../components/button'
 import { archetypeLabel, itemNameOf, rub } from '../format'
 import type { IconName } from '../icons'
 
+const LOOK_HINT_KEY = 'lombard.lookHintSeen'
+
+function lookHintSeen(): boolean {
+  try {
+    return localStorage.getItem(LOOK_HINT_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 type Primary = 'counter/next' | 'day/close' | 'counter/inspect' | 'counter/dismiss'
 
 const OUTCOME: Record<VisitOutcome, string> = {
@@ -35,6 +45,10 @@ export class CounterScreen {
   private primary: HTMLButtonElement
   private secondary: HTMLButtonElement
   private primaryAction: Primary = 'counter/next'
+  /** One-time "drag to look around" hint, shown over the 3D view while nobody is at the counter. */
+  private readonly lookHint: HTMLElement
+  private lookHintDone = lookHintSeen()
+  private lookHintShown = false
 
   constructor(
     dispatch: (a: Action) => void,
@@ -72,13 +86,40 @@ export class CounterScreen {
     })
     actions.append(gear(openSettings), ...(shopButton ? [shopButton] : []), this.secondary, this.primary)
     strip.append(dialogue, actions)
-    root.append(strip)
+    this.lookHint = el('p', 'look-hint', 'Drag to look around')
+    this.lookHint.dataset.id = 'look-hint'
+    this.lookHint.hidden = true
+    root.append(this.lookHint, strip)
     this.root = root
     this.strip = strip
   }
 
+  /** The player turned the head: the hint has done its job, for good. */
+  lookUsed(): void {
+    this.retireLookHint()
+  }
+
+  private retireLookHint(): void {
+    this.lookHint.hidden = true
+    if (this.lookHintDone) return
+    this.lookHintDone = true
+    try {
+      localStorage.setItem(LOOK_HINT_KEY, '1')
+    } catch {
+      // storage blocked: the hint may show again next session
+    }
+  }
+
   render(state: GameState): void {
     const c = state.current
+    if (!this.lookHintDone) {
+      if (!c && state.day.phase === 'open') {
+        this.lookHint.hidden = false
+        this.lookHintShown = true
+      } else if (this.lookHintShown) {
+        this.retireLookHint()
+      }
+    }
     this.speaker.hidden = !c
     if (c) {
       setText(this.name, c.customer.name)

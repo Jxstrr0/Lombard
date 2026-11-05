@@ -50,7 +50,7 @@ Done when: the simulator shows a careful policy growing ~15%/month and a careles
 - Lock the room layout with Colby from preview-bake screenshots before dressing it (layout changes after this mean rebakes).
 - Dress the shop: CC0 props, Poly Haven / ambientCG materials, deliberate clutter and slight misalignment (scripted jitter) so it doesn't look procedurally tidy.
 - Lighting pass with Colby on preview bakes (warmth, window light, dark corners), then one full bake. Glass cases, shelves, lamp, window with a canal backdrop card.
-- First 30 items as real CC0 glb assets (or retextured CC0 bases), Draco + KTX2 pipeline.
+- First 30 items as real models, Draco + KTX2 pipeline. Decided Nov 5: scripted in Blender (`art/items/`), since CC0 sources had almost nothing usable. Pipeline and coins (4/30) built; the other kinds follow one PR each.
 - Customer representation decided (Plan A rigged models vs Plan B portrait cards) after a 1-day test of what CC0 humanoids look like in-scene on phone.
 - Audio: ambience, door, counter, tools.
 - Quality tiers wired and measured on a real mid-range Android.

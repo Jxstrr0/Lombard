@@ -29,6 +29,7 @@ import { CameraRig } from './render/camera'
 import { PerfOverlay, TIER_SETTINGS, TierBenchmark, initialTier } from './render/perf'
 import { ShopScene } from './render/scene'
 import { ItemStage } from './render/stage'
+import { createItemLoader } from './render/loaders'
 import { Ui } from './ui/bind'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
@@ -108,9 +109,16 @@ async function boot(): Promise<void> {
     if (!renderer) return
     canvasHost.appendChild(renderer.domElement)
     const { runGallery } = await import('./render/gallery')
-    await runGallery(renderer, envUrl, () => {
-      window.__lombardReady = true
-    })
+    const loader = params.get('noglb') === '1' ? null : createItemLoader(renderer, import.meta.env.BASE_URL, __BUILD_SHA__)
+    await runGallery(
+      renderer,
+      envUrl,
+      loader?.load,
+      () => {
+        window.__lombardReady = true
+      },
+      params.get('item') ?? undefined,
+    )
     return
   }
 
@@ -149,7 +157,9 @@ async function boot(): Promise<void> {
 
   const shop = new ShopScene()
   const rig = new CameraRig()
-  const stage = new ItemStage(shop.scene, shop.matPoint)
+  // ?noglb=1 keeps every item on its procedural placeholder (for comparing against the scripted models).
+  const itemLoader = params.get('noglb') === '1' ? null : createItemLoader(renderer, import.meta.env.BASE_URL, __BUILD_SHA__)
+  const stage = new ItemStage(shop.scene, shop.matPoint, itemLoader?.load)
 
   // --- UI --------------------------------------------------------------------
   const ui = new Ui(app, {

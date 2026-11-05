@@ -44,13 +44,13 @@ Done when: a tester can play 5 days on a phone, lose money on fakes, and make mo
 
 Done when: the simulator shows a careful policy growing ~15%/month and a careless one busting by day 40.
 
-## M3 — Real art pass (status: in progress. Task 1, the bake pipeline, is done: Colby triggered bake #5 from the GitHub app and it deployed as build 6c45ea1. Next: lock the room layout)
+## M3 — Real art pass (status: in progress. Task 1, the bake pipeline, is done: Colby triggered bake #5 from the GitHub app and it deployed as build 6c45ea1. The 30 item models are done (PRs #7–#12). Next: lock the room layout)
 
 - **First task: bake pipeline end to end on a grey box.** `bake/layout.json` with the placeholder room, `bake/bake.py`, and `.github/workflows/bake.yml` (download + cache Blender, preview and full quality, gltf-transform optimize, commit outputs). Wire the lightmap into `scene.ts` on `uv1`. Done when a preview bake triggered from the GitHub mobile app lands in the deployed build. ✅ Done (bake #5 → 6c45ea1).
 - Lock the room layout with Colby from preview-bake screenshots before dressing it (layout changes after this mean rebakes).
 - Dress the shop: CC0 props, Poly Haven / ambientCG materials, deliberate clutter and slight misalignment (scripted jitter) so it doesn't look procedurally tidy.
 - Lighting pass with Colby on preview bakes (warmth, window light, dark corners), then one full bake. Glass cases, shelves, lamp, window with a canal backdrop card.
-- First 30 items as real models, Draco + KTX2 pipeline. Decided Nov 5: scripted in Blender (`art/items/`), since CC0 sources had almost nothing usable. Pipeline and coins (4/30) built; the other kinds follow one PR each.
+- First 30 items as real models, Draco + KTX2 pipeline. Decided Nov 5: scripted in Blender (`art/items/`), since CC0 sources had almost nothing usable. **Done:** all 30 defs have a scripted glb (coins #7, gold #8, watches #9, militaria #10, phones #11, cameras #12). Review any one on the phone with `?gallery=1&item=<id>`.
 - Customer representation decided (Plan A rigged models vs Plan B portrait cards) after a 1-day test of what CC0 humanoids look like in-scene on phone.
 - Audio: ambience, door, counter, tools.
 - Quality tiers wired and measured on a real mid-range Android.

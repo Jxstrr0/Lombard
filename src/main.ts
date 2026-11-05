@@ -19,7 +19,7 @@ import './style.css'
 import * as THREE from 'three'
 import { AudioEngine } from './audio/engine'
 import { cuesFor } from './audio/cues'
-import { loadSoundSettings } from './audio/settings'
+import { loadSoundSettings, saveSoundSettings, type SoundSettings } from './audio/settings'
 import { tuning } from './data/tuning'
 import { AUTOSAVE_ACTIONS, reducer } from './game/actions'
 import { ITEM_DEFS } from './data/items'
@@ -171,7 +171,8 @@ async function boot(): Promise<void> {
 
   // --- audio -----------------------------------------------------------------
   // Nothing is created or fetched until the first gesture (mobile autoplay rules).
-  const audio = new AudioEngine(import.meta.env.BASE_URL, loadSoundSettings())
+  let sound: SoundSettings = loadSoundSettings()
+  const audio = new AudioEngine(import.meta.env.BASE_URL, sound)
   for (const type of ['pointerup', 'touchend', 'click', 'keydown'] as const) {
     window.addEventListener(type, () => audio.gesture(), { capture: true, passive: true })
   }
@@ -214,6 +215,13 @@ async function boot(): Promise<void> {
         // storage blocked: the choice lasts for this session only
       }
       store.dispatch({ type: 'settings/set', patch: { reduceMotion: on } })
+    },
+    getSound: () => sound,
+    setSound: (patch) => {
+      sound = { ...sound, ...patch }
+      saveSoundSettings(sound)
+      audio.apply(sound)
+      audio.gesture()
     },
   })
 

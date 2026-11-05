@@ -1906,6 +1906,11 @@ html {
   cursor: pointer;
 }
 
+.segment:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .segment.is-selected {
   border-color: var(--lilac);
   box-shadow: inset 0 0 0 1px var(--lilac);

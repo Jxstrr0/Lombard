@@ -48,6 +48,7 @@
       "The students are buying film cameras again. You can sell it to a student."
     ],
     "model": {
+      "glb": "camera_zenit_e.glb",
       "placeholder": "camera",
       "color": "#bdbdb8",
       "scale": 1,
@@ -109,6 +110,7 @@
       "With this camera I took the photos for my wedding. Then the marriage ended. Camera works fine."
     ],
     "model": {
+      "glb": "camera_kanon_ae2.glb",
       "placeholder": "camera",
       "color": "#2a2a2a",
       "scale": 1,
@@ -170,6 +172,7 @@
       "Perfect glass. I looked through it at the sun. Well, not at the sun."
     ],
     "model": {
+      "glb": "lens_helios_44.glb",
       "placeholder": "lens",
       "color": "#2a2a2c",
       "scale": 1,
@@ -234,6 +237,7 @@
       "I had an offer from a man in Moscow, but I prefer to sell locally."
     ],
     "model": {
+      "glb": "camera_weissler_iiic.glb",
       "placeholder": "camera",
       "color": "#c9cac6",
       "scale": 1,

@@ -193,5 +193,132 @@
         { "id": "bottom", "label": "Bottom edge", "position": [0, -0.0626, 0] }
       ]
     }
+  },
+  {
+    "id": "phone_galaxia_nota3",
+    "category": "phones",
+    "name": "Galaxia Nota 3",
+    "brand": "Galaxia",
+    "era": "2013",
+    "baseValue": { "min": 12000, "max": 17000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 168, "tolerance": 6 },
+    "magnetic": true,
+    "rarity": 1.3,
+    "fakeChance": 0.35,
+    "tells": [
+      { "id": "screen", "tool": "loupe", "finding": "Bright, even pixels right to the edge; the glass sits flush with the frame.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "screen" },
+      { "id": "logo", "tool": "loupe", "finding": "GALAXIA printed sharp on the back, the letters evenly spaced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "logo" },
+      { "id": "battery", "tool": "loupe", "finding": "Under the cover: a battery with a hologram sticker and a matching model code.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "battery" },
+      { "id": "stylus", "tool": "loupe", "finding": "The stylus clicks firmly into its slot; its tip is worn from use.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "stylus" },
+      { "id": "heft", "tool": "scale", "finding": "Big but balanced; the weight sits low, around the battery.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_cover", "tool": "magnet", "finding": "Held to the edge, the magnet makes the screen think a cover closed: it dims, then wakes.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "screen" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "clone",
+        "kind": "fake",
+        "valueMultiplier": 0.06,
+        "weight": 2.5,
+        "weightFactor": 0.82,
+        "tells": [
+          { "id": "screen", "tool": "loupe", "finding": "The screen is dim and grainy, the icons a touch too large for it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "screen" },
+          { "id": "battery", "tool": "loupe", "finding": "No hologram on the battery, and the model code has a typo in it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "battery" },
+          { "id": "heft", "tool": "scale", "finding": "Light and hollow-feeling for a phone this big.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "magnet_cover", "tool": "magnet", "finding": "Held to the edge, the magnet does nothing to the screen at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen" }
+        ]
+      },
+      {
+        "id": "reglued_glass",
+        "kind": "restored",
+        "valueMultiplier": 0.5,
+        "weight": 1.5,
+        "tells": [
+          { "id": "screen", "tool": "loupe", "finding": "A faint gap runs along one edge of the glass, where it was glued back on.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "screen" }
+        ]
+      }
+    ],
+    "demandTags": ["electronics", "phones"],
+    "claims": [
+      "The big Galaxia, with the pen. I bought it for drawing and I never drew.",
+      "My daughter upgraded. This is the old one, practically new.",
+      "Full set, charger and everything. Well, the charger.",
+      "A colleague owed me money and gave me this instead. I'd rather have the money."
+    ],
+    "model": {
+      "placeholder": "phone",
+      "color": "#e9e6df",
+      "scale": 1,
+      "inspectDistance": 0.3,
+      "hotspots": [
+        { "id": "screen", "label": "Screen", "position": [0, 0.01, 0.0041] },
+        { "id": "logo", "label": "Logo", "position": [0, 0.01, -0.0041] },
+        { "id": "battery", "label": "Battery (under cover)", "position": [0, -0.01, -0.0035] },
+        { "id": "stylus", "label": "Stylus slot", "position": [0.022, -0.0626, 0] }
+      ]
+    }
+  },
+  {
+    "id": "phone_severin_k1",
+    "category": "phones",
+    "name": "Severin K1 push-button phone",
+    "brand": "Severin",
+    "era": "2000s",
+    "baseValue": { "min": 800, "max": 1500 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 82, "tolerance": 4 },
+    "magnetic": true,
+    "rarity": 1.8,
+    "fakeChance": 0.2,
+    "tells": [
+      { "id": "logo", "tool": "loupe", "finding": "SEVERIN stamped into the back cover, the letters crisp, the plastic slightly textured.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "logo" },
+      { "id": "screen", "tool": "loupe", "finding": "The small screen is scratched but sharp; the backlight is an even pale green.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "screen" },
+      { "id": "battery", "tool": "loupe", "finding": "Under the cover: a fat battery with the maker's label and a serial sticker matching the body.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "battery" },
+      { "id": "heft", "tool": "scale", "finding": "Light, but dense, like a bar of soap.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_speaker", "tool": "magnet", "finding": "The magnet tugs at the earpiece and nowhere else.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "screen" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "clone",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "weightFactor": 0.8,
+        "tells": [
+          { "id": "logo", "tool": "loupe", "finding": "The logo is painted on and reads SEVERlN, with a lowercase l.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "logo" },
+          { "id": "battery", "tool": "loupe", "finding": "The battery label promises an absurd capacity and has no serial.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "battery" },
+          { "id": "heft", "tool": "scale", "finding": "Lighter than it looks; it rattles when shaken.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "new_housing",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          { "id": "logo", "tool": "loupe", "finding": "The back cover is glossy and new; the screws holding the body are scratched and old.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "logo" },
+          { "id": "battery", "tool": "loupe", "finding": "The serial sticker under the battery doesn't match the one on the cover.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "battery" }
+        ]
+      }
+    ],
+    "demandTags": ["electronics", "phones"],
+    "claims": [
+      "The battery lasts a week. You can hammer nails with it.",
+      "My grandmother won't use it. She wants a touch screen now, like everyone.",
+      "It's from the building site. The foreman left it. He doesn't need it.",
+      "Indestructible. I dropped it in the canal once, and it rang."
+    ],
+    "model": {
+      "placeholder": "phone",
+      "color": "#3a3a3a",
+      "scale": 0.85,
+      "inspectDistance": 0.28,
+      "hotspots": [
+        { "id": "screen", "label": "Screen", "position": [0, 0.02, 0.0041] },
+        { "id": "logo", "label": "Logo", "position": [0, 0.01, -0.0041] },
+        { "id": "battery", "label": "Battery (under cover)", "position": [0, -0.012, -0.0035] },
+        { "id": "bottom", "label": "Bottom edge", "position": [0, -0.0626, 0] }
+      ]
+    }
   }
 ]

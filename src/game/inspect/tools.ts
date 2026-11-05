@@ -172,6 +172,24 @@ const CONDITION_TEXT: Record<string, Record<Band, string>> = {
     worn: 'Scuffed corners and a long scratch across the screen.',
     poor: 'A cracked screen corner, a dented frame, buttons worn shiny.',
   },
+  cameras: {
+    mint: 'Chrome bright, leatherette intact, the glass clean.',
+    good: 'Light brassing on the corners; the controls turn smoothly.',
+    worn: 'Worn chrome, a scuffed body, a speck of haze in the glass.',
+    poor: 'Dented edges, peeling leatherette, a stiff dial and hazy glass.',
+  },
+  militaria: {
+    mint: 'Crisp edges, the high points barely touched.',
+    good: 'Light wear on the high points; the details hold.',
+    worn: 'Rubbed smooth in places, with small knocks on the rim.',
+    poor: 'Deep scratches, a bent edge, the detail worn nearly flat.',
+  },
+  coins: {
+    mint: 'Full lustre, not a mark on the high points.',
+    good: 'Light wear on the highest points; the fine detail holds.',
+    worn: 'Worn flat on the high points, with a few rim knocks.',
+    poor: 'Worn smooth, scratched, the date barely legible.',
+  },
 }
 const CONDITION_FALLBACK = CONDITION_TEXT.gold!
 
@@ -192,6 +210,13 @@ const WEIGHT_SUBJECT: Record<ItemDef['model']['placeholder'], string> = {
   earrings: 'A solid pair like this usually weighs',
   watch: 'This model usually weighs',
   phone: 'This model usually weighs',
+  pendant: 'A solid pendant this size usually weighs',
+  camera: 'This model usually weighs',
+  lens: 'This lens usually weighs',
+  medal: 'An original of this award usually weighs',
+  order: 'An original of this award usually weighs',
+  badge: 'An original of this badge usually weighs',
+  coin: 'A coin of this issue weighs',
 }
 
 function scaleReading(def: ItemDef, item: ItemInstance, rng: Rng, first: boolean): Omit<Finding, 'id' | 'tool'> {
@@ -228,8 +253,12 @@ function magnetFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Fin
   let text: string
   if (def.category === 'watches') {
     text = pulls ? 'The case itself tugs toward the magnet.' : 'The case ignores the magnet.'
-  } else if (def.category === 'gold') {
+  } else if (def.category === 'gold' || def.category === 'coins') {
     text = pulls ? 'It jumps to the magnet and holds on.' : 'No pull at all from the magnet.'
+  } else if (def.category === 'militaria') {
+    text = pulls ? 'The whole piece swings toward the magnet.' : 'The piece itself ignores the magnet.'
+  } else if (def.category === 'cameras') {
+    text = pulls ? 'The magnet catches on steel somewhere inside the body.' : 'Nothing; brass and aluminium all through.'
   } else {
     text = pulls ? 'It pulls toward the magnet.' : 'No pull from the magnet.'
   }

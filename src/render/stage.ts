@@ -16,7 +16,7 @@ import { fakeProfileOf } from '../game/items/generate'
 import type { Hotspot, ItemDef, ToolId } from '../game/schema/item'
 import type { GameState } from '../game/state'
 import { INSPECT_POINT, type CameraRig } from './camera'
-import { ItemModels } from './items'
+import { ItemModels, specOf } from './items'
 import { contactShadowTexture } from './textures'
 
 const COUNTER_READ_SIZE = 0.09
@@ -278,13 +278,7 @@ export class ItemStage {
       console.warn('[stage] unknown item def', defId, err)
       return
     }
-    const model = this.models.get(def.id, {
-      placeholder: def.model.placeholder,
-      color: def.model.color,
-      scale: def.model.scale,
-      brand: def.brand,
-      hotspots: def.model.hotspots,
-    })
+    const model = this.models.get(def.id, specOf(def))
     model.position.set(0, 0, 0)
     model.quaternion.identity()
     model.updateMatrixWorld(true)

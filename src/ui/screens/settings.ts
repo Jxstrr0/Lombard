@@ -1,8 +1,10 @@
 /**
  * Settings sheet (Longlight palette): save code copy/load, new career,
- * reduce motion, text size. Loading a code and starting over both ask for
+ * sound and ambience level, reduce motion, text size. Loading a code and starting over both ask for
  * confirmation inline (no browser dialogs).
  */
+import type { SoundSettings } from '../../audio/settings'
+import { AMBIENCE_LEVELS } from '../../data/audio'
 import type { Action } from '../../game/actions'
 import { decodeSaveCode, encodeSaveCode, SaveCodeError } from '../../game/save/code'
 import type { GameState } from '../../game/state'
@@ -18,6 +20,9 @@ export interface SettingsDeps {
   newCareer(): void
   /** Persist and apply the reduce-motion override. */
   setReduceMotion(on: boolean): void
+  /** Device sound settings (localStorage, not the career). */
+  getSound(): SoundSettings
+  setSound(patch: Partial<SoundSettings>): void
 }
 
 export const TEXT_SCALES = [
@@ -40,6 +45,8 @@ export class SettingsSheet {
   private newConfirm: HTMLElement
   private newConfirmText: HTMLElement
   private motion: HTMLButtonElement
+  private sound: HTMLButtonElement
+  private ambience: HTMLButtonElement[] = []
   private sizes: HTMLButtonElement[] = []
   private onClose: (() => void) | null = null
 
@@ -121,6 +128,35 @@ export class SettingsSheet {
     this.newConfirm.append(this.newConfirmText, newActions)
     newSec.append(newBtn, this.newConfirm)
 
+    // --- sound
+    const soundSec = this.section('Sound', '')
+    this.sound = el('button', 'switch')
+    this.sound.type = 'button'
+    this.sound.dataset.id = 'sound'
+    this.sound.setAttribute('role', 'switch')
+    this.sound.innerHTML = '<span class="switch-label">Sound</span><span class="switch-track"><span class="switch-thumb"></span></span><span class="switch-state"></span>'
+    this.sound.addEventListener('click', () => {
+      this.deps.setSound({ enabled: !this.deps.getSound().enabled })
+      this.render(this.deps.getState())
+    })
+    const ambLabel = el('div', 'settings-label', 'Street and canal outside')
+    const ambRow = el('div', 'segmented')
+    ambRow.setAttribute('role', 'radiogroup')
+    ambRow.setAttribute('aria-label', 'Street and canal outside')
+    for (const l of AMBIENCE_LEVELS) {
+      const b = el('button', 'segment', l.label)
+      b.type = 'button'
+      b.dataset.id = `ambience-${Math.round(l.value * 100)}`
+      b.setAttribute('role', 'radio')
+      b.addEventListener('click', () => {
+        this.deps.setSound({ ambience: l.value })
+        this.render(this.deps.getState())
+      })
+      this.ambience.push(b)
+      ambRow.append(b)
+    }
+    soundSec.append(this.sound, ambLabel, ambRow)
+
     // --- comfort
     const comfort = this.section('Comfort', '')
     this.motion = el('button', 'switch')
@@ -149,7 +185,7 @@ export class SettingsSheet {
     comfort.append(this.motion, sizeLabel, sizeRow)
 
     const foot = el('p', 'settings-foot', `Lombard · build ${__BUILD_SHA__} · ${__BUILD_DATE__} · A Longlight Interactive game`)
-    sheet.append(head, copySec, loadSec, newSec, comfort, foot)
+    sheet.append(head, copySec, loadSec, newSec, soundSec, comfort, foot)
     root.append(sheet)
     this.root = root
     this.sheet = sheet
@@ -183,6 +219,16 @@ export class SettingsSheet {
     this.motion.setAttribute('aria-checked', String(rm))
     this.motion.classList.toggle('is-on', rm)
     setText(this.motion.querySelector<HTMLElement>('.switch-state')!, rm ? 'On' : 'Off')
+    const snd = this.deps.getSound()
+    this.sound.setAttribute('aria-checked', String(snd.enabled))
+    this.sound.classList.toggle('is-on', snd.enabled)
+    setText(this.sound.querySelector<HTMLElement>('.switch-state')!, snd.enabled ? 'On' : 'Off')
+    for (const [i, b] of this.ambience.entries()) {
+      const on = AMBIENCE_LEVELS[i]!.value === snd.ambience
+      b.classList.toggle('is-selected', on)
+      b.setAttribute('aria-checked', String(on))
+      b.disabled = !snd.enabled
+    }
     const scale = state.settings.textScale
     for (const [i, b] of this.sizes.entries()) {
       const on = Math.abs(TEXT_SCALES[i]!.value - scale) < 0.01

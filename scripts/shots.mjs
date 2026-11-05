@@ -188,7 +188,9 @@ async function playPortrait(page, h) {
   await h.click('set-estimate')
   await page.waitForTimeout(200)
   await h.click('chip-40')
-  await h.shot('offer', 'offer step 2: chips, approaches, Offer')
+  // Pawn loans: the first pawner's offer pad is shot in loan mode (here, or later in the queue).
+  let pawnShot = s0.current?.wants === 'pawn'
+  await h.shot('offer', pawnShot ? 'offer step 2, pawn mode: Loan amount, terms (due date, rate, owed), Lend' : 'offer step 2: chips, approaches, Offer')
   await h.click('approach-evidence')
   await page.waitForTimeout(200)
   await h.shot('offer-evidence', 'evidence picker: cite a finding')
@@ -213,6 +215,21 @@ async function playPortrait(page, h) {
     const s = await h.state()
     if (!s.current) break
     const kind = kindOf(s.current.item.defId)
+    if (!pawnShot && s.current.wants === 'pawn') {
+      pawnShot = true
+      await h.click('inspect')
+      await h.screen('inspect')
+      await h.click('inspect-done')
+      await h.screen('offer')
+      await typeNumber(h, 6000)
+      await h.click('set-estimate')
+      await h.click('chip-40')
+      await h.shot('offer-pawn', 'offer pad in pawn mode: Loan amount, terms (due date, rate, owed), Lend')
+      await haggleOn(h)
+      await h.screen('counter')
+      await h.click('dismiss')
+      continue
+    }
     if (shotKinds.has(kind) && k !== 1) {
       await h.click('pass')
       await h.click('dismiss')
@@ -241,6 +258,12 @@ async function playPortrait(page, h) {
   await h.screen('ledger')
   await page.waitForTimeout(300)
   await h.shot('ledger', 'ledger: day summary, log, stock with Sell to dealer')
+  if ((await h.state()).loans.length > 0) {
+    await page.evaluate(() => document.querySelector('[data-id="ledger-loans"]')?.scrollIntoView({ block: 'center' }))
+    await page.waitForTimeout(150)
+    await h.shot('ledger-loans', 'ledger: open pawn loans (customer, item, lent, owed, due, days left) and LOAN entries')
+    await page.evaluate(() => document.querySelector('.ledger-scroll')?.scrollTo(0, 0))
+  }
   const sell = page.locator('[data-id^="sell-"]:visible').first()
   if ((await sell.count()) > 0) {
     await sell.click()
@@ -361,6 +384,20 @@ async function main() {
       const { context, page } = await newPage(browser, { name: 'gallery', width: 1000, height: 1250, deviceScaleFactor: 1 }, '?gallery=1')
       await page.screenshot({ path: `${OUT}/gallery.png` })
       out.push(`${OUT}/gallery.png  every item def's placeholder model, front + back, hotspots as pink beads`)
+      await context.close()
+    }
+    {
+      // Dev scenario: a pawner back for a 12-day-old loan is first in line.
+      const { context, page } = await newPage(browser, PORTRAIT, '?seed=1&scenario=redeem')
+      const h = helpers(page, 'redeem')
+      await page.waitForFunction(() => ['news', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) === 'news') await h.click('news-done')
+      await h.screen('counter')
+      await h.click('next-customer')
+      await h.screen('redeem')
+      await page.waitForTimeout(600)
+      await h.shot('redeem', 'redeem visit: who, item, pawn ticket (lent + interest = total), Take X, hand it over')
+      out.push(...h.shots)
       await context.close()
     }
     {

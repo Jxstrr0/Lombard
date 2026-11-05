@@ -1,0 +1,153 @@
+/* Pawn loans (owner: loans worker): counter badge, offer terms, redeem ticket, ledger loans. */
+
+.loan-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(180, 140, 232, 0.16);
+  border: 1px solid rgba(180, 140, 232, 0.45);
+  color: var(--lilac);
+}
+
+/* Offer screen, pawn mode: a pawn-ticket strip under the price tag */
+.loan-terms {
+  margin-top: -2px;
+  padding: 5px 12px;
+  border: 1px dashed rgba(239, 231, 212, 0.35);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--paper);
+}
+
+/* Redeem: the pawn ticket */
+.pawn-ticket {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3px 12px;
+  margin: 10px 0 0;
+  padding: 9px 12px;
+  background: linear-gradient(var(--paper), var(--paper-shade));
+  color: var(--ink);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+}
+
+.pawn-ticket dt,
+.pawn-ticket dd {
+  margin: 0;
+}
+
+.pawn-ticket dd {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pawn-ticket .total {
+  margin-top: 3px;
+  padding-top: 5px;
+  border-top: 1px dashed rgba(42, 36, 28, 0.45);
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+/* Ledger: open loans */
+.loan-totals {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 0 6px;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+.loan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.loan-row {
+  padding: 7px 0;
+  border-bottom: 1px dotted rgba(42, 36, 28, 0.3);
+}
+
+.loan-head,
+.loan-money {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.loan-who {
+  font-weight: 600;
+}
+
+.loan-item {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.loan-money {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.loan-owed {
+  font-weight: 600;
+}
+
+.loan-due {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.loan-due.is-late {
+  color: var(--ink-red);
+  font-weight: 600;
+}
+
+.log-loan .log-amt {
+  color: var(--ink-red);
+}
+
+.log-redeem .log-amt {
+  color: var(--ink-green);
+}
+
+/* Short landscape: the terms sit beside the price tag, one fact per line. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .offer-screen.is-pawn:not(.is-estimating) .offer-panel {
+    grid-template-areas:
+      'ask ask'
+      'est est'
+      'tag terms'
+      'pad appr'
+      'pad act';
+  }
+
+  .loan-terms {
+    grid-area: terms;
+    margin: 0;
+    padding: 3px 8px;
+    font-size: 0.625rem;
+    line-height: 1.25;
+  }
+
+  .loan-terms-part {
+    display: block;
+  }
+
+  .loan-terms-sep {
+    display: none;
+  }
+}

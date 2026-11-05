@@ -11,7 +11,7 @@
 import { getItemDef } from '../data/items'
 import { pickLine, visitLines } from '../data/lines'
 import { tuning } from '../data/tuning'
-import { dealerPrice } from './appraise/value'
+import { claimedValue, dealerPrice } from './appraise/value'
 import { generateDayQueue } from './customers/walkins'
 import { haggleRound, startHaggle, type HaggleContext } from './haggle/machine'
 import { useTool } from './inspect/tools'
@@ -151,7 +151,13 @@ function log(state: GameState, entry: LedgerEntry): GameState {
 
 function haggleContext(state: GameState): HaggleContext | null {
   if (!state.current || !state.inspect) return null
-  return { customer: state.current.customer, item: state.current.item, findings: state.inspect.findings }
+  const item = state.current.item
+  return {
+    customer: state.current.customer,
+    item,
+    claimedValue: claimedValue(getItemDef(item.defId), item),
+    findings: state.inspect.findings,
+  }
 }
 
 // --- day ----------------------------------------------------------------------

@@ -9,6 +9,8 @@ import type { Approach, Finding, HaggleResponse, HaggleState, ItemInstance, Walk
 export interface HaggleContext {
   customer: WalkIn
   item: ItemInstance
+  /** What it would be worth if genuine (appraise/value.ts claimedValue). Customers anchor on this. */
+  claimedValue: number
   /** Findings revealed during inspection (evidence candidates). */
   findings: readonly Finding[]
 }
@@ -21,7 +23,7 @@ export interface HaggleMove {
 }
 
 export function startHaggle(ctx: HaggleContext, rng: Rng): HaggleState {
-  const ask = Math.round((ctx.item.trueValue * rng.range(0.7, 1.1)) / 100) * 100
+  const ask = Math.round((ctx.claimedValue * rng.range(0.7, 1.1)) / 100) * 100
   return { ask, floor: Math.round(ask * 0.6), round: 0, maxRounds: tuning.haggle.maxRounds, irritation: 0, status: 'open', history: [] }
 }
 

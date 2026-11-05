@@ -1,0 +1,437 @@
+/**
+ * M0 placeholder shop: a boxy room from primitives, lit by a Poly Haven HDRI
+ * environment plus at most two real-time lights (counter lamp, window fill).
+ * No real-time shadows. In M3 this is replaced by the baked shop.glb.
+ *
+ * Coordinates (metres): x across the shop (-3..3), z from the back wall
+ * behind the player (-4) to the street wall (+4), y up. The player stands
+ * behind the counter at z ≈ -2.9 looking towards the street.
+ */
+import * as THREE from 'three'
+import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
+import type { GameState } from '../game/state'
+import { canalBackdropTexture, contactShadowTexture, parquetTexture, plasterTexture } from './textures'
+
+const ROOM = { halfW: 3, halfD: 4, height: 4.2 }
+const COUNTER = { z: -2.25, width: 3.2, depth: 0.7, baseH: 0.66, caseH: 0.28 }
+
+export interface SceneOptions {
+  envUrl: string
+}
+
+export class ShopScene {
+  readonly scene = new THREE.Scene()
+  private customer: THREE.Group
+  private customerFade = 0
+  private customerTarget = 0
+  private disposables: { dispose(): void }[] = []
+
+  constructor() {
+    this.scene.background = new THREE.Color('#0d0c0b')
+    this.buildRoom()
+    this.buildCounter()
+    this.buildWallCases()
+    this.buildWindowAndDoor()
+    this.buildFixtures()
+    this.buildLights()
+    this.customer = this.buildCustomer()
+  }
+
+  /** Load the HDRI and set it as the scene environment (reflections + ambient). */
+  async loadEnvironment(renderer: THREE.WebGLRenderer, opts: SceneOptions): Promise<void> {
+    const hdr = await new HDRLoader().loadAsync(opts.envUrl)
+    hdr.mapping = THREE.EquirectangularReflectionMapping
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    const env = pmrem.fromEquirectangular(hdr).texture
+    hdr.dispose()
+    pmrem.dispose()
+    this.scene.environment = env
+    this.scene.environmentIntensity = 0.55
+    this.disposables.push(env)
+  }
+
+  /** Sync render-owned objects to game state. Never mutates state. */
+  sync(state: GameState): void {
+    this.customerTarget = state.current ? 1 : 0
+  }
+
+  update(dt: number): void {
+    const speed = 3
+    this.customerFade += (this.customerTarget - this.customerFade) * Math.min(1, dt * speed)
+    this.customer.visible = this.customerFade > 0.01
+    this.customer.position.z = -1.45 + (1 - this.customerFade) * 0.6
+    for (const child of this.customer.children) {
+      const mat = (child as THREE.Mesh).material as THREE.MeshStandardMaterial
+      mat.opacity = this.customerFade
+    }
+  }
+
+  dispose(): void {
+    this.scene.traverse((o) => {
+      const mesh = o as THREE.Mesh
+      if (mesh.isMesh) {
+        mesh.geometry.dispose()
+        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+        for (const m of mats) m.dispose()
+      }
+    })
+    for (const d of this.disposables) d.dispose()
+  }
+
+  // ---------------------------------------------------------------------------
+
+  private track<T extends { dispose(): void }>(thing: T): T {
+    this.disposables.push(thing)
+    return thing
+  }
+
+  private box(
+    w: number,
+    h: number,
+    d: number,
+    mat: THREE.Material,
+    x: number,
+    y: number,
+    z: number,
+    parent: THREE.Object3D = this.scene,
+  ): THREE.Mesh {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat)
+    mesh.position.set(x, y, z)
+    parent.add(mesh)
+    return mesh
+  }
+
+  private buildRoom(): void {
+    const { halfW, halfD, height } = ROOM
+    const floorMat = new THREE.MeshStandardMaterial({
+      map: this.track(parquetTexture()),
+      roughness: 0.62,
+      metalness: 0,
+    })
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(halfW * 2, halfD * 2), floorMat)
+    floor.rotation.x = -Math.PI / 2
+    this.scene.add(floor)
+
+    const plaster = this.track(plasterTexture())
+    const wallMat = new THREE.MeshStandardMaterial({ map: plaster, roughness: 0.95, color: '#f2ead8' })
+    const walls: [number, number, number, number, number][] = [
+      // width, x, z, rotY, (unused)
+      [halfD * 2, -halfW, 0, Math.PI / 2, 0],
+      [halfD * 2, halfW, 0, -Math.PI / 2, 0],
+      [halfW * 2, 0, -halfD, 0, 0],
+    ]
+    for (const [w, x, z, ry] of walls) {
+      const wall = new THREE.Mesh(new THREE.PlaneGeometry(w, height), wallMat)
+      wall.position.set(x, height / 2, z)
+      wall.rotation.y = ry
+      this.scene.add(wall)
+    }
+
+    // Front (street) wall, built around the window and door openings.
+    const front = new THREE.Shape()
+    front.moveTo(-halfW, 0)
+    front.lineTo(halfW, 0)
+    front.lineTo(halfW, height)
+    front.lineTo(-halfW, height)
+    front.lineTo(-halfW, 0)
+    const windowHole = new THREE.Path()
+    windowHole.moveTo(-2.5, 0.85)
+    windowHole.lineTo(0.5, 0.85)
+    windowHole.lineTo(0.5, 3.25)
+    windowHole.lineTo(-2.5, 3.25)
+    windowHole.lineTo(-2.5, 0.85)
+    const doorHole = new THREE.Path()
+    doorHole.moveTo(1.1, 0)
+    doorHole.lineTo(2.3, 0)
+    doorHole.lineTo(2.3, 2.4)
+    doorHole.lineTo(1.1, 2.4)
+    doorHole.lineTo(1.1, 0)
+    front.holes.push(windowHole, doorHole)
+    const frontGeo = new THREE.ShapeGeometry(front)
+    // ShapeGeometry UVs are in metres; normalise to 0..1 like the other walls.
+    const uv = frontGeo.getAttribute('uv') as THREE.BufferAttribute
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) + halfW) / (halfW * 2), uv.getY(i) / height)
+    const frontWall = new THREE.Mesh(frontGeo, wallMat)
+    frontWall.position.z = halfD
+    frontWall.rotation.y = Math.PI
+    frontWall.scale.x = -1 // keep the hole layout in world-x after the flip
+    this.scene.add(frontWall)
+
+    const ceiling = new THREE.Mesh(
+      new THREE.PlaneGeometry(halfW * 2, halfD * 2),
+      new THREE.MeshStandardMaterial({ color: '#c9c1b0', roughness: 1 }),
+    )
+    ceiling.rotation.x = Math.PI / 2
+    ceiling.position.y = height
+    this.scene.add(ceiling)
+
+    // Painted lower walls (oil-paint dado, typical of old ground-floor shops)
+    const dadoMat = new THREE.MeshStandardMaterial({ color: '#33473f', roughness: 0.45 })
+    const dadoH = 1.15
+    const dadoL = new THREE.Mesh(new THREE.PlaneGeometry(halfD * 2, dadoH), dadoMat)
+    dadoL.position.set(-halfW + 0.005, dadoH / 2, 0)
+    dadoL.rotation.y = Math.PI / 2
+    const dadoR = dadoL.clone()
+    dadoR.position.x = halfW - 0.005
+    dadoR.rotation.y = -Math.PI / 2
+    const dadoB = new THREE.Mesh(new THREE.PlaneGeometry(halfW * 2, dadoH), dadoMat)
+    dadoB.position.set(0, dadoH / 2, -halfD + 0.005)
+    this.scene.add(dadoL, dadoR, dadoB)
+    const railMat = new THREE.MeshStandardMaterial({ color: '#1f2b26', roughness: 0.5 })
+    this.box(0.03, 0.04, halfD * 2, railMat, -halfW + 0.015, dadoH, 0)
+    this.box(0.03, 0.04, halfD * 2, railMat, halfW - 0.015, dadoH, 0)
+
+    // Skirting boards
+    const skirtMat = new THREE.MeshStandardMaterial({ color: '#2a1c14', roughness: 0.7 })
+    this.box(0.03, 0.14, halfD * 2, skirtMat, -halfW + 0.015, 0.07, 0)
+    this.box(0.03, 0.14, halfD * 2, skirtMat, halfW - 0.015, 0.07, 0)
+    this.box(halfW * 2, 0.14, 0.03, skirtMat, 0, 0.07, -halfD + 0.015)
+  }
+
+  private buildCounter(): void {
+    const { z, width, depth, baseH, caseH } = COUNTER
+    const wood = new THREE.MeshStandardMaterial({ color: '#3b2417', roughness: 0.55, metalness: 0 })
+    const brass = new THREE.MeshStandardMaterial({ color: '#b08a45', roughness: 0.35, metalness: 1 })
+    const felt = new THREE.MeshStandardMaterial({ color: '#2d3a2c', roughness: 1 })
+    const glass = new THREE.MeshPhysicalMaterial({
+      color: '#dfeee8',
+      roughness: 0.05,
+      metalness: 0,
+      transparent: true,
+      opacity: 0.2,
+      envMapIntensity: 1.6,
+      depthWrite: false,
+    })
+
+    const counter = new THREE.Group()
+    counter.position.z = z
+    this.scene.add(counter)
+
+    // Wooden base with a kick plate
+    this.box(width, baseH, depth, wood, 0, baseH / 2, 0, counter)
+    this.box(width - 0.02, 0.08, depth - 0.06, new THREE.MeshStandardMaterial({ color: '#160e09' }), 0, 0.04, 0.02, counter)
+
+    // Showcase: wooden case walls, felt bed inside, glass top only, brass rim.
+    const top = baseH + caseH
+    const wall = 0.03
+    this.box(width - 2 * wall, 0.02, depth - 2 * wall, felt, 0, baseH + 0.01, 0, counter)
+    for (const sz of [-1, 1]) this.box(width, caseH, wall, wood, 0, baseH + caseH / 2, sz * (depth / 2 - wall / 2), counter)
+    for (const sx of [-1, 1]) this.box(wall, caseH, depth - 2 * wall, wood, sx * (width / 2 - wall / 2), baseH + caseH / 2, 0, counter)
+    const glassTop = this.box(width - 2 * wall, 0.008, depth - 2 * wall, glass, 0, top - 0.006, 0, counter)
+    glassTop.renderOrder = 2
+    const t = 0.02
+    for (const sz of [-1, 1]) this.box(width + 0.01, t, t * 1.6, brass, 0, top, sz * (depth / 2), counter)
+    for (const sx of [-1, 1]) this.box(t * 1.6, t, depth + 0.01, brass, sx * (width / 2), top, 0, counter)
+    // brass corner caps down the customer-side edges
+    for (const sx of [-1, 1]) this.box(t, caseH + baseH - 0.08, t, brass, sx * (width / 2), (caseH + baseH - 0.08) / 2 + 0.08, depth / 2, counter)
+
+    // A few placeholder trinkets under the glass
+    const gold = new THREE.MeshStandardMaterial({ color: '#d4a64a', roughness: 0.25, metalness: 1 })
+    const steel = new THREE.MeshStandardMaterial({ color: '#b9bcbf', roughness: 0.3, metalness: 1 })
+    const ringGeo = new THREE.TorusGeometry(0.035, 0.007, 8, 24)
+    for (let i = 0; i < 5; i++) {
+      const ring = new THREE.Mesh(ringGeo, gold)
+      ring.rotation.x = -Math.PI / 2 + 0.2 * (i % 2)
+      ring.position.set(0.08 + i * 0.09, baseH + 0.03, 0.14 + (i % 2) * 0.06)
+      counter.add(ring)
+    }
+    for (let i = 0; i < 3; i++) {
+      const watch = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.012, 24), steel)
+      watch.position.set(-0.1 - i * 0.13, baseH + 0.027, 0.16 + (i % 2) * 0.05)
+      counter.add(watch)
+    }
+
+    // Rubber counter mat in front of the player, on the glass
+    this.box(0.46, 0.006, 0.32, new THREE.MeshStandardMaterial({ color: '#1c2a24', roughness: 0.9 }), 0, top + 0.012, 0.12, counter)
+
+    // Contact shadow under the counter
+    const shadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(width + 0.7, depth + 0.7),
+      new THREE.MeshBasicMaterial({ map: this.track(contactShadowTexture()), transparent: true, depthWrite: false }),
+    )
+    shadow.rotation.x = -Math.PI / 2
+    shadow.position.set(0, 0.003, z)
+    this.scene.add(shadow)
+  }
+
+  private buildWallCases(): void {
+    const wood = new THREE.MeshStandardMaterial({ color: '#4a2f1e', roughness: 0.6 })
+    const glass = new THREE.MeshStandardMaterial({
+      color: '#cfe0da',
+      roughness: 0.04,
+      transparent: true,
+      opacity: 0.14,
+      envMapIntensity: 1.5,
+      depthWrite: false,
+    })
+    const brass = new THREE.MeshStandardMaterial({ color: '#a8823f', roughness: 0.4, metalness: 1 })
+
+    // Left wall: two tall glazed cases
+    for (const cz of [0.2, 2.0]) {
+      const g = new THREE.Group()
+      g.position.set(-ROOM.halfW + 0.24, 0, cz)
+      this.scene.add(g)
+      this.box(0.46, 0.8, 1.5, wood, 0, 0.4, 0, g)
+      this.box(0.46, 1.2, 1.5, glass, 0, 1.4, 0, g).renderOrder = 2
+      this.box(0.48, 0.06, 1.52, wood, 0, 2.03, 0, g)
+      for (const sy of [1.2, 1.6]) this.box(0.42, 0.01, 1.44, glass, 0, sy, 0, g)
+      // items: placeholder cameras and boxes
+      for (let i = 0; i < 4; i++) {
+        this.box(0.12, 0.08, 0.16, new THREE.MeshStandardMaterial({ color: i % 2 ? '#222' : '#5a5148', roughness: 0.5 }), 0, 0.85, -0.5 + i * 0.32, g)
+      }
+    }
+
+    // Right wall: glass shelves on brass brackets
+    const shelfZ = 1.2
+    for (const [i, sy] of [1.0, 1.45, 1.9].entries()) {
+      this.box(0.36, 0.012, 2.4, glass, ROOM.halfW - 0.2, sy, shelfZ).renderOrder = 2
+      for (const bz of [-1.0, 1.0]) this.box(0.3, 0.03, 0.015, brass, ROOM.halfW - 0.17, sy - 0.02, shelfZ + bz)
+      for (let k = 0; k < 4; k++) {
+        const h = 0.1 + ((i + k) % 3) * 0.06
+        const prop = this.box(
+          0.12,
+          h,
+          0.12,
+          new THREE.MeshStandardMaterial({ color: ['#6b4b2e', '#2f3438', '#8a7a64', '#3c2a3a'][k]!, roughness: 0.5 }),
+          ROOM.halfW - 0.22,
+          sy + h / 2 + 0.008,
+          shelfZ - 0.9 + k * 0.6,
+        )
+        prop.rotation.y = 0.2 * k
+      }
+    }
+    // Contact shadows under the left cases
+    const shadowMat = new THREE.MeshBasicMaterial({ map: this.track(contactShadowTexture()), transparent: true, depthWrite: false })
+    for (const cz of [0.2, 2.0]) {
+      const s = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 2.0), shadowMat)
+      s.rotation.x = -Math.PI / 2
+      s.position.set(-ROOM.halfW + 0.3, 0.003, cz)
+      this.scene.add(s)
+    }
+  }
+
+  private buildWindowAndDoor(): void {
+    const z = ROOM.halfD
+    // Canal backdrop card outside the window (unlit so it reads as daylight)
+    const backdrop = new THREE.Mesh(
+      new THREE.PlaneGeometry(7, 3.5),
+      new THREE.MeshBasicMaterial({ map: this.track(canalBackdropTexture()), toneMapped: false }),
+    )
+    backdrop.position.set(-1, 1.9, z + 1.6)
+    backdrop.rotation.y = Math.PI
+    this.scene.add(backdrop)
+
+    const frame = new THREE.MeshStandardMaterial({ color: '#e7e1d3', roughness: 0.6 })
+    // window frame and mullions
+    const wx0 = -2.5
+    const wx1 = 0.5
+    const wy0 = 0.85
+    const wy1 = 3.25
+    const fw = 0.07
+    this.box(wx1 - wx0, fw, 0.12, frame, (wx0 + wx1) / 2, wy0, z)
+    this.box(wx1 - wx0, fw, 0.12, frame, (wx0 + wx1) / 2, wy1, z)
+    this.box(wx1 - wx0, fw * 0.7, 0.08, frame, (wx0 + wx1) / 2, 2.55, z)
+    for (const x of [wx0, -1.0, wx1]) this.box(fw, wy1 - wy0, 0.12, frame, x, (wy0 + wy1) / 2, z)
+    // sill
+    this.box(wx1 - wx0 + 0.2, 0.04, 0.3, frame, (wx0 + wx1) / 2, wy0 - 0.02, z - 0.12)
+    // shop sign lettering is M3+; a dark strip stands in for the sign board
+    this.box(wx1 - wx0, 0.18, 0.02, new THREE.MeshStandardMaterial({ color: '#2a201a' }), (wx0 + wx1) / 2, wy1 - 0.12, z - 0.05)
+
+    // Door: dark painted wood with a glass panel
+    const doorMat = new THREE.MeshStandardMaterial({ color: '#2c3b35', roughness: 0.55 })
+    const door = new THREE.Group()
+    door.position.set(1.7, 0, z - 0.03)
+    this.scene.add(door)
+    this.box(1.2, 0.9, 0.05, doorMat, 0, 0.45, 0, door)
+    this.box(1.2, 0.35, 0.05, doorMat, 0, 2.225, 0, door)
+    this.box(0.15, 1.15, 0.05, doorMat, -0.525, 1.475, 0, door)
+    this.box(0.15, 1.15, 0.05, doorMat, 0.525, 1.475, 0, door)
+    const doorGlass = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.9, 1.15),
+      new THREE.MeshBasicMaterial({ color: '#c9d2d4', toneMapped: false }),
+    )
+    doorGlass.position.set(0, 1.475, 0.01)
+    doorGlass.rotation.y = Math.PI
+    door.add(doorGlass)
+    this.box(0.04, 0.2, 0.06, new THREE.MeshStandardMaterial({ color: '#b08a45', metalness: 1, roughness: 0.35 }), -0.45, 1.05, -0.04, door)
+  }
+
+  private buildFixtures(): void {
+    // Radiator under the window
+    const radMat = new THREE.MeshStandardMaterial({ color: '#d9d4c7', roughness: 0.5, metalness: 0.2 })
+    const rad = new THREE.Group()
+    rad.position.set(-1, 0.18, ROOM.halfD - 0.12)
+    this.scene.add(rad)
+    for (let i = 0; i < 14; i++) this.box(0.05, 0.55, 0.09, radMat, -0.65 + i * 0.1, 0.275, 0, rad)
+
+    // Ceiling pendants (emissive shades; real lights come from the bake in M3)
+    const cord = new THREE.MeshBasicMaterial({ color: '#111' })
+    const shade = new THREE.MeshStandardMaterial({ color: '#2b2b26', roughness: 0.6, side: THREE.DoubleSide })
+    const bulb = new THREE.MeshBasicMaterial({ color: '#ffd8a0', toneMapped: false })
+    for (const pz of [-1.6, 1.4]) {
+      const p = new THREE.Group()
+      p.position.set(0, ROOM.height, pz)
+      this.scene.add(p)
+      const c = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 1.2, 4), cord)
+      c.position.y = -0.6
+      p.add(c)
+      const s = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.2, 20, 1, true), shade)
+      s.position.y = -1.3
+      p.add(s)
+      const b = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 8), bulb)
+      b.position.y = -1.38
+      p.add(b)
+    }
+
+    // Counter lamp (the real-time warm light sits in its shade)
+    const lamp = new THREE.Group()
+    lamp.position.set(1.15, COUNTER.baseH + COUNTER.caseH, COUNTER.z - 0.15)
+    this.scene.add(lamp)
+    const metal = new THREE.MeshStandardMaterial({ color: '#1f3a2c', roughness: 0.4, metalness: 0.6 })
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.03, 20), metal)
+    base.position.y = 0.015
+    lamp.add(base)
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.38, 6), metal)
+    arm.position.set(-0.04, 0.2, 0)
+    arm.rotation.z = 0.25
+    lamp.add(arm)
+    const head = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.12, 16, 1, true), metal)
+    head.position.set(-0.1, 0.38, 0.02)
+    head.rotation.z = 0.9
+    lamp.add(head)
+
+    // Back wall: safe door and back-office door (behind the player; seen when turning in later milestones)
+    const safe = new THREE.MeshStandardMaterial({ color: '#3a3d3a', roughness: 0.45, metalness: 0.7 })
+    this.box(0.9, 1.2, 0.12, safe, -1.8, 0.6, -ROOM.halfD + 0.06)
+    this.box(0.9, 2.1, 0.06, new THREE.MeshStandardMaterial({ color: '#4a3526', roughness: 0.6 }), 1.6, 1.05, -ROOM.halfD + 0.03)
+  }
+
+  private buildLights(): void {
+    // 1) Counter lamp: warm, short range
+    const lamp = new THREE.PointLight('#ffc98a', 2.2, 4.5, 1.6)
+    lamp.position.set(1.02, COUNTER.baseH + COUNTER.caseH + 0.33, COUNTER.z - 0.13)
+    this.scene.add(lamp)
+    // 2) Window fill: cool daylight from the street
+    const fill = new THREE.DirectionalLight('#dfe8f0', 1.1)
+    fill.position.set(-1, 3, ROOM.halfD + 2)
+    fill.target.position.set(0, 0.8, -2)
+    this.scene.add(fill, fill.target)
+  }
+
+  private buildCustomer(): THREE.Group {
+    // Stand-in silhouette until M3 decides between rigged models and portrait cards.
+    const g = new THREE.Group()
+    const mat = () =>
+      new THREE.MeshStandardMaterial({ color: '#4c5560', roughness: 0.85, transparent: true, opacity: 0 })
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.85, 4, 12), mat())
+    body.position.y = 1.0
+    body.scale.set(1, 1, 0.6)
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 12), mat())
+    head.position.y = 1.68
+    g.add(body, head)
+    g.position.set(-0.15, 0, -1.45)
+    g.visible = false
+    this.scene.add(g)
+    return g
+  }
+}

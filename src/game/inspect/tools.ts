@@ -1,0 +1,227 @@
+/**
+ * Tool application → findings.
+ *
+ * Every tool works on the item's *effective* tell set: the def's genuine tells,
+ * with the fake profile's tells replacing same-id tells (or adding new ones),
+ * minus the profile's removeTells.
+ *
+ * Noticing: a tell is noticed with probability 1 − miss, where
+ *   miss = difficulty × missFactor × repeatMissDecay^uses   (capped at maxMiss)
+ * A tell already found on this visit (same tellId in `previous`) is never reported again.
+ *
+ * Hotspot rule (loupe only; scale and magnet examine the whole item and ignore it):
+ *   - Loupe aimed at a hotspot: only tells at that hotspot are candidates, and their
+ *     miss chance is multiplied by hotspotFocus (looking right at it helps).
+ *     Tells elsewhere are not reported.
+ *   - Loupe with no hotspot (a general look-over): tells without a hotspot use the
+ *     plain miss chance; tells at a hotspot are still candidates but get
+ *     offHotspotMiss added to their base miss chance before repeat decay, so a
+ *     careful player who aims the loupe finds them faster.
+ *
+ * Tool-specific extras, reported alongside tells:
+ *   - Loupe: one condition finding per visit (tellId CONDITION_TELL).
+ *   - Scale: a reading on every use (tellId WEIGHT_TELL on the first one only),
+ *     compared with the def's expected range. Negative when outside tolerance.
+ *   - Magnet: one pull/no-pull finding per visit (tellId MAGNET_TELL).
+ * These synthetic tellIds start with "@" and never collide with def tell ids.
+ *
+ * If nothing new turns up, a single neutral "Nothing new…" finding is returned.
+ */
+import { tuning } from '../../data/tuning'
+import { fakeProfileOf } from '../items/generate'
+import type { Rng } from '../rng'
+import type { FakeProfile, ItemDef, Polarity, Tell, ToolId } from '../schema/item'
+import type { Finding, ItemInstance } from '../types'
+
+export interface UseToolInput {
+  item: ItemInstance
+  def: ItemDef
+  tool: ToolId
+  hotspot?: string
+  /** Findings already on this visit (for repeat-use logic and unique ids). */
+  previous: readonly Finding[]
+  /** How many times this tool was already used on this visit. */
+  uses: number
+  rng: Rng
+}
+
+export interface UseToolResult {
+  /** New findings produced by this use (may be a single "nothing notable"). */
+  findings: Finding[]
+  /** In-game seconds the use took. */
+  seconds: number
+}
+
+export const CONDITION_TELL = '@condition'
+export const WEIGHT_TELL = '@weight'
+export const MAGNET_TELL = '@magnet'
+
+/** Genuine tells, overridden/extended by the fake profile, minus its removeTells. */
+export function effectiveTells(def: ItemDef, profile: FakeProfile | undefined): Tell[] {
+  if (!profile) return def.tells.slice()
+  const removed = new Set(profile.removeTells)
+  const overrides = new Map(profile.tells.map((t) => [t.id, t]))
+  const genuineIds = new Set(def.tells.map((t) => t.id))
+  const out: Tell[] = []
+  for (const t of def.tells) {
+    if (removed.has(t.id)) continue
+    out.push(overrides.get(t.id) ?? t)
+  }
+  for (const t of profile.tells) {
+    if (!genuineIds.has(t.id) && !removed.has(t.id)) out.push(t)
+  }
+  return out
+}
+
+type Focus = 'plain' | 'focused' | 'unfocused'
+
+/** Chance a candidate tell is missed on this use (see the hotspot rule above). */
+export function missChance(tell: Tell, uses: number, focus: Focus): number {
+  const t = tuning.inspect
+  const decay = t.repeatMissDecay ** uses
+  let miss = tell.difficulty * t.missFactor
+  if (focus === 'focused') miss *= t.hotspotFocus
+  else if (focus === 'unfocused') miss += t.offHotspotMiss
+  return Math.min(t.maxMiss, miss * decay)
+}
+
+function focusFor(tell: Tell, tool: ToolId, hotspot: string | undefined): Focus | null {
+  if (tool !== 'loupe') return 'plain'
+  if (hotspot !== undefined) return tell.hotspot === hotspot ? 'focused' : null
+  return tell.hotspot ? 'unfocused' : 'plain'
+}
+
+export function useTool(input: UseToolInput): UseToolResult {
+  const { item, def, tool, hotspot, previous, uses, rng } = input
+  const profile = fakeProfileOf(def, item)
+  const seen = new Set(previous.flatMap((f) => (f.tellId ? [f.tellId] : [])))
+  const takenIds = new Set(previous.map((f) => f.id))
+  let counter = previous.length
+  const nextId = (): string => {
+    let id: string
+    do id = `f${++counter}`
+    while (takenIds.has(id))
+    takenIds.add(id)
+    return id
+  }
+
+  const findings: Finding[] = []
+  const add = (f: Omit<Finding, 'id' | 'tool'>) => findings.push({ id: nextId(), tool, ...f })
+
+  // Tool-specific extras first (they read as the headline of the card).
+  if (tool === 'loupe' && !seen.has(CONDITION_TELL)) add(conditionFinding(def, item))
+  if (tool === 'scale') add(scaleReading(def, item, rng, !seen.has(WEIGHT_TELL)))
+  if (tool === 'magnet' && !seen.has(MAGNET_TELL)) add(magnetFinding(def, profile))
+
+  for (const tell of effectiveTells(def, profile)) {
+    if (tell.tool !== tool || seen.has(tell.id)) continue
+    const focus = focusFor(tell, tool, hotspot)
+    if (!focus) continue
+    if (rng.chance(missChance(tell, uses, focus))) continue
+    add({
+      text: tell.finding,
+      tellId: tell.id,
+      reveals: tell.reveals,
+      polarity: tell.polarity,
+      ...(tell.hotspot ? { hotspot: tell.hotspot } : {}),
+    })
+  }
+
+  if (findings.length === 0) {
+    add({ text: NOTHING_NEW[tool] ?? 'Nothing new.', polarity: 'neutral', ...(hotspot ? { hotspot } : {}) })
+  }
+  return { findings, seconds: tuning.inspect.toolSeconds[tool] }
+}
+
+// --- text ---------------------------------------------------------------------
+
+const NOTHING_NEW: Partial<Record<ToolId, string>> = {
+  loupe: 'Nothing new under the loupe.',
+  scale: 'The scale has nothing new to say.',
+  magnet: 'Nothing new from the magnet.',
+}
+
+type Band = 'mint' | 'good' | 'worn' | 'poor'
+
+const CONDITION_TEXT: Record<string, Record<Band, string>> = {
+  gold: {
+    mint: 'Bright polish, barely a hairline scratch.',
+    good: 'Light scratches from wear; the edges are still crisp.',
+    worn: 'Rubbed smooth in places, with a few small dings.',
+    poor: 'Deep scuffs, a dent on the edge, worn thin in places.',
+  },
+  watches: {
+    mint: 'Crystal clear, the case barely marked.',
+    good: 'Light desk scratches on the case; the crystal is clean.',
+    worn: 'A scratched crystal and worn finish on the lugs.',
+    poor: 'Crystal chipped at the edge, case deeply scuffed, strap worn through.',
+  },
+  phones: {
+    mint: 'Screen spotless, frame without a mark.',
+    good: 'Fine scratches on the screen, corners lightly scuffed.',
+    worn: 'Scuffed corners and a long scratch across the screen.',
+    poor: 'A cracked screen corner, a dented frame, buttons worn shiny.',
+  },
+}
+const CONDITION_FALLBACK = CONDITION_TEXT.gold!
+
+function conditionFinding(def: ItemDef, item: ItemInstance): Omit<Finding, 'id' | 'tool'> {
+  const b = tuning.inspect.conditionBands
+  const c = item.condition
+  const band: Band = c >= b.mint ? 'mint' : c >= b.good ? 'good' : c >= b.worn ? 'worn' : 'poor'
+  const polarity: Polarity = band === 'mint' ? 'positive' : band === 'poor' ? 'negative' : 'neutral'
+  const text = (CONDITION_TEXT[def.category] ?? CONDITION_FALLBACK)[band]
+  return { text, tellId: CONDITION_TELL, reveals: 'condition', polarity }
+}
+
+/** How to describe "a standard one" of this shape when quoting the expected weight. */
+const WEIGHT_SUBJECT: Record<ItemDef['model']['placeholder'], string> = {
+  ring: 'A solid band this size usually weighs',
+  signet: 'A solid signet this size usually weighs',
+  chain: 'A solid chain this length usually weighs',
+  earrings: 'A solid pair like this usually weighs',
+  watch: 'This model usually weighs',
+  phone: 'This model usually weighs',
+}
+
+function scaleReading(def: ItemDef, item: ItemInstance, rng: Rng, first: boolean): Omit<Finding, 'id' | 'tool'> {
+  const tellId = first ? { tellId: WEIGHT_TELL } : {}
+  const spec = def.weightGrams
+  if (!spec || item.weightGrams === undefined) {
+    return { text: 'The scale settles, but there is no standard weight to hold it against.', polarity: 'neutral', ...tellId }
+  }
+  const decimals = spec.expected < 20 ? 1 : 0
+  const round = (g: number) => Number(g.toFixed(decimals))
+  const noise = rng.range(-1, 1) * tuning.inspect.scaleNoise * spec.expected
+  const reading = round(item.weightGrams + noise)
+  const lo = round(spec.expected - spec.tolerance)
+  const hi = round(spec.expected + spec.tolerance)
+  const inside = reading >= lo && reading <= hi
+  const g = (n: number) => n.toFixed(decimals)
+  const text = first
+    ? `Reads ${g(reading)} g. ${WEIGHT_SUBJECT[def.model.placeholder]} ${g(lo)}–${g(hi)} g.`
+    : `Weighed again: ${g(reading)} g (usually ${g(lo)}–${g(hi)} g).`
+  return { text, reveals: 'authenticity', polarity: inside ? 'positive' : 'negative', ...tellId }
+}
+
+function magnetFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Finding, 'id' | 'tool'> {
+  const pulls = profile?.magnetic ?? def.magnetic
+  const base = { tellId: MAGNET_TELL, reveals: 'authenticity' as const }
+  if (def.category === 'phones') {
+    const text = pulls
+      ? 'The magnet clings near the speaker, as it would on almost any phone. It tells you little.'
+      : 'Hardly any pull, even near the speaker. Phones vary, so it tells you little.'
+    return { ...base, text, polarity: 'neutral' }
+  }
+  // A pull where the genuine article has none (or the reverse) is negative evidence.
+  const polarity: Polarity = pulls !== def.magnetic ? 'negative' : 'neutral'
+  let text: string
+  if (def.category === 'watches') {
+    text = pulls ? 'The case itself tugs toward the magnet.' : 'The case ignores the magnet.'
+  } else if (def.category === 'gold') {
+    text = pulls ? 'It jumps to the magnet and holds on.' : 'No pull at all from the magnet.'
+  } else {
+    text = pulls ? 'It pulls toward the magnet.' : 'No pull from the magnet.'
+  }
+  return { ...base, text, polarity }
+}

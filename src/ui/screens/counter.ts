@@ -1,60 +1,104 @@
 /**
- * Counter screen overlay: dialogue strip plus three action buttons.
- * Reads state and dispatches actions; never mutates state.
+ * Counter screen: the dialogue strip (customer name, archetype, line) and the
+ * buttons that follow the day loop. Reads state and dispatches actions; never
+ * mutates state.
  */
 import type { Action } from '../../game/actions'
 import type { GameState } from '../../game/state'
-import { createButton } from '../components/button'
+import type { VisitOutcome } from '../../game/types'
+import { createButton, el, setButtonLabel, setText } from '../components/button'
+import { archetypeLabel, itemNameOf, rub } from '../format'
+import type { IconName } from '../icons'
 
-const rub = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
+type Primary = 'counter/next' | 'day/close' | 'counter/inspect' | 'counter/dismiss'
+
+const OUTCOME: Record<VisitOutcome, string> = {
+  bought: 'Bought',
+  passed: 'Passed',
+  walked: 'Walked out',
+  left: 'Left',
+}
 
 export class CounterScreen {
   readonly root: HTMLElement
+  readonly strip: HTMLElement
   private speaker: HTMLElement
+  private name: HTMLElement
+  private tag: HTMLElement
+  private itemName: HTMLElement
   private line: HTMLElement
-  private cash: HTMLElement
-  private day: HTMLElement
-  private next: HTMLButtonElement
-  private inspect: HTMLButtonElement
-  private pass: HTMLButtonElement
+  private stamp: HTMLElement
+  private primary: HTMLButtonElement
+  private secondary: HTMLButtonElement
+  private primaryAction: Primary = 'counter/next'
 
-  constructor(dispatch: (a: Action) => void) {
-    const root = document.createElement('section')
-    root.className = 'counter-ui'
-    root.innerHTML = `
-      <header class="hud">
-        <span class="hud-day" data-ref="day"></span>
-        <span class="hud-cash" data-ref="cash"></span>
-      </header>
-      <div class="strip">
-        <div class="dialogue" aria-live="polite">
-          <div class="speaker" data-ref="speaker"></div>
-          <p class="line" data-ref="line"></p>
-        </div>
-        <div class="actions" data-ref="actions"></div>
-      </div>`
-    const q = (ref: string) => root.querySelector<HTMLElement>(`[data-ref="${ref}"]`)!
+  constructor(dispatch: (a: Action) => void, openSettings: () => void, gear: (onPress: () => void) => HTMLButtonElement) {
+    const root = el('section', 'screen counter-screen')
+    root.dataset.screen = 'counter'
+    const strip = el('div', 'strip')
+    const dialogue = el('div', 'dialogue')
+    dialogue.setAttribute('aria-live', 'polite')
+    this.speaker = el('div', 'speaker')
+    this.name = el('span', 'speaker-name')
+    this.tag = el('span', 'speaker-tag')
+    this.speaker.append(this.name, this.tag)
+    this.itemName = el('div', 'item-tag')
+    this.itemName.dataset.id = 'counter-item'
+    this.line = el('p', 'line')
+    this.line.dataset.id = 'counter-line'
+    this.stamp = el('div', 'outcome-stamp')
+    this.stamp.dataset.id = 'outcome'
+    dialogue.append(this.speaker, this.itemName, this.line, this.stamp)
+
+    const actions = el('div', 'actions counter-actions')
+    this.secondary = createButton({ id: 'pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) })
+    this.primary = createButton({
+      id: 'next-customer',
+      label: 'Next customer',
+      variant: 'primary',
+      onPress: () => dispatch({ type: this.primaryAction }),
+    })
+    actions.append(gear(openSettings), this.secondary, this.primary)
+    strip.append(dialogue, actions)
+    root.append(strip)
     this.root = root
-    this.speaker = q('speaker')
-    this.line = q('line')
-    this.cash = q('cash')
-    this.day = q('day')
-    this.next = createButton({ id: 'next', label: 'Next customer', variant: 'primary', onPress: () => dispatch({ type: 'counter/next' }) })
-    this.inspect = createButton({ id: 'inspect', label: 'Inspect', onPress: () => dispatch({ type: 'counter/inspect' }) })
-    this.pass = createButton({ id: 'pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) })
-    q('actions').append(this.inspect, this.pass, this.next)
+    this.strip = strip
   }
 
   render(state: GameState): void {
     const c = state.current
-    this.speaker.textContent = c ? c.customerName : ''
     this.speaker.hidden = !c
-    this.line.textContent = c ? `“${c.line}”` : state.narration
+    if (c) {
+      setText(this.name, c.customer.name)
+      setText(this.tag, archetypeLabel(c.customer.archetype))
+      setText(this.itemName, itemNameOf(c.item.defId, 'Something wrapped in a cloth'))
+    }
+    this.itemName.hidden = !c || c.phase === 'resolved'
+    setText(this.line, c ? `“${c.line}”` : state.narration)
     this.line.classList.toggle('narration', !c)
-    this.cash.textContent = `${rub.format(state.cash)} ₽`
-    this.day.textContent = `Day ${state.calendar.day}`
-    this.inspect.disabled = !c
-    this.pass.disabled = !c
-    this.next.disabled = !!c
+
+    const resolved = c?.phase === 'resolved'
+    this.stamp.hidden = !resolved
+    if (resolved && c.outcome) {
+      const text = c.outcome === 'bought' && c.price !== undefined ? `${OUTCOME.bought} · ${rub(c.price)}` : OUTCOME[c.outcome]
+      setText(this.stamp, text)
+      this.stamp.dataset.outcome = c.outcome
+    }
+
+    this.secondary.hidden = !c || c.phase !== 'present'
+    if (!c) {
+      if (state.queue.length > 0) this.setPrimary('counter/next', 'next-customer', 'Next customer', 'person')
+      else this.setPrimary('day/close', 'close-up', 'Close up', 'door')
+    } else if (c.phase === 'present') {
+      this.setPrimary('counter/inspect', 'inspect', 'Inspect', 'loupe')
+    } else {
+      this.setPrimary('counter/dismiss', 'dismiss', state.queue.length > 0 ? 'Next' : 'Done', undefined)
+    }
+  }
+
+  private setPrimary(action: Primary, id: string, label: string, icon: IconName | undefined): void {
+    this.primaryAction = action
+    this.primary.dataset.id = id
+    setButtonLabel(this.primary, label, icon)
   }
 }

@@ -1,0 +1,268 @@
+/**
+ * Settings sheet (Longlight palette): save code copy/load, new career,
+ * reduce motion, text size. Loading a code and starting over both ask for
+ * confirmation inline (no browser dialogs).
+ */
+import type { Action } from '../../game/actions'
+import { decodeSaveCode, encodeSaveCode, SaveCodeError } from '../../game/save/code'
+import type { GameState } from '../../game/state'
+import { createButton, el, setText } from '../components/button'
+import { rub } from '../format'
+
+export interface SettingsDeps {
+  getState(): GameState
+  dispatch(a: Action): void
+  /** Swap in a loaded career (main also autosaves it). */
+  replaceState(state: GameState): void
+  /** Start a fresh career (main generates the seed and careerId). */
+  newCareer(): void
+  /** Persist and apply the reduce-motion override. */
+  setReduceMotion(on: boolean): void
+}
+
+export const TEXT_SCALES = [
+  { value: 0.9, label: 'Small' },
+  { value: 1, label: 'Normal' },
+  { value: 1.15, label: 'Large' },
+  { value: 1.3, label: 'Larger' },
+] as const
+
+export class SettingsSheet {
+  readonly root: HTMLElement
+  private sheet: HTMLElement
+  private copyStatus: HTMLElement
+  private manual: HTMLTextAreaElement
+  private loadInput: HTMLTextAreaElement
+  private loadError: HTMLElement
+  private loadConfirm: HTMLElement
+  private loadConfirmText: HTMLElement
+  private pending: GameState | null = null
+  private newConfirm: HTMLElement
+  private newConfirmText: HTMLElement
+  private motion: HTMLButtonElement
+  private sizes: HTMLButtonElement[] = []
+  private onClose: (() => void) | null = null
+
+  constructor(private readonly deps: SettingsDeps) {
+    const root = el('div', 'overlay settings-overlay')
+    root.hidden = true
+    root.addEventListener('click', (e) => {
+      if (e.target === root) this.close()
+    })
+    const sheet = el('section', 'sheet menu settings')
+    sheet.dataset.id = 'settings'
+    sheet.setAttribute('role', 'dialog')
+    sheet.setAttribute('aria-modal', 'true')
+    sheet.setAttribute('aria-label', 'Settings')
+
+    const head = el('div', 'sheet-head')
+    head.append(
+      el('h2', '', 'Settings'),
+      createButton({ id: 'settings-close', label: '', icon: 'close', variant: 'ghost', ariaLabel: 'Close settings', onPress: () => this.close() }),
+    )
+
+    // --- save code: copy
+    const copySec = this.section('Save code', 'Move this career to another device: copy the code, paste it into Notes or a message, then load it there.')
+    const copyBtn = createButton({ id: 'copy-code', label: 'Copy save code', icon: 'copy', variant: 'primary', onPress: () => void this.copy() })
+    this.copyStatus = el('p', 'settings-status')
+    this.copyStatus.setAttribute('role', 'status')
+    this.manual = el('textarea', 'code-box')
+    this.manual.dataset.id = 'code-manual'
+    this.manual.readOnly = true
+    this.manual.rows = 3
+    this.manual.hidden = true
+    this.manual.setAttribute('aria-label', 'Your save code')
+    this.manual.addEventListener('focus', () => this.manual.select())
+    copySec.append(copyBtn, this.copyStatus, this.manual)
+
+    // --- save code: load
+    const loadSec = this.section('Load save code', 'Paste a code from another device. It replaces the career on this one.')
+    this.loadInput = el('textarea', 'code-box')
+    this.loadInput.dataset.id = 'code-input'
+    this.loadInput.rows = 3
+    this.loadInput.placeholder = 'LMB1.…'
+    this.loadInput.setAttribute('aria-label', 'Save code to load')
+    this.loadInput.spellcheck = false
+    this.loadInput.autocapitalize = 'off'
+    this.loadError = el('p', 'settings-error')
+    this.loadError.setAttribute('role', 'alert')
+    const loadBtn = createButton({ id: 'load-code', label: 'Load', onPress: () => this.tryLoad() })
+    this.loadConfirm = el('div', 'confirm')
+    this.loadConfirm.hidden = true
+    this.loadConfirmText = el('p', '')
+    const loadActions = el('div', 'actions')
+    loadActions.append(
+      createButton({ id: 'load-cancel', label: 'Cancel', onPress: () => this.cancelLoad() }),
+      createButton({ id: 'load-confirm', label: 'Replace career', variant: 'danger', onPress: () => this.confirmLoad() }),
+    )
+    this.loadConfirm.append(this.loadConfirmText, loadActions)
+    loadSec.append(this.loadInput, this.loadError, loadBtn, this.loadConfirm)
+
+    // --- new career
+    const newSec = this.section('New career', 'Start over on Day 1 with a new shop.')
+    const newBtn = createButton({ id: 'new-career', label: 'New career', onPress: () => this.askNew() })
+    this.newConfirm = el('div', 'confirm')
+    this.newConfirm.hidden = true
+    this.newConfirmText = el('p', '')
+    const newActions = el('div', 'actions')
+    newActions.append(
+      createButton({ id: 'new-cancel', label: 'Cancel', onPress: () => (this.newConfirm.hidden = true) }),
+      createButton({
+        id: 'new-confirm',
+        label: 'Start over',
+        variant: 'danger',
+        onPress: () => {
+          this.newConfirm.hidden = true
+          this.deps.newCareer()
+          this.close()
+        },
+      }),
+    )
+    this.newConfirm.append(this.newConfirmText, newActions)
+    newSec.append(newBtn, this.newConfirm)
+
+    // --- comfort
+    const comfort = this.section('Comfort', '')
+    this.motion = el('button', 'switch')
+    this.motion.type = 'button'
+    this.motion.dataset.id = 'reduce-motion'
+    this.motion.setAttribute('role', 'switch')
+    this.motion.innerHTML = '<span class="switch-label">Reduce motion</span><span class="switch-track"><span class="switch-thumb"></span></span><span class="switch-state"></span>'
+    this.motion.addEventListener('click', () => {
+      const on = !this.deps.getState().settings.reduceMotion
+      this.deps.setReduceMotion(on)
+    })
+    const sizeLabel = el('div', 'settings-label', 'Text size')
+    const sizeRow = el('div', 'segmented')
+    sizeRow.setAttribute('role', 'radiogroup')
+    sizeRow.setAttribute('aria-label', 'Text size')
+    for (const s of TEXT_SCALES) {
+      const b = el('button', 'segment', s.label)
+      b.type = 'button'
+      b.dataset.id = `text-${Math.round(s.value * 100)}`
+      b.setAttribute('role', 'radio')
+      b.style.fontSize = `${s.value}rem`
+      b.addEventListener('click', () => this.deps.dispatch({ type: 'settings/set', patch: { textScale: s.value } }))
+      this.sizes.push(b)
+      sizeRow.append(b)
+    }
+    comfort.append(this.motion, sizeLabel, sizeRow)
+
+    const foot = el('p', 'settings-foot', `Lombard · build ${__BUILD_SHA__} · ${__BUILD_DATE__} · A Longlight Interactive game`)
+    sheet.append(head, copySec, loadSec, newSec, comfort, foot)
+    root.append(sheet)
+    this.root = root
+    this.sheet = sheet
+  }
+
+  get isOpen(): boolean {
+    return !this.root.hidden
+  }
+
+  open(onClose?: () => void): void {
+    this.onClose = onClose ?? null
+    this.copyStatus.textContent = ''
+    this.manual.hidden = true
+    this.loadError.textContent = ''
+    this.cancelLoad()
+    this.newConfirm.hidden = true
+    this.render(this.deps.getState())
+    this.root.hidden = false
+    this.sheet.scrollTop = 0
+    this.sheet.querySelector<HTMLButtonElement>('[data-id="settings-close"]')?.focus()
+  }
+
+  close(): void {
+    if (this.root.hidden) return
+    this.root.hidden = true
+    this.onClose?.()
+  }
+
+  render(state: GameState): void {
+    const rm = state.settings.reduceMotion
+    this.motion.setAttribute('aria-checked', String(rm))
+    this.motion.classList.toggle('is-on', rm)
+    setText(this.motion.querySelector<HTMLElement>('.switch-state')!, rm ? 'On' : 'Off')
+    const scale = state.settings.textScale
+    for (const [i, b] of this.sizes.entries()) {
+      const on = Math.abs(TEXT_SCALES[i]!.value - scale) < 0.01
+      b.classList.toggle('is-selected', on)
+      b.setAttribute('aria-checked', String(on))
+    }
+  }
+
+  private section(title: string, text: string): HTMLElement {
+    const s = el('div', 'settings-section')
+    s.append(el('h3', '', title))
+    if (text) s.append(el('p', 'settings-text', text))
+    return s
+  }
+
+  private async copy(): Promise<void> {
+    let code: string
+    try {
+      code = encodeSaveCode(this.deps.getState())
+    } catch (err) {
+      this.copyStatus.textContent = `Could not make a save code: ${(err as Error).message}`
+      return
+    }
+    this.manual.value = code
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('no clipboard')
+      await navigator.clipboard.writeText(code)
+      this.copyStatus.textContent = `Copied (${code.length.toLocaleString('en-US')} characters). Paste it somewhere safe.`
+      this.manual.hidden = true
+    } catch {
+      // Older mobile browsers: show the code selected for a manual copy.
+      this.copyStatus.textContent = 'Your browser blocked copying. Press and hold the code below, Select all, then Copy.'
+      this.manual.hidden = false
+      this.manual.focus()
+      this.manual.select()
+    }
+  }
+
+  private tryLoad(): void {
+    const code = this.loadInput.value.trim()
+    this.loadError.textContent = ''
+    this.loadConfirm.hidden = true
+    if (!code) {
+      this.loadError.textContent = 'Paste a save code first.'
+      return
+    }
+    try {
+      this.pending = decodeSaveCode(code)
+    } catch (err) {
+      this.pending = null
+      this.loadError.textContent =
+        err instanceof SaveCodeError ? err.message : 'That save code could not be loaded. Check that you copied all of it.'
+      return
+    }
+    const s = this.pending
+    const cur = this.deps.getState()
+    this.loadConfirmText.textContent =
+      `This code holds Day ${s.calendar.day} with ${rub(s.cash)} and ${s.inventory.length} item${s.inventory.length === 1 ? '' : 's'} in stock. ` +
+      `It replaces your current career (Day ${cur.calendar.day}, ${rub(cur.cash)}).`
+    this.loadConfirm.hidden = false
+  }
+
+  private cancelLoad(): void {
+    this.pending = null
+    this.loadConfirm.hidden = true
+  }
+
+  private confirmLoad(): void {
+    if (!this.pending) return
+    const s = this.pending
+    this.pending = null
+    this.loadConfirm.hidden = true
+    this.loadInput.value = ''
+    this.deps.replaceState(s)
+    this.close()
+  }
+
+  private askNew(): void {
+    const cur = this.deps.getState()
+    this.newConfirmText.textContent = `Start over? Your current shop (Day ${cur.calendar.day}, ${rub(cur.cash)}) will be gone unless you copied its save code.`
+    this.newConfirm.hidden = false
+  }
+}

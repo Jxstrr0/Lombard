@@ -14,13 +14,16 @@ import type {
   HaggleState,
   InspectState,
   ItemInstance,
+  Loan,
+  MarketState,
   QueuedVisit,
+  SpecialistState,
   VisitState,
 } from './types'
 
 export type { ItemInstance } from './types'
 
-export const STATE_VERSION = 2
+export const STATE_VERSION = 3
 
 export type Season = 'winter' | 'spring' | 'summer' | 'autumn'
 export type ISODate = string
@@ -29,18 +32,25 @@ export type ArcId = string
 export type UpgradeId = string
 export type Group = 'neighbourhood' | 'police' | 'mob' | 'specialists'
 
-/** placeholder (M2) */
+export type SlotArea = 'counter' | 'wall' | 'back'
+
+/** A display position. Inventory items not in any slot are in the safe (not for sale). */
 export interface Slot {
   id: string
+  area: SlotArea
   itemId: string | null
 }
 
-/** placeholder (M2) */
-export interface Loan {
-  itemId: string
-  customerId: CustomerId
-  principal: number
-  startDay: number
+export interface ShopState {
+  /** Player-chosen at career start; default tuning.career.defaultShopName. */
+  name: string
+  slots: Slot[]
+  /** Tag price per displayed (or safe) inventory item id. */
+  prices: Record<string, number>
+  upgrades: UpgradeId[]
+  /** Acid kit uses left. */
+  acidCharges: number
+  security: number
 }
 
 /** placeholder (M4): regulars only; walk-ins live on their visit. */
@@ -79,14 +89,25 @@ export interface Settings {
 }
 
 export interface GameState {
-  meta: { version: number; seed: number; careerId: string; rng: RngState; nextId: number }
+  meta: {
+    version: number
+    seed: number
+    careerId: string
+    rng: RngState
+    nextId: number
+    /** True until the career-start intro (name the shop, leftover stock) is finished. */
+    intro: boolean
+  }
   calendar: { day: number; weekday: number; season: Season; date: ISODate }
   cash: number
-  shop: { slots: Slot[]; upgrades: UpgradeId[]; security: number }
+  shop: ShopState
   inventory: ItemInstance[]
   /** Purchase price per inventory item id (for profit tracking). */
   paid: Record<string, number>
+  /** Open pawn loans; their items are held here, not in inventory. */
   loans: Loan[]
+  specialists: Record<string, SpecialistState>
+  market: MarketState
   customers: Record<CustomerId, CustomerState>
   queue: QueuedVisit[]
   current: VisitState | null
@@ -123,22 +144,40 @@ export function addDays(isoDate: ISODate, days: number): ISODate {
   return d.toISOString().slice(0, 10)
 }
 
+/** Display slots from tuning, all empty. Ids: counter-1…, wall-1…, back-1…. */
+export function createSlots(): Slot[] {
+  const slots: Slot[] = []
+  for (const area of ['counter', 'wall', 'back'] as const) {
+    for (let i = 1; i <= tuning.shop.slots[area]; i++) slots.push({ id: `${area}-${i}`, area, itemId: null })
+  }
+  return slots
+}
+
 export function createInitialState(seed: number, careerId: string): GameState {
   const date = tuning.career.startDate
   return {
-    meta: { version: STATE_VERSION, seed: seed >>> 0, careerId, rng: seed >>> 0, nextId: 1 },
+    meta: { version: STATE_VERSION, seed: seed >>> 0, careerId, rng: seed >>> 0, nextId: 1, intro: true },
     calendar: { day: 1, weekday: weekdayOf(date), season: seasonOf(date), date },
     cash: tuning.career.startingCash,
-    shop: { slots: [], upgrades: [], security: 0 },
+    shop: {
+      name: tuning.career.defaultShopName,
+      slots: createSlots(),
+      prices: {},
+      upgrades: [],
+      acidCharges: 0,
+      security: 0,
+    },
     inventory: [],
     paid: {},
     loans: [],
+    specialists: {},
+    market: { drift: {}, news: [] },
     customers: {},
     queue: [],
     current: null,
     inspect: null,
     haggle: null,
-    day: { phase: 'closed', clock: 0, served: 0, total: 0, openingCash: tuning.career.startingCash, log: [] },
+    day: { phase: 'closed', clock: 0, served: 0, total: 0, openingCash: tuning.career.startingCash, log: [], newsRead: true },
     history: [],
     crime: { heat: 0, pressure: 0, fenceTrust: 0, flags: [] },
     story: { arcs: {}, pendingEvents: [] },

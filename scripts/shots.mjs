@@ -4,7 +4,8 @@
 //
 // Portrait plays a whole day with ?seed=1: welcome → open → customer → inspect
 // (every tool) → estimate → offer/haggle → resolved → the rest of the queue
-// (one inspect shot per item shape, the rest passed) → close up → ledger (sell one) → settings.
+// (one inspect shot per item shape, the rest passed) → close up → ledger (sell one) → settings
+// → shop sheet (stock the counter case, tag prices) → day 2 → a walk-in buyer → sale result.
 // Landscape and desktop shoot counter, inspect, offer and ledger.
 // Portrait runs in one browser while landscape, desktop, the gallery and the perf
 // readout run in a second. Rendering is SwiftShader (software), so shots use DPR 1.
@@ -59,20 +60,47 @@ function helpers(page, name) {
     async shot(label, what) {
       n++
       const file = `${OUT}/${name}-${String(n).padStart(2, '0')}-${label}.png`
-      await page.screenshot({ path: file })
+      await page.screenshot({ path: file, timeout: 90_000 })
       shots.push(`${file}  ${what}`)
     },
     state: () => page.evaluate(() => window.__lombardState?.()),
+    /** Career-start intro, if showing: optional shot, then Begin with the default name. */
+    async begin(shotIt = false) {
+      await page.waitForFunction(() => ['intro', 'welcome', 'ledger', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) !== 'intro') return
+      await page.waitForTimeout(250)
+      if (shotIt) await api.shot('intro', 'career start: name your shop')
+      // Tap Next through the story cards to Begin; shoot the first story card.
+      for (let i = 0; i < 8 && !(await api.visible('intro-begin')); i++) {
+        await api.click('intro-next')
+        if (shotIt && i === 0) {
+          await page.waitForTimeout(150)
+          await api.shot('intro-card', 'career start: first story card (tap or Next)')
+        }
+      }
+      await api.click('intro-begin')
+    },
+    /** Open the shop and read past the morning paper if there is one. */
+    async open(shotIt = false) {
+      await api.click('open-shop')
+      await page.waitForFunction(() => ['news', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) === 'news') {
+        await page.waitForTimeout(250)
+        if (shotIt) await api.shot('news', 'morning paper at day open')
+        await api.click('news-done')
+      }
+    },
     shots,
   }
   return api
 }
 
-/** Coarse item shape from a def id (gold_band_583 → gold_band, watch_x → watch). */
+/** Coarse item family from a def id (gold_band_583 → gold, lens_x → camera, order_x → militaria). */
 function kindOf(defId) {
-  if (defId.startsWith('watch_')) return 'watch'
-  if (defId.startsWith('phone_')) return 'phone'
-  return defId.split('_').slice(0, 2).join('_')
+  const head = defId.split('_')[0]
+  if (head === 'lens') return 'camera'
+  if (head === 'medal' || head === 'order' || head === 'badge') return 'militaria'
+  return head
 }
 
 /** Type a number on the offer pad. */
@@ -105,9 +133,10 @@ async function haggleOn(h) {
 }
 
 async function playPortrait(page, h) {
+  await h.begin(true)
   await h.screen('welcome')
   await h.shot('welcome', 'first launch: welcome card, Open shop')
-  await h.click('open-shop')
+  await h.open(true)
   await h.screen('counter')
   await h.shot('counter-open', 'shop open, nobody at the counter, Next customer')
   await h.click('next-customer')
@@ -169,7 +198,9 @@ async function playPortrait(page, h) {
   await h.click('set-estimate')
   await page.waitForTimeout(200)
   await h.click('chip-40')
-  await h.shot('offer', 'offer step 2: chips, approaches, Offer')
+  // Pawn loans: the first pawner's offer pad is shot in loan mode (here, or later in the queue).
+  let pawnShot = s0.current?.wants === 'pawn'
+  await h.shot('offer', pawnShot ? 'offer step 2, pawn mode: Loan amount, terms (due date, rate, owed), Lend' : 'offer step 2: chips, approaches, Offer')
   await h.click('approach-evidence')
   await page.waitForTimeout(200)
   await h.shot('offer-evidence', 'evidence picker: cite a finding')
@@ -194,6 +225,21 @@ async function playPortrait(page, h) {
     const s = await h.state()
     if (!s.current) break
     const kind = kindOf(s.current.item.defId)
+    if (!pawnShot && s.current.wants === 'pawn') {
+      pawnShot = true
+      await h.click('inspect')
+      await h.screen('inspect')
+      await h.click('inspect-done')
+      await h.screen('offer')
+      await typeNumber(h, 6000)
+      await h.click('set-estimate')
+      await h.click('chip-40')
+      await h.shot('offer-pawn', 'offer pad in pawn mode: Loan amount, terms (due date, rate, owed), Lend')
+      await haggleOn(h)
+      await h.screen('counter')
+      await h.click('dismiss')
+      continue
+    }
     if (shotKinds.has(kind) && k !== 1) {
       await h.click('pass')
       await h.click('dismiss')
@@ -222,6 +268,12 @@ async function playPortrait(page, h) {
   await h.screen('ledger')
   await page.waitForTimeout(300)
   await h.shot('ledger', 'ledger: day summary, log, stock with Sell to dealer')
+  if ((await h.state()).loans.length > 0) {
+    await page.evaluate(() => document.querySelector('[data-id="ledger-loans"]')?.scrollIntoView({ block: 'center' }))
+    await page.waitForTimeout(150)
+    await h.shot('ledger-loans', 'ledger: open pawn loans (customer, item, lent, owed, due, days left) and LOAN entries')
+    await page.evaluate(() => document.querySelector('.ledger-scroll')?.scrollTo(0, 0))
+  }
   const sell = page.locator('[data-id^="sell-"]:visible').first()
   if ((await sell.count()) > 0) {
     await sell.click()
@@ -246,15 +298,64 @@ async function playPortrait(page, h) {
   await h.click('settings-ledger')
   await h.click('text-100')
   await h.click('settings-close')
-  await h.click('open-shop')
+  await shopFlow(page, h)
+  await h.open()
   await h.screen('counter')
   await h.shot('day2', 'day 2 opened')
+  await buyerFlow(page, h)
+}
+
+/** Ledger → Shop sheet: put the stock in the counter case and tag it a little under value, so day 2 has buyers. */
+async function shopFlow(page, h) {
+  await h.click('shop-ledger')
+  await page.waitForTimeout(200)
+  const s = await h.state()
+  const items = s.inventory.slice(0, 6)
+  for (const [i, it] of items.entries()) {
+    // Tap the item in the safe, tap an empty slot (it stays selected), then price it.
+    await h.click(`safe-${it.id}`)
+    await h.click(`slot-counter-${i + 1}`)
+    await h.click('shop-price')
+    await h.click('tag-clear')
+    for (const ch of String(Math.max(100, Math.round((it.trueValue * 0.85) / 100) * 100))) await h.click(`tag-key-${ch}`)
+    if (i === items.length - 1) await h.shot('shop-price', 'shop sheet: tag price pad (paid chips, never the true value)')
+    await h.click('tag-set')
+  }
+  await page.evaluate(() => document.querySelector('.shop-body')?.scrollTo(0, 0))
+  await page.waitForTimeout(150)
+  await h.shot('shop-placed', 'shop sheet: counter case stocked with paper tags, wall/back shelves, safe')
+  await h.click('shop-close')
+}
+
+/** Day 2: serve the queue until a walk-in buyer reaches the counter, counter once, then take the result. */
+async function buyerFlow(page, h) {
+  for (let i = 0; i < 20 && (await h.visible('next-customer')); i++) {
+    await h.click('next-customer')
+    await page.waitForTimeout(150)
+    const screen = await page.evaluate(() => document.body.dataset.screen)
+    if (screen === 'sale') {
+      await page.waitForTimeout(500)
+      await h.shot('sale-buyer', 'walk-in buyer at the counter: line, item + your tag, their offer; Refuse / Counter / Sell')
+      await h.click('sale-counter')
+      await h.click('sale-chip-split')
+      await h.click('sale-ask')
+      for (let r = 0; r < 4 && (await page.evaluate(() => document.body.dataset.screen)) === 'sale'; r++) await h.click('sale-accept')
+      await h.screen('counter')
+      await h.shot('sale-result', 'sale resolved: buyer’s line + Sold stamp with the price')
+      return
+    }
+    if (screen === 'redeem') await h.click('redeem-return')
+    else if (await h.visible('pass')) await h.click('pass')
+    await h.click('dismiss')
+  }
+  console.warn('portrait: no walk-in buyer came on day 2; sale shots skipped')
 }
 
 async function playShort(page, h) {
+  await h.begin()
   await h.screen('welcome')
   await h.shot('welcome', 'welcome card')
-  await h.click('open-shop')
+  await h.open(page.viewportSize()?.height < 500)
   await h.screen('counter')
   await h.click('next-customer')
   await page.waitForTimeout(900)
@@ -288,6 +389,74 @@ async function playShort(page, h) {
   await h.screen('ledger')
   await page.waitForTimeout(300)
   await h.shot('ledger', 'ledger')
+}
+
+/** Send away whoever is at the counter without a deal (seller, buyer or redeemer). */
+async function sendAway(h) {
+  for (const id of ['pass', 'sale-refuse', 'redeem-return']) {
+    if (await h.visible(id)) {
+      await h.click(id)
+      break
+    }
+  }
+  if (await h.visible('dismiss')) await h.click('dismiss')
+}
+
+/**
+ * Economy (portrait, ?seed=1): day 1 passed → ledger → Office (buy the acid kit,
+ * retain both specialists) → day 2 → the first gold or watch seller → acid,
+ * reference book and a specialist call.
+ */
+async function playEconomy(page, h) {
+  await h.begin()
+  await h.open()
+  await h.screen('counter')
+  while (await h.visible('next-customer')) {
+    await h.click('next-customer')
+    await sendAway(h)
+  }
+  await h.click('close-up')
+  await h.screen('ledger')
+  await h.click('open-office')
+  await page.waitForTimeout(200)
+  for (const id of ['buy-acid_kit', 'retain-jeweler', 'retain-watchmaker']) if (await h.enabled(id)) await h.click(id)
+  await page.evaluate(() => document.querySelector('[data-id="office"]')?.scrollTo(0, 0))
+  await page.waitForTimeout(150)
+  await h.shot('office', 'office sheet: bills due, upgrades (acid kit owned), cash')
+  await page.evaluate(() => document.querySelector('[data-id="office-specialists"]')?.scrollIntoView({ block: 'start' }))
+  await page.waitForTimeout(150)
+  await h.shot('office-specialists', 'office sheet: both specialists retained, calls left, release')
+  await h.click('office-close')
+  await h.open()
+  await h.screen('counter')
+  while (await h.visible('next-customer')) {
+    await h.click('next-customer')
+    const s = await h.state()
+    const def = s.current?.item.defId ?? ''
+    if (s.current?.kind !== 'seller' || !/^(gold|watch|coin)/.test(def)) {
+      await sendAway(h)
+      continue
+    }
+    await h.click('inspect')
+    await h.screen('inspect')
+    await page.waitForTimeout(500)
+    const first = (await h.enabled('tool-acid')) && !(await page.locator('[data-id="tool-acid"].is-locked').count()) ? 'acid' : 'reference'
+    await h.click(`tool-${first}`)
+    await page.waitForTimeout(450)
+    await h.shot(`inspect-${first}`, `inspect toolbar with the M2 tools; ${first} finding (${def})`)
+    await page.waitForTimeout(500)
+    for (const tool of ['reference', 'specialist']) {
+      if (tool === first || (await page.locator(`[data-id="tool-${tool}"].is-locked`).count())) continue
+      await h.click(`tool-${tool}`)
+      await page.waitForTimeout(tool === 'specialist' ? 450 : 800)
+    }
+    if (await page.locator('.fx-for-specialist').count()) await h.shot('inspect-specialist', 'specialist call: phone fx + opinion slip')
+    await page.waitForTimeout(1200)
+    await h.click('findings-stack')
+    await page.waitForTimeout(200)
+    await h.shot('findings-m2', 'findings expanded: acid, reference and specialist slips')
+    break
+  }
 }
 
 async function main() {
@@ -344,9 +513,24 @@ async function main() {
       await context.close()
     }
     {
+      // Dev scenario: a pawner back for a 12-day-old loan is first in line.
+      const { context, page } = await newPage(browser, PORTRAIT, '?seed=1&scenario=redeem')
+      const h = helpers(page, 'redeem')
+      await page.waitForFunction(() => ['news', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) === 'news') await h.click('news-done')
+      await h.screen('counter')
+      await h.click('next-customer')
+      await h.screen('redeem')
+      await page.waitForTimeout(600)
+      await h.shot('redeem', 'redeem visit: who, item, pawn ticket (lent + interest = total), Take X, hand it over')
+      out.push(...h.shots)
+      await context.close()
+    }
+    {
       const { context, page } = await newPage(browser, PORTRAIT, '?seed=1&perf=1')
       const h = helpers(page, 'perf')
-      await h.click('open-shop')
+      await h.begin()
+      await h.open()
       await h.click('next-customer')
       await page.waitForTimeout(1200)
       const counter = await page.locator('.perf-info').textContent()
@@ -355,6 +539,18 @@ async function main() {
       const inspect = await page.locator('.perf-info').textContent()
       console.log(`perf counter: ${counter?.replace(/\n/g, ' | ')}`)
       console.log(`perf inspect: ${inspect?.replace(/\n/g, ' | ')}`)
+      await context.close()
+    }
+    {
+      const { context, page } = await newPage(browser, PORTRAIT, '?seed=1')
+      const h = helpers(page, 'economy')
+      try {
+        await playEconomy(page, h)
+      } catch (err) {
+        await page.screenshot({ path: `${OUT}/economy-FAILED.png` }).catch(() => {})
+        errors.push(`[economy] flow: ${err.message.split('\n')[0]}`)
+      }
+      out.push(...h.shots)
       await context.close()
     }
     return out

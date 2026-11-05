@@ -31,7 +31,7 @@ Goal: play one day with placeholder art.
 
 Done when: a tester can play 5 days on a phone, lose money on fakes, and make money on real gold.
 
-## M2 — Shop and economy (status: not started)
+## M2 — Shop and economy (status: built; simulator criteria met, awaiting phone playtest)
 
 - Display slots, drag items into cases, tag pricing, walk-in buyers who haggle.
 - Pawn loans with interest and redemption.

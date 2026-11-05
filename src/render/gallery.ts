@@ -7,7 +7,7 @@
 import * as THREE from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 import { ITEM_DEFS } from '../data/items'
-import { buildPlaceholder } from './items'
+import { buildPlaceholder, specOf } from './items'
 
 export async function runGallery(renderer: THREE.WebGLRenderer, envUrl: string, onReady: () => void): Promise<void> {
   const scene = new THREE.Scene()
@@ -29,19 +29,13 @@ export async function runGallery(renderer: THREE.WebGLRenderer, envUrl: string, 
   rim.position.set(-0.5, 0.3, -0.4)
   scene.add(key, rim)
 
-  // Grid: two items per row, each shown from the front and from the back.
-  const cols = 4
+  // Grid: three items per row, each shown from the front and from the back.
+  const cols = 6
   const rows = Math.ceil((ITEM_DEFS.length * 2) / cols)
   const beadMat = new THREE.MeshBasicMaterial({ color: '#ff3d9a' })
   ITEM_DEFS.forEach((def, i) => {
     for (const back of [false, true]) {
-      const m = buildPlaceholder({
-        placeholder: def.model.placeholder,
-        color: def.model.color,
-        scale: def.model.scale,
-        brand: def.brand,
-        hotspots: def.model.hotspots,
-      })
+      const m = buildPlaceholder(specOf(def))
       const size = new THREE.Box3().setFromObject(m).getSize(new THREE.Vector3())
       const k = 0.42 / Math.max(size.x, size.y, size.z)
       for (const h of def.model.hotspots) {
@@ -61,13 +55,17 @@ export async function runGallery(renderer: THREE.WebGLRenderer, envUrl: string, 
     }
   })
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50)
-  camera.position.set(0, 0, 6.4)
+  const gridW = cols * 0.5
+  const gridH = rows * 0.55
   const resize = () => {
     const w = window.innerWidth
     const h = window.innerHeight
     renderer.setSize(w, h)
     camera.aspect = w / h
     camera.fov = 30
+    // Back off until the whole grid fits.
+    const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
+    camera.position.set(0, 0, Math.max(gridH / 2 / t, gridW / 2 / (t * camera.aspect)) * 1.04)
     camera.updateProjectionMatrix()
   }
   resize()

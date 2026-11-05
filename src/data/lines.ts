@@ -11,6 +11,8 @@
  * - proud: formal, offended easily, talks about family, history, dignity.
  */
 import type { Rng } from '../game/rng'
+import { loanLines } from './loanLines'
+import { saleLines } from './saleLines'
 
 export const haggleLines: Record<string, readonly string[]> = {
   // --- accept, by temperament -------------------------------------------------
@@ -208,6 +210,8 @@ export const haggleLines: Record<string, readonly string[]> = {
 }
 
 export const visitLines = {
+  /** A buyer reached the counter but the item they wanted is gone from display. */
+  buyerGone: ['Oh. It’s gone? Never mind then.', 'I saw it in the window yesterday… no? Okay.'],
   pass: [
     'Your loss.',
     'Fine. There’s another lombard by the bridge.',
@@ -231,8 +235,23 @@ export const visitLines = {
   ],
 } as const
 
+const LINE_SETS: readonly Record<string, readonly string[]>[] = [haggleLines, saleLines, loanLines]
+
+function lookup(key: string): readonly string[] | undefined {
+  for (const set of LINE_SETS) {
+    const hit = set[key]
+    if (hit && hit.length > 0) return hit
+  }
+  return undefined
+}
+
+/**
+ * Pick a line by key, falling back to the ".flexible" variant of the same event
+ * (the key with its last segment replaced), then to "…". Looks in haggle, sale and loan lines.
+ */
 export function pickLine(key: string, rng: Rng, vars: Record<string, string> = {}): string {
-  const options = haggleLines[key] ?? haggleLines[key.split('.')[0] + '.flexible'] ?? ['…']
+  const fallback = key.includes('.') ? `${key.slice(0, key.lastIndexOf('.'))}.flexible` : key
+  const options = lookup(key) ?? lookup(fallback) ?? haggleLines[key.split('.')[0] + '.flexible'] ?? ['…']
   let line = rng.pick(options)
   for (const [k, v] of Object.entries(vars)) line = line.replaceAll(`{${k}}`, v)
   return line

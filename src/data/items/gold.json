@@ -172,7 +172,7 @@
         ]
       }
     ],
-    "demandTags": ["gold"],
+    "demandTags": ["gold", "jewelry"],
     "claims": [
       "Bought it in Turkey on holiday. 585, the man swore on his mother.",
       "My husband's. He won't be needing it where he's gone. The north, I mean. For work.",
@@ -236,7 +236,7 @@
         ]
       }
     ],
-    "demandTags": ["gold"],
+    "demandTags": ["gold", "jewelry"],
     "claims": [
       "My daughter's. She lost one and her friend made her a copy. No, wait, that's another pair.",
       "From my first husband. The earrings were the best part of him.",
@@ -252,6 +252,135 @@
         { "id": "lock_left", "label": "Left lock", "position": [-0.009, 0.012, 0] },
         { "id": "lock_right", "label": "Right lock", "position": [0.009, 0.012, 0] },
         { "id": "stones", "label": "Stones", "position": [-0.009, -0.008, 0.002] }
+      ]
+    }
+  },
+  {
+    "id": "gold_cross_585",
+    "category": "gold",
+    "name": "585 gold cross pendant",
+    "era": "1990s–2000s",
+    "baseValue": { "min": 6000, "max": 9000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 3.2, "tolerance": 0.25 },
+    "magnetic": false,
+    "rarity": 2,
+    "fakeChance": 0.3,
+    "tells": [
+      { "id": "hallmark", "tool": "loupe", "finding": "On the back of the crossbar: a 585 stamp and a tiny maker's mark, both crisply struck.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "back" },
+      { "id": "bail", "tool": "loupe", "finding": "The bail is soldered neatly and worn bright on the inside where the chain ran.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "bail" },
+      { "id": "colour", "tool": "loupe", "finding": "Pale, even yellow gold. Scratches on the edges show the same colour underneath.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35 },
+      { "id": "heft", "tool": "scale", "finding": "Small, but it drops into the pan with a dense little tick.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_bail", "tool": "magnet", "finding": "The bail and its jump ring ignore the magnet too.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "bail" },
+      { "id": "acid", "tool": "acid", "finding": "The streak on the touchstone holds under the 585 acid and only fades under the stronger one.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2 }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 2,
+        "weightFactor": 0.62,
+        "tells": [
+          { "id": "hallmark", "tool": "loupe", "finding": "A 585 on the back, but blurred into the metal, with no maker's mark beside it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "back" },
+          { "id": "colour", "tool": "loupe", "finding": "On the corners the yellow has rubbed through to a dull pinkish brass.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45 },
+          { "id": "heft", "tool": "scale", "finding": "Light for its size; it barely ticks the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "acid", "tool": "acid", "finding": "The streak fizzes green and is gone under the first drop.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1 }
+        ]
+      },
+      {
+        "id": "gilded_silver",
+        "kind": "fake",
+        "valueMultiplier": 0.1,
+        "weight": 1,
+        "weightFactor": 0.78,
+        "tells": [
+          { "id": "hallmark", "tool": "loupe", "finding": "The 585 sits over a fainter, older stamp that reads 925.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "back" },
+          { "id": "colour", "tool": "loupe", "finding": "Where the edges are worn, the metal underneath is whitish grey.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5 },
+          { "id": "heft", "tool": "scale", "finding": "A touch light in the pan for a cross this size.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 },
+          { "id": "acid", "tool": "acid", "finding": "The streak survives the weak acid but turns milky white, not gold.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.2 }
+        ]
+      }
+    ],
+    "demandTags": ["gold", "jewelry"],
+    "claims": [
+      "My godmother gave it to me at my christening. I don't go to church, but still.",
+      "Solid gold, 585. I had it checked once, at a proper shop.",
+      "My husband wore it every day. He doesn't need it now.",
+      "Found it on the embankment, in the snow. Honestly."
+    ],
+    "model": {
+      "placeholder": "pendant",
+      "color": "#d9ad55",
+      "scale": 1,
+      "inspectDistance": 0.09,
+      "hotspots": [
+        { "id": "bail", "label": "Bail", "position": [0, 0.0185, 0] },
+        { "id": "front", "label": "Front", "position": [0, 0.0, 0.0011] },
+        { "id": "back", "label": "Back of crossbar", "position": [0, 0.006, -0.0011] }
+      ]
+    }
+  },
+  {
+    "id": "gold_bracelet_585",
+    "category": "gold",
+    "name": "585 gold bracelet, Bismarck weave",
+    "era": "1990s",
+    "baseValue": { "min": 26000, "max": 36000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 13.5, "tolerance": 1.0 },
+    "magnetic": false,
+    "rarity": 1.2,
+    "fakeChance": 0.35,
+    "tells": [
+      { "id": "clasp_stamp", "tool": "loupe", "finding": "On the box clasp tongue: 585 and a maker's mark, cleanly struck.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "clasp" },
+      { "id": "links", "tool": "loupe", "finding": "Each link is soldered shut; the weave is tight and doesn't kink.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "links" },
+      { "id": "colour", "tool": "loupe", "finding": "Warm, even gold all the way into the folds of the weave.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4 },
+      { "id": "heft", "tool": "scale", "finding": "It pours into the pan heavily, like a little snake.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_clasp", "tool": "magnet", "finding": "Even the clasp spring stays put; the magnet finds nothing to hold.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "clasp" },
+      { "id": "acid", "tool": "acid", "finding": "The streak shrugs off the 585 acid without fading.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2 }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "hollow_links",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 1,
+        "weightFactor": 0.5,
+        "tells": [
+          { "id": "links", "tool": "loupe", "finding": "One link is dented in, the metal thin as foil around the dent.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "links" },
+          { "id": "heft", "tool": "scale", "finding": "Surprisingly light in the pan for such a fat weave.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 1.5,
+        "weightFactor": 0.6,
+        "tells": [
+          { "id": "clasp_stamp", "tool": "loupe", "finding": "The clasp reads 585, but the stamp is shallow and the tongue shows pinkish metal at the edge.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "clasp" },
+          { "id": "links", "tool": "loupe", "finding": "Greenish crust sits between the links, where sweat got under the plating.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "links" },
+          { "id": "heft", "tool": "scale", "finding": "It clatters into the pan, light as costume jewellery.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "acid", "tool": "acid", "finding": "The first drop turns the streak green and eats it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1 }
+        ]
+      }
+    ],
+    "demandTags": ["gold", "jewelry"],
+    "claims": [
+      "A present from my first husband. The second one never bought me anything.",
+      "It's heavy, feel it. They don't weave them like that any more.",
+      "I need the money for my son's dentist. Don't ask.",
+      "From the gold market on the ring road. The man had a certificate."
+    ],
+    "model": {
+      "placeholder": "chain",
+      "color": "#d6a84e",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        { "id": "clasp", "label": "Clasp", "position": [0, -0.025, 0] },
+        { "id": "links", "label": "Weave", "position": [0, 0.025, 0] }
       ]
     }
   }

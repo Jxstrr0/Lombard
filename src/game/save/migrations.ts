@@ -9,7 +9,8 @@
  * shape no longer exists in the codebase.
  */
 import { z } from 'zod'
-import { STATE_VERSION, type GameState } from '../state'
+import { tuning } from '../../data/tuning'
+import { createSlots, STATE_VERSION, type GameState } from '../state'
 
 export const CURRENT_VERSION = STATE_VERSION
 
@@ -77,8 +78,50 @@ const v1ToV2: Migration = {
   },
 }
 
+/**
+ * v2 (M1) → v3 (M2): display slots and tag prices, pawn loans with held items,
+ * specialists, market/news, visit kinds, the career-start intro flag and the
+ * shop name. An M1 career is already under way, so its intro counts as done and
+ * its stock starts in the safe. Old loans were never creatable, so they are dropped.
+ */
+const v2ToV3: Migration = {
+  from: 2,
+  to: 3,
+  up(raw) {
+    const meta = isRecord(raw.meta) ? raw.meta : {}
+    const shop = isRecord(raw.shop) ? raw.shop : {}
+    const day = isRecord(raw.day) ? raw.day : {}
+    const upgrades = Array.isArray(shop.upgrades) ? shop.upgrades : []
+    const security = typeof shop.security === 'number' ? shop.security : 0
+    const visit = (v: unknown) => (isRecord(v) ? { kind: 'seller', wants: 'sell', ...v } : v)
+    const current = isRecord(raw.current) ? { sale: null, ...(visit(raw.current) as Raw) } : null
+    const history = Array.isArray(raw.history)
+      ? raw.history.map((h) => (isRecord(h) ? { expenses: 0, loaned: 0, redeemed: 0, ...h } : h))
+      : []
+    return {
+      ...raw,
+      meta: { ...meta, intro: false },
+      shop: {
+        name: tuning.career.defaultShopName,
+        slots: createSlots(),
+        prices: {},
+        upgrades,
+        acidCharges: 0,
+        security,
+      },
+      loans: [],
+      specialists: {},
+      market: { drift: {}, news: [] },
+      queue: Array.isArray(raw.queue) ? raw.queue.map(visit) : [],
+      current,
+      day: { ...day, newsRead: true },
+      history,
+    }
+  },
+}
+
 /** Ordered, contiguous chain. Append new steps at the end. */
-export const MIGRATIONS: readonly Migration[] = [v1ToV2]
+export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3]
 
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())
@@ -92,16 +135,26 @@ const GameStateShape = z.looseObject({
     careerId: z.string().min(1),
     rng: num,
     nextId: num,
+    intro: z.boolean(),
   }),
   calendar: z.looseObject({ day: num, weekday: num, season: z.string(), date: z.string() }),
   cash: num,
-  shop: z.looseObject({ slots: z.array(z.unknown()), upgrades: z.array(z.unknown()), security: num }),
+  shop: z.looseObject({
+    name: z.string(),
+    slots: z.array(z.looseObject({ id: z.string(), area: z.string() })),
+    prices: z.record(z.string(), num),
+    upgrades: z.array(z.unknown()),
+    acidCharges: num,
+    security: num,
+  }),
   inventory: z.array(itemLike),
   paid: z.record(z.string(), num),
-  loans: z.array(z.unknown()),
+  loans: z.array(z.looseObject({ id: z.string(), item: itemLike, principal: num })),
+  specialists: rec,
+  market: z.looseObject({ drift: rec, news: z.array(z.unknown()) }),
   customers: rec,
-  queue: z.array(z.looseObject({ visitId: z.string(), item: itemLike })),
-  current: z.looseObject({ visitId: z.string(), phase: z.string(), item: itemLike }).nullable(),
+  queue: z.array(z.looseObject({ visitId: z.string(), kind: z.string(), item: itemLike })),
+  current: z.looseObject({ visitId: z.string(), kind: z.string(), phase: z.string(), item: itemLike }).nullable(),
   inspect: z.looseObject({ findings: z.array(z.unknown()) }).nullable(),
   haggle: z.looseObject({ ask: num, floor: num }).nullable(),
   day: z.looseObject({ phase: z.enum(['open', 'closed']), clock: num, openingCash: num, log: z.array(z.unknown()) }),

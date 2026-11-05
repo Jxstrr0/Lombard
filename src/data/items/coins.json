@@ -1,0 +1,269 @@
+[
+  {
+    "id": "coin_poltinnik_1924",
+    "category": "coins",
+    "name": "Silver poltinnik (50 kopecks), 1924",
+    "era": "1920s",
+    "baseValue": { "min": 600, "max": 1100 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 10, "tolerance": 0.35 },
+    "magnetic": false,
+    "rarity": 2,
+    "fakeChance": 0.3,
+    "tells": [
+      { "id": "relief", "tool": "loupe", "finding": "The blacksmith's hammer and anvil are crisp, the date clear and sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse" },
+      { "id": "emblem", "tool": "loupe", "finding": "The wheat ears of the emblem show fine detail, rubbed smooth only at the highest points.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse" },
+      { "id": "edge", "tool": "loupe", "finding": "The edge carries tiny lettering naming the weight of pure silver, evenly spaced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge" },
+      { "id": "heft", "tool": "scale", "finding": "Settles in the pan just as a silver coin of its size should.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_coin", "tool": "magnet", "finding": "The magnet slides over it without the slightest tug.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse" },
+      { "id": "acid", "tool": "acid", "finding": "A drop of silver test turns the scratch a deep blood red.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2 }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cast_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.05,
+        "weight": 2,
+        "weightFactor": 0.88,
+        "tells": [
+          { "id": "relief", "tool": "loupe", "finding": "The relief is soft and grainy, as if poured, not struck.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" },
+          { "id": "edge", "tool": "loupe", "finding": "The edge lettering is smudged and runs together.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "edge" },
+          { "id": "heft", "tool": "scale", "finding": "A shade light in the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "acid", "tool": "acid", "finding": "The test drop turns the scratch a muddy green.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15 }
+        ]
+      },
+      {
+        "id": "cleaned",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          { "id": "relief", "tool": "loupe", "finding": "The surface is bright and covered in fine parallel hairlines: someone scrubbed it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" }
+        ]
+      }
+    ],
+    "demandTags": ["coins", "silver"],
+    "claims": [
+      "From my grandfather's collection. He had a whole album of these.",
+      "Real silver, Soviet. The early kind, with the blacksmith.",
+      "Dug it up at the dacha planting potatoes. There might be more.",
+      "I need the bus fare home. Truly."
+    ],
+    "model": {
+      "placeholder": "coin",
+      "color": "#cfd0cc",
+      "scale": 1.07,
+      "inspectDistance": 0.09,
+      "emblem": "smith",
+      "hotspots": [
+        { "id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011] },
+        { "id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011] },
+        { "id": "edge", "label": "Edge", "position": [0.0125, 0, 0] }
+      ]
+    }
+  },
+  {
+    "id": "coin_rouble_1877",
+    "category": "coins",
+    "name": "Imperial silver rouble, 1877",
+    "era": "1870s",
+    "baseValue": { "min": 4500, "max": 7500 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 20, "tolerance": 0.7 },
+    "magnetic": false,
+    "rarity": 1,
+    "fakeChance": 0.45,
+    "tells": [
+      { "id": "eagle", "tool": "loupe", "finding": "The double-headed eagle is sharp, each feather separate, the tiny shields on its wings legible.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse" },
+      { "id": "wreath", "tool": "loupe", "finding": "On the back the value sits in a wreath of crisp leaves, the date sharp beneath it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse" },
+      { "id": "edge", "tool": "loupe", "finding": "The edge carries raised lettering and the mintmaster's tiny initials.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge" },
+      { "id": "heft", "tool": "scale", "finding": "A full, heavy weight of silver in the pan.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_coin", "tool": "magnet", "finding": "The magnet glides across it with no pull at all.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse" },
+      { "id": "acid", "tool": "acid", "finding": "The silver test turns the scratch a deep red.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2 }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "alloy_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.02,
+        "weight": 2,
+        "weightFactor": 0.82,
+        "tells": [
+          { "id": "eagle", "tool": "loupe", "finding": "The eagle's feathers merge into smooth lumps; the wing shields are blank.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "obverse" },
+          { "id": "edge", "tool": "loupe", "finding": "The edge lettering is shallow and wanders off the rim.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "edge" },
+          { "id": "heft", "tool": "scale", "finding": "Light in the pan for a coin this size.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "acid", "tool": "acid", "finding": "The test drop turns the scratch green-brown.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15 }
+        ]
+      },
+      {
+        "id": "steel_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.01,
+        "weight": 1,
+        "weightFactor": 0.9,
+        "magnetic": true,
+        "tells": [
+          { "id": "magnet_coin", "tool": "magnet", "finding": "It leaps to the magnet.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1, "hotspot": "obverse" },
+          { "id": "wreath", "tool": "loupe", "finding": "The wreath is flat and the field has a dull grey sheen under the silvering.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "reverse" }
+        ]
+      },
+      {
+        "id": "cleaned",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          { "id": "eagle", "tool": "loupe", "finding": "The whole coin is bright as a spoon, with fine scrub marks across the eagle.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" }
+        ]
+      }
+    ],
+    "demandTags": ["coins", "silver"],
+    "claims": [
+      "Tsarist silver! My great-grandmother hid it in the wall in the twenties.",
+      "A man on the bridge sold it to me. I think I paid too much. Did I?",
+      "Heavy, isn't it? That's the old silver.",
+      "For coins like this people on the internet pay crazy money."
+    ],
+    "model": {
+      "placeholder": "coin",
+      "color": "#d2d2cd",
+      "scale": 1.43,
+      "inspectDistance": 0.1,
+      "emblem": "eagle",
+      "hotspots": [
+        { "id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011] },
+        { "id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011] },
+        { "id": "edge", "label": "Edge", "position": [0.0125, 0, 0] }
+      ]
+    }
+  },
+  {
+    "id": "coin_chervonets_sower",
+    "category": "coins",
+    "name": "Gold chervonets \"Sower\"",
+    "era": "1970s",
+    "baseValue": { "min": 13000, "max": 17000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 8.6, "tolerance": 0.3 },
+    "magnetic": false,
+    "rarity": 0.9,
+    "fakeChance": 0.4,
+    "tells": [
+      { "id": "relief", "tool": "loupe", "finding": "The sower strides across a crisp field; the factory chimneys behind him are sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse" },
+      { "id": "emblem", "tool": "loupe", "finding": "The emblem on the back is fine and clean, the lettering round it evenly spaced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse" },
+      { "id": "edge", "tool": "loupe", "finding": "The reeded edge is fine and even all the way round.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge" },
+      { "id": "heft", "tool": "scale", "finding": "Small but dense; it lands in the pan like a drop of lead.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_coin", "tool": "magnet", "finding": "Gold through and through: the magnet finds nothing.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse" },
+      { "id": "acid", "tool": "acid", "finding": "The streak shrugs off even the strongest acid in the kit.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2 }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.02,
+        "weight": 2,
+        "weightFactor": 0.62,
+        "tells": [
+          { "id": "relief", "tool": "loupe", "finding": "The sower is soft and rounded, and the field has tiny pits.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" },
+          { "id": "edge", "tool": "loupe", "finding": "Along the reeding, the gold has rubbed off to pale yellow metal.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "edge" },
+          { "id": "heft", "tool": "scale", "finding": "Far too light in the pan for gold.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25 },
+          { "id": "acid", "tool": "acid", "finding": "The first drop turns the streak green and eats it away.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1 }
+        ]
+      },
+      {
+        "id": "low_gold",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 1,
+        "weightFactor": 0.92,
+        "tells": [
+          { "id": "emblem", "tool": "loupe", "finding": "The lettering on the back is slightly thicker than it should be, as if from a copied die.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "reverse" },
+          { "id": "heft", "tool": "scale", "finding": "A little light in the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 },
+          { "id": "acid", "tool": "acid", "finding": "The streak survives the weak acid but dulls under the strong one: gold, but not this much.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.2 }
+        ]
+      }
+    ],
+    "demandTags": ["coins", "gold"],
+    "claims": [
+      "Gold coin, the Sower. My father bought it as savings, in case.",
+      "Better than a bank. Banks go bust. Gold does not.",
+      "Pure gold. Well, nine hundred. That's nearly pure.",
+      "A wedding present. The marriage did not last, the coin did."
+    ],
+    "model": {
+      "placeholder": "coin",
+      "color": "#d9ae4f",
+      "scale": 0.9,
+      "inspectDistance": 0.08,
+      "emblem": "sower",
+      "hotspots": [
+        { "id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011] },
+        { "id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011] },
+        { "id": "edge", "label": "Edge", "position": [0.0125, 0, 0] }
+      ]
+    }
+  },
+  {
+    "id": "coin_olympiad_10r",
+    "category": "coins",
+    "name": "Silver 10 roubles, \"Olympiad-80\" series",
+    "era": "1977–1980",
+    "baseValue": { "min": 1200, "max": 2000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 33.3, "tolerance": 1.0 },
+    "magnetic": false,
+    "rarity": 1.3,
+    "fakeChance": 0.2,
+    "tells": [
+      { "id": "relief", "tool": "loupe", "finding": "Mirror-bright field, frosted relief: a sprinter in mid-stride, every muscle crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse" },
+      { "id": "emblem", "tool": "loupe", "finding": "The emblem on the back is sharp, with the mint mark tucked under it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "reverse" },
+      { "id": "edge", "tool": "loupe", "finding": "The edge is lettered with the silver content, evenly spaced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge" },
+      { "id": "heft", "tool": "scale", "finding": "Big and heavy, an honest ounce of silver.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_coin", "tool": "magnet", "finding": "No pull at all from the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse" },
+      { "id": "acid", "tool": "acid", "finding": "The silver test turns the scratch a deep red.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2 }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 1,
+        "weightFactor": 0.85,
+        "tells": [
+          { "id": "relief", "tool": "loupe", "finding": "The field is shiny but wavy, and the sprinter is the same dull shine as everything else.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" },
+          { "id": "edge", "tool": "loupe", "finding": "The edge is plain where letters should be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "edge" },
+          { "id": "heft", "tool": "scale", "finding": "Light in the pan for a coin this big.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "acid", "tool": "acid", "finding": "The test drop turns the scratch dark green.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15 }
+        ]
+      },
+      {
+        "id": "cleaned",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1.5,
+        "tells": [
+          { "id": "relief", "tool": "loupe", "finding": "The mirror field is hazed with polishing swirls; the frost on the relief is rubbed away.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" }
+        ]
+      }
+    ],
+    "demandTags": ["coins", "silver", "soviet"],
+    "claims": [
+      "From the Olympics set. My father bought the whole series. I have one.",
+      "Proof condition. It says so on the plastic. Well, the plastic broke.",
+      "The bear mascot cried at the closing ceremony. I cried too. Anyway, the coin.",
+      "Silver, almost an ounce. I looked up the silver price this morning."
+    ],
+    "model": {
+      "placeholder": "coin",
+      "color": "#d8d8d4",
+      "scale": 1.56,
+      "inspectDistance": 0.1,
+      "emblem": "sprinter",
+      "hotspots": [
+        { "id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011] },
+        { "id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011] },
+        { "id": "edge", "label": "Edge", "position": [0.0125, 0, 0] }
+      ]
+    }
+  }
+]

@@ -1,0 +1,249 @@
+[
+  {
+    "id": "camera_zenit_e",
+    "category": "cameras",
+    "name": "Zenit-E 35 mm SLR",
+    "brand": "Zenit",
+    "era": "1970s–1980s",
+    "baseValue": { "min": 2500, "max": 4500 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 960, "tolerance": 40 },
+    "magnetic": true,
+    "rarity": 1.6,
+    "fakeChance": 0.2,
+    "tells": [
+      { "id": "serial", "tool": "loupe", "finding": "The body serial on the top plate opens with the year's two digits, the factory badge beside it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "top" },
+      { "id": "nameplate", "tool": "loupe", "finding": "ЗЕНИТ in raised letters on the prism housing, the paint worn down in the hollows.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "prism" },
+      { "id": "lens", "tool": "loupe", "finding": "The lens rings and the body's chrome have aged to the same dull, even grey.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "lens" },
+      { "id": "shutter", "tool": "loupe", "finding": "Through the open back, the cloth shutter curtains are whole, no pinholes against the light.", "reveals": "condition", "polarity": "positive", "difficulty": 0.5, "hotspot": "back" },
+      { "id": "heft", "tool": "scale", "finding": "A brick in the pan. Built to survive a tank rolling over it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.25 },
+      { "id": "magnet_body", "tool": "magnet", "finding": "The magnet clings to the steel shutter frame through the top plate.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "top" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "mixed_years",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 1.5,
+        "tells": [
+          { "id": "lens", "tool": "loupe", "finding": "The lens serial is twenty years younger than the body's.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "lens" }
+        ]
+      },
+      {
+        "id": "repainted",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          { "id": "nameplate", "tool": "loupe", "finding": "Fresh black paint in the letters, glossier than anything else on the camera.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "prism" },
+          { "id": "leatherette", "tool": "loupe", "finding": "The leatherette is new and a shade too black; glue shows at one corner.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5 }
+        ]
+      }
+    ],
+    "demandTags": ["cameras", "soviet"],
+    "claims": [
+      "My father photographed every May Day parade with it. Every single one.",
+      "It works without batteries. Try finding a phone that does that.",
+      "Found it on the top shelf of the wardrobe, with forty rolls of old film.",
+      "The students are buying film cameras again. You can sell it to a student."
+    ],
+    "model": {
+      "placeholder": "camera",
+      "color": "#bdbdb8",
+      "scale": 1,
+      "inspectDistance": 0.42,
+      "hotspots": [
+        { "id": "lens", "label": "Lens", "position": [0, -0.006, 0.066] },
+        { "id": "prism", "label": "Prism nameplate", "position": [0, 0.06, 0.012] },
+        { "id": "top", "label": "Top plate", "position": [0.043, 0.0425, 0.004] },
+        { "id": "back", "label": "Film door", "position": [0, -0.004, -0.0205] }
+      ]
+    }
+  },
+  {
+    "id": "camera_kanon_ae2",
+    "category": "cameras",
+    "name": "Kanon AE-2 35 mm SLR",
+    "brand": "Kanon",
+    "era": "1980s",
+    "baseValue": { "min": 6000, "max": 9500 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 750, "tolerance": 35 },
+    "magnetic": true,
+    "rarity": 1,
+    "fakeChance": 0.25,
+    "tells": [
+      { "id": "nameplate", "tool": "loupe", "finding": "KANON engraved on the prism, the paint fill sharp and even.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "prism" },
+      { "id": "mount", "tool": "loupe", "finding": "The lens locks straight into the breech mount, with its matching name ring.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "lens" },
+      { "id": "serial", "tool": "loupe", "finding": "A six-digit serial on the back of the top plate, cleanly stamped.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "top" },
+      { "id": "shutter", "tool": "loupe", "finding": "Fired with the back open, the shutter snaps once, clean and dry.", "reveals": "condition", "polarity": "positive", "difficulty": 0.45, "hotspot": "back" },
+      { "id": "heft", "tool": "scale", "finding": "Lighter than a Soviet SLR, solid all the same.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_body", "tool": "magnet", "finding": "A faint pull at the top plate, where the steel frame is.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "top" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "soviet_lens",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.45,
+        "weight": 1.5,
+        "tells": [
+          { "id": "mount", "tool": "loupe", "finding": "A thin adapter ring sits between the lens and the mount; the lens beyond it is Soviet.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3, "hotspot": "lens" },
+          { "id": "lens_name", "tool": "loupe", "finding": "The lens name ring reads in Cyrillic, nothing like the body's.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3, "hotspot": "lens" }
+        ]
+      },
+      {
+        "id": "squeaky_shutter",
+        "kind": "restored",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          { "id": "shutter", "tool": "loupe", "finding": "The shutter fires with a faint squeak, and an oily sheen sits on the mirror box.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "back" }
+        ]
+      }
+    ],
+    "demandTags": ["cameras"],
+    "claims": [
+      "Japanese. It was my uncle's, he worked on the ships.",
+      "The meter works, the needle moves, look.",
+      "I bought it for a photography course. I went to one lesson.",
+      "With this camera I took the photos for my wedding. Then the marriage ended. Camera works fine."
+    ],
+    "model": {
+      "placeholder": "camera",
+      "color": "#2a2a2a",
+      "scale": 1,
+      "inspectDistance": 0.42,
+      "hotspots": [
+        { "id": "lens", "label": "Lens", "position": [0, -0.006, 0.066] },
+        { "id": "prism", "label": "Prism nameplate", "position": [0, 0.06, 0.012] },
+        { "id": "top", "label": "Top plate", "position": [0.043, 0.0425, 0.004] },
+        { "id": "back", "label": "Film door", "position": [0, -0.004, -0.0205] }
+      ]
+    }
+  },
+  {
+    "id": "lens_helios_44",
+    "category": "cameras",
+    "name": "Helios-44-2 58 mm lens",
+    "brand": "Helios",
+    "era": "1980s",
+    "baseValue": { "min": 1800, "max": 3200 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 230, "tolerance": 10 },
+    "magnetic": false,
+    "rarity": 1.4,
+    "fakeChance": 0.25,
+    "tells": [
+      { "id": "name_ring", "tool": "loupe", "finding": "The name ring reads ГЕЛИОС-44-2 in white, the first digits of the serial giving the year.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "front" },
+      { "id": "aperture", "tool": "loupe", "finding": "The preset aperture ring clicks at each stop, smooth and even.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "aperture" },
+      { "id": "glass", "tool": "loupe", "finding": "The front element has a faint amber coating tint, clean, with only a speck of dust inside.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "front" },
+      { "id": "mount", "tool": "loupe", "finding": "The screw thread at the back is clean, with no burrs from cross-threading.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "mount" },
+      { "id": "heft", "tool": "scale", "finding": "Heavy for its size; brass and glass inside.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_barrel", "tool": "magnet", "finding": "Only a tiny spring inside stirs; the barrel ignores the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "aperture" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "later_optics",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          { "id": "glass", "tool": "loupe", "finding": "The glass behind the name ring has a later purple coating than the ring promises.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "front" }
+        ]
+      },
+      {
+        "id": "cleaned_fungus",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1.5,
+        "tells": [
+          { "id": "glass", "tool": "loupe", "finding": "Fine cleaning swirls on the front element, the coating rubbed thin in the centre.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "front" },
+          { "id": "aperture", "tool": "loupe", "finding": "The aperture ring turns too freely, fresh grease squeezing out at the edge.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "aperture" }
+        ]
+      }
+    ],
+    "demandTags": ["cameras", "soviet"],
+    "claims": [
+      "Video people buy these for the swirly background. I saw it online.",
+      "It came off my Zenit. The Zenit died, the lens is fine.",
+      "I have three of these. My father never threw anything away.",
+      "Perfect glass. I looked through it at the sun. Well, not at the sun."
+    ],
+    "model": {
+      "placeholder": "lens",
+      "color": "#2a2a2c",
+      "scale": 1,
+      "inspectDistance": 0.18,
+      "hotspots": [
+        { "id": "front", "label": "Front element", "position": [0, 0.012, 0.0226] },
+        { "id": "aperture", "label": "Aperture ring", "position": [0, 0.0232, 0.006] },
+        { "id": "mount", "label": "Screw mount", "position": [0, 0, -0.0305] }
+      ]
+    }
+  },
+  {
+    "id": "camera_weissler_iiic",
+    "category": "cameras",
+    "name": "Weissler IIIc rangefinder",
+    "brand": "Weissler",
+    "era": "1940s",
+    "baseValue": { "min": 55000, "max": 85000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 590, "tolerance": 25 },
+    "magnetic": true,
+    "rarity": 0.35,
+    "fakeChance": 0.75,
+    "tells": [
+      { "id": "engraving", "tool": "loupe", "finding": "The top-plate script is hand-engraved, the strokes deep and filled with aged black paint.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "top" },
+      { "id": "serial", "tool": "loupe", "finding": "The serial is crisp and evenly spaced, cut by the same hand as the script.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "top" },
+      { "id": "windows", "tool": "loupe", "finding": "The rangefinder windows have the narrow pre-war shape, the glass faintly amber with age.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "windows" },
+      { "id": "lens", "tool": "loupe", "finding": "The collapsible lens's name ring matches the body's maker and engraving style.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "lens" },
+      { "id": "heft", "tool": "scale", "finding": "Dense and compact in the pan.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35 },
+      { "id": "magnet_body", "tool": "magnet", "finding": "The magnet catches faintly on the shutter crate under the top plate.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "top" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "soviet_dressed",
+        "kind": "fake",
+        "valueMultiplier": 0.06,
+        "weight": 3,
+        "weightFactor": 1.1,
+        "tells": [
+          { "id": "engraving", "tool": "loupe", "finding": "The top-plate script is shallow and machine-even, the paint sitting on top of the cuts.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "top" },
+          { "id": "serial", "tool": "loupe", "finding": "Under the serial, faint traces of a Cyrillic marking that was ground away.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "top" },
+          { "id": "windows", "tool": "loupe", "finding": "The rangefinder windows have the wide shape of a post-war Soviet body.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "windows" },
+          { "id": "lens", "tool": "loupe", "finding": "The lens name ring is re-engraved; the old letters ghost through underneath.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "lens" },
+          { "id": "heft", "tool": "scale", "finding": "Heavier in the pan than this model ought to be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 }
+        ]
+      },
+      {
+        "id": "later_lens",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          { "id": "lens", "tool": "loupe", "finding": "The lens is from the right maker, but a post-war series; its coating doesn't match the body's age.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "lens" }
+        ]
+      }
+    ],
+    "demandTags": ["cameras"],
+    "claims": [
+      "My grandfather brought it back from the war in his kit bag.",
+      "German, pre-war. Collectors in Berlin pay a fortune for these.",
+      "Look at the engraving. Nobody makes things like that now.",
+      "I had an offer from a man in Moscow, but I prefer to sell locally."
+    ],
+    "model": {
+      "placeholder": "camera",
+      "color": "#c9cac6",
+      "scale": 1,
+      "inspectDistance": 0.4,
+      "hotspots": [
+        { "id": "lens", "label": "Lens", "position": [0, -0.006, 0.062] },
+        { "id": "top", "label": "Top plate", "position": [-0.03, 0.0405, 0.004] },
+        { "id": "windows", "label": "Rangefinder windows", "position": [0.042, 0.028, 0.0205] },
+        { "id": "back", "label": "Back", "position": [0, -0.004, -0.0205] }
+      ]
+    }
+  }
+]

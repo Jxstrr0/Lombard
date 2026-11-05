@@ -1,3 +1,4 @@
+import { startedState } from './helpers'
 import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { openDB } from 'idb'
@@ -5,10 +6,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { closeAutosave, deleteCareer, listCareers, loadLatestCareer, saveCareer } from '../src/persist/autosave'
 import { reducer } from '../src/game/actions'
 import { CURRENT_VERSION } from '../src/game/save/migrations'
-import { createInitialState, type GameState } from '../src/game/state'
+import { type GameState } from '../src/game/state'
 
 const career = (id: string, seed = 1, cash?: number): GameState => {
-  const s = createInitialState(seed, id)
+  const s = startedState(seed, id)
   return cash === undefined ? s : { ...s, cash }
 }
 
@@ -43,7 +44,7 @@ describe('autosave round trip', () => {
   })
 
   it('saves and loads a career', async () => {
-    let s = createInitialState(42, 'c-one')
+    let s = startedState(42, 'c-one')
     s = reducer(s, { type: 'day/open' })
     await saveCareer(s)
     expect(await loadLatestCareer()).toEqual(s)

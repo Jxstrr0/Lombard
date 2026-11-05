@@ -4,6 +4,7 @@
  *
  * Query flags: ?seed=N forces a fresh deterministic career (screenshots),
  * ?perf=1 shows the perf overlay, ?gallery=1 shows every placeholder model.
+ * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line.
  */
 import '@fontsource/space-grotesk/400.css'
 import '@fontsource/space-grotesk/500.css'
@@ -13,7 +14,12 @@ import '@fontsource/ibm-plex-mono/500.css'
 import '@fontsource/ibm-plex-mono/600.css'
 import './style.css'
 import * as THREE from 'three'
-import { AUTOSAVE_ACTIONS } from './game/actions'
+import { tuning } from './data/tuning'
+import { AUTOSAVE_ACTIONS, reducer } from './game/actions'
+import { ITEM_DEFS } from './data/items'
+import { generateWalkIn } from './game/customers/walkins'
+import { generateItem } from './game/items/generate'
+import { Rng } from './game/rng'
 import { createInitialState, type GameState } from './game/state'
 import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
@@ -35,6 +41,22 @@ function newSeed(): number {
 
 function newCareerId(seed: number): string {
   return `career-${Date.now().toString(36)}-${seed.toString(36)}`
+}
+
+/** Dev-only (?seed=N&scenario=redeem): a pawner whose 12-day-old loan is due today is first in line. */
+function redeemScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  const rng = new Rng(s.meta.seed)
+  const def = ITEM_DEFS.find((d) => d.category === 'watches') ?? ITEM_DEFS[0]!
+  const item = { ...generateItem(def, rng, 'i-dev'), authenticity: 'genuine' as const }
+  const day = s.calendar.day
+  const customer = { ...generateWalkIn(rng, 'c-dev'), temperament: 'flexible' as const }
+  const principal = Math.max(1000, Math.round((item.trueValue * 0.45) / 100) * 100)
+  const startDay = day - 12
+  const loan = { id: 'l-dev', item, customer, principal, startDay, dueDay: startDay + tuning.loans.termDays, monthlyRate: tuning.loans.monthlyRate, redeemDay: day }
+  s = reducer({ ...s, loans: [loan] }, { type: 'day/open' })
+  const visit = s.queue.find((v) => v.loanId === loan.id)
+  return visit ? { ...s, queue: [visit, ...s.queue.filter((v) => v !== visit)] } : s
 }
 
 function showFatal(message: string): void {
@@ -97,6 +119,7 @@ async function boot(): Promise<void> {
   let initial: GameState | null = null
   if (Number.isFinite(seedParam) && seedParam > 0) {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
+    if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
   } else {
     try {
       initial = await loadLatestCareer()

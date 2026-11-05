@@ -9,7 +9,9 @@ import type { LedgerEntry } from '../../game/types'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
 import { itemNameOf, longDate, rub, signedRub, WEEKDAYS } from '../format'
 import { icons } from '../icons'
+import { LedgerLoans } from './ledgerLoans'
 
+/** @deprecated The shop's name is state.shop.name (chosen at career start); kept for imports that predate it. */
 export const SHOP_NAME = 'Lombard No. 7'
 
 const KIND_LABEL: Record<LedgerEntry['kind'], string> = {
@@ -18,23 +20,31 @@ const KIND_LABEL: Record<LedgerEntry['kind'], string> = {
   walkout: 'LEFT',
   pass: 'PASS',
   expense: 'EXP',
+  loan: 'LOAN',
+  redeem: 'REDEEM',
+  forfeit: 'KEPT',
 }
 
 
 export class LedgerScreen {
   readonly root: HTMLElement
+  private shopName: HTMLElement
   private title: HTMLElement
   private date: HTMLElement
   private summary: HTMLElement
   private log: HTMLElement
   private stock: HTMLElement
   private open: HTMLButtonElement
+  private loans = new LedgerLoans()
   private key = ''
 
   constructor(
     private readonly dispatch: (a: Action) => void,
     openSettings: () => void,
     gear: (onPress: () => void) => HTMLButtonElement,
+    openOffice?: () => void,
+    /** Opens the shop sheet (display and tags). */
+    shopButton?: HTMLButtonElement,
   ) {
     const root = el('section', 'screen ledger-screen')
     root.dataset.screen = 'ledger'
@@ -42,7 +52,8 @@ export class LedgerScreen {
     const receipt = el('article', 'receipt')
     receipt.dataset.id = 'ledger'
     const head = el('header', 'receipt-head')
-    head.append(el('div', 'receipt-shop', SHOP_NAME.toUpperCase()), el('div', 'receipt-cyr', 'ЛОМБАРД № 7 · МОСТОГРАД'))
+    this.shopName = el('div', 'receipt-shop')
+    head.append(this.shopName, el('div', 'receipt-cyr', 'ЛОМБАРД · МОСТОГРАД'))
     this.title = el('div', 'receipt-title')
     this.date = el('div', 'receipt-date')
     head.append(this.title, this.date)
@@ -57,6 +68,8 @@ export class LedgerScreen {
       this.summary,
       el('h3', 'receipt-h', 'Today'),
       this.log,
+      el('h3', 'receipt-h', 'Pawn loans'),
+      this.loans.root,
       el('h3', 'receipt-h', 'In stock'),
       this.stock,
       el('div', 'receipt-foot', 'Thank you · Спасибо'),
@@ -65,13 +78,18 @@ export class LedgerScreen {
 
     const footer = el('footer', 'ledger-actions actions')
     this.open = createButton({ id: 'open-shop', label: 'Open shop', variant: 'primary', icon: 'door', onPress: () => dispatch({ type: 'day/open' }) })
-    footer.append(gear(openSettings), this.open)
+    footer.append(gear(openSettings))
+    if (shopButton) footer.append(shopButton)
+    if (openOffice) footer.append(createButton({ id: 'open-office', label: 'Office', icon: 'briefcase', className: 'btn-office', onPress: openOffice }))
+    footer.append(this.open)
     root.append(scroll, footer)
     this.root = root
   }
 
   render(state: GameState): void {
     setButtonLabel(this.open, `Open shop — Day ${state.calendar.day}`, 'door')
+    this.loans.render(state)
+    setText(this.shopName, state.shop.name.toUpperCase())
     const last = state.history[state.history.length - 1]
     const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last])
     if (key === this.key) return
@@ -90,6 +108,9 @@ export class LedgerScreen {
       [`Bought (${last.bought})`, last.spent > 0 ? signedRub(-last.spent) : rub(0)],
       [`Sold (${last.sold})`, last.earned > 0 ? signedRub(last.earned) : rub(0)],
       ['Walkouts', String(last.walkouts)],
+      ...(last.loaned > 0 ? [['Lent on pawns', signedRub(-last.loaned)] as [string, string]] : []),
+      ...(last.redeemed > 0 ? [['Repaid', signedRub(last.redeemed)] as [string, string]] : []),
+      ...(last.expenses > 0 ? [['Expenses', signedRub(-last.expenses)] as [string, string]] : []),
       ['Closing cash', rub(last.closingCash), 'total'],
     ]
     this.summary.replaceChildren()

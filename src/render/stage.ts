@@ -8,7 +8,7 @@
  * ring on the mat is only ~8 px tall from the counter camera on a phone. On
  * the counter the item is scaled up so its largest side reads as ~9 cm
  * (factor clamped to 1.2–5×). In inspect it is shown at true size (the camera
- * comes close instead). Revisit with real models in M3.
+ * comes close instead). Scripted glb models keep the same real-size convention.
  */
 import * as THREE from 'three'
 import { getItemDef } from '../data/items'
@@ -16,7 +16,8 @@ import { fakeProfileOf } from '../game/items/generate'
 import type { Hotspot, ItemDef, ToolId } from '../game/schema/item'
 import type { GameState } from '../game/state'
 import { INSPECT_POINT, type CameraRig } from './camera'
-import { ItemModels, specOf } from './items'
+import { ItemModels, proxyOf } from './items'
+import type { GlbLoader } from './loaders'
 import { contactShadowTexture } from './textures'
 
 const COUNTER_READ_SIZE = 0.09
@@ -43,7 +44,7 @@ interface ToolAnim {
 
 export class ItemStage {
   readonly pivot = new THREE.Group()
-  private readonly models = new ItemModels(3)
+  private readonly models: ItemModels
   private model: THREE.Group | null = null
   private def: ItemDef | null = null
   private visitId: string | null = null
@@ -71,7 +72,11 @@ export class ItemStage {
   private readonly raycaster = new THREE.Raycaster()
   private readonly matPoint: THREE.Vector3
 
-  constructor(scene: THREE.Scene, matPoint: THREE.Vector3) {
+  constructor(scene: THREE.Scene, matPoint: THREE.Vector3, loadGlb?: GlbLoader) {
+    this.models = new ItemModels(3, loadGlb)
+    this.models.onSwap((defId) => {
+      if (this.def?.id === defId) this.fit()
+    })
     this.matPoint = matPoint.clone()
     // Lying flat, dial/screen up, its top (+Y) pointing away from the player (towards the customer).
     const flat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2)
@@ -252,7 +257,7 @@ export class ItemStage {
         this.raycaster.set(camPos, world.clone().sub(camPos).normalize())
         this.raycaster.near = 0
         this.raycaster.far = dist
-        const hits = this.raycaster.intersectObject(model, true)
+        const hits = this.raycaster.intersectObject(proxyOf(model), true)
         const first = hits[0]
         if (first && first.distance < dist - this.size * 0.06) visible = false
       }
@@ -278,19 +283,30 @@ export class ItemStage {
       console.warn('[stage] unknown item def', defId, err)
       return
     }
-    const model = this.models.get(def.id, specOf(def))
+    const model = this.models.get(def)
     model.position.set(0, 0, 0)
     model.quaternion.identity()
+    this.pivot.add(model)
+    this.model = model
+    this.def = def
+    this.fit()
+  }
+
+  /** Size, counter scale, lift and shadow from the model's bounds (again when a glb swaps in). */
+  private fit(): void {
+    const model = this.model
+    if (!model) return
+    // Measure in the model's own frame (it sits at the pivot's origin; its scale is `model.scale`).
+    const parent = model.parent
+    parent?.remove(model)
     model.updateMatrixWorld(true)
-    const box = new THREE.Box3().setFromObject(model, true)
+    const box = new THREE.Box3().setFromObject(model.getObjectByName('glb') ?? model, true)
+    parent?.add(model)
     const size = box.getSize(new THREE.Vector3())
     this.size = Math.max(size.x, size.y, size.z, 0.005)
     this.counterScale = THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, 1.2, 5)
     // Lying flat: model −Z points down, so lift by the depth below the origin.
     this.lift = -box.min.z
-    this.pivot.add(model)
-    this.model = model
-    this.def = def
     // Footprint for the contact shadow: model X × Y on the mat.
     this.shadow.scale.set(size.x * this.counterScale * 1.5, size.y * this.counterScale * 1.5, 1)
   }

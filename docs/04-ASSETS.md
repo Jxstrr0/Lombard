@@ -89,6 +89,28 @@ Fakes reuse the genuine mesh with a texture/decal variant: softer hallmark stamp
 
 Reference photos of real counterfeit tells (Wikimedia, auction catalogues) inform the decals but are never shipped.
 
+### Scripted item models (decided Nov 2026, M3)
+
+A survey of CC0 / CC BY sources found almost nothing for our items: no Soviet watches, coins, medals or orders, no Helios lens, no Note-style phone. The near-matches (jewellery, a few cameras, branded phones) are Sketchfab CC BY and need an account token to download. So every item is **built by a Blender Python script**, headless, the same way as the shop bake. No licences to track, our fictional brands from the start, and the triangle budget is ours to set.
+
+- `art/items/build.py` reads `src/data/items/*.json` and builds every def whose `model.placeholder` kind has a builder in `art/items/kinds/<kind>.py`. Raw output goes to `art/out/items/` (git-ignored): `<id>.glb`, `<id>.json` (triangles, draw calls, bounds, hotspot gaps) and, with `--preview`, `<id>.png` (Cycles render, front and back, hotspots in pink).
+- `art/items/lib.py` holds the helpers. Authors work in **three.js item coordinates**, the ones `src/render/items.ts` documents and the hotspots use: metres, origin-centred, +Y up, front +Z. Helpers: lathe, cylinder, box, polygon, stroke, dots, text, arc text, bevel. Relief is real geometry. One **AO texture** per item (smart UV unwrap, Cycles AO bake, 512 px default; coins use 1024) multiplies each material's colour, so recesses darken like dirt and wear.
+- Rules for builders:
+  - Overlapping relief pieces must not share a top height. The helpers do this for you: each piece gets a tiny deterministic height difference, because coincident faces occlude each other in the AO bake and turn black.
+  - Relief that sits on a surface leaves out its base face (`base=False`).
+  - Keep an item under 60k triangles (aim for 20–30k) and every hotspot within 1.5 mm of the surface. `--strict` fails the build otherwise.
+- `scripts/items-pack.mjs` writes `public/assets/items/<id>.glb`: Draco geometry, plus textures as KTX2 (ETC1S for the AO/colour, UASTC for any data map). A coin is ~230 KB.
+- A def opts in with `"glb": "<id>.glb"` in its `model`. The game shows the placeholder at once and swaps the glb in when it loads. The hidden placeholder stays as the cheap raycast proxy for hotspot occlusion. `?noglb=1` forces placeholders. `?gallery=1&item=<id>` shows one model large, front and back, which is how Colby reviews a model on the phone.
+- `tests/itemModels.test.ts` checks that defs and packed files agree.
+- The `items` workflow (`.github/workflows/items.yml`) rebuilds and commits the models when a push to `main` changes `art/items/` or the pack script, or on demand from the GitHub app (Actions → items → Run workflow). Normally the models are built and committed together with the builder change.
+
+Run locally (Blender 4.5.15 at `~/blender`):
+
+```
+~/blender/blender --background --factory-startup --python art/items/build.py -- --kind coin --preview
+node scripts/items-pack.mjs
+```
+
 ## Customers
 
 Plan A: 2–3 rigged CC0 humanoid bases (check Quaternius "Universal Base Characters" and Sketchfab CC0 rigged scans), 6 outfit texture variants each, 6 upper-body poses (neutral, nervous, proud, impatient, pleased, angry) baked as animation clips. Faces: a portrait card in the dialogue strip carries the identity; the 3D model only needs silhouette and posture. Target under 15k tris per character.

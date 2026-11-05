@@ -44,7 +44,7 @@ Done when: a tester can play 5 days on a phone, lose money on fakes, and make mo
 
 Done when: the simulator shows a careful policy growing ~15%/month and a careless one busting by day 40.
 
-## M3 — Real art pass (status: not started)
+## M3 — Real art pass (status: in progress. Task 1, the bake pipeline, is built and deployed; waiting on Colby to trigger a preview bake from the GitHub app, then lock the layout)
 
 - **First task: bake pipeline end to end on a grey box.** `bake/layout.json` with the placeholder room, `bake/bake.py`, and `.github/workflows/bake.yml` (download + cache Blender, preview and full quality, gltf-transform optimize, commit outputs). Wire the lightmap into `scene.ts` on `uv1`. Done when a preview bake triggered from the GitHub mobile app lands in the deployed build.
 - Lock the room layout with Colby from preview-bake screenshots before dressing it (layout changes after this mean rebakes).

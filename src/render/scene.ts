@@ -13,6 +13,7 @@
 import * as THREE from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 import type { GameState } from '../game/state'
+import { loadCanalBackdrop, type CanalBackdrop } from './backdrop'
 import { loadBakedShop, type BakedShop, type ShopManifest } from './bakedShop'
 import { INSPECT_POINT } from './camera'
 import { canalBackdropTexture, contactShadowTexture, parquetTexture, plasterTexture } from './textures'
@@ -48,6 +49,10 @@ export class ShopScene {
   private customerTarget = 0
   private disposables: { dispose(): void }[] = []
   private lights!: LightRig
+  /** Canvas card outside the window until the rendered canal backdrop loads (and if it doesn't). */
+  private backdropCard: THREE.Mesh | null = null
+  private backdrop: CanalBackdrop | null = null
+  private backdropState = { clock: 0, reduceMotion: false }
   readonly matPoint = MAT_POINT.clone()
 
   constructor() {
@@ -94,8 +99,33 @@ export class ShopScene {
     }
   }
 
+  /**
+   * Swap the canvas card outside the window for the rendered canal
+   * (art/backdrop, seen through the window and the door glass). The card
+   * stays if the render is missing or fails to load.
+   */
+  async loadBackdrop(renderer: THREE.WebGLRenderer, base: string): Promise<boolean> {
+    try {
+      const backdrop = await loadCanalBackdrop(renderer, base)
+      backdrop.setState(this.backdropState.clock, this.backdropState.reduceMotion)
+      this.backdrop = backdrop
+      this.scene.add(backdrop.mesh)
+      if (this.backdropCard) {
+        this.scene.remove(this.backdropCard)
+        disposeTree(this.backdropCard)
+        this.backdropCard = null
+      }
+      return true
+    } catch (err) {
+      console.info('[shop] canal backdrop: keeping the canvas card:', err instanceof Error ? err.message : err)
+      return false
+    }
+  }
+
   /** Sync render-owned objects to game state. Never mutates state. */
   sync(state: GameState): void {
+    this.backdropState = { clock: state.day.clock, reduceMotion: state.settings.reduceMotion }
+    this.backdrop?.setState(state.day.clock, state.settings.reduceMotion)
     // Dim the customer while inspecting so the silhouette doesn't fight the item.
     this.customerTarget = !state.current ? 0 : state.current.phase === 'inspect' ? INSPECT_CUSTOMER_OPACITY : 1
   }
@@ -120,6 +150,7 @@ export class ShopScene {
   }
 
   update(dt: number): void {
+    this.backdrop?.update(dt)
     const speed = 3
     this.customerFade += (this.customerTarget - this.customerFade) * Math.min(1, dt * speed)
     this.customer.visible = this.customerFade > 0.01
@@ -134,6 +165,10 @@ export class ShopScene {
     if (this.baked) {
       this.scene.remove(this.baked.group)
       this.baked.dispose()
+    }
+    if (this.backdrop) {
+      this.scene.remove(this.backdrop.mesh)
+      this.backdrop.dispose()
     }
     disposeTree(this.scene)
     for (const d of this.disposables) d.dispose()
@@ -373,14 +408,16 @@ export class ShopScene {
 
   private buildWindowAndDoor(): void {
     const z = ROOM.halfD
-    // Canal backdrop card outside the window (unlit so it reads as daylight)
+    // Canal backdrop card outside the window (unlit so it reads as daylight). loadBackdrop()
+    // swaps in the rendered canal; the card is the fallback.
     const backdrop = new THREE.Mesh(
       new THREE.PlaneGeometry(7, 3.5),
-      new THREE.MeshBasicMaterial({ map: this.track(canalBackdropTexture()), toneMapped: false }),
+      new THREE.MeshBasicMaterial({ map: canalBackdropTexture(), toneMapped: false }),
     )
     backdrop.position.set(-1, 1.9, z + 1.6)
     backdrop.rotation.y = Math.PI
     this.scene.add(backdrop) // outside the room group: stays when the baked shop replaces the room
+    this.backdropCard = backdrop
 
     const frame = new THREE.MeshStandardMaterial({ color: '#e7e1d3', roughness: 0.6 })
     // window frame and mullions

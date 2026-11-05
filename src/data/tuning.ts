@@ -78,8 +78,8 @@ export const tuning = {
       { below: 10_000, step: 50 },
       { below: Number.POSITIVE_INFINITY, step: 100 },
     ] as readonly { below: number; step: number }[],
-    /** M1 resale: the dealer pays this share of trueValue. */
-    dealerRate: 0.8,
+    /** Dealer resale (fallback): the dealer pays this share of trueValue. Kept well under display prices (M2). */
+    dealerRate: 0.58,
     /** ± noise on the dealer's price. */
     dealerNoise: 0.08,
   },
@@ -196,13 +196,70 @@ export const tuning = {
   /** M2 display (owner: shop worker). Slot counts per GDD § 6. */
   shop: {
     slots: { counter: 6, wall: 12, back: 20 },
+    /** How often walk-in buyers notice an item in each area (× the economy worker's visibilityBonus). */
+    visibility: { counter: 1, wall: 0.6, back: 0.3 },
+    /** Highest tag the price pad accepts, rubles. */
+    maxTag: 9_999_999,
+    /** Quick multiples of what you paid on the price pad. */
+    tagChips: [1.5, 2, 3] as readonly number[],
   },
 
   /** M2 walk-in buyers and the sale haggle (owner: shop worker). */
   sell: {
-    /** Buyer's opening offer as a share of your tag. */
-    openFactor: 0.8,
-    maxRounds: 3,
+    // --- who comes in (planBuyers) ---
+    /** Daily chance a fairly priced item (tag = trueValue) in the counter case draws a buyer, at normal demand and reputation. */
+    baseChance: 0.35,
+    /** Tag under value: chance × (1 + underBoost × (1 − tag/value)), capped at maxUnderBoost. */
+    underBoost: 2.5,
+    maxUnderBoost: 1.8,
+    /** Tag over value: chance × exp(−overDecay × (tag/value − 1)). 1.3× value ≈ ½ the buyers, 2× ≈ ⅛. */
+    overDecay: 2.2,
+    /** No item draws a buyer more often than this per day. */
+    maxChance: 0.85,
+    /** Reputation: chance × (1 + general × repPerPoint), clamped to repClamp. */
+    repPerPoint: 0.01,
+    repClamp: [0.6, 1.4] as [number, number],
+    /** Most walk-in buyers per day (GDD: the shop is a small place). */
+    maxBuyersPerDay: 4,
+    /** In-game seconds a buyer waits in the queue, [min, max]. Browsers are less patient than sellers. */
+    patience: [120, 220] as [number, number],
+
+    // --- what they will pay (startSale) ---
+    /** ± spread of a buyer's sense of value at knowledge 0 (shrinks to 0 at knowledge 1). */
+    perceptionNoise: 0.25,
+    /** Share of the gap (claimed − true value) a naive buyer is fooled into paying for a fake: × (1 − knowledge). */
+    fakeFooled: 0.35,
+    /** How much they want it today: perceived × a draw in this range (+ temperament premium). */
+    valuation: [0.92, 1.18] as [number, number],
+    premium: { stubborn: -0.04, flexible: 0, desperate: 0.08, proud: 0.05 },
+    /** A tag above their value pulls naive buyers up: × (1 + tagAnchor × (1 − knowledge) × (tag/perceived − 1)). */
+    tagAnchor: 0.45,
+    /** Opening offer = ceiling × openShare (never above tag × openTagCap). */
+    openShare: { stubborn: 0.76, flexible: 0.84, desperate: 0.9, proud: 0.9 },
+    openTagCap: 0.95,
+    /** Rounds each temperament gives you (capped by maxRounds). Proud buyers don't haggle long. */
+    roundsByTemperament: { stubborn: 3, flexible: 4, desperate: 4, proud: 2 },
+    maxRounds: 4,
+
+    // --- per round (saleRound) ---
+    /** Chance to take a counter that is within their ceiling, before the final round (where it is certain). */
+    acceptBase: { stubborn: 0.25, flexible: 0.5, desperate: 0.6, proud: 0.45 },
+    acceptPerRound: 0.12,
+    /** Added × how far the counter sits under their ceiling (relative to the gap from their offer). */
+    acceptRoom: 0.3,
+    /** Share of the gap (your counter − their offer) a raise covers. */
+    raise: { stubborn: 0.25, flexible: 0.5, desperate: 0.55, proud: 0.4 },
+    raisePerRound: 0.05,
+    /** Counter above their ceiling: walk chance = overshootWalk × (counter/ceiling − 1). */
+    overshootWalk: 0.8,
+    /** Holding firm = not coming down from your last counter (or opening at ≥ firmTagShare of the tag). */
+    firmTagShare: 0.97,
+    /** Firm, by temperament: raise multiplier, accept bonus (within ceiling), walk chance (above ceiling). */
+    firmRaise: { stubborn: 0.6, flexible: 1.2, desperate: 1.5, proud: 1 },
+    firmAccept: { stubborn: -0.1, flexible: 0.1, desperate: 0.2, proud: 0.25 },
+    firmWalk: { stubborn: 0.35, flexible: 0.08, desperate: 0.03, proud: 0.45 },
+    /** Tidy prices: round to `big` at or above `bigFrom` ₽, else to `small`. */
+    roundTo: { bigFrom: 2_000, big: 100, small: 10 },
   },
 
   /** M2 pawn loans (owner: loans worker). */

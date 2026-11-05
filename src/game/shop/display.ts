@@ -6,9 +6,13 @@
  *   setPrice(state, itemId, price) → state
  *   displayed(state) → what is on display, with area and tag
  *
- * Rules the stubs already enforce: only inventory items can be placed; one item
- * per slot; placing into an occupied slot swaps the occupant back to the safe.
+ * Rules: only inventory items can be placed; one item per slot. Placing into an
+ * occupied slot swaps: the occupant takes the moved item's old slot, or goes to
+ * the safe if the moved item came from the safe. A tag of 0 (or less) removes
+ * the tag: the item is then not for sale even on display. Tags are capped at
+ * tuning.shop.maxTag.
  */
+import { tuning } from '../../data/tuning'
 import type { GameState, Slot, SlotArea } from '../state'
 import type { ItemInstance } from '../types'
 
@@ -22,9 +26,12 @@ export interface DisplayedItem {
 export function placeItem(state: GameState, itemId: string, slotId: string | null): GameState {
   if (!state.inventory.some((i) => i.id === itemId)) return state
   if (slotId !== null && !state.shop.slots.some((s) => s.id === slotId)) return state
+  const from = state.shop.slots.find((s) => s.itemId === itemId)
+  if ((from?.id ?? null) === slotId) return state
+  const occupant = slotId === null ? null : (state.shop.slots.find((s) => s.id === slotId)?.itemId ?? null)
   const slots = state.shop.slots.map((s) => {
     if (s.id === slotId) return { ...s, itemId }
-    if (s.itemId === itemId) return { ...s, itemId: null }
+    if (s.itemId === itemId) return { ...s, itemId: occupant }
     return s
   })
   return { ...state, shop: { ...state.shop, slots } }
@@ -32,7 +39,13 @@ export function placeItem(state: GameState, itemId: string, slotId: string | nul
 
 export function setPrice(state: GameState, itemId: string, price: number): GameState {
   if (!state.inventory.some((i) => i.id === itemId)) return state
-  const p = Math.max(0, Math.round(price))
+  const p = Math.min(tuning.shop.maxTag, Math.round(price))
+  if (!Number.isFinite(p) || p <= 0) {
+    if (!(itemId in state.shop.prices)) return state
+    const { [itemId]: _drop, ...prices } = state.shop.prices
+    return { ...state, shop: { ...state.shop, prices } }
+  }
+  if (state.shop.prices[itemId] === p) return state
   return { ...state, shop: { ...state.shop, prices: { ...state.shop.prices, [itemId]: p } } }
 }
 

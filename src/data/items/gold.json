@@ -54,6 +54,7 @@
       "Found it in the sofa when we moved. Nobody's asking for it back."
     ],
     "model": {
+      "glb": "gold_band_583.glb",
       "placeholder": "ring",
       "color": "#d4a64a",
       "scale": 1,
@@ -117,6 +118,7 @@
       "I wore it for twenty years. My fingers got too fat for it."
     ],
     "model": {
+      "glb": "gold_signet_583.glb",
       "placeholder": "signet",
       "color": "#cf9c45",
       "scale": 1,
@@ -180,6 +182,7 @@
       "It's been in a drawer since the nineties. Still shines, look."
     ],
     "model": {
+      "glb": "gold_rope_chain_585.glb",
       "placeholder": "chain",
       "color": "#c9973f",
       "scale": 1,
@@ -244,6 +247,7 @@
       "Mama never took them off. I can't bear to look at them now."
     ],
     "model": {
+      "glb": "gold_earrings_583.glb",
       "placeholder": "earrings",
       "color": "#d6a94e",
       "scale": 1,
@@ -310,6 +314,7 @@
       "Found it on the embankment, in the snow. Honestly."
     ],
     "model": {
+      "glb": "gold_cross_585.glb",
       "placeholder": "pendant",
       "color": "#d9ad55",
       "scale": 1,
@@ -374,6 +379,7 @@
       "From the gold market on the ring road. The man had a certificate."
     ],
     "model": {
+      "glb": "gold_bracelet_585.glb",
       "placeholder": "chain",
       "color": "#d6a84e",
       "scale": 1,

@@ -1,5 +1,5 @@
 /**
- * Shared domain types for M1. Modules own their logic; this file owns the
+ * Shared domain types (M1, extended in M2). Modules own their logic; this file owns the
  * shapes that cross module boundaries (state, reducer, UI).
  */
 import type { Polarity, Reveals, ToolId } from './schema/item'
@@ -84,18 +84,43 @@ export interface HaggleState {
 }
 
 export type VisitPhase = 'present' | 'inspect' | 'offer' | 'resolved'
-export type VisitOutcome = 'bought' | 'passed' | 'walked' | 'left'
+/**
+ * bought / pawned: you took the item. sold: a buyer took one of yours.
+ * redeemed: a pawner paid off their loan. passed / walked / left: no deal.
+ */
+export type VisitOutcome = 'bought' | 'pawned' | 'sold' | 'redeemed' | 'passed' | 'walked' | 'left'
+
+/**
+ * seller: brings an item to sell or pawn (inspect → offer → haggle).
+ * buyer: wants one of your displayed items (sale haggle, no inspect).
+ * redeem: comes back to pay off a loan and collect their item.
+ */
+export type VisitKind = 'seller' | 'buyer' | 'redeem'
+export type SellerWants = 'sell' | 'pawn'
 
 export interface QueuedVisit {
   visitId: string
+  kind: VisitKind
   customer: WalkIn
+  /** seller: their item. buyer: a snapshot of the displayed item they want. redeem: the pledged item. */
   item: ItemInstance
   /** Seconds of in-game time they will wait in the queue before leaving. */
   patience: number
+  /** seller only. */
+  wants?: SellerWants
+  /** redeem only. */
+  loanId?: string
+  /** Opening line at the counter (default: item.story). */
+  line?: string
 }
 
 export interface VisitState {
   visitId: string
+  kind: VisitKind
+  wants?: SellerWants
+  loanId?: string
+  /** buyer only: the sale haggle (null for other kinds). */
+  sale: SaleState | null
   customer: WalkIn
   item: ItemInstance
   phase: VisitPhase
@@ -104,8 +129,72 @@ export interface VisitState {
   /** In-game seconds spent at the counter. */
   elapsed: number
   outcome?: VisitOutcome
-  /** Price paid when outcome = bought. */
+  /** Cash that changed hands: price paid (bought), principal (pawned), sale price (sold), amount repaid (redeemed). */
   price?: number
+}
+
+/** A walk-in buyer haggling over one of your displayed items. */
+export interface SaleState {
+  itemId: string
+  /** Your tag price when they picked it up. */
+  tag: number
+  /** Their current offer. */
+  offer: number
+  /** Hidden: the most they will pay. */
+  ceiling: number
+  round: number
+  maxRounds: number
+  status: 'open' | 'sold' | 'walked'
+  history: { counter: number; response: SaleResponse }[]
+}
+
+export interface SaleResponse {
+  /** accept: they pay `price` (= your counter). counter: their new offer. walk: they leave. */
+  kind: 'accept' | 'counter' | 'walk'
+  price: number
+  /** Key into src/data/lines.ts sale lines. */
+  lineKey: string
+}
+
+export interface Loan {
+  id: string
+  /** The pledged item, held by the shop (not in inventory, not for sale). */
+  item: ItemInstance
+  customer: WalkIn
+  principal: number
+  startDay: number
+  /** Last day they can redeem. After it the item is forfeited to the shop. */
+  dueDay: number
+  /** Interest per 30 days, e.g. 0.1. */
+  monthlyRate: number
+  /** Hidden: the day they will come back to redeem, or null if they never will. */
+  redeemDay: number | null
+}
+
+export interface NewsItem {
+  id: string
+  headline: string
+  body: string
+  /** demandTags this story hints at. */
+  tags: string[]
+  direction: 'up' | 'down' | 'flat'
+}
+
+export interface MarketState {
+  /** Slow random-walk multiplier per demandTag (1 = normal). */
+  drift: Record<string, number>
+  /** Today's paper. */
+  news: NewsItem[]
+}
+
+export interface SpecialistState {
+  retained: boolean
+  /** 0–1, grows with steady payment. */
+  relationship: number
+  /** Calls used in the current billing month. */
+  callsUsed: number
+  /** Day the current retainer started (or 0). */
+  sinceDay: number
 }
 
 export interface InspectState {
@@ -115,7 +204,7 @@ export interface InspectState {
   estimate: number | null
 }
 
-export type LedgerKind = 'buy' | 'sell' | 'walkout' | 'pass' | 'expense'
+export type LedgerKind = 'buy' | 'sell' | 'walkout' | 'pass' | 'expense' | 'loan' | 'redeem' | 'forfeit'
 
 export interface LedgerEntry {
   kind: LedgerKind
@@ -134,6 +223,8 @@ export interface DayState {
   total: number
   openingCash: number
   log: LedgerEntry[]
+  /** False while today's paper is still unread (the news screen shows first). */
+  newsRead: boolean
 }
 
 /** Compact record of a finished day (kept in saves; full logs are not). */
@@ -146,4 +237,10 @@ export interface DaySummary {
   sold: number
   earned: number
   walkouts: number
+  /** M2+: rent, bills, retainers, upgrades (positive number). */
+  expenses: number
+  /** M2+: cash lent out on pawns today. */
+  loaned: number
+  /** M2+: cash repaid by redeeming pawners today. */
+  redeemed: number
 }

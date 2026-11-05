@@ -6,6 +6,9 @@ export const tuning = {
   career: {
     startingCash: 80_000,
     startDate: '2014-03-03',
+    defaultShopName: 'Lombard No. 7',
+    /** Longest shop name the name-your-shop screen accepts. */
+    shopNameMaxLength: 24,
   },
 
   day: {
@@ -75,8 +78,8 @@ export const tuning = {
       { below: 10_000, step: 50 },
       { below: Number.POSITIVE_INFINITY, step: 100 },
     ] as readonly { below: number; step: number }[],
-    /** M1 resale: the dealer pays this share of trueValue. */
-    dealerRate: 0.8,
+    /** Dealer resale (fallback): the dealer pays this share of trueValue. Kept well under display prices (M2). */
+    dealerRate: 0.58,
     /** ± noise on the dealer's price. */
     dealerNoise: 0.08,
   },
@@ -189,6 +192,276 @@ export const tuning = {
   },
 
   economy: {},
+
+  /** M2 display (owner: shop worker). Slot counts per GDD § 6. */
+  shop: {
+    slots: { counter: 6, wall: 12, back: 20 },
+    /** How often walk-in buyers notice an item in each area (× the economy worker's visibilityBonus). */
+    visibility: { counter: 1, wall: 0.6, back: 0.3 },
+    /** Highest tag the price pad accepts, rubles. */
+    maxTag: 9_999_999,
+    /** Quick multiples of what you paid on the price pad. */
+    tagChips: [1.5, 2, 3] as readonly number[],
+  },
+
+  /** M2 walk-in buyers and the sale haggle (owner: shop worker). */
+  sell: {
+    // --- who comes in (planBuyers) ---
+    /**
+     * Daily chance a fairly priced item (tag = trueValue) in the counter case draws a buyer, at normal demand and reputation.
+     * Tuned with `npm run sim` (M2): 0.28 puts the careful policy at ~18%/month over 60 and 90 days (target ~15%).
+     */
+    baseChance: 0.28,
+    /** Tag under value: chance × (1 + underBoost × (1 − tag/value)), capped at maxUnderBoost. */
+    underBoost: 2.5,
+    maxUnderBoost: 1.8,
+    /** Tag over value: chance × exp(−overDecay × (tag/value − 1)). 1.3× value ≈ ½ the buyers, 2× ≈ ⅛. */
+    overDecay: 2.2,
+    /** No item draws a buyer more often than this per day. */
+    maxChance: 0.85,
+    /** Reputation: chance × (1 + general × repPerPoint), clamped to repClamp. */
+    repPerPoint: 0.01,
+    repClamp: [0.6, 1.4] as [number, number],
+    /** Most walk-in buyers per day (GDD: the shop is a small place). */
+    maxBuyersPerDay: 4,
+    /** In-game seconds a buyer waits in the queue, [min, max]. Browsers are less patient than sellers. */
+    patience: [120, 220] as [number, number],
+
+    // --- what they will pay (startSale) ---
+    /** ± spread of a buyer's sense of value at knowledge 0 (shrinks to 0 at knowledge 1). */
+    perceptionNoise: 0.25,
+    /** Share of the gap (claimed − true value) a naive buyer is fooled into paying for a fake: × (1 − knowledge). */
+    fakeFooled: 0.35,
+    /** How much they want it today: perceived × a draw in this range (+ temperament premium). */
+    valuation: [0.88, 1.12] as [number, number], // M2 sim pass: was 0.92–1.18
+    premium: { stubborn: -0.04, flexible: 0, desperate: 0.08, proud: 0.05 },
+    /** A tag above their value pulls naive buyers up: × (1 + tagAnchor × (1 − knowledge) × (tag/perceived − 1)). */
+    tagAnchor: 0.45,
+    /** Opening offer = ceiling × openShare (never above tag × openTagCap). */
+    openShare: { stubborn: 0.76, flexible: 0.84, desperate: 0.9, proud: 0.9 },
+    openTagCap: 0.95,
+    /** Rounds each temperament gives you (capped by maxRounds). Proud buyers don't haggle long. */
+    roundsByTemperament: { stubborn: 3, flexible: 4, desperate: 4, proud: 2 },
+    maxRounds: 4,
+
+    // --- per round (saleRound) ---
+    /** Chance to take a counter that is within their ceiling, before the final round (where it is certain). */
+    acceptBase: { stubborn: 0.25, flexible: 0.5, desperate: 0.6, proud: 0.45 },
+    acceptPerRound: 0.12,
+    /** Added × how far the counter sits under their ceiling (relative to the gap from their offer). */
+    acceptRoom: 0.3,
+    /** Share of the gap (your counter − their offer) a raise covers. */
+    raise: { stubborn: 0.25, flexible: 0.5, desperate: 0.55, proud: 0.4 },
+    raisePerRound: 0.05,
+    /** Counter above their ceiling: walk chance = overshootWalk × (counter/ceiling − 1). */
+    overshootWalk: 0.8,
+    /** Holding firm = not coming down from your last counter (or opening at ≥ firmTagShare of the tag). */
+    firmTagShare: 0.97,
+    /** Firm, by temperament: raise multiplier, accept bonus (within ceiling), walk chance (above ceiling). */
+    firmRaise: { stubborn: 0.6, flexible: 1.2, desperate: 1.5, proud: 1 },
+    firmAccept: { stubborn: -0.1, flexible: 0.1, desperate: 0.2, proud: 0.25 },
+    firmWalk: { stubborn: 0.35, flexible: 0.08, desperate: 0.03, proud: 0.45 },
+    /** Tidy prices: round to `big` at or above `bigFrom` ₽, else to `small`. */
+    roundTo: { bigFrom: 2_000, big: 100, small: 10 },
+  },
+
+  /** M2 pawn loans (owner: loans worker). */
+  loans: {
+    /** Loan amount a pawner hopes for, as a share of what they'd ask to sell. */
+    askFactor: 0.6,
+    termDays: 30,
+    /** Interest per 30 days (GDD: ~10%/month). */
+    monthlyRate: 0.1,
+    /** Interest is prorated by days held, but never less than this many days' worth. */
+    minInterestDays: 7,
+    /** Amounts due are rounded up to this many rubles. */
+    roundTo: 10,
+    /** Days after dueDay the item is still held before it is forfeited. */
+    graceDays: 3,
+
+    // --- who pawns (generateDayQueue) ---
+    /** Chance a seller wants a loan instead of a sale: base + desperation × perDesperation (+ heirloom). */
+    pawnChance: { base: 0.12, perDesperation: 0.3, heirloom: 0.3, max: 0.75 },
+
+    // --- will they come back (createLoan) ---
+    /** Redeem chance before adjustments. */
+    redeemBase: 0.75,
+    /** Added when the item is an heirloom (sentiment brings people back). */
+    redeemHeirloom: 0.22,
+    /** Added for proud customers (family honour). */
+    redeemProud: 0.08,
+    /** Subtracted × desperation (some people never get back on their feet). */
+    redeemDesperation: 0.3,
+    /** Multiplies the chance by authenticity: someone pawning a fake rarely comes back. */
+    redeemAuthenticity: { genuine: 1, restored: 0.9, frankenstein: 0.45, fake: 0.2 },
+    /** Lent more than this share of trueValue: × overLentFactor (why repay more than it's worth?). */
+    overLentRatio: 0.9,
+    overLentFactor: 0.5,
+    redeemMin: 0.03,
+    redeemMax: 0.95,
+    /** Earliest redemption, in days after the loan starts (latest is dueDay). */
+    minRedeemDays: 3,
+    /** In-game seconds a redeeming customer will wait in the queue, [min, max]. */
+    redeemPatience: [320, 480] as [number, number],
+  },
+
+  /** M2 rent, bills, upgrades, specialists (owner: economy worker). */
+  /**
+   * Monthly bills, charged at the close of the last day of each calendar month
+   * (the career opens on 3 March 2014, so the first bills land on day 29).
+   *
+   * Reasoning (first pass; the simulator worker retunes): a small ground-floor
+   * shop on a canal in a big Russian city ran ~25–40k ₽/month in 2014. Rent +
+   * utilities = 34,500 ₽ ≈ 43% of the 80,000 ₽ start, so a shop that only breaks
+   * even on deals is visibly sinking by the second bill, while ~1,200 ₽/day of
+   * margin covers it. The M2 target (careful +15%/month after bills) then needs
+   * ~46k ₽/month of trading profit on ~80–100k of working capital: a couple of
+   * good buys a week at 40–60% of value. A careless player who overpays on fakes
+   * loses far more than rent; rent just takes away the cushion.
+   */
+  expenses: {
+    rent: 38_000, // M2 sim pass: was 30,000
+    /** Electricity, heating, water, phone line. */
+    utilities: 5_500, // M2 sim pass: was 4,500
+  },
+
+  /**
+   * Upgrades bought from the office while closed (definitions in src/data/upgrades.ts).
+   * Costs are sized against a ~1.2k ₽/day margin: the acid kit pays for itself
+   * with one avoided plated ring (~10k ₽), the case and the catalogue are
+   * month-two purchases.
+   */
+  upgrades: {
+    cost: {
+      acid_kit: 3_500,
+      reference_2: 6_000,
+      reference_3: 15_000,
+      case_counter: 18_000,
+    },
+    /** Tests in a new acid kit. */
+    acidKitCharges: 10,
+    /** Restock: price and tests per bottle; charges never exceed acidMaxCharges. */
+    acidRestockCost: 1_500,
+    acidRestockCharges: 10,
+    acidMaxCharges: 30,
+    /** Better counter case: counter-area buyer visibility × this; security +securityGain. */
+    caseCounterVisibility: 1.3,
+    caseCounterSecurity: 1,
+    /**
+     * Reference book by tier (index 0 = tier 1, the basic book everyone starts with).
+     * The book quotes def.baseValue's midpoint, shifted by up to ±centreError
+     * (a fixed per-def misprint, the same every time you look) and widened to
+     * ±halfWidth around it.
+     */
+    reference: {
+      halfWidth: [0.35, 0.22, 0.12] as readonly number[],
+      centreError: [0.12, 0.06, 0.02] as readonly number[],
+    },
+  },
+
+  /**
+   * Specialists on retainer (definitions and lines in src/data/specialists.ts).
+   * A call within the allowance costs fee / calls ≈ 1,000–1,500 ₽, so a call is
+   * worth it on items over ~15k ₽ where a mistake costs 10k+.
+   */
+  specialists: {
+    roster: {
+      /** Sharp and accurate, but she'd like your best gold for herself. */
+      jeweler: { fee: 6_000, calls: 6, perCall: 1_500, accuracy: 0.88, honesty: 0.55 },
+      /** Honest to a fault; his eyes are going. */
+      watchmaker: { fee: 7_500, calls: 5, perCall: 2_000, accuracy: 0.74, honesty: 0.95 },
+    } as Record<string, { fee: number; calls: number; perCall: number; accuracy: number; honesty: number }>,
+    /** Relationship on first retaining; + perMonth at each month-end paid in full (cap 1). */
+    relationshipStart: 0.1,
+    relationshipPerMonth: 0.15,
+    /** Lost on release (the relationship cools, it doesn't reset). */
+    releaseRelationshipLoss: 0.3,
+    /** Accuracy + relationship × this (capped at maxAccuracy). */
+    relationshipAccuracy: 0.1,
+    maxAccuracy: 0.97,
+    /** Chance of the wrong verdict = (1 − accuracy) × this. */
+    wrongVerdictFactor: 0.6,
+    /** Value estimate error: ± (1 − accuracy) × this of the value. */
+    valueNoise: 0.35,
+    /** Quoted range = estimate ± this share. */
+    rangeHalfWidth: 0.12,
+    /** A specialist who doubts a sound piece values it at value × this. */
+    doubtValueFactor: 0.6,
+    /** Lowball: genuine items worth at least minValue; chance = (1 − honesty) × chance; value × factor range. */
+    lowballMinValue: 15_000,
+    lowballChance: 0.6,
+    lowballFactor: [0.5, 0.7] as [number, number],
+  },
+
+  /** M2 seasonal demand, market drift, news, career-start stock (owner: content worker). */
+  demand: {
+    /**
+     * Season multiplier per demandTag (GDD § 7). Missing tag or season = 1.
+     * Cameras peak with the tourists and white nights, electronics before the school year,
+     * gold and watches over the New Year gift season.
+     */
+    seasons: {
+      gold: { winter: 1.05, spring: 1, summer: 1.05, autumn: 0.95 },
+      jewelry: { winter: 1.1, spring: 1.05, summer: 1, autumn: 0.9 },
+      watches: { winter: 1.1, spring: 0.95, summer: 0.95, autumn: 1 },
+      luxury: { winter: 1.1, spring: 1, summer: 1.05, autumn: 0.9 },
+      soviet: { winter: 0.9, spring: 1.05, summer: 1.15, autumn: 0.95 },
+      militaria: { winter: 0.9, spring: 1.1, summer: 1.05, autumn: 0.95 },
+      electronics: { winter: 1.05, spring: 0.95, summer: 0.9, autumn: 1.1 },
+      phones: { winter: 1.05, spring: 0.95, summer: 0.9, autumn: 1.1 },
+      cameras: { winter: 0.85, spring: 1.05, summer: 1.2, autumn: 0.9 },
+      coins: { winter: 1.05, spring: 1, summer: 0.95, autumn: 1 },
+      silver: { winter: 1, spring: 1, summer: 1, autumn: 1 },
+    } as Readonly<Record<string, Readonly<Partial<Record<'winter' | 'spring' | 'summer' | 'autumn', number>>>>>,
+    /**
+     * Holidays as date windows (MM-DD, inclusive; a window may wrap the year end) that
+     * multiply demand for some tags. Overlapping boosts multiply. Women's Day lands in the
+     * first week (the career starts 3 March).
+     */
+    holidays: [
+      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, cameras: 1.1 } },
+      { id: 'defender_day', from: '02-16', to: '02-23', boost: { watches: 1.15, militaria: 1.1 } },
+      { id: 'womens_day', from: '02-28', to: '03-08', boost: { jewelry: 1.35, gold: 1.2, watches: 1.05 } },
+      { id: 'victory_day', from: '04-25', to: '05-10', boost: { militaria: 1.45, soviet: 1.15 } },
+      { id: 'white_nights', from: '06-01', to: '07-10', boost: { cameras: 1.2, soviet: 1.1 } },
+      { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25 } },
+    ] as readonly { id: string; from: string; to: string; boost: Readonly<Record<string, number>> }[],
+    /** Per-tag random walk, stepped once a day at day open: d += U(−step, step) + revert × (1 − d), clamped. */
+    drift: { step: 0.025, revert: 0.05, min: 0.8, max: 1.25 },
+    /**
+     * Occasional market shocks: on a day one fires (chance `shockChance`, then picked by
+     * weight), its deltas are added to the drift (then clamped) and the paper reports it.
+     */
+    shockChance: 0.12,
+    shocks: [
+      { id: 'ruble_wobble', weight: 3, delta: { gold: 0.12, coins: 0.1, watches: 0.06, luxury: 0.05, electronics: -0.04 } },
+      { id: 'import_prices', weight: 2, delta: { phones: 0.1, electronics: 0.08 } },
+      { id: 'phone_launch', weight: 2, delta: { phones: -0.1 } },
+      { id: 'flea_market_raid', weight: 1.5, delta: { militaria: -0.12 } },
+      { id: 'collectors_fair', weight: 2, delta: { coins: 0.1, militaria: 0.06, cameras: 0.05 } },
+      { id: 'film_fad', weight: 1.5, delta: { cameras: 0.12 } },
+    ] as readonly { id: string; weight: number; delta: Readonly<Record<string, number>> }[],
+    /** demandMultiplier (mean over an item's tags of season × holiday × drift) is clamped to this. */
+    multiplier: { min: 0.6, max: 1.8 },
+    news: {
+      /** Weights for printing 1, 2 or 3 stories. */
+      storyCountWeights: [1, 2, 1.2] as readonly number[],
+      /** Chance a running holiday gets a story (always on the window's first day). */
+      holidayChance: 0.7,
+      /** A tag drifted at least this far from 1 can get a hint story… */
+      driftHintThreshold: 0.08,
+      /** …with this chance per day. */
+      driftHintChance: 0.6,
+    },
+  },
+  start: {
+    /** Leftovers from the previous owner: one surely-fake piece, one decent genuine one, plus 1–3 odds and ends. */
+    extraItems: [1, 3] as [number, number],
+    /** The decent genuine piece is in at least this condition. */
+    genuineMinCondition: 60,
+    /** Attempts at rolling a forced fake/genuine before taking what came. */
+    maxRolls: 30,
+  },
 
   save: {
     /** Day summaries kept in full; older days are folded into career stats. */

@@ -9,6 +9,14 @@
  * - earrings: a pair side by side along X (centres at x = ±0.009), ≈ 0.03 tall
  * - watch: round case r = 0.019, dial faces +Z, caseback −Z, strap along ±Y, crown +X
  * - phone: 0.06 × 0.125 × 0.008 box, screen +Z, back −Z (logo + camera), bottom edge −Y (port, screws)
+ * - pendant: a cross ≈ 0.019 × 0.035 in XY, bail on top at +Y (≈ 0.018), face +Z
+ * - camera: body 0.14 × 0.083 × 0.04 (top plate up to y ≈ 0.042), lens along +Z to z ≈ 0.064 (SLR) / 0.06 (rangefinder);
+ *   an SLR prism hump (when the def has a `prism` hotspot) rises to y ≈ 0.064; back −Z
+ * - lens: barrel r ≈ 0.0235 along Z, front glass at +Z (0.0225), screw mount at −Z (to −0.0305)
+ * - medal: pentagonal ribbon block on top (y 0.006…0.034), disc r 0.0185 centred at y = −0.02, face +Z
+ * - order: five-pointed star r 0.025 in XY, face +Z, screw post and nut behind (to z ≈ −0.0125)
+ * - badge: oval wreath plate ≈ 0.036 × 0.04 with a banner on top (to y ≈ 0.021), screw post behind (to z ≈ −0.011)
+ * - coin: disc r 0.0125, 2 mm thick, obverse +Z, reverse −Z, edge at x = 0.0125 (size it with model.scale)
  *
  * `model.scale` multiplies the whole model (kept for parity with glb models).
  * Models are cached by defId; ItemModels.evict disposes geometries, materials and textures.
@@ -27,6 +35,23 @@ export interface ModelSpec {
   brand?: string
   /** The def's hotspots: the watch sizes its case to meet the crown and caseback markers. */
   hotspots?: readonly { id: string; position: readonly [number, number, number] }[]
+  /** Medal ribbon stripes, left to right. */
+  ribbon?: readonly string[]
+  /** Which relief a medal/coin draws. */
+  emblem?: string
+}
+
+/** The placeholder spec for an item def (stage and gallery build from the same thing). */
+export function specOf(def: ItemDef): ModelSpec {
+  return {
+    placeholder: def.model.placeholder,
+    color: def.model.color,
+    scale: def.model.scale,
+    brand: def.brand,
+    hotspots: def.model.hotspots,
+    ribbon: def.model.ribbon,
+    emblem: def.model.emblem,
+  }
 }
 
 /** Builds placeholder meshes into a group. Every material/texture is owned by the group. */
@@ -52,6 +77,27 @@ export function buildPlaceholder(spec: ModelSpec): THREE.Group {
       break
     case 'phone':
       buildPhone(g, color, spec.brand, spec.hotspots)
+      break
+    case 'pendant':
+      buildPendant(g, color)
+      break
+    case 'camera':
+      buildCamera(g, color, spec.brand, spec.hotspots)
+      break
+    case 'lens':
+      buildLens(g, color, spec.brand)
+      break
+    case 'medal':
+      buildMedal(g, color, spec.ribbon, spec.emblem)
+      break
+    case 'order':
+      buildOrder(g, color)
+      break
+    case 'badge':
+      buildBadge(g, color)
+      break
+    case 'coin':
+      buildCoin(g, color, spec.emblem)
       break
   }
   const s = spec.scale ?? 1
@@ -633,4 +679,671 @@ function buildPhone(g: THREE.Group, color: THREE.Color, brand?: string, hotspots
   tray.name = 'simtray'
   tray.position.set(w / 2 + 0.0001, sim, 0)
   g.add(tray)
+}
+
+// --- M2 shapes: shared helpers ------------------------------------------------------------
+
+/** Darker or lighter CSS colour from a THREE.Color, for relief strokes on canvas. */
+function shade(color: THREE.Color, k: number): string {
+  const c = color.clone().multiplyScalar(k)
+  c.r = Math.min(1, c.r)
+  c.g = Math.min(1, c.g)
+  c.b = Math.min(1, c.b)
+  return `#${c.getHexString()}`
+}
+
+/** Map a flat shape's XY extent to 0..1 UVs (ExtrudeGeometry uses raw coordinates). */
+function planarUv(geo: THREE.BufferGeometry): void {
+  geo.computeBoundingBox()
+  const b = geo.boundingBox!
+  const w = b.max.x - b.min.x || 1
+  const h = b.max.y - b.min.y || 1
+  const pos = geo.getAttribute('position') as THREE.BufferAttribute
+  const uv = new Float32Array(pos.count * 2)
+  for (let i = 0; i < pos.count; i++) {
+    uv[i * 2] = (pos.getX(i) - b.min.x) / w
+    uv[i * 2 + 1] = (pos.getY(i) - b.min.y) / h
+  }
+  geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2))
+}
+
+/** Disc along Z (front cap +Z, back cap −Z) with materials [edge, front, back]. */
+function disc(r: number, thick: number, mats: THREE.Material[], segments = 40): THREE.Mesh {
+  const geo = new THREE.CylinderGeometry(r, r, thick, segments, 1)
+  geo.rotateX(Math.PI / 2)
+  return new THREE.Mesh(geo, mats)
+}
+
+function starShape(outer: number, inner: number): THREE.Shape {
+  const s = new THREE.Shape()
+  for (let i = 0; i < 10; i++) {
+    const a = Math.PI / 2 + (i * Math.PI) / 5
+    const r = i % 2 ? inner : outer
+    if (i === 0) s.moveTo(Math.cos(a) * r, Math.sin(a) * r)
+    else s.lineTo(Math.cos(a) * r, Math.sin(a) * r)
+  }
+  s.closePath()
+  return s
+}
+
+function drawStar(ctx: CanvasRenderingContext2D, x: number, y: number, outer: number, inner: number): void {
+  ctx.beginPath()
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5
+    const r = i % 2 ? inner : outer
+    ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r)
+  }
+  ctx.closePath()
+  ctx.fill()
+}
+
+/** Text set around a circle (coin and medal rims). Top arcs read clockwise; `bottom` arcs read left to right too. */
+function arcText(ctx: CanvasRenderingContext2D, text: string, cx: number, cy: number, r: number, centre: number, spread: number, bottom = false): void {
+  const chars = [...text]
+  ctx.save()
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  chars.forEach((ch, i) => {
+    const t = chars.length > 1 ? i / (chars.length - 1) : 0.5
+    const a = bottom ? centre + spread / 2 - t * spread : centre - spread / 2 + t * spread
+    ctx.save()
+    ctx.translate(cx + Math.cos(a) * r, cy + Math.sin(a) * r)
+    ctx.rotate(bottom ? a - Math.PI / 2 : a + Math.PI / 2)
+    ctx.fillText(ch, 0, 0)
+    ctx.restore()
+  })
+  ctx.restore()
+}
+
+/** Metallic face: base colour, a raised rim ring, and whatever `draw` adds in a darker shade. */
+function faceTexture(color: THREE.Color, draw: (ctx: CanvasRenderingContext2D, ink: string, hi: string) => void, size = 256): THREE.CanvasTexture {
+  const tex = canvasTexture(size, size, (ctx) => {
+    const c = size / 2
+    const grad = ctx.createRadialGradient(c * 0.8, c * 0.7, size * 0.05, c, c, c)
+    grad.addColorStop(0, shade(color, 1.12))
+    grad.addColorStop(1, shade(color, 0.86))
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, size, size)
+    ctx.strokeStyle = shade(color, 0.62)
+    ctx.lineWidth = size * 0.018
+    ctx.beginPath()
+    ctx.arc(c, c, c * 0.93, 0, Math.PI * 2)
+    ctx.stroke()
+    draw(ctx, shade(color, 0.5), shade(color, 1.25))
+  })
+  // Cylinder caps (see disc()) map the canvas a quarter turn off once the disc faces ±Z.
+  tex.center.set(0.5, 0.5)
+  tex.rotation = Math.PI / 2
+  return tex
+}
+
+// --- pendant (cross) ------------------------------------------------------------------------
+
+function buildPendant(g: THREE.Group, color: THREE.Color): void {
+  const mat = metal(color, 0.24)
+  const t = 0.0018
+  const upright = new THREE.Mesh(new RoundedBoxGeometry(0.0042, 0.03, t, 2, 0.0006), mat)
+  upright.position.y = -0.002
+  upright.name = 'front'
+  const bar = new THREE.Mesh(new RoundedBoxGeometry(0.019, 0.0042, t, 2, 0.0006), mat)
+  bar.position.y = 0.006
+  // small rounded terminals at the four ends
+  const knob = new THREE.SphereGeometry(0.0013, 10, 6)
+  for (const [x, y] of [[0, 0.0135], [0, -0.0175], [0.0095, 0.006], [-0.0095, 0.006]] as const) {
+    const k = new THREE.Mesh(knob, mat)
+    k.position.set(x, y, 0)
+    k.scale.z = 0.7
+    g.add(k)
+  }
+  // bail: a ring standing across the cross so a chain would run through it
+  const bail = new THREE.Mesh(new THREE.TorusGeometry(0.0021, 0.00055, 6, 16), mat)
+  bail.name = 'bail'
+  bail.rotation.y = Math.PI / 2
+  bail.position.y = 0.0168
+  g.add(upright, bar, bail)
+}
+
+// --- camera -----------------------------------------------------------------------------------
+
+const CAMERA = { w: 0.14, h: 0.075, d: 0.04 }
+
+function nameplateTexture(text: string, dark: boolean): THREE.CanvasTexture {
+  return canvasTexture(256, 64, (ctx) => {
+    ctx.fillStyle = dark ? '#1a1a1a' : '#cfcfca'
+    ctx.fillRect(0, 0, 256, 64)
+    ctx.fillStyle = dark ? '#e9e7e0' : '#1b1b1b'
+    ctx.font = '700 38px Georgia, serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(text, 128, 34)
+  })
+}
+
+function leatherTexture(): THREE.CanvasTexture {
+  return canvasTexture(128, 128, (ctx) => {
+    ctx.fillStyle = '#1b1a19'
+    ctx.fillRect(0, 0, 128, 128)
+    for (let i = 0; i < 900; i++) {
+      ctx.fillStyle = hash01(i + 2000) > 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.35)'
+      ctx.fillRect(hash01(i) * 128, hash01(i + 1000) * 128, 2, 2)
+    }
+  })
+}
+
+function buildCamera(g: THREE.Group, color: THREE.Color, brand?: string, hotspots?: ModelSpec['hotspots']): void {
+  const { w, h, d } = CAMERA
+  const slr = hotspots?.some((s) => s.id === 'prism') ?? true
+  const chrome = metal(color, 0.32)
+  const dark = color.getHSL({ h: 0, s: 0, l: 0 }).l < 0.3
+  const leather = new THREE.MeshStandardMaterial({ map: leatherTexture(), roughness: 0.85, metalness: 0 })
+  const body = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, 0.004), leather)
+  body.name = 'body'
+  g.add(body)
+  // Top plate in the def colour (chrome or black paint), bottom plate to match
+  const top = new THREE.Mesh(new RoundedBoxGeometry(w - 0.002, 0.009, d - 0.001, 2, 0.003), chrome)
+  top.name = 'top'
+  top.position.y = h / 2 + 0.0002
+  g.add(top)
+  const plateTop = h / 2 + 0.0047
+  const bottom = new THREE.Mesh(new THREE.BoxGeometry(w - 0.006, 0.003, d - 0.004), chrome)
+  bottom.position.y = -h / 2 - 0.0005
+  g.add(bottom)
+  // Knobs: shutter dial (+X), rewind (−X), release button
+  const knobGeo = new THREE.CylinderGeometry(0.0095, 0.0095, 0.006, 18)
+  const shutter = new THREE.Mesh(knobGeo, chrome)
+  shutter.position.set(0.046, plateTop + 0.003, 0)
+  const rewind = new THREE.Mesh(knobGeo, chrome)
+  rewind.position.set(-0.05, plateTop + 0.003, 0)
+  const release = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.004, 10), chrome)
+  release.position.set(0.03, plateTop + 0.002, 0.008)
+  g.add(shutter, rewind, release)
+  const label = brand ? (/zenit/i.test(brand) ? 'ЗЕНИТ' : brand.toUpperCase()) : 'CAMERA'
+  const plateMat = new THREE.MeshStandardMaterial({ map: nameplateTexture(label, dark), metalness: 0.4, roughness: 0.4 })
+  if (slr) {
+    // Prism hump: a square frustum over the lens axis, nameplate on its sloped front
+    const prismGeo = new THREE.CylinderGeometry(0.018, 0.03, 0.022, 4, 1)
+    prismGeo.rotateY(Math.PI / 4)
+    const prism = new THREE.Mesh(prismGeo, chrome)
+    prism.name = 'prism'
+    prism.position.y = plateTop + 0.011
+    g.add(prism)
+    const half = (r: number) => r / Math.SQRT2
+    const slope = Math.atan2(half(0.03) - half(0.018), 0.022)
+    const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.024, 0.006), plateMat)
+    plate.position.set(0, plateTop + 0.0105, (half(0.03) + half(0.018)) / 2 + 0.0004)
+    plate.rotation.x = slope
+    g.add(plate)
+  } else {
+    // Rangefinder: two windows on the front, engraved script on the top plate
+    const glass = new THREE.MeshStandardMaterial({ color: '#2a2216', roughness: 0.08, metalness: 0.3 })
+    for (const x of [0.042, -0.012]) {
+      const win = new THREE.Mesh(new THREE.PlaneGeometry(x > 0 ? 0.012 : 0.009, 0.007), glass)
+      win.position.set(x, 0.028, d / 2 + 0.0004)
+      g.add(win)
+    }
+    const script = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.0125), plateMat)
+    script.position.set(-0.016, plateTop + 0.0002, 0.003)
+    script.rotation.x = -Math.PI / 2
+    g.add(script)
+  }
+  // Lens: mount ring, barrel, grip ring, front glass
+  const lensEnd = slr ? 0.064 : 0.06
+  const lensY = -0.006
+  const mount = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, 0.004, 28), chrome)
+  mount.rotation.x = Math.PI / 2
+  mount.position.set(0, lensY, d / 2 + 0.002)
+  g.add(mount)
+  const barrelLen = lensEnd - d / 2 - 0.004
+  const barrelMat = new THREE.MeshStandardMaterial({ color: dark ? '#222222' : '#c7c7c2', metalness: 0.7, roughness: 0.35, side: THREE.DoubleSide })
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.0215, 0.0235, barrelLen, 28, 1, true), barrelMat)
+  barrel.rotation.x = Math.PI / 2
+  barrel.position.set(0, lensY, d / 2 + 0.004 + barrelLen / 2)
+  g.add(barrel)
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.0232, 0.0014, 4, 28), new THREE.MeshStandardMaterial({ color: '#141414', roughness: 0.7 }))
+  ring.position.set(0, lensY, d / 2 + 0.004 + barrelLen * 0.45)
+  g.add(ring)
+  const front = new THREE.Mesh(new THREE.RingGeometry(0.016, 0.0216, 28), barrelMat)
+  front.position.set(0, lensY, lensEnd - 0.0001)
+  g.add(front)
+  const glassFront = new THREE.Mesh(
+    new THREE.CircleGeometry(0.0162, 28),
+    new THREE.MeshStandardMaterial({ color: '#141a24', roughness: 0.04, metalness: 0.2, envMapIntensity: 1.6 }),
+  )
+  glassFront.name = 'lens'
+  glassFront.position.set(0, lensY, lensEnd - 0.0012)
+  g.add(glassFront)
+  // Film door seam on the back
+  const seam = new THREE.Mesh(new THREE.PlaneGeometry(0.0012, h - 0.012), new THREE.MeshBasicMaterial({ color: '#050505' }))
+  seam.name = 'back'
+  seam.position.set(0.045, 0, -d / 2 - 0.0002)
+  seam.rotation.y = Math.PI
+  g.add(seam)
+}
+
+// --- lens -------------------------------------------------------------------------------------
+
+function apertureTexture(): THREE.CanvasTexture {
+  return canvasTexture(512, 32, (ctx) => {
+    ctx.fillStyle = '#1d1d1e'
+    ctx.fillRect(0, 0, 512, 32)
+    ctx.fillStyle = '#e6e3da'
+    ctx.font = '600 14px ui-monospace, monospace'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    const stops = ['2', '2.8', '4', '5.6', '8', '11', '16']
+    stops.forEach((s, i) => ctx.fillText(s, 40 + i * 32, 16))
+    for (let x = 300; x < 512; x += 6) ctx.fillRect(x, 4, 2, 24)
+  })
+}
+
+function nameRingTexture(brand?: string): THREE.CanvasTexture {
+  return canvasTexture(256, 256, (ctx) => {
+    ctx.fillStyle = '#18181a'
+    ctx.fillRect(0, 0, 256, 256)
+    ctx.fillStyle = '#ece9e0'
+    ctx.font = '600 15px Georgia, serif'
+    const text = brand && /helios/i.test(brand) ? 'ГЕЛИОС-44-2  2/58  № 8231507' : `${(brand ?? 'LENS').toUpperCase()}  2/58`
+    arcText(ctx, text, 128, 128, 112, -Math.PI / 2, Math.PI * 1.4)
+  })
+}
+
+function buildLens(g: THREE.Group, color: THREE.Color, brand?: string): void {
+  const body = new THREE.MeshStandardMaterial({ color, metalness: 0.75, roughness: 0.38 })
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.0225, 0.0225, 0.045, 32), body)
+  barrel.rotation.x = Math.PI / 2
+  barrel.name = 'barrel'
+  g.add(barrel)
+  const aperture = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.0234, 0.0234, 0.008, 32, 1, true),
+    new THREE.MeshStandardMaterial({ map: apertureTexture(), metalness: 0.5, roughness: 0.45 }),
+  )
+  aperture.rotation.x = Math.PI / 2
+  aperture.position.z = 0.006
+  aperture.name = 'aperture'
+  g.add(aperture)
+  const focus = new THREE.Mesh(new THREE.CylinderGeometry(0.0232, 0.0232, 0.013, 32, 1, true), new THREE.MeshStandardMaterial({ color: '#111111', roughness: 0.8 }))
+  focus.rotation.x = Math.PI / 2
+  focus.position.z = -0.011
+  g.add(focus)
+  const nameRing = new THREE.Mesh(new THREE.RingGeometry(0.0152, 0.0224, 32), new THREE.MeshStandardMaterial({ map: nameRingTexture(brand), metalness: 0.3, roughness: 0.5 }))
+  nameRing.position.z = 0.02255
+  g.add(nameRing)
+  const glass = new THREE.Mesh(
+    new THREE.SphereGeometry(0.03, 24, 6, 0, Math.PI * 2, 0, 0.53),
+    new THREE.MeshStandardMaterial({ color: '#2a1d10', roughness: 0.03, metalness: 0.3, envMapIntensity: 1.8 }),
+  )
+  glass.rotation.x = Math.PI / 2
+  glass.position.z = 0.0225 - 0.03 * Math.cos(0.53) + 0.0006
+  glass.name = 'front'
+  g.add(glass)
+  const thread = new THREE.Mesh(new THREE.CylinderGeometry(0.0205, 0.0205, 0.008, 24), metal(new THREE.Color('#bdbdb8'), 0.3))
+  thread.rotation.x = Math.PI / 2
+  thread.position.z = -0.0265
+  thread.name = 'mount'
+  g.add(thread)
+}
+
+// --- medals ----------------------------------------------------------------------------------
+
+function ribbonTexture(stripes: readonly string[]): THREE.CanvasTexture {
+  return canvasTexture(128, 128, (ctx) => {
+    const n = stripes.length
+    stripes.forEach((c, i) => {
+      ctx.fillStyle = c
+      ctx.fillRect(Math.floor((i * 128) / n), 0, Math.ceil(128 / n) + 1, 128)
+    })
+    // moiré sheen and a little dirt
+    for (let y = 0; y < 128; y += 3) {
+      ctx.fillStyle = `rgba(255,255,255,${0.04 + 0.04 * Math.sin(y * 0.4)})`
+      ctx.fillRect(0, y, 128, 1)
+    }
+    ctx.fillStyle = 'rgba(40,30,20,0.12)'
+    ctx.fillRect(0, 0, 128, 128)
+  })
+}
+
+const MEDAL_TEXT: Record<string, string> = {
+  merit: 'ЗА БОЕВЫЕ ЗАСЛУГИ',
+  victory: 'ЗА ПОБЕДУ НАД ГЕРМАНИЕЙ',
+}
+
+function medalFace(color: THREE.Color, emblem?: string): THREE.CanvasTexture {
+  return faceTexture(color, (ctx, ink) => {
+    ctx.fillStyle = ink
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    if (emblem === 'courage') {
+      // three aircraft over the motto, a tank below
+      for (const [x, y] of [[80, 62], [128, 48], [176, 62]] as const) {
+        ctx.fillRect(x - 16, y - 2, 32, 5)
+        ctx.fillRect(x - 3, y - 9, 6, 18)
+      }
+      ctx.font = '700 30px Georgia, serif'
+      ctx.fillText('ЗА', 128, 104)
+      ctx.fillText('ОТВАГУ', 128, 140)
+      ctx.fillRect(82, 176, 92, 22)
+      ctx.fillRect(104, 164, 44, 14)
+      ctx.fillRect(140, 168, 40, 5)
+    } else {
+      ctx.font = '700 20px Georgia, serif'
+      arcText(ctx, MEDAL_TEXT[emblem ?? ''] ?? 'СССР', 128, 128, 98, -Math.PI / 2, Math.PI * 1.3)
+      drawStar(ctx, 128, 132, 46, 19)
+      ctx.font = '700 24px Georgia, serif'
+      ctx.fillText('СССР', 128, 204)
+    }
+  })
+}
+
+function medalBack(color: THREE.Color): THREE.CanvasTexture {
+  return faceTexture(color, (ctx, ink) => {
+    ctx.fillStyle = ink
+    ctx.font = '600 22px ui-monospace, monospace'
+    ctx.textAlign = 'center'
+    ctx.fillText('№ 2841937', 128, 136)
+  })
+}
+
+function buildMedal(g: THREE.Group, color: THREE.Color, ribbon?: readonly string[], emblem?: string): void {
+  const mat = metal(color, 0.3)
+  // Pentagonal mount: wide top, sides down, a point at the bottom; ribbon on the front
+  const shape = new THREE.Shape()
+  shape.moveTo(-0.0125, 0.034)
+  shape.lineTo(-0.0125, 0.016)
+  shape.lineTo(0, 0.006)
+  shape.lineTo(0.0125, 0.016)
+  shape.lineTo(0.0125, 0.034)
+  shape.closePath()
+  const blockGeo = new THREE.ExtrudeGeometry(shape, { depth: 0.002, bevelEnabled: false })
+  blockGeo.translate(0, 0, -0.001)
+  planarUv(blockGeo)
+  const block = new THREE.Mesh(blockGeo, [
+    new THREE.MeshStandardMaterial({ map: ribbonTexture(ribbon ?? ['#8a8a86']), roughness: 0.75, metalness: 0 }),
+    mat,
+  ])
+  block.name = 'ribbon'
+  g.add(block)
+  // Pin across the back of the mount
+  const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.0006, 0.0006, 0.02, 6), metal(new THREE.Color('#9a9a96'), 0.4))
+  pin.rotation.z = Math.PI / 2
+  pin.position.set(0, 0.024, -0.0016)
+  pin.name = 'pin'
+  g.add(pin)
+  // Eyelet and jump ring linking the mount to the disc
+  const eyelet = new THREE.Mesh(new THREE.TorusGeometry(0.0022, 0.0007, 6, 14), mat)
+  eyelet.rotation.y = Math.PI / 2
+  eyelet.position.y = 0.0012
+  eyelet.name = 'eyelet'
+  g.add(eyelet)
+  const jump = new THREE.Mesh(new THREE.TorusGeometry(0.002, 0.0005, 5, 12), mat)
+  jump.position.y = 0.0045
+  g.add(jump)
+  const face = new THREE.MeshStandardMaterial({ map: medalFace(color, emblem), metalness: 1, roughness: 0.32 })
+  const back = new THREE.MeshStandardMaterial({ map: medalBack(color), metalness: 1, roughness: 0.36 })
+  const d = disc(0.0185, 0.003, [mat, face, back])
+  d.position.y = -0.02
+  d.name = 'disc'
+  g.add(d)
+}
+
+function orderCentre(): THREE.CanvasTexture {
+  return faceTexture(new THREE.Color('#cfcfca'), (ctx, ink) => {
+    ctx.fillStyle = '#b3222a'
+    ctx.beginPath()
+    ctx.arc(128, 128, 116, 0, Math.PI * 2)
+    ctx.arc(128, 128, 82, 0, Math.PI * 2, true)
+    ctx.fill()
+    ctx.fillStyle = '#e9d9a8'
+    ctx.font = '700 16px Georgia, serif'
+    arcText(ctx, 'ПРОЛЕТАРИИ ВСЕХ СТРАН', 128, 128, 99, -Math.PI / 2, Math.PI * 1.2)
+    ctx.font = '700 22px Georgia, serif'
+    arcText(ctx, 'СССР', 128, 128, 99, Math.PI / 2, 0.7, true)
+    // a soldier in a greatcoat, rifle on the shoulder
+    ctx.fillStyle = ink
+    ctx.beginPath()
+    ctx.arc(124, 88, 10, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.moveTo(110, 100)
+    ctx.lineTo(138, 100)
+    ctx.lineTo(146, 168)
+    ctx.lineTo(102, 168)
+    ctx.closePath()
+    ctx.fill()
+    ctx.fillRect(140, 64, 4, 66)
+  })
+}
+
+function buildOrder(g: THREE.Group, color: THREE.Color): void {
+  const enamel = new THREE.MeshStandardMaterial({ color, metalness: 0.15, roughness: 0.22 })
+  const starGeo = new THREE.ExtrudeGeometry(starShape(0.025, 0.0105), {
+    depth: 0.003,
+    bevelEnabled: true,
+    bevelThickness: 0.0006,
+    bevelSize: 0.0006,
+    bevelSegments: 1,
+  })
+  starGeo.translate(0, 0, -0.0015)
+  const star = new THREE.Mesh(starGeo, enamel)
+  star.name = 'enamel'
+  g.add(star)
+  const silver = metal(new THREE.Color('#cfcfca'), 0.3)
+  const centre = disc(0.0095, 0.0016, [silver, new THREE.MeshStandardMaterial({ map: orderCentre(), metalness: 0.8, roughness: 0.35 }), silver], 32)
+  centre.position.z = 0.0025
+  centre.name = 'center'
+  g.add(centre)
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.002, 0.002, 0.011, 10), silver)
+  post.rotation.x = Math.PI / 2
+  post.position.z = -0.0075
+  post.name = 'screw'
+  g.add(post)
+  const nutBack = faceTexture(new THREE.Color('#bdbdb8'), (ctx, ink) => {
+    ctx.fillStyle = ink
+    ctx.font = '700 22px Georgia, serif'
+    arcText(ctx, 'МОНЕТНЫЙ ДВОР', 128, 128, 92, -Math.PI / 2, Math.PI * 1.2)
+  })
+  const nut = disc(0.0145, 0.002, [silver, silver, new THREE.MeshStandardMaterial({ map: nutBack, metalness: 1, roughness: 0.4 })], 32)
+  nut.position.z = -0.0095
+  nut.name = 'nut'
+  g.add(nut)
+}
+
+function buildBadge(g: THREE.Group, color: THREE.Color): void {
+  const gilt = metal(color, 0.3)
+  // Oval wreath plate with a red star at its heart
+  const plateShape = new THREE.Shape()
+  plateShape.absellipse(0, -0.003, 0.018, 0.02, 0, Math.PI * 2, false, 0)
+  const plateGeo = new THREE.ExtrudeGeometry(plateShape, { depth: 0.002, bevelEnabled: true, bevelThickness: 0.0004, bevelSize: 0.0005, bevelSegments: 1, curveSegments: 24 })
+  plateGeo.translate(0, 0, -0.001)
+  planarUv(plateGeo)
+  const wreathTex = canvasTexture(256, 256, (ctx) => {
+    ctx.fillStyle = shade(color, 1.05)
+    ctx.fillRect(0, 0, 256, 256)
+    ctx.fillStyle = shade(color, 0.55)
+    // oak leaves round the edge
+    for (let i = 0; i < 26; i++) {
+      const a = (i / 26) * Math.PI * 2
+      ctx.save()
+      ctx.translate(128 + Math.cos(a) * 100, 128 + Math.sin(a) * 104)
+      ctx.rotate(a + Math.PI / 2)
+      ctx.beginPath()
+      ctx.ellipse(0, 0, 8, 17, 0, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.restore()
+    }
+    ctx.fillStyle = '#b3222a'
+    drawStar(ctx, 128, 140, 40, 16)
+  })
+  const plate = new THREE.Mesh(plateGeo, [new THREE.MeshStandardMaterial({ map: wreathTex, metalness: 0.9, roughness: 0.32 }), gilt])
+  plate.name = 'wreath'
+  g.add(plate)
+  // Red enamel banner across the top
+  const bannerTex = canvasTexture(256, 64, (ctx) => {
+    ctx.fillStyle = '#b3222a'
+    ctx.fillRect(0, 0, 256, 64)
+    ctx.fillStyle = '#e8c766'
+    ctx.font = '700 40px Georgia, serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('ГВАРДИЯ', 128, 34)
+  })
+  const bannerMat = new THREE.MeshStandardMaterial({ map: bannerTex, metalness: 0.15, roughness: 0.25 })
+  const banner = new THREE.Mesh(new THREE.BoxGeometry(0.031, 0.009, 0.0016), [gilt, gilt, gilt, gilt, bannerMat, gilt])
+  banner.position.set(0, 0.0165, 0.0012)
+  banner.name = 'banner'
+  g.add(banner)
+  // Screw post and nut behind
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.0018, 0.0018, 0.01, 10), gilt)
+  post.rotation.x = Math.PI / 2
+  post.position.z = -0.006
+  post.name = 'screw'
+  g.add(post)
+  const nut = disc(0.011, 0.0015, [gilt, gilt, gilt], 24)
+  nut.position.z = -0.0078
+  g.add(nut)
+}
+
+// --- coins ------------------------------------------------------------------------------------
+
+function coinObverse(color: THREE.Color, emblem?: string): THREE.CanvasTexture {
+  return faceTexture(color, (ctx, ink, hi) => {
+    ctx.fillStyle = ink
+    ctx.strokeStyle = ink
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    // beaded border
+    for (let i = 0; i < 60; i++) {
+      const a = (i / 60) * Math.PI * 2
+      ctx.beginPath()
+      ctx.arc(128 + Math.cos(a) * 112, 128 + Math.sin(a) * 112, 2.4, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    ctx.lineWidth = 7
+    ctx.lineCap = 'round'
+    if (emblem === 'smith') {
+      // hammer raised over an anvil
+      ctx.fillRect(88, 150, 80, 20)
+      ctx.fillRect(110, 170, 36, 24)
+      ctx.beginPath()
+      ctx.moveTo(120, 140)
+      ctx.lineTo(160, 70)
+      ctx.stroke()
+      ctx.fillRect(146, 56, 34, 18)
+      ctx.font = '700 20px Georgia, serif'
+      ctx.fillText('ОДИН ПОЛТИННИК', 128, 214)
+    } else if (emblem === 'eagle') {
+      // a double-headed eagle, simplified: body, two heads, spread wings
+      ctx.beginPath()
+      ctx.ellipse(128, 132, 18, 34, 0, 0, Math.PI * 2)
+      ctx.fill()
+      for (const s of [-1, 1]) {
+        ctx.beginPath()
+        ctx.arc(128 + s * 18, 86, 9, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.beginPath()
+        ctx.moveTo(128 + s * 14, 112)
+        ctx.lineTo(128 + s * 78, 84)
+        ctx.lineTo(128 + s * 70, 150)
+        ctx.lineTo(128 + s * 16, 150)
+        ctx.closePath()
+        ctx.fill()
+      }
+      ctx.fillStyle = hi
+      ctx.fillRect(121, 120, 14, 18)
+    } else if (emblem === 'sower') {
+      // the sower striding, a rising sun and chimneys behind
+      ctx.beginPath()
+      ctx.arc(150, 120, 30, Math.PI, Math.PI * 2)
+      ctx.stroke()
+      ctx.fillRect(64, 104, 8, 44)
+      ctx.fillRect(80, 114, 8, 34)
+      ctx.beginPath()
+      ctx.arc(120, 82, 10, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.beginPath()
+      ctx.moveTo(108, 96)
+      ctx.lineTo(132, 96)
+      ctx.lineTo(150, 186)
+      ctx.lineTo(136, 186)
+      ctx.lineTo(120, 140)
+      ctx.lineTo(104, 186)
+      ctx.lineTo(90, 186)
+      ctx.closePath()
+      ctx.fill()
+      ctx.fillRect(60, 186, 136, 6)
+    } else if (emblem === 'sprinter') {
+      // a runner in mid-stride on a proof field
+      ctx.beginPath()
+      ctx.arc(140, 70, 11, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.beginPath()
+      ctx.moveTo(136, 84)
+      ctx.lineTo(118, 136)
+      ctx.lineTo(90, 176)
+      ctx.moveTo(118, 136)
+      ctx.lineTo(150, 160)
+      ctx.lineTo(168, 196)
+      ctx.moveTo(132, 96)
+      ctx.lineTo(96, 110)
+      ctx.moveTo(132, 96)
+      ctx.lineTo(166, 118)
+      ctx.stroke()
+      ctx.font = '700 16px Georgia, serif'
+      arcText(ctx, 'ИГРЫ XXII ОЛИМПИАДЫ', 128, 128, 96, -Math.PI / 2, Math.PI * 1.1)
+    } else {
+      drawStar(ctx, 128, 128, 40, 16)
+    }
+  })
+}
+
+const COIN_VALUE: Record<string, [string, string]> = {
+  smith: ['50', 'КОПЕЕК'],
+  eagle: ['РУБЛЬ', ''],
+  sower: ['ЧЕРВОНЕЦ', ''],
+  sprinter: ['10', 'РУБЛЕЙ'],
+}
+
+function coinReverse(color: THREE.Color, emblem?: string): THREE.CanvasTexture {
+  const [big, small] = COIN_VALUE[emblem ?? ''] ?? ['1', '']
+  return faceTexture(color, (ctx, ink) => {
+    ctx.fillStyle = ink
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    // wreath of wheat ears on both sides
+    for (const s of [-1, 1]) {
+      for (let i = 0; i < 9; i++) {
+        const a = Math.PI / 2 + s * (0.35 + i * 0.26)
+        ctx.save()
+        ctx.translate(128 + Math.cos(a) * 92, 128 + Math.sin(a) * 92)
+        ctx.rotate(a)
+        ctx.beginPath()
+        ctx.ellipse(0, 0, 5, 11, 0, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+      }
+    }
+    ctx.font = `700 ${big.length > 3 ? 30 : 64}px Georgia, serif`
+    ctx.fillText(big, 128, small ? 114 : 128)
+    if (small) {
+      ctx.font = '700 24px Georgia, serif'
+      ctx.fillText(small, 128, 164)
+    }
+  })
+}
+
+function reedTexture(color: THREE.Color): THREE.CanvasTexture {
+  return canvasTexture(256, 8, (ctx) => {
+    ctx.fillStyle = shade(color, 1)
+    ctx.fillRect(0, 0, 256, 8)
+    ctx.fillStyle = shade(color, 0.6)
+    for (let x = 0; x < 256; x += 4) ctx.fillRect(x, 0, 2, 8)
+  })
+}
+
+function buildCoin(g: THREE.Group, color: THREE.Color, emblem?: string): void {
+  const edge = new THREE.MeshStandardMaterial({ map: reedTexture(color), metalness: 1, roughness: 0.3 })
+  const front = new THREE.MeshStandardMaterial({ map: coinObverse(color, emblem), metalness: 1, roughness: 0.28 })
+  const back = new THREE.MeshStandardMaterial({ map: coinReverse(color, emblem), metalness: 1, roughness: 0.3 })
+  const c = disc(0.0125, 0.002, [edge, front, back], 48)
+  c.name = 'coin'
+  g.add(c)
 }

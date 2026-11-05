@@ -4,21 +4,24 @@
  * markers projected from the 3D item. The orbit/pinch gestures are attached
  * to `gestureLayer` by main (src/input/gestures.ts drives the render stage).
  *
- * Tools: the loupe is the selected tool in M1. Tapping a marker looks closely
- * at that spot; tapping the Loupe button looks over the whole item. Scale and
- * magnet apply at once.
+ * Tools: the loupe is the selected tool. Tapping a marker looks closely
+ * at that spot; tapping the Loupe button looks over the whole item. The other
+ * tools apply at once. The toolbar comes from availableTools() (M2: acid kit,
+ * reference book, specialist call); locked tools stay visible, greyed, with a
+ * note ("no kit", "no retainer") in place of their time.
  */
 import { getItemDef } from '../../data/items'
 import { tuning } from '../../data/tuning'
 import type { Action } from '../../game/actions'
+import { availableTools, TOOLBAR } from '../../game/inspect/available'
 import { fakeProfileOf } from '../../game/items/generate'
-import { M1_TOOLS, type ItemDef, type ToolId } from '../../game/schema/item'
+import type { ItemDef, ToolId } from '../../game/schema/item'
 import type { GameState } from '../../game/state'
 import type { Finding } from '../../game/types'
 import { createButton, el, setText } from '../components/button'
 import { FindingStack } from '../components/findings'
 import { TOOL_LABEL } from '../format'
-import { icons } from '../icons'
+import { icons, type IconName } from '../icons'
 
 export interface HotspotView {
   id: string
@@ -41,7 +44,10 @@ export class InspectScreen {
   private hotspotLayer: HTMLElement
   private hotspotEls = new Map<string, HTMLButtonElement>()
   private fx: HTMLElement
+  private toolbar: HTMLElement
   private toolButtons = new Map<ToolId, HTMLButtonElement>()
+  private toolOrder: ToolId[] = []
+  private toolUsable = new Map<ToolId, boolean>()
   private def: ItemDef | null = null
   private visitId: string | null = null
   private busyUntil = 0
@@ -73,18 +79,7 @@ export class InspectScreen {
     const toolbar = el('div', 'toolbar')
     toolbar.setAttribute('role', 'toolbar')
     toolbar.setAttribute('aria-label', 'Tools')
-    for (const tool of M1_TOOLS) {
-      const b = el('button', 'tool')
-      b.type = 'button'
-      b.dataset.id = `tool-${tool}`
-      const secs = tuning.inspect.toolSeconds[tool]
-      b.innerHTML = `${icons[tool as 'loupe' | 'scale' | 'magnet']}<span class="tool-name">${TOOL_LABEL[tool]}</span><span class="tool-cost">${icons.clock}${secs} s</span><span class="tool-uses" hidden></span>`
-      b.setAttribute('aria-label', `${TOOL_LABEL[tool]}, ${secs} seconds${tool === 'loupe' ? ', look over the whole item' : ''}`)
-      if (tool === 'loupe') b.classList.add('is-selected')
-      b.addEventListener('click', () => this.useTool(tool))
-      this.toolButtons.set(tool, b)
-      toolbar.append(b)
-    }
+    this.toolbar = toolbar
     const actions = el('div', 'actions inspect-actions')
     actions.append(
       createButton({ id: 'inspect-pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) }),
@@ -148,12 +143,7 @@ export class InspectScreen {
     this.findings.render(insp.findings, labels)
     this.examined = new Set(insp.findings.filter((f) => f.hotspot).map((f) => f.hotspot!))
 
-    for (const [tool, b] of this.toolButtons) {
-      const uses = insp.toolUses[tool] ?? 0
-      const badge = b.querySelector<HTMLElement>('.tool-uses')!
-      badge.hidden = uses === 0
-      setText(badge, `×${uses}`)
-    }
+    this.renderToolbar(state)
 
     // Tool feedback for findings that just arrived
     const before = prev?.current?.visitId === c.visitId ? (prev.inspect?.findings.length ?? 0) : insp.findings.length
@@ -168,13 +158,58 @@ export class InspectScreen {
     this.renderHotspots(list)
   }
 
-  /** Keyboard: 1–3 pick a tool. */
+  /** Keyboard: 1–6 pick a tool in toolbar order. */
   key(k: string): boolean {
     const i = Number(k) - 1
-    const tool = M1_TOOLS[i]
+    const tool = Number.isInteger(i) ? this.toolOrder[i] : undefined
     if (!tool) return false
     this.useTool(tool)
     return true
+  }
+
+  /** Toolbar from availableTools(): locked tools stay visible, greyed, with their note. */
+  private renderToolbar(state: GameState): void {
+    const insp = state.inspect!
+    const list = this.def ? availableTools(state, this.def) : TOOLBAR.map((tool) => ({ tool, usable: false, note: '' }))
+    const order = list.map((t) => t.tool)
+    if (order.join() !== this.toolOrder.join()) {
+      this.toolOrder = order
+      this.toolButtons.clear()
+      this.toolbar.replaceChildren()
+      this.toolbar.classList.toggle('toolbar-many', order.length > 3)
+      for (const tool of order) {
+        const b = el('button', 'tool')
+        b.type = 'button'
+        b.dataset.id = `tool-${tool}`
+        b.innerHTML = `${icons[tool as IconName] ?? icons.doc}<span class="tool-name">${TOOL_LABEL[tool]}</span><span class="tool-cost"><span class="tc-clock">${icons.clock}</span><span class="tc-lock">${icons.lock}</span><span class="tool-secs">${tuning.inspect.toolSeconds[tool]} s</span><span class="tool-note"></span></span><span class="tool-uses" hidden></span>`
+        if (tool === 'loupe') b.classList.add('is-selected')
+        b.addEventListener('click', () => {
+          if (this.toolUsable.get(tool)) this.useTool(tool)
+        })
+        this.toolButtons.set(tool, b)
+        this.toolbar.append(b)
+      }
+    }
+    for (const t of list) {
+      const b = this.toolButtons.get(t.tool)!
+      this.toolUsable.set(t.tool, t.usable)
+      b.classList.toggle('is-locked', !t.usable)
+      b.setAttribute('aria-disabled', String(!t.usable))
+      const note = t.note ?? ''
+      // Locked: the note replaces the time ("no kit"). Usable: "20 s · 9 left".
+      const noteEl = b.querySelector<HTMLElement>('.tool-note')!
+      b.querySelector<HTMLElement>('.tool-secs')!.hidden = !t.usable && !!note
+      setText(noteEl, note ? (t.usable ? ` · ${note}` : note) : '')
+      const secs = tuning.inspect.toolSeconds[t.tool]
+      b.setAttribute(
+        'aria-label',
+        `${TOOL_LABEL[t.tool]}, ${secs} seconds${t.tool === 'loupe' ? ', look over the whole item' : ''}${note ? `, ${note}` : ''}${t.usable ? '' : ', unavailable'}`,
+      )
+      const uses = insp.toolUses[t.tool] ?? 0
+      const badge = b.querySelector<HTMLElement>('.tool-uses')!
+      badge.hidden = uses === 0
+      setText(badge, `×${uses}`)
+    }
   }
 
   private useTool(tool: ToolId, hotspot?: string): void {
@@ -247,6 +282,16 @@ export class InspectScreen {
       if (c && this.def) magnetic = fakeProfileOf(this.def, c.item)?.magnetic ?? this.def.magnetic
       node.classList.add(magnetic ? 'is-stuck' : 'is-free')
       node.innerHTML = `<span class="fx-magnet">${icons.magnet}</span><span class="fx-magnet-word">${magnetic ? 'snap!' : 'no pull'}</span>`
+    } else if (f.tool === 'acid') {
+      // Read the reaction off the finding (never the hidden item): negative = it fizzed.
+      const fizz = fresh.some((g) => g.tool === 'acid' && g.polarity === 'negative')
+      node.classList.add(fizz ? 'is-fizz' : 'is-holds')
+      node.innerHTML = `<span class="fx-drop"></span><span class="fx-splash"></span><span class="fx-word">${fizz ? 'fizz…' : 'holds'}</span>`
+    } else if (f.tool === 'reference') {
+      const m = /([\d,]+ ₽)–([\d,]+ ₽)/.exec(f.text)
+      node.innerHTML = `<span class="fx-book">${icons.reference}<span class="fx-word">${m ? `${m[1]}–${m[2]}` : 'not listed'}</span></span>`
+    } else if (f.tool === 'specialist') {
+      node.innerHTML = `<span class="fx-phone">${icons.specialist}<span class="fx-word">ring… ring…</span></span>`
     } else {
       return
     }

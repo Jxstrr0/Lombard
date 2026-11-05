@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint . && tsc --noEmit",
-    "shots": "vite build && node scripts/shots.mjs"
+    "shots": "vite build && node scripts/shots.mjs",
+    "sim": "node scripts/sim.mjs"
   },
   "engines": {
     "node": ">=20.19"

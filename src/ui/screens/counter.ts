@@ -14,6 +14,9 @@ type Primary = 'counter/next' | 'day/close' | 'counter/inspect' | 'counter/dismi
 
 const OUTCOME: Record<VisitOutcome, string> = {
   bought: 'Bought',
+  pawned: 'Pawned',
+  sold: 'Sold',
+  redeemed: 'Redeemed',
   passed: 'Passed',
   walked: 'Walked out',
   left: 'Left',
@@ -25,6 +28,7 @@ export class CounterScreen {
   private speaker: HTMLElement
   private name: HTMLElement
   private tag: HTMLElement
+  private loanBadge: HTMLElement
   private itemName: HTMLElement
   private line: HTMLElement
   private stamp: HTMLElement
@@ -32,7 +36,13 @@ export class CounterScreen {
   private secondary: HTMLButtonElement
   private primaryAction: Primary = 'counter/next'
 
-  constructor(dispatch: (a: Action) => void, openSettings: () => void, gear: (onPress: () => void) => HTMLButtonElement) {
+  constructor(
+    dispatch: (a: Action) => void,
+    openSettings: () => void,
+    gear: (onPress: () => void) => HTMLButtonElement,
+    /** Opens the shop sheet; shown only while nobody is at the counter. */
+    private readonly shopButton?: HTMLButtonElement,
+  ) {
     const root = el('section', 'screen counter-screen')
     root.dataset.screen = 'counter'
     const strip = el('div', 'strip')
@@ -41,7 +51,9 @@ export class CounterScreen {
     this.speaker = el('div', 'speaker')
     this.name = el('span', 'speaker-name')
     this.tag = el('span', 'speaker-tag')
-    this.speaker.append(this.name, this.tag)
+    this.loanBadge = el('span', 'loan-badge', 'wants a loan')
+    this.loanBadge.dataset.id = 'loan-badge'
+    this.speaker.append(this.name, this.tag, this.loanBadge)
     this.itemName = el('div', 'item-tag')
     this.itemName.dataset.id = 'counter-item'
     this.line = el('p', 'line')
@@ -58,7 +70,7 @@ export class CounterScreen {
       variant: 'primary',
       onPress: () => dispatch({ type: this.primaryAction }),
     })
-    actions.append(gear(openSettings), this.secondary, this.primary)
+    actions.append(gear(openSettings), ...(shopButton ? [shopButton] : []), this.secondary, this.primary)
     strip.append(dialogue, actions)
     root.append(strip)
     this.root = root
@@ -71,6 +83,7 @@ export class CounterScreen {
     if (c) {
       setText(this.name, c.customer.name)
       setText(this.tag, archetypeLabel(c.customer.archetype))
+      this.loanBadge.hidden = !(c.kind === 'seller' && c.wants === 'pawn' && c.phase !== 'resolved')
       setText(this.itemName, itemNameOf(c.item.defId, 'Something wrapped in a cloth'))
     }
     this.itemName.hidden = !c || c.phase === 'resolved'
@@ -80,12 +93,14 @@ export class CounterScreen {
     const resolved = c?.phase === 'resolved'
     this.stamp.hidden = !resolved
     if (resolved && c.outcome) {
-      const text = c.outcome === 'bought' && c.price !== undefined ? `${OUTCOME.bought} · ${rub(c.price)}` : OUTCOME[c.outcome]
+      const priced = (c.outcome === 'bought' || c.outcome === 'sold' || c.outcome === 'pawned' || c.outcome === 'redeemed') && c.price !== undefined
+      const text = priced ? `${OUTCOME[c.outcome]} · ${rub(c.price!)}` : OUTCOME[c.outcome]
       setText(this.stamp, text)
       this.stamp.dataset.outcome = c.outcome
     }
 
     this.secondary.hidden = !c || c.phase !== 'present'
+    if (this.shopButton) this.shopButton.hidden = !!c
     if (!c) {
       if (state.queue.length > 0) this.setPrimary('counter/next', 'next-customer', 'Next customer', 'person')
       else this.setPrimary('day/close', 'close-up', 'Close up', 'door')

@@ -229,12 +229,20 @@ async function boot(): Promise<void> {
 
   // --- loop ------------------------------------------------------------------
   let envReady = false
-  shop
+  const envLoad = shop
     .loadEnvironment(renderer, { envUrl })
     .catch((err) => console.warn('[env] HDRI failed to load, continuing without it', err))
-    .finally(() => {
-      envReady = true
-    })
+  // ?nobake=1 keeps the procedural grey box (for comparing against the bake).
+  const bakeLoad =
+    params.get('nobake') === '1'
+      ? Promise.resolve(null)
+      : shop.loadBaked(renderer, import.meta.env.BASE_URL).then((m) => {
+          if (m) ui.setBakeInfo(`bake ${m.quality}${m.commit ? ` ${m.commit}` : ''}`)
+          return m
+        })
+  void Promise.all([envLoad, bakeLoad]).finally(() => {
+    envReady = true
+  })
 
   const clock = new THREE.Clock()
   let readyFrames = 0

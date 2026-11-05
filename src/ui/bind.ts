@@ -79,6 +79,7 @@ export class Ui {
   private readonly screens: Record<ScreenId, { root: HTMLElement }>
   private current: ScreenId | null = null
   private lastLayout: UiLayout | null = null
+  private build!: HTMLElement
   /** Called when the visible screen changes (main re-measures the camera layout). */
   onScreenChange: ((id: ScreenId) => void) | null = null
 
@@ -135,6 +136,12 @@ export class Ui {
     const build = el('div', 'build-number', `${__BUILD_SHA__} · ${__BUILD_DATE__}`)
     build.dataset.id = 'build'
     mount.appendChild(build)
+    this.build = build
+  }
+
+  /** Appends which lightmap is live (preview / full bake) to the build number. */
+  setBakeInfo(text: string): void {
+    this.build.textContent = `${__BUILD_SHA__} · ${__BUILD_DATE__} · ${text}`
   }
 
   render(state: GameState, prev: GameState | null): void {

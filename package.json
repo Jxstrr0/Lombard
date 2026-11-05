@@ -5,13 +5,16 @@
   "type": "module",
   "description": "A pawn shop sim on the canals of Mostograd. A Longlight Interactive game.",
   "scripts": {
+    "predev": "node scripts/copy-decoders.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/copy-decoders.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint . && tsc --noEmit",
-    "shots": "vite build && node scripts/shots.mjs",
-    "sim": "node scripts/sim.mjs"
+    "shots": "npm run build && node scripts/shots.mjs",
+    "sim": "node scripts/sim.mjs",
+    "bake:pack": "node scripts/bake-pack.mjs"
   },
   "engines": {
     "node": ">=20.19"
@@ -27,13 +30,20 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@gltf-transform/core": "4.5.1",
+    "@gltf-transform/extensions": "4.5.1",
+    "@gltf-transform/functions": "4.5.1",
     "@types/node": "24.19.2",
+    "@types/pngjs": "6.0.5",
     "@types/stats.js": "0.17.4",
     "@types/three": "0.187.0",
+    "draco3dgltf": "1.5.9",
     "eslint": "10.14.0",
     "fake-indexeddb": "6.2.7",
     "globals": "17.14.0",
+    "ktx2-encoder": "0.6.0",
     "playwright": "1.63.0",
+    "pngjs": "7.0.0",
     "typescript": "5.9.3",
     "typescript-eslint": "8.72.1",
     "vite": "8.3.5",

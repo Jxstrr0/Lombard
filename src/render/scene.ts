@@ -1,7 +1,10 @@
 /**
- * M0 placeholder shop: a boxy room from primitives, lit by a Poly Haven HDRI
- * environment plus at most two real-time lights (counter lamp, window fill).
- * No real-time shadows. In M3 this is replaced by the baked shop.glb.
+ * The shop scene. The static room comes from the bake (bakedShop.ts:
+ * shop.glb + Cycles lightmap, built from bake/layout.json); until that loads,
+ * or if it fails, or with ?nobake=1, a procedural grey box stands in. Both are
+ * lit by a Poly Haven HDRI environment plus at most two real-time lights
+ * (counter lamp, window fill), which mostly matter for the item and customer.
+ * No real-time shadows.
  *
  * Coordinates (metres): x across the shop (-3..3), z from the back wall
  * behind the player (-4) to the street wall (+4), y up. The player stands
@@ -10,6 +13,7 @@
 import * as THREE from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 import type { GameState } from '../game/state'
+import { loadBakedShop, type BakedShop, type ShopManifest } from './bakedShop'
 import { INSPECT_POINT } from './camera'
 import { canalBackdropTexture, contactShadowTexture, parquetTexture, plasterTexture } from './textures'
 
@@ -36,6 +40,9 @@ const INSPECT_CUSTOMER_OPACITY = 0.25
 
 export class ShopScene {
   readonly scene = new THREE.Scene()
+  /** Procedural grey-box room; removed once the baked shop is in. */
+  private room = new THREE.Group()
+  private baked: BakedShop | null = null
   private customer: THREE.Group
   private customerFade = 0
   private customerTarget = 0
@@ -45,6 +52,8 @@ export class ShopScene {
 
   constructor() {
     this.scene.background = new THREE.Color('#0d0c0b')
+    this.room.name = 'grey-box'
+    this.scene.add(this.room)
     this.buildRoom()
     this.buildCounter()
     this.buildWallCases()
@@ -65,6 +74,24 @@ export class ShopScene {
     this.scene.environment = env
     this.scene.environmentIntensity = ENV_INTENSITY.counter
     this.disposables.push(env)
+  }
+
+  /**
+   * Swap the grey box for the baked shop. Resolves to the bake manifest, or
+   * null if there is no bake yet (the grey box stays).
+   */
+  async loadBaked(renderer: THREE.WebGLRenderer, base: string): Promise<ShopManifest | null> {
+    try {
+      const baked = await loadBakedShop(renderer, base)
+      this.baked = baked
+      this.scene.add(baked.group)
+      this.scene.remove(this.room)
+      disposeTree(this.room)
+      return baked.manifest
+    } catch (err) {
+      console.info('[shop] using the grey box:', err instanceof Error ? err.message : err)
+      return null
+    }
   }
 
   /** Sync render-owned objects to game state. Never mutates state. */
@@ -104,14 +131,11 @@ export class ShopScene {
   }
 
   dispose(): void {
-    this.scene.traverse((o) => {
-      const mesh = o as THREE.Mesh
-      if (mesh.isMesh) {
-        mesh.geometry.dispose()
-        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-        for (const m of mats) m.dispose()
-      }
-    })
+    if (this.baked) {
+      this.scene.remove(this.baked.group)
+      this.baked.dispose()
+    }
+    disposeTree(this.scene)
     for (const d of this.disposables) d.dispose()
   }
 
@@ -130,7 +154,7 @@ export class ShopScene {
     x: number,
     y: number,
     z: number,
-    parent: THREE.Object3D = this.scene,
+    parent: THREE.Object3D = this.room,
   ): THREE.Mesh {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat)
     mesh.position.set(x, y, z)
@@ -147,7 +171,7 @@ export class ShopScene {
     })
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(halfW * 2, halfD * 2), floorMat)
     floor.rotation.x = -Math.PI / 2
-    this.scene.add(floor)
+    this.room.add(floor)
 
     const plaster = this.track(plasterTexture())
     const wallMat = new THREE.MeshStandardMaterial({ map: plaster, roughness: 0.95, color: '#f2ead8' })
@@ -161,7 +185,7 @@ export class ShopScene {
       const wall = new THREE.Mesh(new THREE.PlaneGeometry(w, height), wallMat)
       wall.position.set(x, height / 2, z)
       wall.rotation.y = ry
-      this.scene.add(wall)
+      this.room.add(wall)
     }
 
     // Front (street) wall, built around the window and door openings.
@@ -192,7 +216,7 @@ export class ShopScene {
     frontWall.position.z = halfD
     frontWall.rotation.y = Math.PI
     frontWall.scale.x = -1 // keep the hole layout in world-x after the flip
-    this.scene.add(frontWall)
+    this.room.add(frontWall)
 
     const ceiling = new THREE.Mesh(
       new THREE.PlaneGeometry(halfW * 2, halfD * 2),
@@ -200,7 +224,7 @@ export class ShopScene {
     )
     ceiling.rotation.x = Math.PI / 2
     ceiling.position.y = height
-    this.scene.add(ceiling)
+    this.room.add(ceiling)
 
     // Painted lower walls (oil-paint dado, typical of old ground-floor shops)
     const dadoMat = new THREE.MeshStandardMaterial({ color: '#33473f', roughness: 0.45 })
@@ -213,7 +237,7 @@ export class ShopScene {
     dadoR.rotation.y = -Math.PI / 2
     const dadoB = new THREE.Mesh(new THREE.PlaneGeometry(halfW * 2, dadoH), dadoMat)
     dadoB.position.set(0, dadoH / 2, -halfD + 0.005)
-    this.scene.add(dadoL, dadoR, dadoB)
+    this.room.add(dadoL, dadoR, dadoB)
     const railMat = new THREE.MeshStandardMaterial({ color: '#1f2b26', roughness: 0.5 })
     this.box(0.03, 0.04, halfD * 2, railMat, -halfW + 0.015, dadoH, 0)
     this.box(0.03, 0.04, halfD * 2, railMat, halfW - 0.015, dadoH, 0)
@@ -242,7 +266,7 @@ export class ShopScene {
 
     const counter = new THREE.Group()
     counter.position.z = z
-    this.scene.add(counter)
+    this.room.add(counter)
 
     // Wooden base with a kick plate
     this.box(width, baseH, depth, wood, 0, baseH / 2, 0, counter)
@@ -288,7 +312,7 @@ export class ShopScene {
     )
     shadow.rotation.x = -Math.PI / 2
     shadow.position.set(0, 0.003, z)
-    this.scene.add(shadow)
+    this.room.add(shadow)
   }
 
   private buildWallCases(): void {
@@ -307,7 +331,7 @@ export class ShopScene {
     for (const cz of [0.2, 2.0]) {
       const g = new THREE.Group()
       g.position.set(-ROOM.halfW + 0.24, 0, cz)
-      this.scene.add(g)
+      this.room.add(g)
       this.box(0.46, 0.8, 1.5, wood, 0, 0.4, 0, g)
       this.box(0.46, 1.2, 1.5, glass, 0, 1.4, 0, g).renderOrder = 2
       this.box(0.48, 0.06, 1.52, wood, 0, 2.03, 0, g)
@@ -343,7 +367,7 @@ export class ShopScene {
       const s = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 2.0), shadowMat)
       s.rotation.x = -Math.PI / 2
       s.position.set(-ROOM.halfW + 0.3, 0.003, cz)
-      this.scene.add(s)
+      this.room.add(s)
     }
   }
 
@@ -356,7 +380,7 @@ export class ShopScene {
     )
     backdrop.position.set(-1, 1.9, z + 1.6)
     backdrop.rotation.y = Math.PI
-    this.scene.add(backdrop)
+    this.scene.add(backdrop) // outside the room group: stays when the baked shop replaces the room
 
     const frame = new THREE.MeshStandardMaterial({ color: '#e7e1d3', roughness: 0.6 })
     // window frame and mullions
@@ -378,7 +402,7 @@ export class ShopScene {
     const doorMat = new THREE.MeshStandardMaterial({ color: '#2c3b35', roughness: 0.55 })
     const door = new THREE.Group()
     door.position.set(1.7, 0, z - 0.03)
-    this.scene.add(door)
+    this.room.add(door)
     this.box(1.2, 0.9, 0.05, doorMat, 0, 0.45, 0, door)
     this.box(1.2, 0.35, 0.05, doorMat, 0, 2.225, 0, door)
     this.box(0.15, 1.15, 0.05, doorMat, -0.525, 1.475, 0, door)
@@ -398,7 +422,7 @@ export class ShopScene {
     const radMat = new THREE.MeshStandardMaterial({ color: '#d9d4c7', roughness: 0.5, metalness: 0.2 })
     const rad = new THREE.Group()
     rad.position.set(-1, 0.18, ROOM.halfD - 0.12)
-    this.scene.add(rad)
+    this.room.add(rad)
     for (let i = 0; i < 14; i++) this.box(0.05, 0.55, 0.09, radMat, -0.65 + i * 0.1, 0.275, 0, rad)
 
     // Ceiling pendants (emissive shades; real lights come from the bake in M3)
@@ -408,7 +432,7 @@ export class ShopScene {
     for (const pz of [-1.6, 1.4]) {
       const p = new THREE.Group()
       p.position.set(0, ROOM.height, pz)
-      this.scene.add(p)
+      this.room.add(p)
       const c = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 1.2, 4), cord)
       c.position.y = -0.6
       p.add(c)
@@ -423,7 +447,7 @@ export class ShopScene {
     // Counter lamp (the real-time warm light sits in its shade)
     const lamp = new THREE.Group()
     lamp.position.set(1.15, COUNTER.baseH + COUNTER.caseH, COUNTER.z - 0.15)
-    this.scene.add(lamp)
+    this.room.add(lamp)
     const metal = new THREE.MeshStandardMaterial({ color: '#1f3a2c', roughness: 0.4, metalness: 0.6 })
     const base = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.03, 20), metal)
     base.position.y = 0.015
@@ -481,3 +505,17 @@ export class ShopScene {
 }
 
 const TMP = new THREE.Vector3()
+
+function disposeTree(root: THREE.Object3D): void {
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh
+    if (mesh.isMesh) {
+      mesh.geometry.dispose()
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      for (const m of mats) {
+        for (const v of Object.values(m)) if (v instanceof THREE.Texture) v.dispose()
+        m.dispose()
+      }
+    }
+  })
+}

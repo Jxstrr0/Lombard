@@ -5,3 +5,8 @@ shots/
 .DS_Store
 .vite/
 .claude/worktrees/
+public/assets/decoders/
+bake/out/*
+!bake/out/preview.jpg
+!bake/out/preview-wide.jpg
+__pycache__/

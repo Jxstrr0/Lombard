@@ -108,6 +108,8 @@ export class LedgerScreen {
       [`Bought (${last.bought})`, last.spent > 0 ? signedRub(-last.spent) : rub(0)],
       [`Sold (${last.sold})`, last.earned > 0 ? signedRub(last.earned) : rub(0)],
       ['Walkouts', String(last.walkouts)],
+      ...(last.loaned > 0 ? [['Lent on pawns', signedRub(-last.loaned)] as [string, string]] : []),
+      ...(last.redeemed > 0 ? [['Repaid', signedRub(last.redeemed)] as [string, string]] : []),
       ...(last.expenses > 0 ? [['Expenses', signedRub(-last.expenses)] as [string, string]] : []),
       ['Closing cash', rub(last.closingCash), 'total'],
     ]

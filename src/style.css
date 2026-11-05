@@ -1623,6 +1623,18 @@ html {
   border-top: 1px solid var(--strip-edge);
 }
 
+/* Portrait: gear / Shop / Office on one row, "Open shop — Day N" full width below. */
+@media (orientation: portrait) {
+  .ledger-actions {
+    flex-wrap: wrap;
+  }
+
+  .ledger-actions > .btn-primary {
+    flex: 1 0 100%;
+    order: 10;
+  }
+}
+
 /* --- menus: Longlight palette -------------------------------------------------- */
 
 .menu {

@@ -50,6 +50,7 @@
 | Nov 5, 2026 | **Surface textures (M3 dressing):** the room's big surfaces get CC0 ambientCG colour maps, recoloured to average each material's authored colour so the tuned palette and the bake's bounce light stay the same. Prepared once by `art/materials/prepare.py` and committed in `bake/textures/`; they ride inside `shop.glb` as KTX2. Only colour maps, since the shop is unlit plus lightmap. See 04-ASSETS § Surface textures. |
 | Nov 5, 2026 | **Props (M3 dressing):** 22 CC0 Poly Haven models (25 placed), vetted for real brands, prepared by `art/props/prepare.py` into committed `bake/props/*.glb`, placed from `bake/layout.json`. Their lighting is baked per vertex (a colour attribute) rather than into the room's lightmap, which can't hold their thousands of tiny UV islands. See 04-ASSETS § Props. |
 | Nov 5, 2026 | **Clutter (M3 dressing):** a second wave of 29 Poly Haven props (59 instances of 51 kinds in all) replaces the placeholder boxes on the shelves, in the cases and in the storeroom. Draw calls are about 106 of 150, so a prop texture atlas is held back for quality tiers. Big flat faces are subdivided (`densify`) because per-vertex lighting only sees corners. |
+| Nov 5, 2026 | **Lighting mood (M3 lighting pass): option B, "warm evening"**, picked by Colby from three Cycles previews (A as built, B, C). Overcast sky 0.6 (#9fb3c8) through the window and door; pendants 2400 K at 16 W (back) and 14 W (front); counter lamp 2700 K 26 W; storeroom bulb 2900 K 14 W; two small 2.5 W 2900 K points under the tops of the wall cases so their shelves don't fall into shadow. Then one full-quality bake. The two real-time lights (lamp and window fill, for metal items) are unchanged. |
 
 ## Open, decide at the milestone listed
 
@@ -58,7 +59,6 @@
 | Customers in 3D (Plan A) vs portrait cards (Plan B) | portrait card in dialogue strip; 3D silhouette optional | M3, after a 1-day test. A roaming employee (below) needs 3D people, which favours Plan A |
 | Hired employee who walks around the shop (Colby, Nov 5): the GDD's one appraiser hire becomes a visible person who moves between the back room, behind the counter and the shop floor | not built; layout keeps the walkways clear | build with The Appraiser hire (M6); depends on the Plan A/B decision |
 | Retirement unlock day | day 90 | M5, after playtesting career pacing |
-| Lighting mood (sky strength, pendant/lamp power and warmth) | overcast sky 0.35, pendants 12 W 2700 K, counter lamp 22 W 3000 K | M3 lighting pass on preview bakes |
 | Preview render tone mapping: Cycles previews use AgX (+0.74 EV), the game uses three's ACES; midtones read darker in the previews than in game | game screenshots are the reference | M3 lighting pass |
 
 When an open item is decided, move it to the Decided table with the date.

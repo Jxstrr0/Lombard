@@ -15,6 +15,9 @@ import { findingCard } from '../components/findings'
 import { NumPad } from '../components/numpad'
 import { archetypeLabel, itemNameOf, rub } from '../format'
 import type { IconName } from '../icons'
+import { dayLabel, monthlyRateLabel } from '../loanFormat'
+import { loanTerms } from '../../game/loans/loans'
+import '../loans.css'
 
 const CHIPS = [0.25, 0.4, 0.6] as const
 
@@ -38,6 +41,8 @@ export class OfferScreen {
   private tagLabel: HTMLElement
   private tagValue: HTMLElement
   private tagNote: HTMLElement
+  /** Pawn mode: due date, rate, what they'll owe. */
+  private terms: HTMLElement
   private pad: NumPad
   private approachRow: HTMLElement
   private approachBtns = new Map<Approach, HTMLButtonElement>()
@@ -83,6 +88,8 @@ export class OfferScreen {
     this.tagValue = el('span', 'price-tag-value')
     this.tagNote = el('span', 'price-tag-note')
     tag.append(this.tagLabel, this.tagValue, this.tagNote)
+    this.terms = el('div', 'loan-terms')
+    this.terms.dataset.id = 'loan-terms'
 
     this.pad = new NumPad('offer', (v) => {
       this.amount = v
@@ -106,7 +113,7 @@ export class OfferScreen {
     this.submit = createButton({ id: 'make-offer', label: 'Offer', variant: 'primary', onPress: () => this.onSubmit() })
     actions.append(back, pass, this.submit)
 
-    panel.append(this.askRow, this.estimateRow, tag, this.pad.root, this.approachRow, this.approachHint, actions)
+    panel.append(this.askRow, this.estimateRow, tag, this.terms, this.pad.root, this.approachRow, this.approachHint, actions)
     this.panel = panel
 
     // Evidence picker sheet
@@ -175,13 +182,15 @@ export class OfferScreen {
     const est = s.inspect.estimate ?? 0
     const h = s.haggle
     const countered = !!h && h.status === 'open' && h.history.length > 0
+    const pawn = s.current.wants === 'pawn'
     this.root.classList.toggle('is-estimating', estimating)
+    this.root.classList.toggle('is-pawn', pawn)
 
     // Ask row (after a counter offer)
     this.askRow.hidden = estimating || !countered
     if (countered && h) {
-      setText(this.askText, `They want ${rub(h.ask)}`)
-      setButtonLabel(this.acceptBtn, `Accept ${rub(h.ask)}`)
+      setText(this.askText, pawn ? `They want a ${rub(h.ask)} loan` : `They want ${rub(h.ask)}`)
+      setButtonLabel(this.acceptBtn, pawn ? `Lend ${rub(h.ask)}` : `Accept ${rub(h.ask)}`)
       this.acceptBtn.disabled = h.ask > s.cash
     }
     // Estimate row
@@ -191,13 +200,26 @@ export class OfferScreen {
 
     // Price tag
     const v = this.amount
-    setText(this.tagLabel, estimating ? 'What is it worth?' : 'Your offer')
+    setText(this.tagLabel, estimating ? 'What is it worth?' : pawn ? 'Loan amount' : 'Your offer')
     setText(this.tagValue, v > 0 ? rub(v) : '— ₽')
     const over = !estimating && v > s.cash
     this.root.classList.toggle('is-over', over)
     if (estimating) setText(this.tagNote, 'Your own estimate. The customer never sees it.')
     else if (over) setText(this.tagNote, `More than your cash (${rub(s.cash)})`)
     else setText(this.tagNote, `Cash ${rub(s.cash)}`)
+
+    // Loan terms (pawn mode, after the estimate)
+    this.terms.hidden = !pawn || estimating
+    if (pawn && !estimating) {
+      const t = loanTerms(v, s.calendar.day)
+      const parts = [`Due ${dayLabel(s, t.dueDay)}`, monthlyRateLabel(t.monthlyRate)]
+      if (v > 0) parts.push(`owes ${rub(t.owedAtDue)}`)
+      this.terms.replaceChildren()
+      parts.forEach((p, i) => {
+        if (i > 0) this.terms.append(el('span', 'loan-terms-sep', ' · '))
+        this.terms.append(el('span', 'loan-terms-part', p))
+      })
+    }
 
     // Side keys: chips in step 2, clear in step 1
     if (estimating) {
@@ -238,7 +260,8 @@ export class OfferScreen {
       this.submit.dataset.id = 'set-estimate'
       this.submit.disabled = v <= 0
     } else {
-      setButtonLabel(this.submit, v > 0 ? `Offer ${rub(v)}` : 'Offer')
+      const verb = pawn ? 'Lend' : 'Offer'
+      setButtonLabel(this.submit, v > 0 ? `${verb} ${rub(v)}` : verb)
       this.submit.dataset.id = 'make-offer'
       this.submit.disabled = v <= 0 || over || s.current.phase !== 'offer'
     }

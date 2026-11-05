@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import gold from '../src/data/items/gold.json'
-import phones from '../src/data/items/phones.json'
-import watches from '../src/data/items/watches.json'
-import { ITEM_DEFS, getItemDef } from '../src/data/items'
+import { ITEM_DEFS, RAW_ITEM_FILES, getItemDef } from '../src/data/items'
 import { tuning } from '../src/data/tuning'
 import { fakeProfileOf, generateItem, pickItemDef } from '../src/game/items/generate'
 import { Rng } from '../src/game/rng'
@@ -10,7 +7,25 @@ import { ItemDef, M1_TOOLS, type FakeProfile, type Tell } from '../src/game/sche
 import type { ItemInstance } from '../src/game/types'
 
 const VERDICT_WORDS = /\b(fake|genuine|real)\b/i
-const ALLOWED_BRANDS = new Set(['Pobeda', 'Vostok', 'Rolland', 'Mangosteen', 'Galaxia'])
+const ALLOWED_BRANDS = new Set([
+  // historical Soviet makers (GDD § Brands)
+  'Pobeda',
+  'Vostok',
+  'Poljot',
+  'Zenit',
+  'Helios',
+  // invented
+  'Rolland',
+  'Omeca',
+  'Brequet-Fils',
+  'Mangosteen',
+  'Galaxia',
+  'Severin',
+  'Kanon',
+  'Weissler',
+])
+/** Categories whose items carry no maker's brand (struck by a state mint or a jeweller). */
+const UNBRANDED = new Set(['gold', 'militaria', 'coins'])
 
 function makeItem(def: ItemDef, profile: FakeProfile | undefined, seed: number): ItemInstance {
   const forced: ItemDef = profile ? { ...def, fakeChance: 1, fakeProfiles: [profile] } : { ...def, fakeChance: 0 }
@@ -27,23 +42,33 @@ const HALF_EXTENTS: Record<ItemDef['model']['placeholder'], [number, number, num
   earrings: [0.02, 0.016, 0.006],
   watch: [0.024, 0.024, 0.008],
   phone: [0.031, 0.0635, 0.0045],
+  pendant: [0.01, 0.021, 0.003],
+  camera: [0.072, 0.066, 0.068],
+  lens: [0.025, 0.025, 0.032],
+  medal: [0.019, 0.04, 0.006],
+  order: [0.026, 0.026, 0.014],
+  badge: [0.02, 0.025, 0.011],
+  coin: [0.013, 0.013, 0.0015],
 }
 
 describe('item definitions', () => {
   it('all raw defs parse against the zod schema', () => {
-    for (const raw of [...gold, ...watches, ...phones]) {
+    for (const raw of Object.values(RAW_ITEM_FILES).flat()) {
       const r = ItemDef.safeParse(raw)
       expect(r.success, `${(raw as { id: string }).id}: ${r.success ? '' : r.error.message}`).toBe(true)
     }
   })
 
-  it('ships 10 defs across gold (4), watches (3) and phones (3) with unique ids', () => {
-    expect(ITEM_DEFS).toHaveLength(10)
+  it('ships 30 defs across 6 categories with unique ids', () => {
+    expect(ITEM_DEFS).toHaveLength(30)
     const count = (c: string) => ITEM_DEFS.filter((d) => d.category === c).length
-    expect(count('gold')).toBe(4)
-    expect(count('watches')).toBe(3)
-    expect(count('phones')).toBe(3)
-    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(10)
+    expect(count('gold')).toBe(6)
+    expect(count('watches')).toBe(6)
+    expect(count('phones')).toBe(5)
+    expect(count('cameras')).toBe(4)
+    expect(count('militaria')).toBe(5)
+    expect(count('coins')).toBe(4)
+    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(30)
     expect(getItemDef('gold_band_583').category).toBe('gold')
   })
 
@@ -120,7 +145,7 @@ describe('item definitions', () => {
       expect(def.claims.length).toBeLessThanOrEqual(4)
       if (def.brand) expect(ALLOWED_BRANDS.has(def.brand), def.brand).toBe(true)
     }
-    expect(ITEM_DEFS.filter((d) => d.category !== 'gold').every((d) => d.brand)).toBe(true)
+    for (const d of ITEM_DEFS) expect(Boolean(d.brand), d.id).toBe(!UNBRANDED.has(d.category))
   })
 
   it('hotspots sit on the placeholder model (metres, centred at the origin)', () => {

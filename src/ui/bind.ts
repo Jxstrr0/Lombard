@@ -3,10 +3,14 @@
  * each screen render itself. Screens read state and dispatch actions; they
  * never mutate state.
  *
+ *   career intro pending   → intro
  *   day closed, no history → welcome
  *   day closed             → ledger
+ *   today's paper unread   → news
  *   visit phase inspect    → inspect
  *   visit phase offer      → offer
+ *   buyer at the counter   → sale (until resolved)
+ *   pawner redeeming       → redeem (until resolved)
  *   otherwise              → counter (incl. the resolved outcome + Next)
  */
 import type { Action } from '../game/actions'
@@ -17,18 +21,28 @@ import { createButton, el } from './components/button'
 import { Hud } from './components/hud'
 import { CounterScreen } from './screens/counter'
 import { InspectScreen, type HotspotView } from './screens/inspect'
+import { IntroScreen } from './screens/intro'
 import { LedgerScreen } from './screens/ledger'
+import { NewsScreen } from './screens/news'
+import { OfficeSheet } from './screens/office'
 import { OfferScreen } from './screens/offer'
+import { RedeemScreen } from './screens/redeem'
+import { SaleScreen } from './screens/sale'
 import { SettingsSheet } from './screens/settings'
+import { ShopSheet } from './screens/shop'
 import { WelcomeScreen } from './screens/welcome'
 
-export type ScreenId = 'welcome' | 'counter' | 'inspect' | 'offer' | 'ledger'
+export type ScreenId = 'intro' | 'welcome' | 'news' | 'counter' | 'inspect' | 'offer' | 'sale' | 'redeem' | 'ledger'
 
 export function screenFor(state: GameState): ScreenId {
+  if (state.meta.intro) return 'intro'
   if (state.day.phase === 'closed') return state.history.length > 0 ? 'ledger' : 'welcome'
-  const phase = state.current?.phase
-  if (phase === 'inspect') return 'inspect'
-  if (phase === 'offer') return 'offer'
+  if (!state.day.newsRead) return 'news'
+  const c = state.current
+  if (c?.phase === 'inspect') return 'inspect'
+  if (c?.phase === 'offer') return 'offer'
+  if (c?.phase === 'present' && c.kind === 'buyer') return 'sale'
+  if (c?.phase === 'present' && c.kind === 'redeem') return 'redeem'
   return 'counter'
 }
 
@@ -55,7 +69,13 @@ export class Ui {
   private readonly offer: OfferScreen
   private readonly ledger: LedgerScreen
   private readonly welcome: WelcomeScreen
+  private readonly intro: IntroScreen
+  private readonly news: NewsScreen
+  private readonly sale: SaleScreen
+  private readonly redeem: RedeemScreen
   private readonly settings: SettingsSheet
+  private readonly office: OfficeSheet
+  private readonly shop: ShopSheet
   private readonly screens: Record<ScreenId, { root: HTMLElement }>
   private current: ScreenId | null = null
   private lastLayout: UiLayout | null = null
@@ -71,11 +91,20 @@ export class Ui {
     const gear = (suffix: string) => (onPress: () => void) =>
       createButton({ id: `settings-${suffix}`, label: '', icon: 'gear', ariaLabel: 'Settings', className: 'btn-icon', onPress })
 
-    this.counter = new CounterScreen(dispatch, openSettings, gear('counter'))
+    this.shop = new ShopSheet({ getState: () => deps.store.get(), dispatch })
+    const shopButton = (suffix: string) =>
+      createButton({ id: `shop-${suffix}`, label: 'Shop', icon: 'tag', ariaLabel: 'Shop floor: display and price tags', className: 'btn-shop', onPress: () => this.shop.open() })
+
+    this.counter = new CounterScreen(dispatch, openSettings, gear('counter'), shopButton('counter'))
     this.inspect = new InspectScreen(dispatch)
     this.offer = new OfferScreen(dispatch)
-    this.ledger = new LedgerScreen(dispatch, openSettings, gear('ledger'))
+    this.office = new OfficeSheet({ getState: () => deps.store.get(), dispatch })
+    this.ledger = new LedgerScreen(dispatch, openSettings, gear('ledger'), () => this.office.open(), shopButton('ledger'))
     this.welcome = new WelcomeScreen(dispatch, openSettings, gear('welcome'))
+    this.intro = new IntroScreen(dispatch)
+    this.news = new NewsScreen(dispatch)
+    this.sale = new SaleScreen(dispatch)
+    this.redeem = new RedeemScreen(dispatch)
     this.settings = new SettingsSheet({
       getState: () => deps.store.get(),
       dispatch,
@@ -89,13 +118,19 @@ export class Ui {
       offer: this.offer,
       ledger: this.ledger,
       welcome: this.welcome,
+      intro: this.intro,
+      news: this.news,
+      sale: this.sale,
+      redeem: this.redeem,
     }
     for (const s of Object.values(this.screens)) {
       s.root.hidden = true
       mount.appendChild(s.root)
     }
     mount.appendChild(this.hud.root)
+    mount.appendChild(this.shop.root)
     mount.appendChild(this.settings.root)
+    mount.appendChild(this.office.root)
 
     const build = el('div', 'build-number', `${__BUILD_SHA__} · ${__BUILD_DATE__}`)
     build.dataset.id = 'build'
@@ -112,7 +147,7 @@ export class Ui {
       this.current = id
       document.body.dataset.screen = id
     }
-    this.hud.root.hidden = id === 'welcome' || id === 'ledger'
+    this.hud.root.hidden = id === 'welcome' || id === 'ledger' || id === 'intro' || id === 'news'
     this.hud.render(state)
     switch (id) {
       case 'counter':
@@ -130,8 +165,25 @@ export class Ui {
       case 'welcome':
         this.welcome.render(state)
         break
+      case 'intro':
+        this.intro.render(state)
+        break
+      case 'news':
+        this.news.render(state)
+        break
+      case 'sale':
+        this.sale.render(state)
+        break
+      case 'redeem':
+        this.redeem.render(state)
+        break
     }
+    if (this.shop.isOpen) this.shop.render(state)
     if (this.settings.isOpen) this.settings.render(state)
+    if (this.office.isOpen) {
+      if (id === 'ledger') this.office.render(state)
+      else this.office.close()
+    }
     if (prev === null || screenFor(prev) !== id) this.onScreenChange?.(id)
   }
 
@@ -145,8 +197,9 @@ export class Ui {
     const h = window.innerHeight
     const w = window.innerWidth
     let counterBottom = this.lastLayout?.counterBottom ?? h * 0.33
-    if (this.current === 'counter') {
-      const r = this.counter.strip.getBoundingClientRect()
+    const strip = this.current === 'counter' ? this.counter.strip : this.current === 'sale' ? this.sale.strip : this.current === 'redeem' ? this.redeem.strip : null
+    if (strip) {
+      const r = strip.getBoundingClientRect()
       if (r.height > 0) counterBottom = w > h && w >= 700 ? 0 : h - r.top
     } else if (this.current === 'offer') {
       const r = this.offer.root.querySelector('.offer-bubble')!.getBoundingClientRect()
@@ -177,6 +230,11 @@ export class Ui {
       }
       return false
     }
+    if (this.office.isOpen) {
+      if (k === 'Escape') this.office.close()
+      return k === 'Escape'
+    }
+    if (this.shop.isOpen) return this.shop.keyPress(k)
     const s = this.deps.store
     switch (this.current) {
       case 'inspect':
@@ -189,6 +247,8 @@ export class Ui {
           return true
         }
         return this.offer.key(k)
+      case 'sale':
+        return this.sale.key(k)
       default:
         return false
     }
@@ -196,6 +256,6 @@ export class Ui {
 
   /** Elements whose size changes should re-frame the camera. */
   observed(): HTMLElement[] {
-    return [this.counter.strip, this.inspect.panel, this.inspect.header, this.offer.panel, this.mount]
+    return [this.counter.strip, this.sale.strip, this.redeem.strip, this.inspect.panel, this.inspect.header, this.offer.panel, this.mount]
   }
 }

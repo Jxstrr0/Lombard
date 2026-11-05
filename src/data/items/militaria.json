@@ -1,0 +1,351 @@
+[
+  {
+    "id": "medal_for_courage",
+    "category": "militaria",
+    "name": "Medal \"For Courage\"",
+    "era": "1940s",
+    "baseValue": { "min": 12000, "max": 20000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 28, "tolerance": 1.5 },
+    "magnetic": false,
+    "rarity": 1,
+    "fakeChance": 0.4,
+    "tells": [
+      { "id": "relief", "tool": "loupe", "finding": "The tanks and aircraft on the face are struck sharp; even the tiny rivets stand out.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse" },
+      { "id": "number", "tool": "loupe", "finding": "On the back: a hand-stamped number, the digits slightly uneven in depth, worn smooth.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse" },
+      { "id": "eyelet", "tool": "loupe", "finding": "The eyelet is part of the disc, not soldered on; the jump ring is worn oval.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "eyelet" },
+      { "id": "ribbon", "tool": "loupe", "finding": "The grey moiré ribbon is faded and soft, dirt worked deep into the weave.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "ribbon" },
+      { "id": "heft", "tool": "scale", "finding": "A good, dense weight in the pan for its size.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_disc", "tool": "magnet", "finding": "The disc ignores the magnet; only the pin on the back twitches.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "pin" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cast_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.04,
+        "weight": 2,
+        "weightFactor": 0.82,
+        "tells": [
+          { "id": "relief", "tool": "loupe", "finding": "The tanks are soft-edged and the field is dotted with tiny pits, like a casting.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" },
+          { "id": "number", "tool": "loupe", "finding": "The number on the back is crisp, but every digit is exactly the same depth, machine-pressed.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "reverse" },
+          { "id": "seam", "tool": "loupe", "finding": "A fine seam line runs round the rim, where two halves of a mould met.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "eyelet" },
+          { "id": "patina", "tool": "loupe", "finding": "The dark patina is one flat black everywhere, even on high points that should rub bright.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5 },
+          { "id": "heft", "tool": "scale", "finding": "Lighter in the pan than a silver disc this size.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "renumbered",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          { "id": "number", "tool": "loupe", "finding": "The back is thinner around the number, as if an older number was ground away first.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.6, "hotspot": "reverse" }
+        ]
+      },
+      {
+        "id": "new_mount",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          { "id": "ribbon", "tool": "loupe", "finding": "The ribbon is crisp and bright, far too clean for its age.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "ribbon" },
+          { "id": "mount_back", "tool": "loupe", "finding": "The mount's back plate is new, its pin and catch bright and modern.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "pin" }
+        ]
+      }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "It was my grandfather's. He never talked about what he got it for.",
+      "My mother kept it in a biscuit tin. She died in the winter.",
+      "The roof is leaking and the pension is what it is. He would understand.",
+      "A man at the flea market said you'd give a fair price. I hope he was right."
+    ],
+    "model": {
+      "placeholder": "medal",
+      "color": "#c9c9c6",
+      "scale": 1,
+      "inspectDistance": 0.2,
+      "ribbon": ["#3a5fb0", "#a8a8a3", "#a8a8a3", "#a8a8a3", "#a8a8a3", "#a8a8a3", "#a8a8a3", "#3a5fb0"],
+      "emblem": "courage",
+      "hotspots": [
+        { "id": "obverse", "label": "Face", "position": [0, -0.02, 0.0017] },
+        { "id": "reverse", "label": "Back", "position": [0, -0.02, -0.0017] },
+        { "id": "eyelet", "label": "Eyelet", "position": [0, -0.0005, 0] },
+        { "id": "ribbon", "label": "Ribbon", "position": [0, 0.022, 0.0025] },
+        { "id": "pin", "label": "Mount pin", "position": [0, 0.022, -0.0025] }
+      ]
+    }
+  },
+  {
+    "id": "medal_combat_merit",
+    "category": "militaria",
+    "name": "Medal \"For Combat Merit\"",
+    "era": "1940s",
+    "baseValue": { "min": 6000, "max": 10000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 23, "tolerance": 1.3 },
+    "magnetic": false,
+    "rarity": 1.3,
+    "fakeChance": 0.35,
+    "tells": [
+      { "id": "relief", "tool": "loupe", "finding": "The raised lettering on the face has sharp serifs and clean edges, the star above it crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse" },
+      { "id": "number", "tool": "loupe", "finding": "A hand-stamped number on the back, slightly crooked, its edges softened by years of wear.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse" },
+      { "id": "eyelet", "tool": "loupe", "finding": "The eyelet is struck with the disc; the old jump ring is worn thin where it rubbed.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "eyelet" },
+      { "id": "ribbon", "tool": "loupe", "finding": "The ribbon is grey with yellow edges, faded unevenly from years behind glass.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "ribbon" },
+      { "id": "heft", "tool": "scale", "finding": "It settles in the pan with the weight of silver.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_disc", "tool": "magnet", "finding": "Nothing from the disc; the mount pin gives a faint tug.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "pin" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cast_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.05,
+        "weight": 2,
+        "weightFactor": 0.8,
+        "tells": [
+          { "id": "relief", "tool": "loupe", "finding": "The letters are rounded and blurry, with tiny bubbles in the recesses.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" },
+          { "id": "patina", "tool": "loupe", "finding": "A greenish-black paste sits in every crevice, and the disc smells faintly of sulphur.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45 },
+          { "id": "heft", "tool": "scale", "finding": "Light in the pan for silver.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "new_mount",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          { "id": "mount_back", "tool": "loupe", "finding": "The mount on the back is a modern copy: a bright screw where a pin should be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "pin" }
+        ]
+      }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "My uncle got this. He was a sapper. That is all he ever said.",
+      "We're clearing out the flat. Nobody in the family wants it.",
+      "It's silver, isn't it? At least it's worth its silver.",
+      "I don't want to sell it. I just need a bit of money until the end of the month."
+    ],
+    "model": {
+      "placeholder": "medal",
+      "color": "#c4c4c0",
+      "scale": 1,
+      "inspectDistance": 0.2,
+      "ribbon": ["#d9b13b", "#a8a8a3", "#a8a8a3", "#a8a8a3", "#a8a8a3", "#a8a8a3", "#a8a8a3", "#d9b13b"],
+      "emblem": "merit",
+      "hotspots": [
+        { "id": "obverse", "label": "Face", "position": [0, -0.02, 0.0017] },
+        { "id": "reverse", "label": "Back", "position": [0, -0.02, -0.0017] },
+        { "id": "eyelet", "label": "Eyelet", "position": [0, -0.0005, 0] },
+        { "id": "ribbon", "label": "Ribbon", "position": [0, 0.022, 0.0025] },
+        { "id": "pin", "label": "Mount pin", "position": [0, 0.022, -0.0025] }
+      ]
+    }
+  },
+  {
+    "id": "order_red_star",
+    "category": "militaria",
+    "name": "Order of the Red Star",
+    "era": "1940s",
+    "baseValue": { "min": 25000, "max": 40000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 33, "tolerance": 1.8 },
+    "magnetic": false,
+    "rarity": 0.6,
+    "fakeChance": 0.45,
+    "tells": [
+      { "id": "figure", "tool": "loupe", "finding": "The soldier in the centre is struck in fine relief; the rifle and greatcoat folds are crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "center" },
+      { "id": "enamel", "tool": "loupe", "finding": "The red enamel has a few tiny chips at the ray tips, with silver showing underneath.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "enamel" },
+      { "id": "number", "tool": "loupe", "finding": "The back carries a hand-stamped number and the mint's name, the letters slightly uneven.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse" },
+      { "id": "screw", "tool": "loupe", "finding": "The screw post is thick, with an old, slightly flattened thread.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "screw" },
+      { "id": "nut", "tool": "loupe", "finding": "The big nut carries the mint's name in raised letters, worn soft at the edges.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "nut" },
+      { "id": "heft", "tool": "scale", "finding": "Heavy in the pan for its size: silver and enamel.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_screw", "tool": "magnet", "finding": "The star and nut ignore the magnet entirely.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "screw" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cast_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 2,
+        "weightFactor": 0.8,
+        "tells": [
+          { "id": "figure", "tool": "loupe", "finding": "The soldier is blurry at the edges, and tiny bubbles sit in the recesses.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "center" },
+          { "id": "enamel", "tool": "loupe", "finding": "The red is glossy and perfect, but it is paint: it lifts at one ray tip like nail varnish.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "enamel" },
+          { "id": "screw", "tool": "loupe", "finding": "The screw post has a fine modern thread and a tool mark at its base.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "screw" },
+          { "id": "patina", "tool": "loupe", "finding": "Greenish-black paste in every crevice, and a faint smell of sulphur.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4 },
+          { "id": "heft", "tool": "scale", "finding": "Too light in the pan for a silver star this size.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "wrong_nut",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          { "id": "nut", "tool": "loupe", "finding": "The nut is from a different mint, its lettering later than the star's.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "nut" }
+        ]
+      },
+      {
+        "id": "re_enamelled",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          { "id": "enamel", "tool": "loupe", "finding": "The enamel is flawless and slightly domed, filled level over old chips.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "enamel" }
+        ]
+      }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "My grandfather was a tank commander. He has two of these. Had.",
+      "Grandmother says sell it before the grandchildren fight over it. They're already fighting.",
+      "The bank wants the payment by Monday. I am sorry, Grandpa.",
+      "Bought it at the flea market in the nineties. I always knew it was worth something."
+    ],
+    "model": {
+      "placeholder": "order",
+      "color": "#b3222a",
+      "scale": 1,
+      "inspectDistance": 0.16,
+      "hotspots": [
+        { "id": "center", "label": "Centre", "position": [0, 0, 0.0032] },
+        { "id": "enamel", "label": "Enamel ray", "position": [0, 0.017, 0.0022] },
+        { "id": "reverse", "label": "Back", "position": [0.009, -0.012, -0.0022] },
+        { "id": "screw", "label": "Screw post", "position": [0, 0.0, -0.0105] },
+        { "id": "nut", "label": "Nut", "position": [0.0125, 0.0, -0.0095] }
+      ]
+    }
+  },
+  {
+    "id": "medal_victory_germany",
+    "category": "militaria",
+    "name": "Medal \"For the Victory over Germany\"",
+    "era": "1945",
+    "baseValue": { "min": 1500, "max": 3000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 15.5, "tolerance": 0.9 },
+    "magnetic": false,
+    "rarity": 1.8,
+    "fakeChance": 0.3,
+    "tells": [
+      { "id": "relief", "tool": "loupe", "finding": "The relief on the face is struck sharp, the lettering round the rim clean and evenly spaced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse" },
+      { "id": "reverse", "tool": "loupe", "finding": "The inscription on the back is crisp, worn only on the highest letters.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse" },
+      { "id": "ribbon", "tool": "loupe", "finding": "The orange and black ribbon has faded to brown and cream at the folds.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "ribbon" },
+      { "id": "heft", "tool": "scale", "finding": "A modest weight of solid brass.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_disc", "tool": "magnet", "finding": "The brass disc ignores the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "steel_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.1,
+        "weight": 1.5,
+        "weightFactor": 0.88,
+        "magnetic": true,
+        "tells": [
+          { "id": "relief", "tool": "loupe", "finding": "The face is shiny and flat, the lettering a little too bold for the rim.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse" },
+          { "id": "magnet_disc", "tool": "magnet", "finding": "The whole medal snaps onto the magnet.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1, "hotspot": "obverse" },
+          { "id": "heft", "tool": "scale", "finding": "A shade light in the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 }
+        ]
+      },
+      {
+        "id": "cast_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.1,
+        "weight": 1,
+        "tells": [
+          { "id": "reverse", "tool": "loupe", "finding": "The letters on the back are soft and filled in at the corners, like a cast.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "reverse" },
+          { "id": "patina", "tool": "loupe", "finding": "The brown patina wipes off on a fingertip.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45 }
+        ]
+      }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "Every soldier got one of these. My great-grandfather too.",
+      "It's not rare, I know. But it's ours. Was ours.",
+      "For the Victory Day parade my son wants a new phone. So.",
+      "Found it in a box of buttons at the dacha."
+    ],
+    "model": {
+      "placeholder": "medal",
+      "color": "#c39a5b",
+      "scale": 1,
+      "inspectDistance": 0.2,
+      "ribbon": ["#e07a1f", "#1a1a1a", "#e07a1f", "#1a1a1a", "#e07a1f"],
+      "emblem": "victory",
+      "hotspots": [
+        { "id": "obverse", "label": "Face", "position": [0, -0.02, 0.0017] },
+        { "id": "reverse", "label": "Back", "position": [0, -0.02, -0.0017] },
+        { "id": "eyelet", "label": "Eyelet", "position": [0, -0.0005, 0] },
+        { "id": "ribbon", "label": "Ribbon", "position": [0, 0.022, 0.0025] },
+        { "id": "pin", "label": "Mount pin", "position": [0, 0.022, -0.0025] }
+      ]
+    }
+  },
+  {
+    "id": "badge_guards",
+    "category": "militaria",
+    "name": "Guards badge, wartime pattern",
+    "era": "1940s",
+    "baseValue": { "min": 3000, "max": 6000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 25, "tolerance": 1.4 },
+    "magnetic": false,
+    "rarity": 1.3,
+    "fakeChance": 0.4,
+    "tells": [
+      { "id": "banner", "tool": "loupe", "finding": "The red enamel banner is hand-filled, slightly uneven at the edges, the gilt letters crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "banner" },
+      { "id": "wreath", "tool": "loupe", "finding": "The oak leaves have crisp veins, and the gilt is worn at the high points.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "wreath" },
+      { "id": "reverse", "tool": "loupe", "finding": "A plain back with the maker's stamp, darkened evenly with age.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "reverse" },
+      { "id": "screw", "tool": "loupe", "finding": "A thick screw post with a large flat nut; the old thread is worn smooth.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "screw" },
+      { "id": "heft", "tool": "scale", "finding": "Solid brass weight; it clinks in the pan.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_badge", "tool": "magnet", "finding": "Brass through and through; the magnet finds nothing.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "reverse" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cast_alloy",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 2,
+        "weightFactor": 0.5,
+        "tells": [
+          { "id": "banner", "tool": "loupe", "finding": "The red is a flat, sticker-like layer, perfectly even, with no gilt on the letters.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "banner" },
+          { "id": "wreath", "tool": "loupe", "finding": "The leaves are mushy, with no veins at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "wreath" },
+          { "id": "screw", "tool": "loupe", "finding": "The screw post is thin, with a modern thread.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "screw" },
+          { "id": "heft", "tool": "scale", "finding": "So light it hardly moves the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25 }
+        ]
+      },
+      {
+        "id": "iron_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 1,
+        "weightFactor": 0.95,
+        "magnetic": true,
+        "tells": [
+          { "id": "magnet_badge", "tool": "magnet", "finding": "The badge jumps to the magnet.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1, "hotspot": "reverse" },
+          { "id": "reverse", "tool": "loupe", "finding": "Rust blooms in a pinhole on the back, under the gilt.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "reverse" }
+        ]
+      }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "My grandfather wore it on his jacket every May. Every May.",
+      "I don't know anything about it. It was in a jar of coins.",
+      "There were two. My brother sold his. I am selling mine.",
+      "I need it for a costume. No, I mean I need the money for a costume."
+    ],
+    "model": {
+      "placeholder": "badge",
+      "color": "#c6a14a",
+      "scale": 1,
+      "inspectDistance": 0.13,
+      "hotspots": [
+        { "id": "banner", "label": "Banner", "position": [0, 0.0165, 0.0022] },
+        { "id": "wreath", "label": "Wreath", "position": [-0.0135, -0.006, 0.0018] },
+        { "id": "reverse", "label": "Back", "position": [0.008, -0.01, -0.0016] },
+        { "id": "screw", "label": "Screw post", "position": [0, 0, -0.0095] }
+      ]
+    }
+  }
+]

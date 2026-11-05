@@ -1,0 +1,519 @@
+/*
+ * Shop sheet and sale screen (owner: shop worker). In-game look: felt-lined
+ * counter case, worn wooden shelves, paper price tags in receipt mono.
+ * Portrait first (390×844); landscape and desktop centre the sheet.
+ */
+
+/* --- shop sheet ------------------------------------------------------------ */
+
+.shop-sheet {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(100vh - 16px - var(--safe-top));
+  max-height: calc(100dvh - 16px - var(--safe-top));
+  height: calc(100dvh - 16px - var(--safe-top));
+  padding-bottom: 0;
+  background: #1b1915;
+}
+
+.shop-titles h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.shop-summary {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+.shop-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -16px;
+  padding: 0 16px 16px;
+}
+
+.shop-help {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.shop-area {
+  margin-bottom: 12px;
+  padding: 8px 8px 10px;
+  border-radius: 10px;
+  /* worn wood */
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0 2px, transparent 2px 9px),
+    linear-gradient(#3a2d22, #2c221a);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.area-counter {
+  /* felt bed under glass */
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.07), transparent 40%),
+    radial-gradient(ellipse at 50% 0%, #2f4237, #1d2b23);
+  border-color: #8a6a3a;
+  box-shadow: inset 0 0 0 2px rgba(201, 162, 90, 0.25);
+}
+
+.area-safe {
+  background: linear-gradient(#2a2b2d, #1e1f21);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.shop-area-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 2px 7px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--paper);
+}
+
+.shop-area-hint {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+  gap: 6px;
+}
+
+.slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2px;
+  min-height: 58px;
+  min-width: 0;
+  padding: 5px 5px 4px 7px;
+  border-radius: 3px 7px 7px 3px;
+  border: 0;
+  background: linear-gradient(var(--paper), var(--paper-shade));
+  color: var(--ink);
+  font-family: var(--mono);
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.slot:nth-child(3n + 1) {
+  --tilt: -0.6deg;
+}
+
+.slot:nth-child(4n + 2) {
+  --tilt: 0.5deg;
+}
+
+.area-back .slot {
+  min-height: 52px;
+  padding: 4px 3px 3px 5px;
+}
+
+.slot-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.area-back .slot-name {
+  font-size: 0.625rem;
+}
+
+.slot-price {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.area-back .slot-price {
+  font-size: 0.625rem;
+}
+
+.slot.no-tag .slot-price,
+.safe-item .slot-price:only-child,
+.tray-tag.no-tag {
+  color: var(--ink-red);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.slot.is-empty {
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px dashed rgba(250, 249, 245, 0.18);
+  box-shadow: none;
+  transform: none;
+}
+
+.slot-num {
+  font-size: 0.75rem;
+  color: rgba(250, 249, 245, 0.3);
+}
+
+.slot.is-target {
+  border-color: var(--clay);
+  background: rgba(217, 119, 87, 0.1);
+}
+
+.slot.is-target .slot-num {
+  color: var(--clay-light);
+}
+
+.slot.is-selected,
+.safe-item.is-selected {
+  outline: 3px solid var(--clay);
+  outline-offset: 1px;
+}
+
+.safe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.safe-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'name price' 'paid price';
+  align-items: center;
+  column-gap: 10px;
+  min-height: 48px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(var(--paper), var(--paper-shade));
+  color: var(--ink);
+  font-family: var(--mono);
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.safe-name {
+  grid-area: name;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.safe-paid {
+  grid-area: paid;
+  font-size: 0.6875rem;
+  color: var(--ink-soft);
+}
+
+.safe-item .slot-price {
+  grid-area: price;
+  font-size: 0.8125rem;
+}
+
+.safe-empty {
+  margin: 4px 2px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* selection tray */
+.shop-tray {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 -16px;
+  padding: 10px 16px calc(12px + var(--safe-bottom));
+  background: var(--strip-bg);
+  border-top: 1px solid var(--strip-edge);
+  box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.4);
+}
+
+.tray-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tray-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tray-name {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tray-where {
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+.tray-tag {
+  flex: none;
+  padding: 4px 10px 4px 16px;
+  background: linear-gradient(var(--paper), var(--paper-shade));
+  color: var(--ink);
+  font-family: var(--mono);
+  font-weight: 600;
+  clip-path: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
+  border-radius: 2px 6px 6px 2px;
+}
+
+/* price pad */
+.shop-pricer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  /* thumb reach: the pad sits at the bottom of the sheet */
+  justify-content: flex-end;
+  gap: 10px;
+  padding-bottom: calc(14px + var(--safe-bottom));
+}
+
+.shop-sheet.is-pricing {
+  height: auto;
+}
+
+.shop-sheet.is-pricing .shop-pricer {
+  flex: none;
+}
+
+.pricer-name {
+  font-weight: 700;
+}
+
+.shop-pricer .price-tag-value {
+  font-size: 1.875rem;
+}
+
+.shop-pricer .key {
+  min-height: 54px;
+}
+
+.actions > .btn-shop {
+  flex: 0 0 auto;
+  padding: 0 14px;
+}
+
+/* --- sale screen ----------------------------------------------------------------- */
+
+.sale-offer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(250, 249, 245, 0.05);
+  border: 1px solid var(--strip-edge);
+}
+
+.sale-offer-main {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sale-offer-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.sale-offer-tag {
+  align-items: flex-start;
+}
+
+.sale-tag-value {
+  padding: 2px 10px 2px 16px;
+  background: linear-gradient(var(--paper), var(--paper-shade));
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  clip-path: polygon(8px 0, 100% 0, 100% 100%, 8px 100%, 0 50%);
+  border-radius: 2px 6px 6px 2px;
+}
+
+.sale-offer-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.sale-offer-value {
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--paper);
+}
+
+.sale-offer-trail {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+.sale-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sale-screen.is-countering .dialogue {
+  min-height: 0;
+}
+
+.sale-screen.is-countering .line {
+  font-size: 0.9375rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sale-screen.is-countering .sale-offer {
+  display: none;
+}
+
+.sale-screen.is-over .price-tag-note {
+  color: var(--ink-red);
+  font-weight: 600;
+}
+
+.outcome-stamp[data-outcome='sold'] {
+  color: #9fd39a;
+}
+
+/* --- landscape and desktop ------------------------------------------------------------ */
+
+@media (orientation: landscape) and (min-width: 700px) {
+  .shop-sheet {
+    width: min(620px, 100vw);
+  }
+
+  .sale-screen.is-countering .strip {
+    width: min(460px, 60vw);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .shop-sheet {
+    height: calc(100dvh - 8px);
+    max-height: calc(100dvh - 8px);
+  }
+
+  .slot {
+    min-height: 46px;
+  }
+
+  .shop-help {
+    display: none;
+  }
+
+  /* tray on one row so the slot grids keep most of the height */
+  .shop-tray {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px calc(6px + var(--safe-bottom));
+  }
+
+  .tray-top {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .shop-tray .actions {
+    flex: none;
+    width: 260px;
+  }
+
+  .shop-tray .btn,
+  .shop-pricer .btn {
+    min-height: 44px;
+  }
+
+  .shop-pricer [data-id='tag-back'] {
+    flex: 0 0 48px;
+  }
+
+  .shop-pricer [data-id='tag-back'] .btn-label {
+    display: none;
+  }
+
+  .shop-pricer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: 'name pad' 'tag pad' 'act pad';
+    align-content: start;
+    column-gap: 12px;
+  }
+
+  .shop-pricer .pricer-name {
+    grid-area: name;
+  }
+
+  .shop-pricer .price-tag {
+    grid-area: tag;
+  }
+
+  .shop-pricer .numpad {
+    grid-area: pad;
+  }
+
+  .shop-pricer .actions {
+    grid-area: act;
+  }
+
+  .shop-pricer .key {
+    min-height: 44px;
+  }
+
+  .sale-screen.is-countering .strip {
+    max-height: calc(100vh - var(--hud-h) - 8px);
+    overflow-y: auto;
+  }
+
+  .sale-screen.is-countering .numpad .key {
+    min-height: 40px;
+  }
+}

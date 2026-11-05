@@ -5,9 +5,9 @@
   "lightmapScale": 1.25,
   "samples": 96,
   "blender": "4.5.15 LTS",
-  "inputHash": "32b94acd18414017",
+  "inputHash": "fd8f38f9fd705cad",
   "baked": true,
-  "commit": "f30307c",
+  "commit": "3bdaae9",
   "files": {
     "glb": "shop.glb",
     "lightmap": "shop_lightmap.ktx2"

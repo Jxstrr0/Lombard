@@ -4,6 +4,9 @@
  *
  * Query flags: ?seed=N forces a fresh deterministic career (screenshots),
  * ?perf=1 shows the perf overlay, ?gallery=1 shows every placeholder model.
+ * ?look=<yawDeg>,<pitchDeg> starts the counter view with the head turned from the
+ * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
+ * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line.
  */
 import '@fontsource/space-grotesk/400.css'
@@ -24,13 +27,14 @@ import { createInitialState, type GameState } from './game/state'
 import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
 import { bindKeyboard } from './input/keyboard'
+import { LookGestures } from './input/look'
 import { deleteCareer, loadLatestCareer, saveCareer } from './persist/autosave'
 import { CameraRig } from './render/camera'
 import { PerfOverlay, TIER_SETTINGS, TierBenchmark, initialTier } from './render/perf'
 import { ShopScene } from './render/scene'
 import { ItemStage } from './render/stage'
 import { createItemLoader } from './render/loaders'
-import { Ui } from './ui/bind'
+import { Ui, screenFor, type ScreenId } from './ui/bind'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
 
@@ -58,6 +62,18 @@ function redeemScenario(s0: GameState): GameState {
   s = reducer({ ...s, loans: [loan] }, { type: 'day/open' })
   const visit = s.queue.find((v) => v.loanId === loan.id)
   return visit ? { ...s, queue: [visit, ...s.queue.filter((v) => v !== visit)] } : s
+}
+
+/** Screens that show the counter view and leave the 3D area free to drag. */
+const LOOK_SCREENS = new Set<ScreenId>(['counter', 'sale', 'redeem', 'offer'])
+
+/** ?look=<yawDeg>,<pitchDeg>, or null. */
+function lookParam(params: URLSearchParams): { yaw: number; pitch: number } | null {
+  const raw = params.get('look')
+  if (!raw) return null
+  const [yaw, pitch = 0] = raw.split(',').map(Number)
+  if (!Number.isFinite(yaw) || !Number.isFinite(pitch)) return null
+  return { yaw: yaw!, pitch }
 }
 
 function showFatal(message: string): void {
@@ -157,6 +173,8 @@ async function boot(): Promise<void> {
 
   const shop = new ShopScene()
   const rig = new CameraRig()
+  const look = lookParam(params)
+  if (look) rig.setHeadOffset(look.yaw, look.pitch)
   // ?noglb=1 keeps every item on its procedural placeholder (for comparing against the scripted models).
   const itemLoader = params.get('noglb') === '1' ? null : createItemLoader(renderer, import.meta.env.BASE_URL, __BUILD_SHA__)
   const stage = new ItemStage(shop.scene, shop.matPoint, itemLoader?.load)
@@ -198,6 +216,8 @@ async function boot(): Promise<void> {
     shop.sync(state)
     stage.sync(state)
     rig.reduceMotion = stage.reduceMotion = state.settings.reduceMotion
+    // A new customer steps up: face the counter again.
+    if (prev && state.current && state.current.visitId !== prev.current?.visitId) rig.recentre()
     rig.setInspect(state.current?.phase === 'inspect')
     rig.setOfferFocus(state.current?.phase === 'offer')
   }
@@ -220,6 +240,21 @@ async function boot(): Promise<void> {
     orbit: (dx, dy) => stage.orbit(dx, dy),
     zoom: (f) => stage.zoomBy(f),
     dragging: (on) => stage.setDragging(on),
+  })
+  // Head look in the counter view: drag the 3D view to turn, tap the item to inspect, double-tap to recentre.
+  new LookGestures(renderer.domElement, {
+    enabled: () => rig.canLook && LOOK_SCREENS.has(screenFor(store.get())),
+    look: (dx, dy) => rig.turnHead(dx, dy),
+    dragging: (on) => {
+      rig.setLookDragging(on)
+      if (on) ui.lookUsed()
+    },
+    tap: (x, y) => {
+      const s = store.get()
+      if (screenFor(s) !== 'counter' || s.current?.phase !== 'present' || s.current.kind !== 'seller') return
+      if (stage.hitOnCounter(rig.camera, x, y, window.innerWidth, window.innerHeight)) store.dispatch({ type: 'counter/inspect' })
+    },
+    doubleTap: () => rig.recentre(),
   })
   bindKeyboard((k) => ui.key(k))
 

@@ -44,10 +44,10 @@ Done when: a tester can play 5 days on a phone, lose money on fakes, and make mo
 
 Done when: the simulator shows a careful policy growing ~15%/month and a careless one busting by day 40.
 
-## M3 — Real art pass (status: in progress. Task 1, the bake pipeline, is done: Colby triggered bake #5 from the GitHub app and it deployed as build 6c45ea1. The 30 item models are done (PRs #7–#12). Next: lock the room layout)
+## M3 — Real art pass (status: in progress. Task 1, the bake pipeline, is done: Colby triggered bake #5 from the GitHub app and it deployed as build 6c45ea1. The 30 item models are done (PRs #7–#12). Room layout locked Nov 5 (layout v2: glass counter and cases, back room). Next: dress the shop and the lighting pass)
 
 - **First task: bake pipeline end to end on a grey box.** `bake/layout.json` with the placeholder room, `bake/bake.py`, and `.github/workflows/bake.yml` (download + cache Blender, preview and full quality, gltf-transform optimize, commit outputs). Wire the lightmap into `scene.ts` on `uv1`. Done when a preview bake triggered from the GitHub mobile app lands in the deployed build. ✅ Done (bake #5 → 6c45ea1).
-- Lock the room layout with Colby from preview-bake screenshots before dressing it (layout changes after this mean rebakes).
+- Lock the room layout with Colby from preview-bake screenshots before dressing it (layout changes after this mean rebakes). ✅ Locked Nov 5 with Colby's changes: glass showcase counter, a low glass case behind it to the player's right, a freestanding glass case on the floor, and a storeroom off the wall to the player's left (see 05).
 - Head look at the counter (Colby, Nov 5): drag to turn the head while the eye stays put (full yaw, pitch −55°…+50°); double tap, a new customer, inspect and the portrait offer view recentre it; reduce motion = no inertia and an instant recentre; `?look=<yaw>,<pitch>` for review. Tapping the item on the mat now opens inspect too. ✅ Done.
 - Dress the shop: CC0 props, Poly Haven / ambientCG materials, deliberate clutter and slight misalignment (scripted jitter) so it doesn't look procedurally tidy.
 - Lighting pass with Colby on preview bakes (warmth, window light, dark corners), then one full bake. Glass cases, shelves, lamp, window with a canal backdrop card.
@@ -82,7 +82,7 @@ Done when: a clean run, a mob-friendly run, and a fence-heavy run all play diffe
 ## M6 — Launch polish (status: not started)
 
 - 120 items, 40 regulars, 8 arcs, 3 seasons of news.
-- The Flood event, The Appraiser hire.
+- The Flood event, The Appraiser hire (a visible employee who walks between the back room, the counter and the floor; see 05).
 - Desktop layout pass (landscape, mouse hotspots, keyboard shortcuts).
 - Save migrations tested across all milestone versions.
 - Localization-ready strings (English only shipped).

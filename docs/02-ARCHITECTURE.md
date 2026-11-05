@@ -2,7 +2,7 @@
 
 ## Stack
 
-TypeScript 5, Vite 5, Three.js (pin a current stable release in package.json), `idb`, `zod`, `vitest`, `eslint`. No UI framework. Deployed as a static site to GitHub Pages.
+TypeScript 5, Vite (current stable, pinned), Three.js (pin a current stable release in package.json), `idb`, `zod`, `vitest`, `eslint`. No UI framework. Deployed as a static site to GitHub Pages.
 
 ## Folder layout
 

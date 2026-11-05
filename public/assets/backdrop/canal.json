@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "eye": [
+    0,
+    1.62,
+    -3.2
+  ],
+  "plane": {
+    "z": 11,
+    "x0": -5.2469,
+    "x1": 4.552,
+    "y0": 0.0091,
+    "y1": 5.1535
+  },
+  "size": [
+    1280,
+    672
+  ],
+  "waterY": -0.65,
+  "samples": 256,
+  "exposure": 2.2,
+  "blender": "4.5.15 LTS",
+  "inputHash": "5a9fafc463e32254",
+  "encoding": "etc1s",
+  "file": "canal.ktx2"
+}

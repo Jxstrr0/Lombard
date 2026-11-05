@@ -285,7 +285,9 @@ async function boot(): Promise<void> {
           if (m) ui.setBakeInfo(`bake ${m.quality}${m.commit ? ` ${m.commit}` : ''}`)
           return m
         })
-  void Promise.all([envLoad, bakeLoad]).finally(() => {
+  // The canal outside the window comes after the shop; ?nobackdrop=1 keeps the old canvas card.
+  const backdropLoad = params.get('nobackdrop') === '1' ? Promise.resolve(false) : bakeLoad.then(() => shop.loadBackdrop(renderer, import.meta.env.BASE_URL))
+  void Promise.all([envLoad, bakeLoad, backdropLoad]).finally(() => {
     envReady = true
   })
 

@@ -14,7 +14,8 @@
     "lint": "eslint . && tsc --noEmit",
     "shots": "npm run build && node scripts/shots.mjs",
     "sim": "node scripts/sim.mjs",
-    "bake:pack": "node scripts/bake-pack.mjs"
+    "bake:pack": "node scripts/bake-pack.mjs",
+    "backdrop:pack": "node scripts/backdrop-pack.mjs"
   },
   "engines": {
     "node": ">=20.19"

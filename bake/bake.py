@@ -37,13 +37,15 @@ import numpy as np
 from mathutils import Matrix, Vector
 
 HERE = Path(__file__).resolve().parent
+TEXTURES = HERE / "textures"
+PROPS = HERE / "props"
 sys.path.insert(0, str(HERE))
 from materials import MATERIALS, hex_to_linear, validate  # noqa: E402
 
 QUALITY = {
-    # lightmap px, bake samples, island margin px, preview samples
-    "preview": {"size": 512, "samples": 96, "margin": 3, "preview_samples": 48},
-    "full": {"size": 2048, "samples": 768, "margin": 6, "preview_samples": 192},
+    # lightmap px, bake samples, island margin px, preview samples, prop vertex-bake samples (no denoiser there)
+    "preview": {"size": 512, "samples": 96, "margin": 3, "preview_samples": 48, "prop_samples": 256},
+    "full": {"size": 2048, "samples": 768, "margin": 6, "preview_samples": 192, "prop_samples": 1024},
 }
 
 # three.js (x, y, z) -> Blender (x, -z, y)
@@ -200,6 +202,8 @@ class Builder:
         self.names: set[str] = set()
         # opaque boxes (Blender-space matrix, size) that can hide faces pressed against them
         self.solids: list[tuple[Matrix, list[float]]] = []
+        # (name, prop id, three-space matrix, scale): bake/props/<id>.glb instances
+        self.props: list[tuple[str, str, Matrix, float]] = []
 
     def mat_index(self, name: str) -> tuple[bmesh.types.BMesh, int]:
         if name not in MATERIALS:
@@ -225,6 +229,12 @@ class Builder:
             m = parent @ trs(obj.get("position", [0, 0, 0]), obj.get("rotation"))
             for child in obj["children"]:
                 self.walk(child, m)
+            return
+        if obj.get("shape") == "prop":
+            dpos, dyaw = self.jitter(name, obj.get("jitter"))
+            pos = Vector(obj.get("position", [0, 0, 0])) + dpos
+            m = parent @ Matrix.Translation(pos) @ Matrix.Rotation(math.radians(dyaw), 4, "Y") @ euler_three(obj.get("rotation") or [0, 0, 0])
+            self.props.append((name, obj["prop"], m, obj.get("scale", 1.0)))
             return
         rep = obj.get("repeat", {"count": 1, "step": [0, 0, 0]})
         mats = rep.get("materials")
@@ -412,9 +422,10 @@ def weld_surfaces(bm: bmesh.types.BMesh, solids: list[tuple[Matrix, list[float]]
     return splits, hidden
 
 
-def box_project_uv(bm: bmesh.types.BMesh, layer) -> None:
-    """uv0 in world metres from the dominant face axis (tiling textures)."""
+def box_project_uv(bm: bmesh.types.BMesh, layer, tiles: list[float]) -> None:
+    """uv0 from the dominant face axis: world metres / the material's texture tile."""
     for f in bm.faces:
+        k = 1.0 / tiles[f.material_index]
         n = f.normal
         ax = max(range(3), key=lambda i: abs(n[i]))
         for loop in f.loops:
@@ -425,7 +436,7 @@ def box_project_uv(bm: bmesh.types.BMesh, layer) -> None:
                 uv = (-co.y if n.x > 0 else co.y, co.z)
             else:
                 uv = (co.x if n.y > 0 else -co.x, co.z)
-            loop[layer].uv = uv
+            loop[layer].uv = (uv[0] * k, uv[1] * k)
 
 
 # ---------------------------------------------------------------------------
@@ -443,6 +454,20 @@ def make_material(name: str, for_render: bool) -> bpy.types.Material:
     bsdf.inputs["Roughness"].default_value = spec.get("roughness", 0.5)
     bsdf.inputs["Metallic"].default_value = spec.get("metalness", 0.0)
     kind = spec["kind"]
+    if "texture" in spec:
+        # bake/textures/<name>.jpg (art/materials/prepare.py) on uv0; the glTF
+        # exporter carries it as the base colour texture
+        img = bpy.data.images.load(str(TEXTURES / f"{name}.jpg"))
+        img.colorspace_settings.name = "sRGB"
+        # exported as PNG: bake-pack decodes PNG only, then encodes KTX2
+        img.file_format = "PNG"
+        node = nt.nodes.new("ShaderNodeTexImage")
+        node.image = img
+        node.interpolation = "Linear"
+        uv = nt.nodes.new("ShaderNodeUVMap")
+        uv.uv_map = "uv0"
+        nt.links.new(uv.outputs["UV"], node.inputs["Vector"])
+        nt.links.new(node.outputs["Color"], bsdf.inputs["Base Color"])
     if kind == "glass":
         bsdf.inputs["Transmission Weight"].default_value = 1.0
         bsdf.inputs["IOR"].default_value = 1.5
@@ -455,8 +480,6 @@ def make_material(name: str, for_render: bool) -> bpy.types.Material:
         mat.use_backface_culling = False
     # Exported as glTF material extras; the game reads these.
     mat["kind"] = kind
-    if "runtime" in spec:
-        mat["runtime"] = spec["runtime"]
     if "opacity" in spec:
         mat["opacity"] = spec["opacity"]
     if spec.get("doubleSided"):
@@ -530,7 +553,7 @@ def build_objects(layout: dict) -> dict[str, bpy.types.Object]:
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
         bm.normal_update()
         uv0 = bm.loops.layers.uv.new("uv0")
-        box_project_uv(bm, uv0)
+        box_project_uv(bm, uv0, [MATERIALS[n].get("texture", {}).get("tile", 1.0) for n in k["mats"]])
         mesh = bpy.data.meshes.new(f"shop_{kind}")
         bm.to_mesh(mesh)
         bm.free()
@@ -541,7 +564,74 @@ def build_objects(layout: dict) -> dict[str, bpy.types.Object]:
         bpy.context.scene.collection.objects.link(ob)
         out[kind] = ob
         log(f"{ob.name}: {len(mesh.polygons)} faces, {len(k['mats'])} materials, {culled} hidden faces culled, {welds[0]} edges split, {welds[1]} hidden faces dropped by welding")
+    props = add_props(b.props)
+    if props:
+        out["prop"] = props
     return out
+
+
+def add_props(props: list[tuple[str, str, Matrix, float]]) -> bpy.types.Object | None:
+    """The prop instances (bake/props/<id>.glb, from art/props/prepare.py) as one
+    mesh. They're too fiddly for the room's lightmap (thousands of tiny UV
+    islands, each needing a texel gutter), so their lighting is baked per
+    vertex instead (bake_props); their own texture UVs stay uv0."""
+    meshes: dict[str, bpy.types.Mesh] = {}
+    objs = []
+    for name, prop_id, m, scale in props:
+        if prop_id not in meshes:
+            before = set(bpy.data.objects)
+            bpy.ops.import_scene.gltf(filepath=str(PROPS / f"{prop_id}.glb"))
+            new = [o for o in bpy.data.objects if o not in before]
+            src = next(o for o in new if o.type == "MESH")
+            me = src.data.copy()
+            me.transform(src.matrix_world)
+            me.uv_layers[0].name = "uv0"
+            for mat in me.materials:
+                mat["kind"] = "prop"
+            for o in new:
+                bpy.data.objects.remove(o, do_unlink=True)
+            meshes[prop_id] = me
+        me = meshes[prop_id].copy()
+        # the prop's own frame is Blender's (Z up, front −Y = three +z); place it in three space
+        me.transform(THREE_TO_BLENDER @ m @ THREE_TO_BLENDER.inverted() @ Matrix.Scale(scale, 4))
+        ob = bpy.data.objects.new(f"prop_{name}", me)
+        bpy.context.scene.collection.objects.link(ob)
+        objs.append(ob)
+    if not objs:
+        return None
+    for o in bpy.context.scene.objects:
+        o.select_set(o in objs)
+    bpy.context.view_layer.objects.active = objs[0]
+    if len(objs) > 1:
+        bpy.ops.object.join()
+    ob = bpy.context.view_layer.objects.active
+    ob.name = ob.data.name = "shop_props"
+    ob["kind"] = "prop"
+    log(f"{ob.name}: {len(objs)} props ({len(meshes)} kinds), {len(ob.data.polygons)} faces, {len(ob.data.materials)} materials")
+    return ob
+
+
+def bake_props(ob: bpy.types.Object, hidden: list[bpy.types.Object], samples: int, scale: float) -> None:
+    """Cycles diffuse lighting (no colour) per vertex into the `lighting` colour
+    attribute, divided by the lightmap's scale so the game treats both alike."""
+    me = ob.data
+    attr = me.color_attributes.new("lighting", "FLOAT_COLOR", "POINT")
+    me.color_attributes.active_color = attr
+    for o in hidden:
+        o.hide_render = True
+    bpy.context.scene.cycles.samples = samples
+    select_only(ob)
+    t0 = time.time()
+    bpy.ops.object.bake(type="DIFFUSE", pass_filter={"DIRECT", "INDIRECT"}, target="VERTEX_COLORS", use_clear=True)
+    for o in hidden:
+        o.hide_render = False
+    col = np.empty(len(me.vertices) * 4, dtype=np.float32)
+    attr.data.foreach_get("color", col)
+    col = col.reshape(-1, 4)
+    col[:, :3] = np.clip(col[:, :3] / scale, 0.0, 1.0)
+    col[:, 3] = 1.0
+    attr.data.foreach_set("color", col.ravel())
+    log(f"baked {len(me.vertices)} prop vertices x {samples} samples in {time.time() - t0:.0f}s")
 
 
 def select_only(ob: bpy.types.Object) -> None:
@@ -639,6 +729,7 @@ def bake_lightmap(ob: bpy.types.Object, hidden: list[bpy.types.Object], q: dict,
         nt = mat.node_tree
         uv = nt.nodes.new("ShaderNodeUVMap")
         uv.uv_map = "lightmap"
+        uv.name = "lightmap_uv"
         node = nt.nodes.new("ShaderNodeTexImage")
         node.image = img
         node.name = "lightmap_target"
@@ -661,7 +752,7 @@ def bake_lightmap(ob: bpy.types.Object, hidden: list[bpy.types.Object], q: dict,
         o.hide_render = False
     for mat in ob.data.materials:
         nt = mat.node_tree
-        for n in [n for n in nt.nodes if n.name == "lightmap_target" or n.bl_idname == "ShaderNodeUVMap"]:
+        for n in [n for n in nt.nodes if n.name in ("lightmap_target", "lightmap_uv")]:
             nt.nodes.remove(n)
 
     # Replace Blender's margin with one grown from each island's own texels,
@@ -782,6 +873,8 @@ def export_glb(path: Path) -> None:
         export_normals=True,
         export_tangents=False,
         export_materials="EXPORT",
+        # the props' baked per-vertex lighting (the room meshes have no colour attribute)
+        export_vertex_color="ACTIVE",
         export_cameras=False,
         export_lights=False,
         export_yup=True,
@@ -790,10 +883,16 @@ def export_glb(path: Path) -> None:
     )
 
 
+def input_files() -> list[Path]:
+    """Everything a bake depends on, in the order scripts/bake-hash.sh hashes it (sorted paths)."""
+    files = [HERE / "layout.json", HERE / "materials.py", HERE / "bake.py", HERE.parent / "scripts" / "bake-pack.mjs"]
+    return files + sorted(p for d in (TEXTURES, PROPS) for p in d.rglob("*") if p.is_file())
+
+
 def input_hash() -> str:
     h = hashlib.sha256()
-    # Same files, same order as the bake workflow's "Decide whether to bake" step.
-    for p in (HERE / "layout.json", HERE / "materials.py", HERE / "bake.py", HERE.parent / "scripts" / "bake-pack.mjs"):
+    # Same files, same order as scripts/bake-hash.sh (used by the bake workflow).
+    for p in input_files():
         h.update(p.read_bytes())
     return h.hexdigest()[:16]
 
@@ -818,6 +917,8 @@ def main() -> None:
     if not args.no_bake:
         hidden = [objs[k] for k in ("glass", "unlit") if k in objs]
         scale = bake_lightmap(baked, hidden, q, out)
+        if "prop" in objs:
+            bake_props(objs["prop"], hidden, q["prop_samples"], scale)
     if not args.no_preview:
         render_previews(layout, q["preview_samples"], out)
 

@@ -25,6 +25,7 @@
 | Nov 4, 2026 | **Specialists:** monthly retainers, one named specialist per category group, with accuracy, honesty, and relationship. See GDD § 2b. |
 | Nov 5, 2026 | **Repo visibility: public.** Unlimited Actions minutes for deploys and bakes. |
 | Nov 5, 2026 | **Toolchain versions:** current stable Vite (8.x) and Vitest instead of Vite 5 (out of support); TypeScript stays on 5.x (typescript-eslint does not support 7.x yet). Exact versions pinned in `package.json`. |
+| Nov 5, 2026 | **Placeholder counter (M0):** wooden showcase with a glass top only (no glass sides). With glass sides, the sightline through the top exits the far side and shows the floor instead of the felt bed. Worth keeping in mind for the real counter in M3. |
 | Nov 5, 2026 | **Delivery:** each task goes on a branch with a PR; Claude Code squash-merges it once checks pass, and the merge to `main` deploys. |
 
 ## Open, decide at the milestone listed
@@ -40,6 +41,8 @@
 When an open item is decided, move it to the Decided table with the date.
 
 ## Parked (do not build without a decision)
+
+- Phone landscape: the dialogue strip covers most of the counter. Revisit in the M6 desktop/landscape layout pass.
 
 - Walking around the shop or the street.
 - A second shop location.

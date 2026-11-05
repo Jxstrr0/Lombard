@@ -2,7 +2,7 @@
 
 Work one milestone at a time. Each has a definition of done. Update the status line as you go.
 
-## M0 — Skeleton (status: not started)
+## M0 — Skeleton (status: done Nov 5, 2026; awaiting Colby's phone check)
 
 Goal: a page loads on a phone and shows the shop.
 

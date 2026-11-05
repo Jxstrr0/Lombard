@@ -508,8 +508,8 @@ async function main() {
     const out = []
     {
       const { context, page } = await newPage(browser, { name: 'gallery', width: 1000, height: 1250, deviceScaleFactor: 1 }, '?gallery=1')
-      await page.screenshot({ path: `${OUT}/gallery.png` })
-      out.push(`${OUT}/gallery.png  every item def's placeholder model, front + back, hotspots as pink beads`)
+      await page.screenshot({ path: `${OUT}/gallery.png`, timeout: 120_000 })
+      out.push(`${OUT}/gallery.png  every item def's model (glb or placeholder), front + back, hotspots as pink beads`)
       await context.close()
     }
     {

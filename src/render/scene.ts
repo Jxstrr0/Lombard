@@ -10,10 +10,22 @@
 import * as THREE from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 import type { GameState } from '../game/state'
+import { INSPECT_POINT } from './camera'
 import { canalBackdropTexture, contactShadowTexture, parquetTexture, plasterTexture } from './textures'
 
 const ROOM = { halfW: 3, halfD: 4, height: 4.2 }
 const COUNTER = { z: -2.25, width: 3.2, depth: 0.7, baseH: 0.66, caseH: 0.28 }
+/** Top surface of the rubber counter mat in front of the player (world). */
+const MAT_POINT = new THREE.Vector3(0, COUNTER.baseH + COUNTER.caseH + 0.015, COUNTER.z + 0.12)
+const ENV_INTENSITY = { counter: 0.55, inspect: 1.0 }
+
+interface LightRig {
+  lamp: THREE.PointLight
+  fill: THREE.DirectionalLight
+  lampPos: THREE.Vector3
+  fillPos: THREE.Vector3
+  fillTarget: THREE.Vector3
+}
 
 export interface SceneOptions {
   envUrl: string
@@ -25,6 +37,8 @@ export class ShopScene {
   private customerFade = 0
   private customerTarget = 0
   private disposables: { dispose(): void }[] = []
+  private lights!: LightRig
+  readonly matPoint = MAT_POINT.clone()
 
   constructor() {
     this.scene.background = new THREE.Color('#0d0c0b')
@@ -46,13 +60,32 @@ export class ShopScene {
     hdr.dispose()
     pmrem.dispose()
     this.scene.environment = env
-    this.scene.environmentIntensity = 0.55
+    this.scene.environmentIntensity = ENV_INTENSITY.counter
     this.disposables.push(env)
   }
 
   /** Sync render-owned objects to game state. Never mutates state. */
   sync(state: GameState): void {
     this.customerTarget = state.current ? 1 : 0
+  }
+
+  /**
+   * Retune the two real-time lights for the inspect view (no extra lights):
+   * the window fill becomes a soft key from the upper left of the camera and
+   * the counter lamp a warm rim from the right, so metals read well.
+   * 0 = counter lighting, 1 = inspect lighting.
+   */
+  setInspectBlend(b: number): void {
+    const { lamp, fill, lampPos, fillPos, fillTarget } = this.lights
+    const P = INSPECT_POINT
+    lamp.position.copy(lampPos).lerp(TMP.set(P.x - 0.3, P.y + 0.18, P.z + 0.22), b)
+    lamp.intensity = 2.2 + (0.35 - 2.2) * b
+    fill.position.copy(fillPos).lerp(TMP.set(P.x + 0.9, P.y + 1.1, P.z - 1.3), b)
+    fill.target.position.copy(fillTarget).lerp(P, b)
+    fill.intensity = 1.1 + (1.9 - 1.1) * b
+    if (this.scene.environment) {
+      this.scene.environmentIntensity = ENV_INTENSITY.counter + (ENV_INTENSITY.inspect - ENV_INTENSITY.counter) * b
+    }
   }
 
   update(dt: number): void {
@@ -241,7 +274,7 @@ export class ShopScene {
       counter.add(watch)
     }
 
-    // Rubber counter mat in front of the player, on the glass
+    // Rubber counter mat in front of the player, on the glass (items sit on MAT_POINT)
     this.box(0.46, 0.006, 0.32, new THREE.MeshStandardMaterial({ color: '#1c2a24', roughness: 0.9 }), 0, top + 0.012, 0.12, counter)
 
     // Contact shadow under the counter
@@ -416,6 +449,13 @@ export class ShopScene {
     fill.position.set(-1, 3, ROOM.halfD + 2)
     fill.target.position.set(0, 0.8, -2)
     this.scene.add(fill, fill.target)
+    this.lights = {
+      lamp,
+      fill,
+      lampPos: lamp.position.clone(),
+      fillPos: fill.position.clone(),
+      fillTarget: fill.target.position.clone(),
+    }
   }
 
   private buildCustomer(): THREE.Group {
@@ -435,3 +475,5 @@ export class ShopScene {
     return g
   }
 }
+
+const TMP = new THREE.Vector3()

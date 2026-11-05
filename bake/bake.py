@@ -245,13 +245,21 @@ class Builder:
 
 
 def cull_hidden_faces(bm: bmesh.types.BMesh, room: dict) -> int:
-    """Drop faces nobody can see: outside the room shell, or face-down on the floor."""
+    """Drop faces nobody can see: outside the room shell (and its annexes, e.g.
+    the back room), or face-down on the floor."""
     hw, hd, h = room["halfW"], room["halfD"], room["height"]
     eps = 0.002
+    # annex boxes in three.js coords: min/max [x, y, z]
+    annexes = [(a["min"], a["max"]) for a in room.get("annexes", [])]
+
+    def in_annex(x: float, y: float, z: float) -> bool:
+        return any(lo[0] - eps <= x <= hi[0] + eps and lo[1] - eps <= y <= hi[1] + eps and lo[2] - eps <= z <= hi[2] + eps for lo, hi in annexes)
+
     gone = []
     for f in bm.faces:
         c = f.calc_center_median()  # Blender coords: x, y = -z_three, z = y_three
-        outside = abs(c.x) > hw + eps or abs(c.y) > hd + eps or c.z < -eps or c.z > h + eps
+        in_main = abs(c.x) <= hw + eps and abs(c.y) <= hd + eps and -eps <= c.z <= h + eps
+        outside = not in_main and not in_annex(c.x, c.z, -c.y)
         under = c.z < eps and f.normal.z < -0.9
         if outside or under:
             gone.append(f)
@@ -343,6 +351,8 @@ def add_lights(layout: dict) -> None:
                 data.spot_blend = spec.get("spotBlend", 0.5)
             ob = bpy.data.objects.new(spec["name"], data)
             ob.location = pos
+            # the lamp itself never shows in the preview renders (the game has no light sprites)
+            ob.visible_camera = False
             if "target" in spec:
                 direction = (THREE_TO_BLENDER @ Vector(spec["target"])) - pos
                 ob.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()

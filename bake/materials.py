@@ -50,7 +50,8 @@ MATERIALS = {
     "frame": {"color": "#e7e1d3", "roughness": 0.6, "kind": "baked"},
     "sign_board": {"color": "#2a201a", "roughness": 0.8, "kind": "baked"},
     "door_paint": {"color": "#2c3b35", "roughness": 0.55, "kind": "baked"},
-    "door_glass": {"color": "#c9d2d4", "kind": "unlit"},
+    # see-through so the canal backdrop shows in the door, like the window
+    "door_glass": {"color": "#dfe8ea", "roughness": 0.05, "kind": "glass", "opacity": 0.12},
     "radiator": {"color": "#d9d4c7", "roughness": 0.5, "kind": "baked"},
     "cord": {"color": "#111111", "kind": "unlit"},
     "shade": {"color": "#2b2b26", "roughness": 0.6, "metalness": 0.3, "kind": "dynamic", "doubleSided": True},
@@ -58,6 +59,13 @@ MATERIALS = {
     "lamp_metal": {"color": "#1f3a2c", "roughness": 0.4, "metalness": 0.6, "kind": "dynamic"},
     "safe": {"color": "#3a3d3a", "roughness": 0.45, "metalness": 0.7, "kind": "dynamic"},
     "office_door": {"color": "#4a3526", "roughness": 0.6, "kind": "baked"},
+    "cork": {"color": "#8f6a45", "roughness": 0.95, "kind": "baked"},
+    "tag_paper": {"color": "#e8e0c8", "roughness": 0.9, "kind": "baked"},
+    # back room (storeroom)
+    "lino": {"color": "#5b5a4c", "roughness": 0.7, "kind": "baked"},
+    "plaster_back": {"color": "#c8cbbb", "roughness": 0.95, "kind": "baked", "runtime": "plaster"},
+    "shelf_metal": {"color": "#5f6462", "roughness": 0.55, "kind": "baked"},
+    "cardboard": {"color": "#9a7a52", "roughness": 0.9, "kind": "baked"},
 }
 
 KINDS = {"baked", "dynamic", "glass", "unlit"}

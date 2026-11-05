@@ -124,7 +124,7 @@ jobs:
           # (a re-run of an old run, or a bake that finished after someone pushed).
           out=$(mktemp -d)
           cp -r public/assets/shop "$out/shop"
-          cp bake/out/preview.jpg bake/out/preview-wide.jpg "$out/"
+          cp bake/out/preview*.jpg "$out/"
           for i in 1 2 3 4; do
             git fetch -q origin "$GITHUB_REF_NAME"
             git reset -q --hard FETCH_HEAD
@@ -136,8 +136,8 @@ jobs:
             fi
             rm -rf public/assets/shop
             cp -r "$out/shop" public/assets/shop
-            cp "$out"/preview.jpg "$out"/preview-wide.jpg bake/out/
-            git add -A public/assets/shop bake/out/preview.jpg bake/out/preview-wide.jpg
+            cp "$out"/preview*.jpg bake/out/
+            git add -A public/assets/shop bake/out/preview*.jpg
             if git diff --cached --quiet; then
               echo "bake unchanged, nothing to commit"
               echo "pushed=false" >> "$GITHUB_OUTPUT"

@@ -38,6 +38,7 @@ export class LedgerScreen {
     private readonly dispatch: (a: Action) => void,
     openSettings: () => void,
     gear: (onPress: () => void) => HTMLButtonElement,
+    openOffice?: () => void,
   ) {
     const root = el('section', 'screen ledger-screen')
     root.dataset.screen = 'ledger'
@@ -68,7 +69,9 @@ export class LedgerScreen {
 
     const footer = el('footer', 'ledger-actions actions')
     this.open = createButton({ id: 'open-shop', label: 'Open shop', variant: 'primary', icon: 'door', onPress: () => dispatch({ type: 'day/open' }) })
-    footer.append(gear(openSettings), this.open)
+    footer.append(gear(openSettings))
+    if (openOffice) footer.append(createButton({ id: 'open-office', label: 'Office', icon: 'briefcase', className: 'btn-office', onPress: openOffice }))
+    footer.append(this.open)
     root.append(scroll, footer)
     this.root = root
   }
@@ -93,6 +96,7 @@ export class LedgerScreen {
       [`Bought (${last.bought})`, last.spent > 0 ? signedRub(-last.spent) : rub(0)],
       [`Sold (${last.sold})`, last.earned > 0 ? signedRub(last.earned) : rub(0)],
       ['Walkouts', String(last.walkouts)],
+      ...(last.expenses > 0 ? [['Expenses', signedRub(-last.expenses)] as [string, string]] : []),
       ['Closing cash', rub(last.closingCash), 'total'],
     ]
     this.summary.replaceChildren()

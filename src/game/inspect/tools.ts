@@ -23,12 +23,38 @@
  *   - Scale: a reading on every use (tellId WEIGHT_TELL on the first one only),
  *     compared with the def's expected range. Negative when outside tolerance.
  *   - Magnet: one pull/no-pull finding per visit (tellId MAGNET_TELL).
+ *   - Acid (M2): one purity finding per visit (tellId ACID_TELL) from the item's
+ *     metal and fake profile: genuine gold "the 583 scratch holds", plated brass
+ *     "the scratch fizzes green" (text in src/data/toolText.ts).
+ *   - Reference (M2): one value-range finding per visit (tellId REFERENCE_TELL)
+ *     for the def, genuine and in good condition, from the book tier in
+ *     extras.refTier. Width shrinks with tier; some categories predate the book.
+ *     It never detects fakes (neutral, reveals nothing).
+ *   - Specialist (M2): an opinion on authenticity plus a value range from the
+ *     retained specialist in extras.specialist (tellId SPECIALIST_TELL), see
+ *     specialistOpinion(). Never says FAKE outright.
  * These synthetic tellIds start with "@" and never collide with def tell ids.
+ * Def/profile tells authored for acid/reference/specialist are reported too.
  *
  * If nothing new turns up, a single neutral "Nothing new…" finding is returned.
  */
+import { getSpecialist } from '../../data/specialists'
+import {
+  ACID_FAKE_FALLBACK,
+  ACID_FAKE_REACTIONS,
+  ACID_GENUINE,
+  ACID_PURITY_FALLBACK,
+  NOTHING_NEW_M2,
+  PURITY_MARKS,
+  REFERENCE_TEXT,
+  type Metal,
+} from '../../data/toolText'
 import { tuning } from '../../data/tuning'
+import { referenceBook } from '../../data/upgrades'
+import { claimedValue, tidyPrice } from '../appraise/value'
 import { fakeProfileOf } from '../items/generate'
+import { hashString } from '../rng'
+import type { Verdict } from '../schema/economy'
 import type { Rng } from '../rng'
 import type { FakeProfile, ItemDef, Polarity, Tell, ToolId } from '../schema/item'
 import type { Finding, ItemInstance } from '../types'
@@ -65,6 +91,9 @@ export interface UseToolResult {
 export const CONDITION_TELL = '@condition'
 export const WEIGHT_TELL = '@weight'
 export const MAGNET_TELL = '@magnet'
+export const ACID_TELL = '@acid'
+export const REFERENCE_TELL = '@reference'
+export const SPECIALIST_TELL = '@specialist'
 
 /** Genuine tells, overridden/extended by the fake profile, minus its removeTells. */
 export function effectiveTells(def: ItemDef, profile: FakeProfile | undefined): Tell[] {
@@ -122,6 +151,12 @@ export function useTool(input: UseToolInput): UseToolResult {
   if (tool === 'loupe' && !seen.has(CONDITION_TELL)) add(conditionFinding(def, item))
   if (tool === 'scale') add(scaleReading(def, item, rng, !seen.has(WEIGHT_TELL)))
   if (tool === 'magnet' && !seen.has(MAGNET_TELL)) add(magnetFinding(def, profile))
+  if (tool === 'acid' && !seen.has(ACID_TELL)) add(acidFinding(def, profile))
+  if (tool === 'reference' && !seen.has(REFERENCE_TELL)) add(referenceFinding(def, input.extras?.refTier ?? 1))
+  if (tool === 'specialist' && !seen.has(SPECIALIST_TELL)) {
+    const sp = input.extras?.specialist
+    if (sp) add(specialistFinding(def, item, sp, rng))
+  }
 
   for (const tell of effectiveTells(def, profile)) {
     if (tell.tool !== tool || seen.has(tell.id)) continue
@@ -149,6 +184,7 @@ const NOTHING_NEW: Partial<Record<ToolId, string>> = {
   loupe: 'Nothing new under the loupe.',
   scale: 'The scale has nothing new to say.',
   magnet: 'Nothing new from the magnet.',
+  ...NOTHING_NEW_M2,
 }
 
 type Band = 'mint' | 'good' | 'worn' | 'poor'
@@ -234,4 +270,125 @@ function magnetFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Fin
     text = pulls ? 'It pulls toward the magnet.' : 'No pull from the magnet.'
   }
   return { ...base, text, polarity }
+}
+
+// --- M2 tools -------------------------------------------------------------------
+
+const rub = (n: number) => `${Math.round(n).toLocaleString('en-US')} ₽`
+const fill = (text: string, vars: Record<string, string>) => text.replace(/\{(\w+)\}/g, (m, k: string) => vars[k] ?? m)
+
+/** Precious metal of a def: the gold category is gold; otherwise read the id, name and tags. */
+export function metalOf(def: ItemDef): Metal {
+  if (def.category === 'gold') return 'gold'
+  const words = [def.id, def.name, ...def.demandTags].join(' ').toLowerCase()
+  if (/gold|chervonets/.test(words)) return 'gold'
+  if (/silver/.test(words)) return 'silver'
+  return 'base'
+}
+
+/** Purity mark ("583") from the def id or name, if any. */
+export function purityOf(def: ItemDef): string | undefined {
+  const words = ` ${def.id.replaceAll('_', ' ')} ${def.name} `
+  return PURITY_MARKS.find((p) => new RegExp(`[^0-9]${p}[^0-9]`).test(words))
+}
+
+function acidFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Finding, 'id' | 'tool'> {
+  const base = { tellId: ACID_TELL, reveals: 'authenticity' as const }
+  if (profile) {
+    const reaction = ACID_FAKE_REACTIONS.find((r) => r.match.test(profile.id))
+    if (reaction) return { ...base, text: reaction.text, polarity: 'negative' }
+    if (profile.kind === 'fake') return { ...base, text: ACID_FAKE_FALLBACK, polarity: 'negative' }
+  }
+  const metal = metalOf(def)
+  const text = fill(ACID_GENUINE[metal], { purity: purityOf(def) ?? ACID_PURITY_FALLBACK[metal] })
+  return { ...base, text, polarity: metal === 'base' ? 'neutral' : 'positive' }
+}
+
+/** The book's range for a def at a tier: a fixed per-def misprint, narrower with tier. Null if the edition predates it. */
+export function referenceRange(def: ItemDef, tier: number): { lo: number; hi: number } | null {
+  const book = referenceBook(tier)
+  if (book.outdated.includes(def.category)) return null
+  const r = tuning.upgrades.reference
+  const i = book.tier - 1
+  const mid = (def.baseValue.min + def.baseValue.max) / 2
+  // Deterministic in [-1, 1): the same book always says the same thing.
+  const misprint = (hashString(`${def.id}:${book.tier}`) / 2 ** 32) * 2 - 1
+  const centre = mid * (1 + misprint * r.centreError[i]!)
+  return { lo: tidyPrice(centre * (1 - r.halfWidth[i]!)), hi: tidyPrice(centre * (1 + r.halfWidth[i]!)) }
+}
+
+function referenceFinding(def: ItemDef, tier: number): Omit<Finding, 'id' | 'tool'> {
+  const book = referenceBook(tier).title
+  const range = referenceRange(def, tier)
+  const text = range
+    ? fill(REFERENCE_TEXT.listed, { book, item: def.name, lo: rub(range.lo), hi: rub(range.hi) })
+    : fill(REFERENCE_TEXT.outdated, { book, item: def.name })
+  return { tellId: REFERENCE_TELL, text, polarity: 'neutral' }
+}
+
+/** What the item really is, in specialist terms. */
+function truthOf(item: ItemInstance): Verdict {
+  switch (item.authenticity) {
+    case 'genuine':
+      return 'sound'
+    case 'restored':
+      return 'redone'
+    case 'frankenstein':
+      return 'mixed'
+    default:
+      return 'doubt'
+  }
+}
+
+export interface SpecialistOpinion {
+  verdict: Verdict
+  lo: number
+  hi: number
+  /** Effective accuracy used (for tests and tuning). */
+  accuracy: number
+}
+
+/**
+ * A specialist's opinion. Draw order (part of determinism): wrong-verdict roll,
+ * [wrong verdict pick], [lowball roll, lowball factor], value noise; the caller then picks a line.
+ *   accuracy = roster accuracy + relationship × relationshipAccuracy (capped)
+ *   wrong verdict chance = (1 − accuracy) × wrongVerdictFactor: a sound piece is
+ *     doubted (or called redone); anything else is called sound.
+ *   lowball (sound pieces worth ≥ lowballMinValue, called sound): chance (1 − honesty) ×
+ *     lowballChance; the value is cut to lowballFactor and the line hints they'd buy it.
+ *   value: what they believe it is (sound-but-not → genuine value; doubted-but-sound →
+ *     value × doubtValueFactor), ± (1 − accuracy) × valueNoise, quoted ± rangeHalfWidth.
+ */
+export function specialistOpinion(def: ItemDef, item: ItemInstance, sp: { id: string; relationship: number }, rng: Rng): SpecialistOpinion {
+  const t = tuning.specialists
+  const roster = t.roster[sp.id] ?? { accuracy: 0.5, honesty: 1 }
+  const accuracy = Math.min(t.maxAccuracy, roster.accuracy + sp.relationship * t.relationshipAccuracy)
+  const truth = truthOf(item)
+  let verdict: Verdict = truth
+  if (rng.chance((1 - accuracy) * t.wrongVerdictFactor)) {
+    verdict = truth === 'sound' ? rng.pick<Verdict>(['doubt', 'redone']) : 'sound'
+  }
+  let value = item.trueValue
+  if (verdict === 'sound' && truth !== 'sound') value = claimedValue(def, item)
+  else if (verdict !== 'sound' && truth === 'sound') value = item.trueValue * t.doubtValueFactor
+  if (truth === 'sound' && verdict === 'sound' && item.trueValue >= t.lowballMinValue && rng.chance((1 - roster.honesty) * t.lowballChance)) {
+    verdict = 'lowball'
+    value *= rng.range(t.lowballFactor[0], t.lowballFactor[1])
+  }
+  const estimate = value * (1 + rng.range(-1, 1) * (1 - accuracy) * t.valueNoise)
+  return {
+    verdict,
+    lo: tidyPrice(estimate * (1 - t.rangeHalfWidth)),
+    hi: tidyPrice(estimate * (1 + t.rangeHalfWidth)),
+    accuracy,
+  }
+}
+
+function specialistFinding(def: ItemDef, item: ItemInstance, sp: { id: string; relationship: number }, rng: Rng): Omit<Finding, 'id' | 'tool'> {
+  const op = specialistOpinion(def, item, sp, rng)
+  const spec = getSpecialist(sp.id)
+  const line = spec ? rng.pick(spec.lines[op.verdict]) : 'The specialist gives a range: {lo}–{hi}.'
+  const text = fill(line, { lo: rub(op.lo), hi: rub(op.hi), item: def.name })
+  const polarity: Polarity = op.verdict === 'sound' ? 'positive' : 'negative'
+  return { tellId: SPECIALIST_TELL, text, reveals: 'authenticity', polarity }
 }

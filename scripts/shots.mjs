@@ -310,6 +310,74 @@ async function playShort(page, h) {
   await h.shot('ledger', 'ledger')
 }
 
+/** Send away whoever is at the counter without a deal (seller, buyer or redeemer). */
+async function sendAway(h) {
+  for (const id of ['pass', 'sale-refuse', 'redeem-return']) {
+    if (await h.visible(id)) {
+      await h.click(id)
+      break
+    }
+  }
+  if (await h.visible('dismiss')) await h.click('dismiss')
+}
+
+/**
+ * Economy (portrait, ?seed=1): day 1 passed → ledger → Office (buy the acid kit,
+ * retain both specialists) → day 2 → the first gold or watch seller → acid,
+ * reference book and a specialist call.
+ */
+async function playEconomy(page, h) {
+  await h.begin()
+  await h.open()
+  await h.screen('counter')
+  while (await h.visible('next-customer')) {
+    await h.click('next-customer')
+    await sendAway(h)
+  }
+  await h.click('close-up')
+  await h.screen('ledger')
+  await h.click('open-office')
+  await page.waitForTimeout(200)
+  for (const id of ['buy-acid_kit', 'retain-jeweler', 'retain-watchmaker']) if (await h.enabled(id)) await h.click(id)
+  await page.evaluate(() => document.querySelector('[data-id="office"]')?.scrollTo(0, 0))
+  await page.waitForTimeout(150)
+  await h.shot('office', 'office sheet: bills due, upgrades (acid kit owned), cash')
+  await page.evaluate(() => document.querySelector('[data-id="office-specialists"]')?.scrollIntoView({ block: 'start' }))
+  await page.waitForTimeout(150)
+  await h.shot('office-specialists', 'office sheet: both specialists retained, calls left, release')
+  await h.click('office-close')
+  await h.open()
+  await h.screen('counter')
+  while (await h.visible('next-customer')) {
+    await h.click('next-customer')
+    const s = await h.state()
+    const def = s.current?.item.defId ?? ''
+    if (s.current?.kind !== 'seller' || !/^(gold|watch|coin)/.test(def)) {
+      await sendAway(h)
+      continue
+    }
+    await h.click('inspect')
+    await h.screen('inspect')
+    await page.waitForTimeout(500)
+    const first = (await h.enabled('tool-acid')) && !(await page.locator('[data-id="tool-acid"].is-locked').count()) ? 'acid' : 'reference'
+    await h.click(`tool-${first}`)
+    await page.waitForTimeout(450)
+    await h.shot(`inspect-${first}`, `inspect toolbar with the M2 tools; ${first} finding (${def})`)
+    await page.waitForTimeout(500)
+    for (const tool of ['reference', 'specialist']) {
+      if (tool === first || (await page.locator(`[data-id="tool-${tool}"].is-locked`).count())) continue
+      await h.click(`tool-${tool}`)
+      await page.waitForTimeout(tool === 'specialist' ? 450 : 800)
+    }
+    if (await page.locator('.fx-for-specialist').count()) await h.shot('inspect-specialist', 'specialist call: phone fx + opinion slip')
+    await page.waitForTimeout(1200)
+    await h.click('findings-stack')
+    await page.waitForTimeout(200)
+    await h.shot('findings-m2', 'findings expanded: acid, reference and specialist slips')
+    break
+  }
+}
+
 async function main() {
   await rm(OUT, { recursive: true, force: true })
   await mkdir(OUT, { recursive: true })
@@ -376,6 +444,18 @@ async function main() {
       const inspect = await page.locator('.perf-info').textContent()
       console.log(`perf counter: ${counter?.replace(/\n/g, ' | ')}`)
       console.log(`perf inspect: ${inspect?.replace(/\n/g, ' | ')}`)
+      await context.close()
+    }
+    {
+      const { context, page } = await newPage(browser, PORTRAIT, '?seed=1')
+      const h = helpers(page, 'economy')
+      try {
+        await playEconomy(page, h)
+      } catch (err) {
+        await page.screenshot({ path: `${OUT}/economy-FAILED.png` }).catch(() => {})
+        errors.push(`[economy] flow: ${err.message.split('\n')[0]}`)
+      }
+      out.push(...h.shots)
       await context.close()
     }
     return out

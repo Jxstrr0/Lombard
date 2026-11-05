@@ -25,7 +25,7 @@ for (const policy of [policies.careful, policies.careless]) {
   console.log(
     `${s.policy.padEnd(9)} growth/month ${pct(s.medianGrowth).padStart(7)}  busted ${s.busted}/${s.runs}` +
       `  median bust day ${s.medianBustDay ?? '-'}  median worth ${Math.round(s.medianFinalWorth).toLocaleString('en-US')} ₽` +
-      `  fakes bought ${s.avgFakesBought.toFixed(1)}`,
+      `  fakes bought ${s.avgFakesBought.toFixed(1)}  cash<0 in ${s.cashDips} runs`,
   )
   // Worth curve of the median run, every 10 days.
   const mid = runs.slice().sort((a, b) => a.finalWorth - b.finalWorth)[Math.floor(runs.length / 2)]

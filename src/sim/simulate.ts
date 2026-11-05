@@ -21,8 +21,14 @@ export interface RunResult {
   seed: number
   policy: string
   days: DayPoint[]
-  /** First day closing cash was below zero, or null. */
+  /**
+   * First day the shop was insolvent (worth below zero: cash plus stock at cost
+   * plus loans out can't cover what it owes), or null. A one-night cash dip on
+   * rent day with stock on the shelves is not a bust.
+   */
   bustDay: number | null
+  /** Lowest closing cash seen. */
+  minCash: number
   finalCash: number
   finalWorth: number
   stats: GameState['stats']
@@ -64,10 +70,12 @@ export function simulate(seed: number, policy: Policy, days: number): RunResult 
       policy.after?.(s, action, ctx)
       if (s.calendar.day !== day) break // day/close advanced the calendar
     }
-    points.push({ day, cash: s.cash, worth: worthOf(s) })
-    if (bustDay === null && s.cash < 0) bustDay = day
+    const worth = worthOf(s)
+    points.push({ day, cash: s.cash, worth })
+    if (bustDay === null && worth < 0) bustDay = day
   }
-  return { seed, policy: policy.name, days: points, bustDay, finalCash: s.cash, finalWorth: worthOf(s), stats: s.stats, steps }
+  const minCash = Math.min(...points.map((p) => p.cash))
+  return { seed, policy: policy.name, days: points, bustDay, minCash, finalCash: s.cash, finalWorth: worthOf(s), stats: s.stats, steps }
 }
 
 /** Compound growth per 30 days of `worth`, from the start of the run to its end. */
@@ -85,6 +93,8 @@ export interface Summary {
   medianBustDay: number | null
   medianFinalWorth: number
   avgFakesBought: number
+  /** Runs whose closing cash ever went below zero. */
+  cashDips: number
 }
 
 const median = (xs: number[]) => {
@@ -104,5 +114,6 @@ export function summarize(results: RunResult[], startWorth: number): Summary {
     medianBustDay: busts.length ? median(busts) : null,
     medianFinalWorth: median(results.map((r) => r.finalWorth)),
     avgFakesBought: results.reduce((a, r) => a + r.stats.fakesBought, 0) / Math.max(1, results.length),
+    cashDips: results.filter((r) => r.minCash < 0).length,
   }
 }

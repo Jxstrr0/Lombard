@@ -9,6 +9,7 @@
 import { getItemDef } from '../data/items'
 import type { Action } from '../game/actions'
 import { claimedValue } from '../game/appraise/value'
+import { upcomingBills } from '../game/economy/expenses'
 import { availableTools } from '../game/inspect/available'
 import type { ToolId } from '../game/schema/item'
 import type { GameState } from '../game/state'
@@ -57,6 +58,15 @@ export interface PolicyParams {
   dumpAfterDays: number
   /** How far the estimate is off the claimed value (0 = takes the claim at face value). */
   skepticism: number
+  /** Keep cash for bills due within this many days (0 = spend everything). */
+  reserveDays: number
+}
+
+/** Cash the policy is willing to spend right now. */
+function spendable(state: GameState, p: PolicyParams): number {
+  if (p.reserveDays <= 0) return state.cash
+  const due = upcomingBills(state).filter((b) => b.inDays <= p.reserveDays).reduce((a, b) => a + b.amount, 0)
+  return state.cash - due
 }
 
 const isRedFlag = (f: Finding) => f.polarity === 'negative' && f.reveals === 'authenticity'
@@ -118,9 +128,10 @@ export function makePolicy(p: PolicyParams): Policy {
       const open = pawn ? p.loanOpenAt : p.openAt
       const max = pawn ? p.loanMaxAt : p.maxAt
       const h = state.haggle
-      if (h && h.status === 'open' && p.acceptAskAt > 0 && h.ask <= est * p.acceptAskAt && h.ask <= state.cash) return { type: 'offer/acceptAsk' }
+      const budget = spendable(state, p)
+      if (h && h.status === 'open' && p.acceptAskAt > 0 && h.ask <= est * p.acceptAskAt && h.ask <= budget) return { type: 'offer/acceptAsk' }
       const offer = Math.round(est * (open + p.step * ctx.rounds))
-      if (offer > est * max || offer > state.cash || offer <= 0) return { type: 'counter/pass' }
+      if (offer > est * max || offer > budget || offer <= 0) return { type: 'counter/pass' }
       ctx.rounds++
       const evidence = findings.find((f) => f.polarity === 'negative')
       return { type: 'offer/make', amount: offer, approach: evidence && ctx.rounds === 1 ? 'evidence' : 'straight', evidenceId: evidence?.id }
@@ -182,6 +193,7 @@ export const careful = makePolicy({
   holdAt: 0.97,
   dumpAfterDays: 21,
   skepticism: 0.1,
+  reserveDays: 10,
 })
 
 export const careless = makePolicy({
@@ -199,4 +211,5 @@ export const careless = makePolicy({
   holdAt: 1,
   dumpAfterDays: 3,
   skepticism: 0,
+  reserveDays: 0,
 })

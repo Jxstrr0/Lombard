@@ -207,8 +207,11 @@ export const tuning = {
   /** M2 walk-in buyers and the sale haggle (owner: shop worker). */
   sell: {
     // --- who comes in (planBuyers) ---
-    /** Daily chance a fairly priced item (tag = trueValue) in the counter case draws a buyer, at normal demand and reputation. */
-    baseChance: 0.35,
+    /**
+     * Daily chance a fairly priced item (tag = trueValue) in the counter case draws a buyer, at normal demand and reputation.
+     * Tuned with `npm run sim` (M2): 0.28 puts the careful policy at ~18%/month over 60 and 90 days (target ~15%).
+     */
+    baseChance: 0.28,
     /** Tag under value: chance × (1 + underBoost × (1 − tag/value)), capped at maxUnderBoost. */
     underBoost: 2.5,
     maxUnderBoost: 1.8,
@@ -230,7 +233,7 @@ export const tuning = {
     /** Share of the gap (claimed − true value) a naive buyer is fooled into paying for a fake: × (1 − knowledge). */
     fakeFooled: 0.35,
     /** How much they want it today: perceived × a draw in this range (+ temperament premium). */
-    valuation: [0.92, 1.18] as [number, number],
+    valuation: [0.88, 1.12] as [number, number], // M2 sim pass: was 0.92–1.18
     premium: { stubborn: -0.04, flexible: 0, desperate: 0.08, proud: 0.05 },
     /** A tag above their value pulls naive buyers up: × (1 + tagAnchor × (1 − knowledge) × (tag/perceived − 1)). */
     tagAnchor: 0.45,
@@ -317,9 +320,9 @@ export const tuning = {
    * loses far more than rent; rent just takes away the cushion.
    */
   expenses: {
-    rent: 30_000,
+    rent: 38_000, // M2 sim pass: was 30,000
     /** Electricity, heating, water, phone line. */
-    utilities: 4_500,
+    utilities: 5_500, // M2 sim pass: was 4,500
   },
 
   /**

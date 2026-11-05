@@ -23,12 +23,15 @@
 | Nov 5, 2026 | **Saves across devices:** copy-paste save code (like PEW) plus browser autosave. No cloud sync. |
 | Nov 5, 2026 | **Business model:** free forever on the Longlight hub. No ads, payments, or accounts. |
 | Nov 4, 2026 | **Specialists:** monthly retainers, one named specialist per category group, with accuracy, honesty, and relationship. See GDD § 2b. |
+| Nov 5, 2026 | **Repo visibility: public.** Unlimited Actions minutes for deploys and bakes. |
+| Nov 5, 2026 | **Toolchain versions:** current stable Vite (8.x) and Vitest instead of Vite 5 (out of support); TypeScript stays on 5.x (typescript-eslint does not support 7.x yet). Exact versions pinned in `package.json`. |
+| Nov 5, 2026 | **Placeholder counter (M0):** wooden showcase with a glass top only (no glass sides). With glass sides, the sightline through the top exits the far side and shows the floor instead of the felt bed. Worth keeping in mind for the real counter in M3. |
+| Nov 5, 2026 | **Delivery:** each task goes on a branch with a PR; Claude Code squash-merges it once checks pass, and the merge to `main` deploys. |
 
 ## Open, decide at the milestone listed
 
 | Item | Default until decided | Decide at |
 |---|---|---|
-| Repo public or private | either works: public = unlimited Actions minutes; private = 3,000 min/month on Pro (plenty for this project) | M0, when the repo is created |
 | Customers in 3D (Plan A) vs portrait cards (Plan B) | portrait card in dialogue strip; 3D silhouette optional | M3, after a 1-day test |
 | Day length / customers per day | 8–14 customers, ~10–15 real minutes | M1, with a stopwatch on a phone |
 | Loan interest and holding period | 30 days, 10%/month | M2, simulator tuning |
@@ -38,6 +41,8 @@
 When an open item is decided, move it to the Decided table with the date.
 
 ## Parked (do not build without a decision)
+
+- Phone landscape: the dialogue strip covers most of the counter. Revisit in the M6 desktop/landscape layout pass.
 
 - Walking around the shop or the street.
 - A second shop location.

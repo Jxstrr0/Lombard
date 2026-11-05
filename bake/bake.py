@@ -884,14 +884,14 @@ def export_glb(path: Path) -> None:
 
 
 def input_files() -> list[Path]:
-    """Everything a bake depends on, in the order bake.yml hashes it (sorted paths)."""
+    """Everything a bake depends on, in the order scripts/bake-hash.sh hashes it (sorted paths)."""
     files = [HERE / "layout.json", HERE / "materials.py", HERE / "bake.py", HERE.parent / "scripts" / "bake-pack.mjs"]
     return files + sorted(p for d in (TEXTURES, PROPS) for p in d.rglob("*") if p.is_file())
 
 
 def input_hash() -> str:
     h = hashlib.sha256()
-    # Same files, same order as the bake workflow's "Decide whether to bake" step.
+    # Same files, same order as scripts/bake-hash.sh (used by the bake workflow).
     for p in input_files():
         h.update(p.read_bytes())
     return h.hexdigest()[:16]

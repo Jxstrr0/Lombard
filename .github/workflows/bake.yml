@@ -23,6 +23,7 @@ on:
       - 'bake/**'
       - '!bake/out/**'
       - 'scripts/bake-pack.mjs'
+      - 'scripts/bake-hash.sh'
 
 permissions:
   contents: write
@@ -50,7 +51,7 @@ jobs:
         id: plan
         run: |
           # same files, same order as input_files() in bake/bake.py
-          hash=$(cat bake/layout.json bake/materials.py bake/bake.py scripts/bake-pack.mjs $(find bake/textures bake/props -type f | LC_ALL=C sort) | sha256sum | cut -c1-16)
+          hash=$(scripts/bake-hash.sh)
           quality='${{ inputs.quality }}'
           quality=${quality:-preview}
           current=$(jq -r '.inputHash // ""' public/assets/shop/shop.json 2>/dev/null || true)
@@ -129,7 +130,7 @@ jobs:
           for i in 1 2 3 4; do
             git fetch -q origin "$GITHUB_REF_NAME"
             git reset -q --hard FETCH_HEAD
-            now=$(cat bake/layout.json bake/materials.py bake/bake.py scripts/bake-pack.mjs | sha256sum | cut -c1-16)
+            now=$(scripts/bake-hash.sh)
             if [ "$now" != "$HASH" ]; then
               echo "::warning::The bake inputs on $GITHUB_REF_NAME changed since this run started ($HASH → $now); not committing a stale bake. Run the workflow again."
               echo "pushed=false" >> "$GITHUB_OUTPUT"

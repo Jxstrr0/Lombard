@@ -58,7 +58,8 @@ Everything runs headless; no one opens the Blender UI.
    - exports `bake/out/shop_raw.glb` with both UV sets and renders the two previews (AgX, exposure matched to the game's ACES).
 4. `scripts/bake-pack.mjs` (glTF Transform + `ktx2-encoder`, both npm packages, no system tools): Draco-compresses the glb, re-encodes its surface textures as KTX2 (ETC1S, sRGB, mipmaps), converts the lightmap to KTX2 (UASTC + RDO + Zstd, mipmaps), and writes `public/assets/shop/{shop.glb, shop_lightmap.ktx2, shop.json}`. Preview bake: 60 KB + 180 KB.
 5. `.github/workflows/bake.yml`:
-   - triggers: `workflow_dispatch` with `quality` (preview default), and pushes that change `bake/**` or the pack script (preview; skipped if the committed `shop.json` already has the same input hash);
+   - triggers: `workflow_dispatch` with `quality` (preview default), and pushes that change `bake/**`, the pack script or `scripts/bake-hash.sh` (preview; skipped if the committed `shop.json` already has the same input hash);
+   - the input hash comes from `scripts/bake-hash.sh`, used both to decide whether to bake and to check, just before committing, that the inputs on the branch haven't changed under the run (the one list of inputs; `input_files()` in `bake/bake.py` must match it);
    - downloads the pinned Blender LTS Linux build and caches it with `actions/cache`;
    - runs on the standard `ubuntu-latest` runner (never a larger runner; those are always billed);
    - commits `public/assets/shop/*` and the preview images back to the branch it ran on, then dispatches `deploy.yml` for that branch (a push made with the workflow token doesn't trigger workflows itself). `deploy.yml` publishes only from `main`; on other branches it just runs the checks.
@@ -89,7 +90,7 @@ The room's big surfaces (parquet, plaster, ceiling, dado paint, counter and case
 - `python3 art/materials/prepare.py` (system Python with Pillow and numpy, needs the network) downloads the 1K JPG, keeps only the colour map, resizes it, and recolours it so its average is the material's authored `color`. Mode `scale` keeps the texture's own hue variation (wood, cork, cardboard); mode `tint` keeps only its brightness pattern times the authored colour (plaster, paint, fabric), so a red or blue source can't leak its hue. `contrast` squeezes or stretches the variation. It writes `bake/textures/<material>.jpg`, which is committed: CI never downloads anything. Rerun it only when an entry changes.
 - The bake maps the texture on uv0 and still bakes lighting only, so the lightmap doesn't change; the glb carries the textures and bake-pack turns them into KTX2 ETC1S (about 1 MB for all fourteen, a few MB of GPU memory with mips).
 - Only colour maps: the shop is drawn unlit plus lightmap (`MeshBasicMaterial`), so normal and roughness maps would do nothing.
-- The textures are bake inputs: changing one triggers a preview bake (bake.yml hashes `bake/textures/*` with the other inputs).
+- The textures are bake inputs: changing one triggers a preview bake (`scripts/bake-hash.sh` hashes `bake/textures/*` with the other inputs).
 
 ## Props (decided Nov 2026, M3 dressing)
 
@@ -99,7 +100,7 @@ The shop is dressed with CC0 models from Poly Haven: a cash register, an old TV,
 - `bake/layout.json` places them with `{"shape": "prop", "prop": "<id>", "position", "rotation", "scale"?, "jitter"?}` entries (in the `props` group). Unrotated, a prop's front faces +z, away from the player at the counter.
 - Their lighting is baked **per vertex**, not into the lightmap: decimated scans unwrap into thousands of tiny islands that each need a texel gutter, which no shared 512–2048 lightmap can give. After the room's lightmap bake, Cycles bakes diffuse lighting (no colour) into a `lighting` colour attribute on the joined `shop_props` mesh, divided by the lightmap's scale. It isn't denoised, so it takes more samples (`prop_samples`: 256 preview, 1024 full). Props still cast shadows into the room's lightmap.
 - At runtime a material with `kind: "prop"` is `MeshBasicMaterial` with its texture × vertex colours × the lightmap scale, so props and room sit in the same light.
-- Budget: ~70k triangles and ~33 materials (draw calls) for the 25 instances; about 2 MB of the shop glb.
+- Budget: ~70k triangles and 24 materials (draw calls) for the 25 instances; about 2 MB of the shop glb.
 - Add a prop: add it to `PROPS` in `art/props/prepare.py`, run it with `--only <id>`, place it in the layout, push (the bake runs). Add its ATTRIBUTION line.
 
 ## Items

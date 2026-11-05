@@ -51,6 +51,7 @@ TypeScript 5, Vite (current stable, pinned), Three.js (pin a current stable rele
       customers.ts          # customer models/poses (see Assets doc)
       inspect.ts            # orbit, zoom, cursor hit for tools
       perf.ts               # stats overlay, quality tiers
+    audio/                  # WebAudio: cues (pure), engine, sound settings
     ui/                     # DOM
       screens/              # counter, inspect, offer, shop, ledger, menu
       components/           # buttons, number pad, finding card
@@ -134,7 +135,13 @@ IndexedDB store `careers` keyed by careerId. Save = full `GameState` JSON plus `
 
 ## Audio
 
-Howler.js or plain WebAudio. Ambient loop (canal, trams, rain by season), bell on door, counter sounds, tool sounds. All CC0 (see Assets doc). Audio starts on first tap (mobile autoplay rules).
+Plain WebAudio, no library. Ambient loop (canal, trams, rain by season), bell on door, counter sounds, tool sounds. All CC0 (see Assets doc § Audio). Audio starts on first tap (mobile autoplay rules).
+
+As built (M3), in `src/audio/`, beside `render/` and `ui/` and with the same rule (reads state, never mutates it; `src/game` may not import it):
+- `cues.ts`: pure `cuesFor(prev, next, action)` → sounds for a state change (a new visit → door bell + set-down, a tool use → its sound, a paid outcome → cash drawer, display placement → set-down, dealer/upgrade money → coins). Unit-tested.
+- `engine.ts`: the AudioContext, created or resumed on the first gesture; loads every sound only after that; one-shots with a little random detune; ambience as overlapping crossfaded passes; suspended while the page is hidden.
+- `settings.ts`: Sound on/off and the ambience level, kept in localStorage (device settings, not in the career or the save code).
+- `main.ts` subscribes it to the store next to render/UI and forwards gestures and button clicks. Files, gains and timings live in `src/data/audio.ts`.
 
 ## Build and deploy
 

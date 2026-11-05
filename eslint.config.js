@@ -32,7 +32,7 @@ export default tseslint.config(
         {
           patterns: [
             { group: ['three', 'three/*'], message: 'src/game must not import three.' },
-            { group: ['**/render/**', '**/ui/**', '**/input/**'], message: 'src/game must stay pure.' },
+            { group: ['**/render/**', '**/ui/**', '**/input/**', '**/audio/**'], message: 'src/game must stay pure.' },
           ],
         },
       ],

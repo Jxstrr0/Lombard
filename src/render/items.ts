@@ -25,6 +25,8 @@ export interface ModelSpec {
   scale?: number
   /** Printed on dials/backs where it fits (watch dial, phone back). */
   brand?: string
+  /** The def's hotspots: the watch sizes its case to meet the crown and caseback markers. */
+  hotspots?: readonly { id: string; position: readonly [number, number, number] }[]
 }
 
 /** Builds placeholder meshes into a group. Every material/texture is owned by the group. */
@@ -46,10 +48,10 @@ export function buildPlaceholder(spec: ModelSpec): THREE.Group {
       buildEarrings(g, color)
       break
     case 'watch':
-      buildWatch(g, color, spec.brand)
+      buildWatch(g, color, spec.brand, spec.hotspots)
       break
     case 'phone':
-      buildPhone(g, color, spec.brand)
+      buildPhone(g, color, spec.brand, spec.hotspots)
       break
   }
   const s = spec.scale ?? 1
@@ -182,7 +184,7 @@ function buildSignet(g: THREE.Group, color: THREE.Color): void {
   g.add(band)
   // Shoulders swelling into the head
   const shoulder = new THREE.Mesh(new THREE.CylinderGeometry(0.0052, 0.0072, 0.0034, 28, 1), mat)
-  shoulder.position.y = 0.0098
+  shoulder.position.y = 0.0093
   g.add(shoulder)
   // Flat oval face on top (+Y), engraved monogram on the top cap
   const engraving = canvasTexture(128, 128, (ctx) => {
@@ -203,7 +205,7 @@ function buildSignet(g: THREE.Group, color: THREE.Color): void {
   const capMat = new THREE.MeshStandardMaterial({ color: 0xffffff, map: engraving, metalness: 1, roughness: 0.3 })
   const head = new THREE.Mesh(new THREE.CylinderGeometry(0.0056, 0.0056, 0.0016, 32, 1), [mat, capMat, mat])
   head.name = 'face'
-  head.position.y = 0.0123
+  head.position.y = 0.0114
   head.scale.set(1, 1, 0.82)
   g.add(head)
 }
@@ -217,8 +219,10 @@ function buildChain(g: THREE.Group, color: THREE.Color): void {
   const n = 14
   for (let i = 0; i < n; i++) {
     const a = -Math.PI / 2 + (i / n) * Math.PI * 2
-    const wobble = 1 + (hash01(i) - 0.5) * 0.14
-    pts.push(new THREE.Vector3(Math.cos(a) * 0.025 * wobble, Math.sin(a) * 0.022 * wobble + 0.002, (hash01(i + 40) - 0.5) * 0.003))
+    // keep the clasp (−Y) and the top of the loop where the hotspots expect them
+    const pinned = i === 0 || i === n / 2
+    const wobble = pinned ? 1 : 1 + (hash01(i) - 0.5) * 0.14
+    pts.push(new THREE.Vector3(Math.cos(a) * 0.025 * wobble, Math.sin(a) * 0.0245 * wobble, (hash01(i + 40) - 0.5) * 0.003))
   }
   const curve = new THREE.CatmullRomCurve3(pts, true, 'centripetal')
   const linkLen = 0.0032
@@ -380,9 +384,12 @@ function casebackTexture(caseColor: THREE.Color): THREE.CanvasTexture {
   })
 }
 
-function buildWatch(g: THREE.Group, color: THREE.Color, brand?: string): void {
-  const R = 0.019
-  const depth = 0.009
+function buildWatch(g: THREE.Group, color: THREE.Color, brand?: string, hotspots?: ModelSpec['hotspots']): void {
+  // Case radius from the crown marker (+X), thickness from the caseback marker (−Z), within sane bounds.
+  const crownX = hotspots?.find((h) => h.id === 'crown')?.position[0]
+  const backZ = hotspots?.find((h) => h.id === 'caseback')?.position[2]
+  const R = crownX ? THREE.MathUtils.clamp(crownX - 0.0016, 0.016, 0.022) : 0.019
+  const depth = backZ ? THREE.MathUtils.clamp(Math.abs(backZ) * 2 - 0.0006, 0.007, 0.014) : 0.009
   const caseMat = metal(color, 0.3)
   // Case: cylinder with axis along Z
   const caseGeo = new THREE.CylinderGeometry(R, R * 0.96, depth, 40, 1)
@@ -410,6 +417,7 @@ function buildWatch(g: THREE.Group, color: THREE.Color, brand?: string): void {
   crystal.rotation.x = Math.PI / 2
   crystal.position.z = depth / 2 - R * 0.92 * Math.cos(0.28) + 0.0012
   crystal.renderOrder = 3
+  crystal.raycast = () => {} // see-through: never hides a hotspot
   g.add(crystal)
   // Caseback (−Z), engraved
   const back = new THREE.Mesh(
@@ -425,14 +433,14 @@ function buildWatch(g: THREE.Group, color: THREE.Color, brand?: string): void {
   crownGeo.rotateZ(Math.PI / 2)
   const crown = new THREE.Mesh(crownGeo, caseMat)
   crown.name = 'crown'
-  crown.position.x = R + 0.0013
+  crown.position.x = R + 0.0014
   g.add(crown)
   // Lugs (±Y)
   const lugGeo = new THREE.BoxGeometry(0.0026, 0.007, 0.0045)
   for (const sx of [-1, 1]) {
     for (const sy of [-1, 1]) {
       const lug = new THREE.Mesh(lugGeo, caseMat)
-      lug.position.set(sx * 0.0085, sy * (R + 0.0015), -0.0005)
+      lug.position.set(sx * 0.0085, sy * (R + 0.0015), 0)
       g.add(lug)
     }
   }
@@ -505,11 +513,11 @@ function backTexture(color: THREE.Color, brand?: string): THREE.CanvasTexture {
     if (isFruit) {
       // Mangosteen: a round fruit with a four-leaf crown
       ctx.beginPath()
-      ctx.arc(64, 118, 15, 0, Math.PI * 2)
+      ctx.arc(64, 106, 15, 0, Math.PI * 2)
       ctx.fill()
       for (let i = 0; i < 4; i++) {
         ctx.save()
-        ctx.translate(64, 101)
+        ctx.translate(64, 89)
         ctx.rotate((i - 1.5) * 0.55)
         ctx.beginPath()
         ctx.ellipse(0, -6, 3, 7, 0, 0, Math.PI * 2)
@@ -519,7 +527,7 @@ function backTexture(color: THREE.Color, brand?: string): THREE.CanvasTexture {
     } else {
       ctx.font = '600 15px Georgia, serif'
       ctx.textAlign = 'center'
-      ctx.fillText(brand.toUpperCase(), 64, 122)
+      ctx.fillText(brand.toUpperCase(), 64, 110)
     }
     ctx.font = '7px ui-monospace, monospace'
     ctx.textAlign = 'center'
@@ -561,7 +569,7 @@ function bottomEdgeTexture(): THREE.CanvasTexture {
   })
 }
 
-function buildPhone(g: THREE.Group, color: THREE.Color, brand?: string): void {
+function buildPhone(g: THREE.Group, color: THREE.Color, brand?: string, hotspots?: ModelSpec['hotspots']): void {
   const { w, h, d } = PHONE
   const body = new THREE.Mesh(
     new RoundedBoxGeometry(w, h, d, 3, 0.0035),
@@ -619,4 +627,10 @@ function buildPhone(g: THREE.Group, color: THREE.Color, brand?: string): void {
     vol.position.set(-w / 2 - 0.0003, y, 0)
     g.add(vol)
   }
+  // SIM tray on the +X edge (at the marker when the def has one)
+  const sim = hotspots?.find((h) => h.id === 'simtray')?.position[1] ?? 0.01
+  const tray = new THREE.Mesh(new THREE.BoxGeometry(0.0004, 0.014, 0.0028), metal(new THREE.Color('#8f9297'), 0.3))
+  tray.name = 'simtray'
+  tray.position.set(w / 2 + 0.0001, sim, 0)
+  g.add(tray)
 }

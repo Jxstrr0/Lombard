@@ -8,9 +8,9 @@
  *
  * Inspect: the camera parks in front of INSPECT_POINT looking along +Z; the
  * item (not the camera) is orbited by the stage, so the lamp highlight moves
- * across it as it turns. The inspect lens is narrow (INSPECT_FOV_DEG across the
- * narrow side of the free area), so `model.inspectDistance` should be about
- * 4 × the item's largest dimension for the item to fill ~60% of that side.
+ * across it as it turns. The inspect lens spans INSPECT_FOV_DEG (30°) across the
+ * narrow side of the free area, so at `model.inspectDistance` = 3 × the item's
+ * largest dimension the item fills ~60% of that side.
  */
 import * as THREE from 'three'
 
@@ -21,12 +21,12 @@ const LOOK_PORTRAIT = new THREE.Vector3(0, 0.62, -0.9)
 // Landscape/desktop: the strip is docked bottom-left, so frame counter and customer together.
 const LOOK_LANDSCAPE = new THREE.Vector3(0, 1.0, -0.9)
 // Offer view (portrait): the number pad covers most of the screen, so look up at the customer.
-const LOOK_OFFER = new THREE.Vector3(0, 1.18, -0.9)
+const LOOK_OFFER = new THREE.Vector3(0, 1.35, -0.9)
 
 /** Where the item floats while inspected: just in front of the player's eyes, over the counter. */
 export const INSPECT_POINT = new THREE.Vector3(0, 1.5, -2.7)
 /** Field of view across the narrow side of the free screen area in inspect mode. */
-const INSPECT_FOV_DEG = 20
+const INSPECT_FOV_DEG = 30
 
 export interface ViewLayout {
   width: number

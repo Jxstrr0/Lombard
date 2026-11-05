@@ -21,7 +21,7 @@ import { contactShadowTexture } from './textures'
 
 const COUNTER_READ_SIZE = 0.09
 const ZOOM_MIN = 0.45
-const ZOOM_MAX = 1.8
+const ZOOM_MAX = 2.6
 const PITCH_LIMIT = 1.35
 const DEFAULT_YAW = -0.42
 const DEFAULT_PITCH = -0.22
@@ -165,7 +165,7 @@ export class ItemStage {
   /** Camera distance for the inspect view, from model.inspectDistance (clamped to sane bounds). */
   private inspectDistance(): number {
     const authored = this.def?.model.inspectDistance ?? this.size * 4
-    return THREE.MathUtils.clamp(authored, this.size * 2.2, this.size * 8) * this.zoom
+    return THREE.MathUtils.clamp(authored, this.size * 0.5, this.size * 10) * this.zoom
   }
 
   update(dt: number, rig: CameraRig): void {
@@ -283,6 +283,7 @@ export class ItemStage {
       color: def.model.color,
       scale: def.model.scale,
       brand: def.brand,
+      hotspots: def.model.hotspots,
     })
     model.position.set(0, 0, 0)
     model.quaternion.identity()

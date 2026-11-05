@@ -1,21 +1,13 @@
 /**
- * Dev view (`?gallery=1`): every placeholder model side by side under the
- * inspect lighting, front and back, for self-review in `npm run shots`.
+ * Dev view (`?gallery=1`): every item def's placeholder model under the
+ * inspect lighting, front and back, with its hotspots as small pink beads,
+ * for self-review in `npm run shots`.
  * Not reachable from the game UI.
  */
 import * as THREE from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
-import { PLACEHOLDER_MODELS } from '../game/schema/item'
-import { buildPlaceholder, type PlaceholderKind } from './items'
-
-const SAMPLE: Record<PlaceholderKind, { color: string; brand?: string; size: number }> = {
-  ring: { color: '#d4a64a', size: 0.022 },
-  signet: { color: '#c99a3e', size: 0.026 },
-  chain: { color: '#d8ae52', size: 0.055 },
-  earrings: { color: '#d4a64a', size: 0.035 },
-  watch: { color: '#c0c3c6', brand: 'Pobeda', size: 0.2 },
-  phone: { color: '#8a8d93', brand: 'Mangosteen', size: 0.13 },
-}
+import { ITEM_DEFS } from '../data/items'
+import { buildPlaceholder } from './items'
 
 export async function runGallery(renderer: THREE.WebGLRenderer, envUrl: string, onReady: () => void): Promise<void> {
   const scene = new THREE.Scene()
@@ -37,30 +29,45 @@ export async function runGallery(renderer: THREE.WebGLRenderer, envUrl: string, 
   rim.position.set(-0.5, 0.3, -0.4)
   scene.add(key, rim)
 
-  // Grid: one column per kind (2 per row), front view on the left, back on the right.
-  const cell = 1
-  const cols = 2
-  PLACEHOLDER_MODELS.forEach((kind, i) => {
-    const s = SAMPLE[kind]
-    const k = (cell * 0.36) / s.size
+  // Grid: two items per row, each shown from the front and from the back.
+  const cols = 4
+  const rows = Math.ceil((ITEM_DEFS.length * 2) / cols)
+  const beadMat = new THREE.MeshBasicMaterial({ color: '#ff3d9a' })
+  ITEM_DEFS.forEach((def, i) => {
     for (const back of [false, true]) {
-      const m = buildPlaceholder({ placeholder: kind, color: s.color, brand: s.brand })
-      m.scale.setScalar(k)
-      const col = (i % cols) * 2 + (back ? 1 : 0)
-      const row = Math.floor(i / cols)
-      m.position.set((col - 1.5) * cell * 0.5, -(row - 1) * cell * 0.62, 0)
-      m.rotation.set(back ? 0.25 : 0.3, back ? Math.PI + 0.5 : -0.5, 0)
-      scene.add(m)
+      const m = buildPlaceholder({
+        placeholder: def.model.placeholder,
+        color: def.model.color,
+        scale: def.model.scale,
+        brand: def.brand,
+        hotspots: def.model.hotspots,
+      })
+      const size = new THREE.Box3().setFromObject(m).getSize(new THREE.Vector3())
+      const k = 0.42 / Math.max(size.x, size.y, size.z)
+      for (const h of def.model.hotspots) {
+        const bead = new THREE.Mesh(new THREE.SphereGeometry(0.012 / k, 8, 6), beadMat)
+        bead.position.set(...h.position)
+        m.add(bead)
+      }
+      const holder = new THREE.Group()
+      holder.add(m)
+      holder.scale.setScalar(k)
+      const slot = i * 2 + (back ? 1 : 0)
+      const col = slot % cols
+      const row = Math.floor(slot / cols)
+      holder.position.set((col - (cols - 1) / 2) * 0.5, -(row - (rows - 1) / 2) * 0.55, 0)
+      holder.rotation.set(back ? 0.25 : 0.3, back ? Math.PI + 0.5 : -0.5, 0)
+      scene.add(holder)
     }
   })
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50)
-  camera.position.set(0, 0, 4.6)
+  camera.position.set(0, 0, 6.4)
   const resize = () => {
     const w = window.innerWidth
     const h = window.innerHeight
     renderer.setSize(w, h)
     camera.aspect = w / h
-    camera.fov = w < h ? 46 : 30
+    camera.fov = 30
     camera.updateProjectionMatrix()
   }
   resize()

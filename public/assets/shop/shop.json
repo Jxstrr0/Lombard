@@ -7,7 +7,7 @@
   "blender": "4.5.15 LTS",
   "inputHash": "c75690f18d675001",
   "baked": true,
-  "commit": null,
+  "commit": "4923077",
   "files": {
     "glb": "shop.glb",
     "lightmap": "shop_lightmap.ktx2"

@@ -44,25 +44,26 @@ Everything runs headless; no one opens the Blender UI.
 **Run it from a phone:** GitHub app → repo → Actions → **bake** → Run workflow → quality `preview` (default) or `full` → Run. A preview takes ~5 minutes including the Blender download on a cold cache; the result is committed and deployed automatically, and the build number in the game's corner then ends in `bake preview <commit>` (or `bake full …`). The Cycles renders from the player's eye land in `bake/out/preview.jpg` (portrait), `bake/out/preview-wide.jpg`, and `preview-left.jpg` / `preview-right.jpg` (head turned left to the storeroom door, right to the wing case; note the player looks along +z, so +x is on their left); open them in the repo to judge layout and mood. Add `?nobake=1` to the game URL to see the old procedural grey box for comparison.
 
 1. `bake/layout.json` describes the room in three.js coordinates (metres, y up): room size (plus `annexes`, extra boxes such as the storeroom whose faces survive the outside-the-room culling), every object (box / cylinder / cone / sphere / torus for the grey box, glb props later) with position, rotation, material, optional `repeat` and seeded `jitter`, plus the light rig (ceiling pendants, counter lamp, overcast sky through window and door portals), and the two preview cameras.
-2. `bake/materials.py` is the single source for static materials: colour, roughness, metalness, and a `kind`:
+2. `bake/materials.py` is the single source for static materials: colour, roughness, metalness, an optional surface `texture` (see § Surface textures), and a `kind`:
    - `baked`: diffuse, gets the lightmap; drawn as `MeshBasicMaterial` + lightmap at runtime so the two real-time lights (there for the item and the customer) don't light the room twice;
    - `dynamic`: metals; not in the lightmap, lit at runtime by the env map and the two lights (they still cast shadows in the bake);
    - `glass` and `unlit`: hidden during the bake, drawn transparent / flat at runtime.
-   `kind` and an optional procedural `runtime` texture id travel to the game as glTF material extras.
+   `kind` travels to the game as a glTF material extra; a surface texture travels as the material's base colour texture.
 3. `bake/bake.py` (`blender --background --factory-startup --python bake/bake.py -- --quality preview|full`):
    - generates all geometry straight into four meshes, one per kind (so the shop costs about one draw call per material: ~30 instead of ~70–100 for the old grey box), applying the seeded jitter and culling faces nobody can see;
    - welds the baked mesh so boxes that meet act as one surface: drops faces pressed flat against another opaque box (cut along that box's sides first if only partly covered), splits edges at T-junctions and beauty-triangulates the result. Each flat wall then unwraps as one lightmap island, and no hidden face sits at a visible edge to depth-fight. Without this, a wall built from several boxes shows a dark or bright line at every joint;
-   - uv0 = world-metre box projection (tiling textures), uv1 = Smart UV Project + pack (all islands selected) with a margin for the target resolution;
+   - uv0 = world-metre box projection divided by the material's texture tile (tiling textures), uv1 = Smart UV Project + pack (all islands selected) with a margin for the target resolution;
    - bakes Cycles diffuse lighting (direct + indirect, no colour) to uv1, denoises it with OpenImageDenoise, regrows the margin from each island's own texels (before and after the denoiser, which blurs across islands), and stores it as an 8-bit sRGB PNG divided by `lightmapScale` (written to the manifest; the game multiplies back);
+   - bakes the props' lighting per vertex (see § Props);
    - exports `bake/out/shop_raw.glb` with both UV sets and renders the two previews (AgX, exposure matched to the game's ACES).
-4. `scripts/bake-pack.mjs` (glTF Transform + `ktx2-encoder`, both npm packages, no system tools): Draco-compresses the glb, converts the lightmap to KTX2 (UASTC + RDO + Zstd, mipmaps), and writes `public/assets/shop/{shop.glb, shop_lightmap.ktx2, shop.json}`. Preview bake: 60 KB + 180 KB.
+4. `scripts/bake-pack.mjs` (glTF Transform + `ktx2-encoder`, both npm packages, no system tools): Draco-compresses the glb, re-encodes its surface textures as KTX2 (ETC1S, sRGB, mipmaps), converts the lightmap to KTX2 (UASTC + RDO + Zstd, mipmaps), and writes `public/assets/shop/{shop.glb, shop_lightmap.ktx2, shop.json}`. Preview bake: 60 KB + 180 KB.
 5. `.github/workflows/bake.yml`:
    - triggers: `workflow_dispatch` with `quality` (preview default), and pushes that change `bake/**` or the pack script (preview; skipped if the committed `shop.json` already has the same input hash);
    - downloads the pinned Blender LTS Linux build and caches it with `actions/cache`;
    - runs on the standard `ubuntu-latest` runner (never a larger runner; those are always billed);
    - commits `public/assets/shop/*` and the preview images back to the branch it ran on, then dispatches `deploy.yml` for that branch (a push made with the workflow token doesn't trigger workflows itself). `deploy.yml` publishes only from `main`; on other branches it just runs the checks.
    - Runs on the same branch queue rather than cancel, so a push never kills a full bake in progress.
-6. Runtime (`src/render/bakedShop.ts`): loads `shop.json`, then the glb (Draco decoder) and the lightmap (Basis transcoder; both copied from three into `public/assets/decoders/` by `npm run dev`/`build`), builds the materials per kind, and replaces the grey box. If there's no bake, the grey box stays.
+6. Runtime (`src/render/bakedShop.ts`): loads `shop.json`, then the glb (Draco decoder, Basis for its textures) and the lightmap (Basis transcoder; both copied from three into `public/assets/decoders/` by `npm run dev`/`build`), builds the materials per kind, and replaces the grey box. If there's no bake, the grey box stays.
 
 Local run (for whoever has Blender; CI doesn't need this): `blender --background --factory-startup --python bake/bake.py -- --quality preview` then `npm run bake:pack`.
 
@@ -79,6 +80,27 @@ Rules:
 - Moving props (items on the counter, customers) are not in the bake; they're lit by the env map and counter lamp at runtime.
 - Keep `bake/layout.json` anchors in step with `src/render/scene.ts` (counter top 0.94 m, mat at z −2.13, lamp light, eye at z −3.2).
 - The canal view outside is not part of the bake (see § Canal backdrop), but it is rendered for the window and door openings and the eye in `bake/layout.json`. If either opening or the eye moves, rerun `art/backdrop/build.py`; `tests/backdrop.test.ts` fails until you do.
+
+## Surface textures (decided Nov 2026, M3 dressing)
+
+The room's big surfaces (parquet, plaster, ceiling, dado paint, counter and case wood, felt, rubber mat, door paint, cork, the storeroom's lino and peeling plaster, cardboard) carry a real CC0 colour map from ambientCG.
+
+- Each `texture` entry in `bake/materials.py` names its source (`ambientcg:<asset id>`), its size in pixels, how many metres one repeat covers (`tile`), and how it's recoloured.
+- `python3 art/materials/prepare.py` (system Python with Pillow and numpy, needs the network) downloads the 1K JPG, keeps only the colour map, resizes it, and recolours it so its average is the material's authored `color`. Mode `scale` keeps the texture's own hue variation (wood, cork, cardboard); mode `tint` keeps only its brightness pattern times the authored colour (plaster, paint, fabric), so a red or blue source can't leak its hue. `contrast` squeezes or stretches the variation. It writes `bake/textures/<material>.jpg`, which is committed: CI never downloads anything. Rerun it only when an entry changes.
+- The bake maps the texture on uv0 and still bakes lighting only, so the lightmap doesn't change; the glb carries the textures and bake-pack turns them into KTX2 ETC1S (about 1 MB for all fourteen, a few MB of GPU memory with mips).
+- Only colour maps: the shop is drawn unlit plus lightmap (`MeshBasicMaterial`), so normal and roughness maps would do nothing.
+- The textures are bake inputs: changing one triggers a preview bake (bake.yml hashes `bake/textures/*` with the other inputs).
+
+## Props (decided Nov 2026, M3 dressing)
+
+The shop is dressed with CC0 models from Poly Haven: a cash register, an old TV, clocks, a boombox, a cassette player, a ukulele, a suitcase, a security camera, cardboard boxes, a monobloc chair by the window, a plant on the sill, and in the storeroom a kettle, a multimeter, a toolbox, crates, a hand truck, a broom and a dustpan. Each was checked for real brands (Poly Haven's camera, TV, extinguisher, fire alarm and postcards were rejected for logos or real text).
+
+- `art/props/prepare.py` (headless Blender, needs the network) lists them with a triangle budget and a texture size. It downloads the 1k glTF, keeps the listed parts, joins them, puts the origin at the bottom centre with the front facing glTF +z, decimates, drops glass covers and lenses (drawn opaque they'd hide the clock faces), keeps only the base colour texture, and writes `bake/props/<id>.glb`. Those are committed bake inputs; CI never downloads anything.
+- `bake/layout.json` places them with `{"shape": "prop", "prop": "<id>", "position", "rotation", "scale"?, "jitter"?}` entries (in the `props` group). Unrotated, a prop's front faces +z, away from the player at the counter.
+- Their lighting is baked **per vertex**, not into the lightmap: decimated scans unwrap into thousands of tiny islands that each need a texel gutter, which no shared 512–2048 lightmap can give. After the room's lightmap bake, Cycles bakes diffuse lighting (no colour) into a `lighting` colour attribute on the joined `shop_props` mesh, divided by the lightmap's scale. It isn't denoised, so it takes more samples (`prop_samples`: 256 preview, 1024 full). Props still cast shadows into the room's lightmap.
+- At runtime a material with `kind: "prop"` is `MeshBasicMaterial` with its texture × vertex colours × the lightmap scale, so props and room sit in the same light.
+- Budget: ~70k triangles and ~33 materials (draw calls) for the 25 instances; about 2 MB of the shop glb.
+- Add a prop: add it to `PROPS` in `art/props/prepare.py`, run it with `--only <id>`, place it in the layout, push (the bake runs). Add its ATTRIBUTION line.
 
 ## Items
 
@@ -160,4 +182,6 @@ npm run assets:optimize   # gltf-transform: draco + ktx2 + prune + dedup on publ
 npm run assets:check      # verify every file in public/assets has an ATTRIBUTION.md line
 # bake: GitHub Actions 'bake' workflow (see Bake pipeline above)
 # canal backdrop: art/backdrop/build.py in Blender, then npm run backdrop:pack (see Canal backdrop above)
+# surface textures: python3 art/materials/prepare.py, then push (the bake runs; see Surface textures above)
+# props: art/props/prepare.py in Blender, then place them in bake/layout.json and push (see Props above)
 ```

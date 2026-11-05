@@ -49,7 +49,8 @@ jobs:
       - name: Decide whether to bake
         id: plan
         run: |
-          hash=$(cat bake/layout.json bake/materials.py bake/bake.py scripts/bake-pack.mjs | sha256sum | cut -c1-16)
+          # same files, same order as input_files() in bake/bake.py
+          hash=$(cat bake/layout.json bake/materials.py bake/bake.py scripts/bake-pack.mjs $(find bake/textures bake/props -type f | LC_ALL=C sort) | sha256sum | cut -c1-16)
           quality='${{ inputs.quality }}'
           quality=${quality:-preview}
           current=$(jq -r '.inputHash // ""' public/assets/shop/shop.json 2>/dev/null || true)

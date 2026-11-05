@@ -73,6 +73,8 @@ Every third-party asset shipped in this game is listed here, including CC0 asset
 | Multi Cleaner Bottle (prop `cleaner_bottle`, `bake/props/cleaner_bottle.glb`) | James Ray Cock | https://polyhaven.com/a/multi_cleaner_bottle | CC0 | parts joined, decimated, glass covers/lenses/flames removed, only the base colour texture kept (resized); lighting baked per vertex; shipped inside `public/assets/shop/shop.glb` (Draco + KTX2) |
 | Plastic Jerrycan (prop `jerrycan`, `bake/props/jerrycan.glb`) | Ulan Cabanilla | https://polyhaven.com/a/plastic_jerrycan | CC0 | parts joined, decimated, glass covers/lenses/flames removed, only the base colour texture kept (resized); lighting baked per vertex; shipped inside `public/assets/shop/shop.glb` (Draco + KTX2) |
 | Trashbag (prop `trash_bag`, `bake/props/trash_bag.glb`) | Benny Weimer | https://polyhaven.com/a/trashbag | CC0 | parts joined, decimated, glass covers/lenses/flames removed, only the base colour texture kept (resized); lighting baked per vertex; shipped inside `public/assets/shop/shop.glb` (Draco + KTX2) |
+| MakeHuman system assets (test customer `public/assets/customer-test/mpfb_middleaged_man.glb`, M3 customer test only): base mesh and targets, `game_engine` rig, skin `middleage_caucasian_male`, clothes `male_casualsuit05`, shoes `shoes02`, hair `short02`, `eyebrow001`, `eyelashes01`, eyes `low-poly` (bluegreen) | MakeHuman team (Data Collection AB, Joel Palmius, Jonas Hauquier) | https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html, assembled with the MPFB 2.0.18 Blender add-on (https://extensions.blender.org/add-ons/mpfb/, GPLv3; claims nothing over its output) | CC0 | built headless in Blender: aged, posed arms-down as the rest pose, decimated (18.9k tris), textures packed into three 1024 px atlases; exported as glb |
+| Microsoft Rocketbox Avatar Library, avatar `Male_Adult_03` and animation `m_idle_breathe_01` (test customer `public/assets/customer-test/rocketbox_male_adult_03.glb`, M3 customer test only) | Microsoft (original avatars by Rocketbox) | https://github.com/microsoft/Microsoft-Rocketbox | MIT (full notice below) | idle retargeted onto the avatar and looped, normal maps dropped, textures 1024 px; exported as glb (7.2k tris) |
 | Lebombo (HDRI, `public/assets/env/lebombo_1k.hdr`) | Greg Zaal | https://polyhaven.com/a/lebombo | CC0 | 1k .hdr, unmodified |
 | Draco 3D decoder (`public/assets/decoders/draco/`, copied from three.js at build) | Google | https://github.com/google/draco | Apache 2.0 | unmodified |
 | Basis Universal transcoder (`public/assets/decoders/basis/`, copied from three.js at build) | Binomial LLC | https://github.com/BinomialLLC/basis_universal | Apache 2.0 | unmodified |
@@ -90,3 +92,31 @@ Every third-party asset shipped in this game is listed here, including CC0 asset
 | gatve Varniu 2 (sound, street traffic in the ambience; `public/assets/audio/ambience.mp3`) | ignasd | https://opengameart.org/content/high-traffic-road-sounds | CC0 | 1–58 s, low-passed (heard through the window), lightly compressed, mixed as the ambience's main layer |
 | Vistula waves, short version (sound, canal water in the ambience; `public/assets/audio/ambience.mp3`) | randommind | https://opengameart.org/content/sea-and-river-wave-sounds (`VistulaShort_0.mp3`) | CC0 | 133–190 s, low-passed to 650 Hz, mixed 9 dB under the street |
 | convenience store drinks fridge drone (sound, room tone in the ambience; `public/assets/audio/ambience.mp3`) | LEGIT Audio | https://opengameart.org/content/the-shop (`legit_audio_-_the_shop_free_sfx_wav.zip`; CC0 applies to the free files on OpenGameArt) | CC0 | low-passed to 380 Hz, tiled with crossfades, mixed 13 dB under the street; the 54 s mix is crossfaded into a seamless loop, mono MP3 48 kbps |
+
+## Microsoft Rocketbox licence
+
+Applies to `public/assets/customer-test/rocketbox_male_adult_03.glb`.
+
+```
+MIT License
+
+Copyright (c) 2020 Microsoft
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

@@ -58,7 +58,7 @@
 
 | Item | Default until decided | Decide at |
 |---|---|---|
-| Customers in 3D (Plan A) vs portrait cards (Plan B) | portrait card in dialogue strip; 3D silhouette optional | M3, after a 1-day test. A roaming employee (below) needs 3D people, which favours Plan A |
+| Customers in 3D (Plan A) vs portrait cards (Plan B) | portrait card in dialogue strip; 3D silhouette optional | M3, after a 1-day test. **Test is up (Nov 5):** `?customer=mpfb_middleaged_man` (MakeHuman CC0) and `?customer=rocketbox_male_adult_03` (Rocketbox MIT) against the silhouette; Colby judges on the phone (see 04 § Customers). A roaming employee (below) needs 3D people, which favours Plan A |
 | Hired employee who walks around the shop (Colby, Nov 5): the GDD's one appraiser hire becomes a visible person who moves between the back room, behind the counter and the shop floor | not built; layout keeps the walkways clear | build with The Appraiser hire (M6); depends on the Plan A/B decision |
 | Retirement unlock day | day 90 | M5, after playtesting career pacing |
 | Lighting mood (sky strength, pendant/lamp power and warmth) | overcast sky 0.35, pendants 12 W 2700 K, counter lamp 22 W 3000 K | M3 lighting pass on preview bakes |

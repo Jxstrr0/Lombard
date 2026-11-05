@@ -220,8 +220,74 @@ export const tuning = {
   specialists: {},
 
   /** M2 seasonal demand, market drift, news, career-start stock (owner: content worker). */
-  demand: {},
-  start: {},
+  demand: {
+    /**
+     * Season multiplier per demandTag (GDD § 7). Missing tag or season = 1.
+     * Cameras peak with the tourists and white nights, electronics before the school year,
+     * gold and watches over the New Year gift season.
+     */
+    seasons: {
+      gold: { winter: 1.05, spring: 1, summer: 1.05, autumn: 0.95 },
+      jewelry: { winter: 1.1, spring: 1.05, summer: 1, autumn: 0.9 },
+      watches: { winter: 1.1, spring: 0.95, summer: 0.95, autumn: 1 },
+      luxury: { winter: 1.1, spring: 1, summer: 1.05, autumn: 0.9 },
+      soviet: { winter: 0.9, spring: 1.05, summer: 1.15, autumn: 0.95 },
+      militaria: { winter: 0.9, spring: 1.1, summer: 1.05, autumn: 0.95 },
+      electronics: { winter: 1.05, spring: 0.95, summer: 0.9, autumn: 1.1 },
+      phones: { winter: 1.05, spring: 0.95, summer: 0.9, autumn: 1.1 },
+      cameras: { winter: 0.85, spring: 1.05, summer: 1.2, autumn: 0.9 },
+      coins: { winter: 1.05, spring: 1, summer: 0.95, autumn: 1 },
+      silver: { winter: 1, spring: 1, summer: 1, autumn: 1 },
+    } as Readonly<Record<string, Readonly<Partial<Record<'winter' | 'spring' | 'summer' | 'autumn', number>>>>>,
+    /**
+     * Holidays as date windows (MM-DD, inclusive; a window may wrap the year end) that
+     * multiply demand for some tags. Overlapping boosts multiply. Women's Day lands in the
+     * first week (the career starts 3 March).
+     */
+    holidays: [
+      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, cameras: 1.1 } },
+      { id: 'defender_day', from: '02-16', to: '02-23', boost: { watches: 1.15, militaria: 1.1 } },
+      { id: 'womens_day', from: '02-28', to: '03-08', boost: { jewelry: 1.35, gold: 1.2, watches: 1.05 } },
+      { id: 'victory_day', from: '04-25', to: '05-10', boost: { militaria: 1.45, soviet: 1.15 } },
+      { id: 'white_nights', from: '06-01', to: '07-10', boost: { cameras: 1.2, soviet: 1.1 } },
+      { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25 } },
+    ] as readonly { id: string; from: string; to: string; boost: Readonly<Record<string, number>> }[],
+    /** Per-tag random walk, stepped once a day at day open: d += U(−step, step) + revert × (1 − d), clamped. */
+    drift: { step: 0.025, revert: 0.05, min: 0.8, max: 1.25 },
+    /**
+     * Occasional market shocks: on a day one fires (chance `shockChance`, then picked by
+     * weight), its deltas are added to the drift (then clamped) and the paper reports it.
+     */
+    shockChance: 0.12,
+    shocks: [
+      { id: 'ruble_wobble', weight: 3, delta: { gold: 0.12, coins: 0.1, watches: 0.06, luxury: 0.05, electronics: -0.04 } },
+      { id: 'import_prices', weight: 2, delta: { phones: 0.1, electronics: 0.08 } },
+      { id: 'phone_launch', weight: 2, delta: { phones: -0.1 } },
+      { id: 'flea_market_raid', weight: 1.5, delta: { militaria: -0.12 } },
+      { id: 'collectors_fair', weight: 2, delta: { coins: 0.1, militaria: 0.06, cameras: 0.05 } },
+      { id: 'film_fad', weight: 1.5, delta: { cameras: 0.12 } },
+    ] as readonly { id: string; weight: number; delta: Readonly<Record<string, number>> }[],
+    /** demandMultiplier (mean over an item's tags of season × holiday × drift) is clamped to this. */
+    multiplier: { min: 0.6, max: 1.8 },
+    news: {
+      /** Weights for printing 1, 2 or 3 stories. */
+      storyCountWeights: [1, 2, 1.2] as readonly number[],
+      /** Chance a running holiday gets a story (always on the window's first day). */
+      holidayChance: 0.7,
+      /** A tag drifted at least this far from 1 can get a hint story… */
+      driftHintThreshold: 0.08,
+      /** …with this chance per day. */
+      driftHintChance: 0.6,
+    },
+  },
+  start: {
+    /** Leftovers from the previous owner: one surely-fake piece, one decent genuine one, plus 1–3 odds and ends. */
+    extraItems: [1, 3] as [number, number],
+    /** The decent genuine piece is in at least this condition. */
+    genuineMinCondition: 60,
+    /** Attempts at rolling a forced fake/genuine before taking what came. */
+    maxRolls: 30,
+  },
 
   save: {
     /** Day summaries kept in full; older days are folded into career stats. */

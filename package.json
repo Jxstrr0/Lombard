@@ -1,0 +1,36 @@
+{
+  "name": "lombard",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "A pawn shop sim on the canals of Mostograd. A Longlight Interactive game.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "lint": "eslint . && tsc --noEmit",
+    "shots": "vite build && node scripts/shots.mjs"
+  },
+  "engines": {
+    "node": ">=20.19"
+  },
+  "dependencies": {
+    "@fontsource/space-grotesk": "5.3.0",
+    "stats.js": "0.17.0",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.19.2",
+    "@types/stats.js": "0.17.4",
+    "@types/three": "0.187.0",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
+    "playwright": "1.63.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1",
+    "vite": "8.3.5",
+    "vitest": "5.1.0"
+  }
+}

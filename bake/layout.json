@@ -124,9 +124,7 @@
         { "name": "island_case_post_lf", "shape": "box", "size": [0.02, 0.65, 0.02], "position": [-0.65, 0.875, 0.3], "material": "brass" },
         { "name": "island_case_post_rb", "shape": "box", "size": [0.02, 0.65, 0.02], "position": [0.65, 0.875, -0.3], "material": "brass" },
         { "name": "island_case_post_rf", "shape": "box", "size": [0.02, 0.65, 0.02], "position": [0.65, 0.875, 0.3], "material": "brass" },
-        { "name": "island_case_shelf", "shape": "box", "size": [1.25, 0.008, 0.5], "position": [0, 0.9, 0.0], "material": "glass" },
-        { "name": "island_cam", "shape": "box", "size": [0.14, 0.09, 0.07], "position": [-0.45, 0.6, 0.0], "material": "prop_slate", "repeat": {"count": 4, "step": [0.3, 0, 0], "materials": ["prop_slate", "box_dark"]}, "jitter": {"position": 0.03, "yaw": 20} },
-        { "name": "island_box", "shape": "box", "size": [0.1, 0.07, 0.1], "position": [-0.4, 0.95, 0.05], "material": "box_grey", "repeat": {"count": 4, "step": [0.27, 0, 0], "materials": ["box_grey", "prop_plum", "prop_brown"]}, "jitter": {"position": 0.03, "yaw": 20} }
+        { "name": "island_case_shelf", "shape": "box", "size": [1.25, 0.008, 0.5], "position": [0, 0.9, 0.0], "material": "glass" }
       ]
     },
     {
@@ -136,8 +134,7 @@
         { "name": "case_a_glass", "shape": "box", "size": [0.46, 1.2, 1.5], "position": [0, 1.4, 0], "material": "glass" },
         { "name": "case_a_top", "shape": "box", "size": [0.48, 0.06, 1.52], "position": [0, 2.03, 0], "material": "case_wood" },
         { "name": "case_a_shelf_low", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.2, 0], "material": "glass" },
-        { "name": "case_a_shelf_high", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.6, 0], "material": "glass" },
-        { "name": "case_a_box", "shape": "box", "size": [0.12, 0.08, 0.16], "position": [0, 0.84, -0.5], "material": "box_dark", "repeat": {"count": 4, "step": [0, 0, 0.32], "materials": ["box_dark", "box_grey"]}, "jitter": {"position": 0.03, "yaw": 12} }
+        { "name": "case_a_shelf_high", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.6, 0], "material": "glass" }
       ]
     },
     {
@@ -147,8 +144,7 @@
         { "name": "case_b_glass", "shape": "box", "size": [0.46, 1.2, 1.5], "position": [0, 1.4, 0], "material": "glass" },
         { "name": "case_b_top", "shape": "box", "size": [0.48, 0.06, 1.52], "position": [0, 2.03, 0], "material": "case_wood" },
         { "name": "case_b_shelf_low", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.2, 0], "material": "glass" },
-        { "name": "case_b_shelf_high", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.6, 0], "material": "glass" },
-        { "name": "case_b_box", "shape": "box", "size": [0.12, 0.08, 0.16], "position": [0, 0.84, -0.5], "material": "box_grey", "repeat": {"count": 4, "step": [0, 0, 0.32], "materials": ["box_grey", "box_dark"]}, "jitter": {"position": 0.03, "yaw": 12} }
+        { "name": "case_b_shelf_high", "shape": "box", "size": [0.42, 0.01, 1.44], "position": [0, 1.6, 0], "material": "glass" }
       ]
     },
     {
@@ -156,10 +152,7 @@
       "children": [
         { "name": "shelf_glass", "shape": "box", "size": [0.36, 0.012, 2.4], "position": [0, 1.0, 0], "material": "glass", "repeat": {"count": 3, "step": [0, 0.45, 0]} },
         { "name": "bracket_a", "shape": "box", "size": [0.3, 0.03, 0.015], "position": [0.03, 0.98, -1.0], "material": "brass", "repeat": {"count": 3, "step": [0, 0.45, 0]} },
-        { "name": "bracket_b", "shape": "box", "size": [0.3, 0.03, 0.015], "position": [0.03, 0.98, 1.0], "material": "brass", "repeat": {"count": 3, "step": [0, 0.45, 0]} },
-        { "name": "shelf1_prop", "shape": "box", "size": [0.12, 0.1, 0.12], "position": [-0.02, 1.058, -0.9], "material": "prop_brown", "repeat": {"count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.1, 0.16, 0.22, 0.1]}, "jitter": {"position": 0.04, "yaw": 20} },
-        { "name": "shelf2_prop", "shape": "box", "size": [0.12, 0.16, 0.12], "position": [-0.02, 1.538, -0.9], "material": "prop_brown", "repeat": {"count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.16, 0.22, 0.1, 0.16]}, "jitter": {"position": 0.04, "yaw": 20} },
-        { "name": "shelf3_prop", "shape": "box", "size": [0.12, 0.22, 0.12], "position": [-0.02, 2.018, -0.9], "material": "prop_brown", "repeat": {"count": 4, "step": [0, 0, 0.6], "materials": ["prop_brown", "prop_slate", "prop_sand", "prop_plum"], "heights": [0.22, 0.1, 0.16, 0.22]}, "jitter": {"position": 0.04, "yaw": 20} }
+        { "name": "bracket_b", "shape": "box", "size": [0.3, 0.03, 0.015], "position": [0.03, 0.98, 1.0], "material": "brass", "repeat": {"count": 3, "step": [0, 0.45, 0]} }
       ]
     },
     {
@@ -240,7 +233,6 @@
         { "name": "br_bench_leg", "shape": "box", "size": [0.05, 0.875, 0.05], "position": [3.5, 0.4375, -3.43], "material": "shelf_metal", "repeat": {"count": 2, "step": [1.3, 0, 0]} },
         { "name": "br_bench_leg_back", "shape": "box", "size": [0.05, 0.875, 0.05], "position": [3.5, 0.4375, -3.93], "material": "shelf_metal", "repeat": {"count": 2, "step": [1.3, 0, 0]} },
         { "name": "br_bench_shelf", "shape": "box", "size": [1.3, 0.02, 0.5], "position": [4.15, 0.25, -3.68], "material": "counter_wood" },
-        { "name": "br_ledger", "shape": "box", "size": [0.3, 0.04, 0.22], "position": [4.0, 0.945, -3.62], "material": "prop_plum", "rotation": [0, 12, 0] },
         { "name": "br_cashbox", "shape": "box", "size": [0.3, 0.1, 0.2], "position": [4.55, 0.975, -3.75], "material": "safe" },
         { "name": "br_chair_seat", "shape": "box", "size": [0.42, 0.04, 0.42], "position": [4.1, 0.46, -3.05], "material": "counter_wood", "rotation": [0, -14, 0] },
         { "name": "br_chair_back", "shape": "box", "size": [0.42, 0.45, 0.03], "position": [4.15, 0.7, -2.86], "material": "counter_wood", "rotation": [0, -14, 0] },
@@ -282,7 +274,41 @@
         { "name": "br_crate_top", "shape": "prop", "prop": "crate", "position": [5.02, 0.254, -1.92], "rotation": [0, -9, 0], "jitter": {"position": 0.015, "yaw": 6} },
         { "name": "br_truck", "shape": "prop", "prop": "hand_truck", "position": [4.25, 0.0, -1.98], "rotation": [0, 175, 0], "jitter": {"position": 0.015, "yaw": 6} },
         { "name": "br_broom", "shape": "prop", "prop": "broom", "position": [3.32, 0.0, -1.8], "rotation": [0, 30, 0], "jitter": {"position": 0.015, "yaw": 6} },
-        { "name": "br_dustpan", "shape": "prop", "prop": "dustpan", "position": [3.62, 0.0, -1.86], "rotation": [0, -25, 0], "jitter": {"position": 0.015, "yaw": 6} }
+        { "name": "br_dustpan", "shape": "prop", "prop": "dustpan", "position": [3.62, 0.0, -1.86], "rotation": [0, -25, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_video_camera", "shape": "prop", "prop": "video_camera", "position": [2.8, 1.006, 0.35], "rotation": [0, -80, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_drill", "shape": "prop", "prop": "drill", "position": [2.8, 1.006, 0.85], "rotation": [0, -110, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_projector", "shape": "prop", "prop": "film_projector", "position": [2.82, 1.006, 1.35], "rotation": [0, -90, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_binoculars", "shape": "prop", "prop": "binoculars", "position": [2.78, 1.456, 0.35], "rotation": [0, -120, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_jug", "shape": "prop", "prop": "milk_jug", "position": [2.8, 1.456, 0.85], "rotation": [0, -75, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_teapot", "shape": "prop", "prop": "tea_set", "position": [2.8, 1.456, 1.35], "rotation": [0, -90, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_vase", "shape": "prop", "prop": "ceramic_vase", "position": [2.8, 1.906, 0.3], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_phone", "shape": "prop", "prop": "rotary_phone", "position": [2.84, 1.906, 0.85], "rotation": [0, -90, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "sh_brass_vase", "shape": "prop", "prop": "brass_vase", "position": [2.8, 1.906, 1.4], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ca_binocular", "shape": "prop", "prop": "brass_binocular", "position": [-2.76, 0.8, -0.3], "rotation": [0, 110, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ca_microscope", "shape": "prop", "prop": "microscope", "position": [-2.76, 0.8, 0.45], "rotation": [0, 90, 0], "scale": 0.92, "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ca_compass", "shape": "prop", "prop": "compass", "position": [-2.76, 1.205, -0.25], "rotation": [0, 70, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ca_lighter", "shape": "prop", "prop": "lighter", "position": [-2.74, 1.205, 0.15], "rotation": [0, 100, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ca_spectacles", "shape": "prop", "prop": "spectacles", "position": [-2.76, 1.205, 0.55], "rotation": [0, 90, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ca_candles", "shape": "prop", "prop": "candleholders", "position": [-2.78, 1.605, 0.2], "rotation": [0, 90, 0], "scale": 0.92, "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "cb_chess", "shape": "prop", "prop": "chess_set", "position": [-2.76, 0.8, 1.75], "rotation": [0, 95, 0], "scale": 0.7, "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "cb_teapot", "shape": "prop", "prop": "tea_set", "position": [-2.76, 1.205, 2.35], "rotation": [0, 60, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "cb_lighter", "shape": "prop", "prop": "lighter", "position": [-2.74, 1.205, 1.7], "rotation": [0, 80, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "cb_jug", "shape": "prop", "prop": "milk_jug", "position": [-2.76, 1.605, 1.6], "rotation": [0, 120, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "cb_oil_lamp", "shape": "prop", "prop": "oil_lamp", "position": [-2.76, 2.06, 1.5], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "is_video_camera", "shape": "prop", "prop": "video_camera", "position": [-1.6, 0.57, 0.75], "rotation": [0, 170, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "is_binoculars", "shape": "prop", "prop": "binoculars", "position": [-1.55, 0.904, 0.8], "rotation": [0, 160, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ct_notepad", "shape": "prop", "prop": "notepads", "position": [-0.62, 0.95, -2.45], "rotation": [0, 8, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ct_pen_cup", "shape": "prop", "prop": "pen_cup", "position": [-0.86, 0.95, -2.55], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "ct_stapler", "shape": "prop", "prop": "stapler", "position": [0.8, 0.95, -2.52], "rotation": [0, 165, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "wall_painting", "shape": "prop", "prop": "painting", "position": [-2.985, 2.4, 1.1], "rotation": [0, 90, 0] },
+        { "name": "wall_old_painting", "shape": "prop", "prop": "old_painting", "position": [2.985, 2.55, 1.2], "rotation": [0, -90, 0] },
+        { "name": "ceiling_fan", "shape": "prop", "prop": "ceiling_fan", "position": [0, 3.68, -0.1] },
+        { "name": "br_binder", "shape": "prop", "prop": "binder", "position": [4.0, 0.925, -3.62], "rotation": [0, 12, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "br_microwave", "shape": "prop", "prop": "microwave", "position": [3.76, 0.27, -3.68], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "br_cleaner", "shape": "prop", "prop": "cleaner_bottle", "position": [4.8, 0.925, -3.85], "rotation": [0, -20, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "br_army_crate", "shape": "prop", "prop": "army_crate", "position": [4.75, 0.0, -2.45], "rotation": [0, 80, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "br_jerrycan", "shape": "prop", "prop": "jerrycan", "position": [5.1, 0.0, -3.8], "rotation": [0, -15, 0], "jitter": {"position": 0.015, "yaw": 6} },
+        { "name": "br_trash", "shape": "prop", "prop": "trash_bag", "position": [5.15, 0.0, -3.25], "rotation": [0, 40, 0], "jitter": {"position": 0.015, "yaw": 6} }
       ]
     }
   ]

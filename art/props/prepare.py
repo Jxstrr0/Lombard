@@ -8,7 +8,7 @@ listed parts, joins them into one mesh, puts the origin at the bottom centre
 (Blender +Z up, the model's own front facing -Y, i.e. glTF +Z), decimates to
 the triangle budget, keeps only the base colour texture (resized; the shop is
 drawn unlit plus baked lighting, so normal/roughness maps would do nothing),
-drops glass covers and lenses, and writes bake/props/<id>.glb. Those glbs are committed bake inputs: CI never
+drops glass covers, lenses and flames, and writes bake/props/<id>.glb. Those glbs are committed bake inputs: CI never
 downloads anything. bake/bake.py places them from `"shape": "prop"` entries in
 bake/layout.json and bakes their lighting per vertex.
 """
@@ -31,7 +31,9 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "bake" / "props"
 
 # id: Poly Haven asset; tris: decimation budget; tex: base colour size in px;
-# keep: substrings of the object names to keep (multi-object assets), else all.
+# keep / drop: regexes searched in the object names to keep (multi-object
+# assets; default all) or to leave out; scale: fix a model's size; densify:
+# longest edge in metres, for big flat faces (lighting is baked per vertex).
 PROPS: dict[str, dict] = {
     # counter and behind it
     "cash_register": {"src": "CashRegister_01", "tris": 6000, "tex": 512},
@@ -59,6 +61,39 @@ PROPS: dict[str, dict] = {
     "hand_truck": {"src": "hand_truck", "tris": 4000, "tex": 512},
     "broom": {"src": "plastic_broom", "tris": 2500, "tex": 256},
     "dustpan": {"src": "dustpan", "tris": 1500, "tex": 256},
+    # clutter wave 2: stock on the right-hand shelves
+    "video_camera": {"src": "vintage_video_camera", "tris": 2500, "tex": 512},
+    "drill": {"src": "Drill_01", "tris": 1500, "tex": 256},
+    "film_projector": {"src": "filmstrip_projector_8mm", "tris": 3000, "tex": 512, "drop": ["cable", "connector", "schuko"]},
+    "binoculars": {"src": "binoculars", "tris": 2000, "tex": 256, "drop": ["strap"]},
+    "rotary_phone": {"src": "vintage_telephone_wall_clock", "tris": 2500, "tex": 512},
+    "brass_vase": {"src": "brass_vase_01", "tris": 1500, "tex": 256, "scale": 0.55},
+    "ceramic_vase": {"src": "ceramic_vase_03", "tris": 1200, "tex": 256},
+    "milk_jug": {"src": "jug_01", "tris": 1200, "tex": 256},
+    "oil_lamp": {"src": "vintage_oil_lamp", "tris": 2000, "tex": 256, "scale": 0.6},
+    # clutter wave 2: the tall glass cases
+    "brass_binocular": {"src": "vintage_binocular", "tris": 2000, "tex": 256},
+    "microscope": {"src": "vintage_microscope", "tris": 2500, "tex": 256},
+    "compass": {"src": "seadogs_compass", "tris": 1200, "tex": 256},
+    "candleholders": {"src": "brass_candleholders", "tris": 2000, "tex": 256, "keep": ["candleholder_02"]},
+    "lighter": {"src": "vintage_lighter", "tris": 600, "tex": 128},
+    "spectacles": {"src": "round_spectacles", "tris": 1000, "tex": 128},
+    "chess_set": {"src": "chess_set", "tris": 4000, "tex": 512},
+    "tea_set": {"src": "tea_set_01", "tris": 1500, "tex": 512, "keep": ["teapot"]},
+    # clutter wave 2: counter, walls, ceiling
+    "notepads": {"src": "office_notepads", "tris": 700, "tex": 256, "keep": ["yellow_pad"], "densify": 0.06},
+    "stapler": {"src": "vintage_stapler", "tris": 1000, "tex": 128},
+    "pen_cup": {"src": "stationery_supplies", "tris": 1500, "tex": 256, "keep": ["pencilcup"]},
+    "painting": {"src": "hanging_picture_frame_02", "tris": 1000, "tex": 512, "densify": 0.06},
+    "old_painting": {"src": "fancy_picture_frame_01", "tris": 1000, "tex": 512, "densify": 0.06},
+    "ceiling_fan": {"src": "ceiling_fan", "tris": 2500, "tex": 256},
+    # clutter wave 2: storeroom
+    "binder": {"src": "binder_notebook", "tris": 1500, "tex": 256, "keep": ["_closed$"]},
+    "microwave": {"src": "vintage_microwave", "tris": 2000, "tex": 256, "scale": 0.5},
+    "army_crate": {"src": "old_military_crate", "tris": 1500, "tex": 512, "keep": ["_a$"]},
+    "cleaner_bottle": {"src": "multi_cleaner_bottle", "tris": 1000, "tex": 256},
+    "jerrycan": {"src": "plastic_jerrycan", "tris": 1200, "tex": 256},
+    "trash_bag": {"src": "trashbag", "tris": 1200, "tex": 256},
 }
 
 
@@ -135,6 +170,22 @@ def simplify_material(mat: bpy.types.Material, prop_id: str, idx: int, tex_px: i
     mat["kind"] = "baked"
 
 
+def densify(me: bpy.types.Mesh, max_len: float) -> None:
+    """Subdivide (UVs interpolated) the faces that are big in both directions
+    (shortest edge over max_len metres) until none is; thin faces are left."""
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    for _ in range(6):
+        big = [f for f in bm.faces if min(e.calc_length() for e in f.edges) > max_len]
+        long = list({e for f in big for e in f.edges})
+        if not long:
+            break
+        bmesh.ops.subdivide_edges(bm, edges=long, cuts=1, use_grid_fill=True)
+        bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 3])
+    bm.to_mesh(me)
+    bm.free()
+
+
 def prepare(prop_id: str, spec: dict, cache: Path, tmp: Path) -> None:
     reset()
     gltf = fetch(spec["src"], cache)
@@ -142,7 +193,10 @@ def prepare(prop_id: str, spec: dict, cache: Path, tmp: Path) -> None:
     meshes = [o for o in bpy.context.scene.objects if o.type == "MESH"]
     keep = spec.get("keep")
     if keep:
-        meshes = [o for o in meshes if any(k in o.name for k in keep)]
+        meshes = [o for o in meshes if any(re.search(k, o.name) for k in keep)]
+    drop = spec.get("drop")
+    if drop:
+        meshes = [o for o in meshes if not any(re.search(k, o.name) for k in drop)]
     if not meshes:
         raise RuntimeError(f"{prop_id}: nothing to keep")
     # bake every transform into the mesh, then join
@@ -166,6 +220,9 @@ def prepare(prop_id: str, spec: dict, cache: Path, tmp: Path) -> None:
         me.uv_layers.remove(me.uv_layers[-1])
     if me.uv_layers:
         me.uv_layers[0].name = "uv0"
+    # no vertex colours: the bake adds the one the game reads (baked lighting)
+    for attr in list(me.color_attributes):
+        me.color_attributes.remove(attr)
     if spec.get("scale"):
         me.transform(Matrix.Scale(spec["scale"], 4))
     # origin at the bottom centre
@@ -185,15 +242,20 @@ def prepare(prop_id: str, spec: dict, cache: Path, tmp: Path) -> None:
         mod.ratio = spec["tris"] / tris
         mod.use_collapse_triangulate = True
         bpy.ops.object.modifier_apply(modifier=mod.name)
-    # drop glass covers and lenses (clock faces, gauges, camera): drawn opaque
-    # they'd hide what's behind them, and the shop has no per-prop transparency
-    glass = {i for i, m in enumerate(me.materials) if m and re.search(r"_glass(\.\d+)?$|lens", m.name.lower())}
+    # drop glass covers, lenses and flames (clock faces, gauges, camera, lamps):
+    # drawn opaque they'd hide what's behind them (or glow as solid cards), and
+    # the shop has no per-prop transparency
+    glass = {i for i, m in enumerate(me.materials) if m and re.search(r"_glass(\.\d+)?$|lens|flame", m.name.lower())}
     if glass:
         bm = bmesh.new()
         bm.from_mesh(me)
         bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.material_index in glass], context="FACES")
         bm.to_mesh(me)
         bm.free()
+    # big flat faces (a canvas, a pad of paper) get their lighting from their
+    # corners only (the bake is per vertex), so split edges longer than this
+    if spec.get("densify"):
+        densify(me, spec["densify"])
     # drop unused material slots, simplify the rest
     used = {p.material_index for p in me.polygons}
     for i in sorted(range(len(me.materials)), reverse=True):

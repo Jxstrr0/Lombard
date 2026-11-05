@@ -586,6 +586,10 @@ def add_props(props: list[tuple[str, str, Matrix, float]]) -> bpy.types.Object |
             me = src.data.copy()
             me.transform(src.matrix_world)
             me.uv_layers[0].name = "uv0"
+            # the only colour attribute the game reads is the baked "lighting";
+            # a model's own vertex colours would be exported beside it as COLOR_n
+            for attr in list(me.color_attributes):
+                me.color_attributes.remove(attr)
             for mat in me.materials:
                 mat["kind"] = "prop"
             for o in new:

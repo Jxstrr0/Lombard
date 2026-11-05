@@ -1,0 +1,215 @@
+[
+  {
+    "id": "watch_pobeda_gold",
+    "category": "watches",
+    "name": "Pobeda wristwatch, 583 gold case",
+    "brand": "Pobeda",
+    "era": "1950s",
+    "baseValue": { "min": 40000, "max": 56000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 34, "tolerance": 2.5 },
+    "magnetic": false,
+    "rarity": 0.7,
+    "fakeChance": 0.45,
+    "tells": [
+      { "id": "dial", "tool": "loupe", "finding": "The Pobeda script is thin and a little uneven, the print sunk into aged cream paint.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "dial" },
+      { "id": "caseback_stamp", "tool": "loupe", "finding": "Inside the caseback: a deep 583, a star assay mark, and a watchmaker's scratched repair date.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "caseback" },
+      { "id": "movement", "tool": "loupe", "finding": "A plain 15-jewel movement, its factory marks from the same years as the case.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "caseback" },
+      { "id": "crown", "tool": "loupe", "finding": "The crown is gold too, its knurling worn soft from decades of winding.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.5, "hotspot": "crown" },
+      { "id": "heft", "tool": "scale", "finding": "Heavier in the pan than a steel watch this small.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35 },
+      { "id": "magnet_case", "tool": "magnet", "finding": "Only the movement inside stirs at the magnet; the case and lugs stay still.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "caseback" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "gilded_brass_case",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 2,
+        "weightFactor": 0.88,
+        "tells": [
+          { "id": "caseback_stamp", "tool": "loupe", "finding": "The 583 inside the caseback is freshly punched, over a ghost of older lettering.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "caseback" },
+          { "id": "crown", "tool": "loupe", "finding": "The crown's colour has worn through at the knurling, showing yellowish-white metal.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "crown" },
+          { "id": "lug_wear", "tool": "loupe", "finding": "On the lug tips the gold is thin as paint, with a coppery tint underneath.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "lugs" },
+          { "id": "heft", "tool": "scale", "finding": "Lighter in the pan than its colour suggests.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 }
+        ]
+      },
+      {
+        "id": "redial",
+        "kind": "restored",
+        "valueMultiplier": 0.5,
+        "weight": 1.5,
+        "tells": [
+          { "id": "dial", "tool": "loupe", "finding": "The dial print is too crisp and a touch thick; the Pobeda script sits a hair off centre.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "dial" },
+          { "id": "hands", "tool": "loupe", "finding": "The hands are bright and new-looking against a dial that should be sixty years old.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.6, "hotspot": "dial" }
+        ]
+      }
+    ],
+    "demandTags": ["watches", "soviet", "gold"],
+    "claims": [
+      "My grandfather got it for thirty years at the tractor plant. Gold, you see.",
+      "A Pobeda in a gold case. You don't see these every day, do you?",
+      "It still runs. I wind it every Sunday, like he did.",
+      "A collector in Moscow offered me a fortune. I said no. Now I'm saying yes, to you."
+    ],
+    "model": {
+      "placeholder": "watch",
+      "color": "#c8a04c",
+      "scale": 1,
+      "inspectDistance": 0.14,
+      "hotspots": [
+        { "id": "dial", "label": "Dial", "position": [0, 0.006, 0.0055] },
+        { "id": "caseback", "label": "Caseback", "position": [0, 0, -0.0055] },
+        { "id": "crown", "label": "Crown", "position": [0.0205, 0, 0] },
+        { "id": "lugs", "label": "Lugs", "position": [0, 0.0205, 0.002] }
+      ]
+    }
+  },
+  {
+    "id": "watch_vostok_komandirskie",
+    "category": "watches",
+    "name": "Vostok Komandirskie, Defence Ministry dial",
+    "brand": "Vostok",
+    "era": "1980s",
+    "baseValue": { "min": 6500, "max": 10500 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 60, "tolerance": 4 },
+    "magnetic": false,
+    "rarity": 1.5,
+    "fakeChance": 0.4,
+    "tells": [
+      { "id": "dial", "tool": "loupe", "finding": "The red star on the dial is printed crisp, the order text tiny and evenly spaced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "dial" },
+      { "id": "caseback", "tool": "loupe", "finding": "The caseback has a tank engraving and a serial, worn as evenly as the rest of the case.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "caseback" },
+      { "id": "movement", "tool": "loupe", "finding": "Inside: a 17-jewel hand-wound movement, its factory marks the same era as the dial.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "caseback" },
+      { "id": "crown", "tool": "loupe", "finding": "The star-signed crown screws down stiffly.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "crown" },
+      { "id": "lugs", "tool": "loupe", "finding": "Sharp lug edges under honest scratches; the chrome is dull and even.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.45, "hotspot": "lugs" },
+      { "id": "heft", "tool": "scale", "finding": "Middling heft, most of it in the case.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35 },
+      { "id": "magnet_crown", "tool": "magnet", "finding": "Only the crown stem tugs faintly at the magnet; the chromed case doesn't.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "crown" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "dial_swap",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.35,
+        "weight": 2,
+        "tells": [
+          { "id": "caseback", "tool": "loupe", "finding": "A plain civilian caseback, its serial in a format that doesn't fit the dial's era.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "caseback" },
+          { "id": "movement", "tool": "loupe", "finding": "Inside: a 1990s automatic movement, decades newer than the dial's print style.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "caseback" },
+          { "id": "dial_feet", "tool": "loupe", "finding": "The dial sits slightly crooked. At its edge, a glue smear where dial feet should be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.6, "hotspot": "dial" }
+        ]
+      },
+      {
+        "id": "relume_refinish",
+        "kind": "restored",
+        "valueMultiplier": 0.55,
+        "weight": 1,
+        "tells": [
+          { "id": "dial", "tool": "loupe", "finding": "The lume on the hands and markers is fresh and greenish-white, too clean beside the faded dial.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "dial" },
+          { "id": "lugs", "tool": "loupe", "finding": "The lug edges are rounded soft and the chrome is bright and new, as if buffed and replated.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "lugs" }
+        ]
+      }
+    ],
+    "demandTags": ["watches", "soviet", "militaria"],
+    "claims": [
+      "Issued to my father in the army. Officers only, those dials.",
+      "Komandirskie, Ministry order. Collectors go mad for these.",
+      "It went through Afghanistan on my uncle's wrist. Still ticks.",
+      "Got it at the flea market by the bridge. The man said it's the special one."
+    ],
+    "model": {
+      "placeholder": "watch",
+      "color": "#a9adb1",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        { "id": "dial", "label": "Dial", "position": [0, 0.007, 0.0065] },
+        { "id": "caseback", "label": "Caseback", "position": [0, 0, -0.0065] },
+        { "id": "crown", "label": "Crown", "position": [0.0215, 0, 0] },
+        { "id": "lugs", "label": "Lugs", "position": [0, 0.0215, 0.002] }
+      ]
+    }
+  },
+  {
+    "id": "watch_rolland_abyssal",
+    "category": "watches",
+    "name": "Rolland Abyssal diver",
+    "brand": "Rolland",
+    "era": "1990s",
+    "baseValue": { "min": 120000, "max": 170000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 150, "tolerance": 8 },
+    "magnetic": false,
+    "rarity": 0.5,
+    "fakeChance": 0.85,
+    "tells": [
+      { "id": "dial", "tool": "loupe", "finding": "The R-and-anchor logo and dial text are sharp-edged; every lume plot is neatly filled.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "dial" },
+      { "id": "seconds", "tool": "loupe", "finding": "The seconds hand sweeps round in tiny, even steps, smooth as a glide.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "dial" },
+      { "id": "cyclops", "tool": "loupe", "finding": "The date magnifier blows the date up to fill the whole lens.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "dial" },
+      { "id": "bezel", "tool": "loupe", "finding": "The bezel turns one way only in crisp, tight clicks; the insert numerals are deep.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "bezel" },
+      { "id": "lugs_serial", "tool": "loupe", "finding": "Between the lugs, a deep engraved serial with sharp, slightly rough edges.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.55, "hotspot": "lugs" },
+      { "id": "caseback", "tool": "loupe", "finding": "A plain solid steel caseback, no window, a few fine swirl scratches.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "caseback" },
+      { "id": "heft", "tool": "scale", "finding": "Dense. The bracelet links clink like solid steel.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35 },
+      { "id": "magnet_case", "tool": "magnet", "finding": "Only the movement inside makes the magnet stir; the case and bracelet ignore it.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "crown" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cheap_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.015,
+        "weight": 3,
+        "weightFactor": 0.78,
+        "magnetic": true,
+        "tells": [
+          { "id": "seconds", "tool": "loupe", "finding": "The seconds hand ticks once a second, a hard jump each time.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15, "hotspot": "dial" },
+          { "id": "cyclops", "tool": "loupe", "finding": "The date magnifier barely enlarges the date. It might as well be flat glass.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "dial" },
+          { "id": "dial", "tool": "loupe", "finding": "The logo's edges are fuzzy and the lume plots uneven, one of them smudged.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "dial" },
+          { "id": "caseback", "tool": "loupe", "finding": "The caseback has a window onto a plain, rattly movement with a shiny gold-coloured rotor.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15, "hotspot": "caseback" },
+          { "id": "lugs_serial", "tool": "loupe", "finding": "Between the lugs: smooth, blank metal where an engraving would be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "lugs" },
+          { "id": "heft", "tool": "scale", "finding": "Light. The bracelet rattles like folded tin.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "magnet_case", "tool": "magnet", "finding": "The bracelet links cling to the magnet one after another.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1, "hotspot": "crown" }
+        ]
+      },
+      {
+        "id": "high_grade_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 1,
+        "weightFactor": 0.97,
+        "tells": [
+          { "id": "lugs_serial", "tool": "loupe", "finding": "Between the lugs, the serial is shallow and glassy-smooth, as if burned in rather than cut.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.75, "hotspot": "lugs" },
+          { "id": "bezel", "tool": "loupe", "finding": "The bezel clicks round, but the clicks are a little mushy and it wobbles at rest.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.7, "hotspot": "bezel" },
+          { "id": "cyclops", "tool": "loupe", "finding": "The date magnifier is close, but the date doesn't quite fill the lens.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.65, "hotspot": "dial" }
+        ]
+      },
+      {
+        "id": "aftermarket_parts",
+        "kind": "restored",
+        "valueMultiplier": 0.55,
+        "weight": 1,
+        "tells": [
+          { "id": "bezel", "tool": "loupe", "finding": "The bezel insert is glossier than the rest of the watch, its numerals slightly shallow.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "bezel" },
+          { "id": "polish", "tool": "loupe", "finding": "The case bevels are gone, polished round; the lug holes look smaller than they should.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "lugs" }
+        ]
+      }
+    ],
+    "demandTags": ["watches", "luxury"],
+    "claims": [
+      "Bought it in Switzerland. Well, at the airport. Well, near the airport.",
+      "A Rolland. You know what these cost new? Don't even look it up.",
+      "My boss gave it to me instead of a bonus. Now I need the bonus.",
+      "It's the diver's model. It went to the bottom of the Volga and back."
+    ],
+    "model": {
+      "placeholder": "watch",
+      "color": "#c9ccd0",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        { "id": "dial", "label": "Dial", "position": [0, 0.007, 0.0065] },
+        { "id": "bezel", "label": "Bezel", "position": [0, 0.019, 0.0068] },
+        { "id": "crown", "label": "Crown", "position": [0.0225, 0, 0] },
+        { "id": "caseback", "label": "Caseback", "position": [0, 0, -0.0065] },
+        { "id": "lugs", "label": "Between the lugs", "position": [0, 0.0215, 0] }
+      ]
+    }
+  }
+]

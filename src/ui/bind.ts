@@ -24,6 +24,7 @@ import { InspectScreen, type HotspotView } from './screens/inspect'
 import { IntroScreen } from './screens/intro'
 import { LedgerScreen } from './screens/ledger'
 import { NewsScreen } from './screens/news'
+import { OfficeSheet } from './screens/office'
 import { OfferScreen } from './screens/offer'
 import { RedeemScreen } from './screens/redeem'
 import { SaleScreen } from './screens/sale'
@@ -72,6 +73,7 @@ export class Ui {
   private readonly sale: SaleScreen
   private readonly redeem: RedeemScreen
   private readonly settings: SettingsSheet
+  private readonly office: OfficeSheet
   private readonly screens: Record<ScreenId, { root: HTMLElement }>
   private current: ScreenId | null = null
   private lastLayout: UiLayout | null = null
@@ -90,7 +92,8 @@ export class Ui {
     this.counter = new CounterScreen(dispatch, openSettings, gear('counter'))
     this.inspect = new InspectScreen(dispatch)
     this.offer = new OfferScreen(dispatch)
-    this.ledger = new LedgerScreen(dispatch, openSettings, gear('ledger'))
+    this.office = new OfficeSheet({ getState: () => deps.store.get(), dispatch })
+    this.ledger = new LedgerScreen(dispatch, openSettings, gear('ledger'), () => this.office.open())
     this.welcome = new WelcomeScreen(dispatch, openSettings, gear('welcome'))
     this.intro = new IntroScreen(dispatch)
     this.news = new NewsScreen(dispatch)
@@ -120,6 +123,7 @@ export class Ui {
     }
     mount.appendChild(this.hud.root)
     mount.appendChild(this.settings.root)
+    mount.appendChild(this.office.root)
 
     const build = el('div', 'build-number', `${__BUILD_SHA__} · ${__BUILD_DATE__}`)
     build.dataset.id = 'build'
@@ -168,6 +172,10 @@ export class Ui {
         break
     }
     if (this.settings.isOpen) this.settings.render(state)
+    if (this.office.isOpen) {
+      if (id === 'ledger') this.office.render(state)
+      else this.office.close()
+    }
     if (prev === null || screenFor(prev) !== id) this.onScreenChange?.(id)
   }
 
@@ -213,6 +221,10 @@ export class Ui {
         return true
       }
       return false
+    }
+    if (this.office.isOpen) {
+      if (k === 'Escape') this.office.close()
+      return k === 'Escape'
     }
     const s = this.deps.store
     switch (this.current) {

@@ -50,6 +50,7 @@
       "I need the bus fare home. Truly."
     ],
     "model": {
+      "glb": "coin_poltinnik_1924.glb",
       "placeholder": "coin",
       "color": "#cfd0cc",
       "scale": 1.07,
@@ -125,6 +126,7 @@
       "For coins like this people on the internet pay crazy money."
     ],
     "model": {
+      "glb": "coin_rouble_1877.glb",
       "placeholder": "coin",
       "color": "#d2d2cd",
       "scale": 1.43,
@@ -191,6 +193,7 @@
       "A wedding present. The marriage did not last, the coin did."
     ],
     "model": {
+      "glb": "coin_chervonets_sower.glb",
       "placeholder": "coin",
       "color": "#d9ae4f",
       "scale": 0.9,
@@ -254,6 +257,7 @@
       "Silver, almost an ounce. I looked up the silver price this morning."
     ],
     "model": {
+      "glb": "coin_olympiad_10r.glb",
       "placeholder": "coin",
       "color": "#d8d8d4",
       "scale": 1.56,

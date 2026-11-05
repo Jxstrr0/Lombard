@@ -10,3 +10,4 @@ bake/out/*
 !bake/out/preview.jpg
 !bake/out/preview-wide.jpg
 __pycache__/
+art/out/

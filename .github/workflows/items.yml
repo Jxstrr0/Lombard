@@ -1,0 +1,132 @@
+name: items
+
+# Scripted item models (docs/04-ASSETS.md § Items): headless Blender builds every
+# item def whose kind has a builder in art/items/kinds/, scripts/items-pack.mjs
+# packs them (Draco + KTX2) into public/assets/items/, and the result is
+# committed back to the branch, then deploy.yml is dispatched for it.
+#
+# From the GitHub app: Actions → items → Run workflow → Run.
+# Also runs when a push to main changes the builders. Models are normally
+# built and committed with the change itself; this keeps main reproducible.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'art/items/**'
+      - 'scripts/items-pack.mjs'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: items-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Same pin as bake.yml (and the same cache).
+  BLENDER_VERSION: '4.5.15'
+  BLENDER_SERIES: '4.5'
+
+jobs:
+  items:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Inputs
+        id: plan
+        run: |
+          hash=$(find art/items -name '*.py' | sort | xargs cat src/data/items/*.json scripts/items-pack.mjs | sha256sum | cut -c1-16)
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+          echo "inputs $hash"
+
+      - name: Cache Blender
+        id: blender-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/blender
+          key: blender-${{ env.BLENDER_VERSION }}-linux-x64
+
+      - name: Download Blender ${{ env.BLENDER_VERSION }}
+        if: steps.blender-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/blender
+          curl -fsSL --retry 3 "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+            | tar -xJ -C ~/blender --strip-components=1
+
+      - name: Blender system libraries
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends libxi6 libxxf86vm1 libxfixes3 libxrender1 libxkbcommon0 libsm6 libice6 libgl1 libegl1 libx11-6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: npm ci
+        run: npm ci
+
+      - name: Build models
+        run: ~/blender/blender --background --factory-startup --python art/items/build.py -- --strict
+
+      - name: Pack (Draco + KTX2)
+        run: node scripts/items-pack.mjs
+
+      - name: Check the defs still match the packed files
+        run: npx vitest run tests/itemModels.test.ts
+
+      - name: Upload models
+        uses: actions/upload-artifact@v7
+        with:
+          name: items
+          path: |
+            art/out/items/*.json
+            public/assets/items/
+          retention-days: 14
+
+      - name: Commit the models
+        id: commit
+        env:
+          HASH: ${{ steps.plan.outputs.hash }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # Same approach as bake.yml: commit onto the branch as it is now, and
+          # never over newer builder or item-def changes.
+          out=$(mktemp -d)
+          cp -r public/assets/items "$out/items"
+          for i in 1 2 3 4; do
+            git fetch -q origin "$GITHUB_REF_NAME"
+            git reset -q --hard FETCH_HEAD
+            now=$(find art/items -name '*.py' | sort | xargs cat src/data/items/*.json scripts/items-pack.mjs | sha256sum | cut -c1-16)
+            if [ "$now" != "$HASH" ]; then
+              echo "::warning::The item builders or defs on $GITHUB_REF_NAME changed since this run started ($HASH → $now); not committing stale models. Run the workflow again."
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            rm -rf public/assets/items
+            cp -r "$out/items" public/assets/items
+            git add -A public/assets/items
+            if git diff --cached --quiet; then
+              echo "models unchanged, nothing to commit"
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git commit -q -m "M3: rebuild item models ($HASH)"
+            if git push -q origin "HEAD:$GITHUB_REF_NAME"; then
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep $((i * 5))
+          done
+          exit 1
+
+      - name: Deploy the new models
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref "$GITHUB_REF_NAME"

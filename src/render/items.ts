@@ -24,6 +24,7 @@
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import type { ItemDef } from '../game/schema/item'
+import type { GlbLoader } from './loaders'
 
 export type PlaceholderKind = ItemDef['model']['placeholder']
 
@@ -126,24 +127,51 @@ export function disposeObject(root: THREE.Object3D): void {
  * Cache of built models keyed by defId. Keeps the most recent few so going
  * back and forth between counter and inspect never rebuilds; older models are
  * disposed (docs/02-ARCHITECTURE.md § Rendering: dispose after > 2 scene changes).
+ *
+ * A def with `model.glb` (a scripted model from art/items, packed into
+ * public/assets/items) shows its placeholder at once and swaps the glb in when
+ * it has loaded; `onSwap` listeners hear about it so the stage can refit. The
+ * placeholder stays behind, hidden, as a cheap stand-in for raycasts (see `proxyOf`).
  */
 export class ItemModels {
   private cache = new Map<string, THREE.Group>()
+  private readonly listeners = new Set<(defId: string) => void>()
 
-  constructor(private readonly keep = 3) {}
+  constructor(
+    private readonly keep = 3,
+    private readonly loadGlb?: GlbLoader,
+  ) {}
 
-  get(defId: string, spec: ModelSpec): THREE.Group {
-    let model = this.cache.get(defId)
+  get(def: ItemDef): THREE.Group {
+    let model = this.cache.get(def.id)
     if (model) {
       // refresh LRU order
-      this.cache.delete(defId)
-      this.cache.set(defId, model)
+      this.cache.delete(def.id)
+      this.cache.set(def.id, model)
       return model
     }
-    model = buildPlaceholder(spec)
-    this.cache.set(defId, model)
+    model = buildPlaceholder(specOf(def))
+    this.cache.set(def.id, model)
     this.evict()
+    const file = def.model.glb
+    if (file && this.loadGlb) {
+      const target = model
+      this.loadGlb(file)
+        .then((scene) => {
+          if (this.cache.get(def.id) !== target) {
+            disposeObject(scene)
+            return
+          }
+          swapInGlb(target, scene)
+          for (const l of this.listeners) l(def.id)
+        })
+        .catch((err: unknown) => console.warn(`[items] ${file} failed, keeping the placeholder`, err))
+    }
     return model
+  }
+
+  onSwap(fn: (defId: string) => void): void {
+    this.listeners.add(fn)
   }
 
   private evict(): void {
@@ -161,7 +189,29 @@ export class ItemModels {
       disposeObject(m)
     }
     this.cache.clear()
+    this.listeners.clear()
   }
+}
+
+/**
+ * Put a loaded glb scene inside a placeholder group (which carries `model.scale`).
+ * The placeholder meshes move into a hidden `proxy` child: raycasters ignore
+ * visibility, so hotspot occlusion tests keep using a few hundred triangles
+ * instead of the glb's tens of thousands.
+ */
+export function swapInGlb(model: THREE.Group, scene: THREE.Group): void {
+  const proxy = new THREE.Group()
+  proxy.name = 'proxy'
+  proxy.visible = false
+  for (const c of [...model.children]) proxy.add(c)
+  scene.name = 'glb'
+  model.add(proxy, scene)
+  model.userData.glb = true
+}
+
+/** What to raycast against for occlusion: the hidden placeholder if a glb took its place. */
+export function proxyOf(model: THREE.Object3D): THREE.Object3D {
+  return model.getObjectByName('proxy') ?? model
 }
 
 // --- materials ------------------------------------------------------------------

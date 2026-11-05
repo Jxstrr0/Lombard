@@ -1,15 +1,24 @@
 /**
- * Dev view (`?gallery=1`): every item def's placeholder model under the
+ * Dev view (`?gallery=1`): every item def's model (its scripted glb where it
+ * has one, else the placeholder; `&noglb=1` forces placeholders) under the
  * inspect lighting, front and back, with its hotspots as small pink beads,
- * for self-review in `npm run shots`.
+ * for self-review in `npm run shots`. `&item=<id>` shows one item large, which
+ * is how a scripted model is reviewed on a phone.
  * Not reachable from the game UI.
  */
 import * as THREE from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 import { ITEM_DEFS } from '../data/items'
-import { buildPlaceholder, specOf } from './items'
+import { buildPlaceholder, specOf, swapInGlb } from './items'
+import type { GlbLoader } from './loaders'
 
-export async function runGallery(renderer: THREE.WebGLRenderer, envUrl: string, onReady: () => void): Promise<void> {
+export async function runGallery(
+  renderer: THREE.WebGLRenderer,
+  envUrl: string,
+  loadGlb: GlbLoader | undefined,
+  onReady: () => void,
+  only?: string,
+): Promise<void> {
   const scene = new THREE.Scene()
   scene.background = new THREE.Color('#141413')
   try {
@@ -30,13 +39,31 @@ export async function runGallery(renderer: THREE.WebGLRenderer, envUrl: string, 
   scene.add(key, rim)
 
   // Grid: three items per row, each shown from the front and from the back.
-  const cols = 6
-  const rows = Math.ceil((ITEM_DEFS.length * 2) / cols)
+  // `&item=<id>` shows just that one, large (stacked on a portrait screen).
+  const defs = only ? ITEM_DEFS.filter((d) => d.id === only) : ITEM_DEFS
+  if (defs.length === 0) console.warn('[gallery] no item def', only)
+  const cols = only ? (window.innerWidth < window.innerHeight ? 1 : 2) : 6
+  const rows = Math.max(1, Math.ceil((defs.length * 2) / cols))
   const beadMat = new THREE.MeshBasicMaterial({ color: '#ff3d9a' })
-  ITEM_DEFS.forEach((def, i) => {
+  const glbs = new Map<string, THREE.Group | null>()
+  await Promise.all(
+    defs.map(async (def) => {
+      const file = def.model.glb
+      if (!file || !loadGlb) return
+      try {
+        glbs.set(def.id, await loadGlb(file))
+      } catch (err) {
+        console.warn('[gallery] glb failed', file, err)
+      }
+    }),
+  )
+  defs.forEach((def, i) => {
     for (const back of [false, true]) {
       const m = buildPlaceholder(specOf(def))
-      const size = new THREE.Box3().setFromObject(m).getSize(new THREE.Vector3())
+      const glb = glbs.get(def.id)
+      if (glb) swapInGlb(m, back ? glb.clone() : glb)
+      m.updateMatrixWorld(true)
+      const size = new THREE.Box3().setFromObject(m.getObjectByName('glb') ?? m).getSize(new THREE.Vector3())
       const k = 0.42 / Math.max(size.x, size.y, size.z)
       for (const h of def.model.hotspots) {
         const bead = new THREE.Mesh(new THREE.SphereGeometry(0.012 / k, 8, 6), beadMat)

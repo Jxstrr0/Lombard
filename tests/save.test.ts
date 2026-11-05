@@ -1,3 +1,4 @@
+import { startedState } from './helpers'
 import { deflateSync, strToU8 } from 'fflate'
 import { describe, expect, it } from 'vitest'
 import { tuning } from '../src/data/tuning'
@@ -80,7 +81,7 @@ function playDay(s0: GameState, p: Policy, boughtSoFar: { n: number }): GameStat
 }
 
 function playCareer(days: number, p: Policy, seed = 2024): { state: GameState; bought: number } {
-  let s = createInitialState(seed, 'career-test')
+  let s = startedState(seed, 'career-test')
   const bought = { n: 0 }
   for (let d = 0; d < days; d++) s = playDay(s, p, bought)
   return { state: s, bought: bought.n }
@@ -346,7 +347,7 @@ describe('migrations', () => {
 
   it('upgrades an M0 save to the current shape with sensible defaults', () => {
     const s = migrate(v1())
-    expect(s.meta).toEqual({ version: CURRENT_VERSION, seed: 123, careerId: 'old-career', rng: 987654, nextId: 1 })
+    expect(s.meta).toEqual({ version: CURRENT_VERSION, seed: 123, careerId: 'old-career', rng: 987654, nextId: 1, intro: false })
     expect(s.calendar.day).toBe(4)
     expect(s.cash).toBe(61_500)
     expect(s.current).toBeNull()
@@ -355,7 +356,7 @@ describe('migrations', () => {
     expect(s.queue).toEqual([])
     expect(s.paid).toEqual({})
     expect(s.history).toEqual([])
-    expect(s.day).toEqual({ phase: 'closed', clock: 0, served: 0, total: 0, openingCash: 61_500, log: [] })
+    expect(s.day).toEqual({ phase: 'closed', clock: 0, served: 0, total: 0, openingCash: 61_500, log: [], newsRead: true })
     expect(s.stats).toEqual({ ...createInitialState(1, 'x').stats, customersSeen: 17 })
     expect(s.settings).toEqual({ reduceMotion: true, textScale: 1.25 })
     expect(s.reputation.general).toBe(3)
@@ -417,5 +418,32 @@ describe('migrations', () => {
       expect(e).toBeInstanceOf(SaveFormatError)
       expect((e as SaveFormatError).kind).toBe('future')
     }
+  })
+})
+
+describe('v2 → v3 (M2)', () => {
+  it('an M1 mid-career save gains M2 defaults and keeps playing', () => {
+    // Build a v2-shaped record by stripping the M2 fields from a played state.
+    let s = startedState(77, 'm1-career')
+    s = reducer(s, { type: 'day/open' })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- deliberately untyped old-shape record
+    const raw = JSON.parse(JSON.stringify(s)) as Record<string, any>
+    raw.meta.version = 2
+    delete raw.meta.intro
+    raw.shop = { slots: [], upgrades: [], security: 0 }
+    delete raw.specialists
+    delete raw.market
+    delete raw.day.newsRead
+    for (const v of raw.queue) {
+      delete v.kind
+      delete v.wants
+    }
+    const m = migrate(raw)
+    expect(m.meta.intro).toBe(false)
+    expect(m.shop.name).toBe('Lombard No. 7')
+    expect(m.shop.slots.length).toBeGreaterThan(0)
+    expect(m.queue.every((v) => v.kind === 'seller' && v.wants === 'sell')).toBe(true)
+    const next = reducer(m, { type: 'counter/next' })
+    expect(next.current?.kind).toBe('seller')
   })
 })

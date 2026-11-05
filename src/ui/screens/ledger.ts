@@ -18,6 +18,9 @@ const KIND_LABEL: Record<LedgerEntry['kind'], string> = {
   walkout: 'LEFT',
   pass: 'PASS',
   expense: 'EXP',
+  loan: 'LOAN',
+  redeem: 'REDEEM',
+  forfeit: 'KEPT',
 }
 
 

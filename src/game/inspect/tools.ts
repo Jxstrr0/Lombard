@@ -43,6 +43,16 @@ export interface UseToolInput {
   /** How many times this tool was already used on this visit. */
   uses: number
   rng: Rng
+  /** M2: shop context for reference, acid and specialist tools (from inspect/available.ts toolExtras). */
+  extras?: ToolExtras
+}
+
+/** Shop context some tools need (owner: economy worker; extend as needed). */
+export interface ToolExtras {
+  /** Reference book tier owned (0 = none). */
+  refTier: number
+  /** Retained specialist covering this item's category, if any. */
+  specialist?: { id: string; relationship: number }
 }
 
 export interface UseToolResult {

@@ -6,6 +6,9 @@ export const tuning = {
   career: {
     startingCash: 80_000,
     startDate: '2014-03-03',
+    defaultShopName: 'Lombard No. 7',
+    /** Longest shop name the name-your-shop screen accepts. */
+    shopNameMaxLength: 24,
   },
 
   day: {
@@ -189,6 +192,36 @@ export const tuning = {
   },
 
   economy: {},
+
+  /** M2 display (owner: shop worker). Slot counts per GDD § 6. */
+  shop: {
+    slots: { counter: 6, wall: 12, back: 20 },
+  },
+
+  /** M2 walk-in buyers and the sale haggle (owner: shop worker). */
+  sell: {
+    /** Buyer's opening offer as a share of your tag. */
+    openFactor: 0.8,
+    maxRounds: 3,
+  },
+
+  /** M2 pawn loans (owner: loans worker). */
+  loans: {
+    /** Loan amount a pawner hopes for, as a share of what they'd ask to sell. */
+    askFactor: 0.6,
+    termDays: 30,
+    /** Interest per 30 days (GDD: ~10%/month). */
+    monthlyRate: 0.1,
+  },
+
+  /** M2 rent, bills, upgrades, specialists (owner: economy worker). */
+  expenses: {},
+  upgrades: {},
+  specialists: {},
+
+  /** M2 seasonal demand, market drift, news, career-start stock (owner: content worker). */
+  demand: {},
+  start: {},
 
   save: {
     /** Day summaries kept in full; older days are folded into career stats. */

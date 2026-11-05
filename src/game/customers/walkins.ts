@@ -35,7 +35,7 @@ export function generateDayQueue(rng: Rng, count: number, nextId: (prefix: strin
     const item = generateItem(def, rng, nextId('i'))
     // People further back in the line have waited less when you reach them; give them more patience.
     const patience = Math.round(rng.range(pMin, pMax) + i * 25)
-    queue.push({ visitId: nextId('v'), customer, item, patience })
+    queue.push({ visitId: nextId('v'), kind: 'seller', wants: 'sell', customer, item, patience })
   }
   return queue
 }

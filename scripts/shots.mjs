@@ -63,6 +63,24 @@ function helpers(page, name) {
       shots.push(`${file}  ${what}`)
     },
     state: () => page.evaluate(() => window.__lombardState?.()),
+    /** Career-start intro, if showing: optional shot, then Begin with the default name. */
+    async begin(shotIt = false) {
+      await page.waitForFunction(() => ['intro', 'welcome', 'ledger', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) !== 'intro') return
+      await page.waitForTimeout(250)
+      if (shotIt) await api.shot('intro', 'career start: name your shop')
+      await api.click('intro-begin')
+    },
+    /** Open the shop and read past the morning paper if there is one. */
+    async open(shotIt = false) {
+      await api.click('open-shop')
+      await page.waitForFunction(() => ['news', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) === 'news') {
+        await page.waitForTimeout(250)
+        if (shotIt) await api.shot('news', 'morning paper at day open')
+        await api.click('news-done')
+      }
+    },
     shots,
   }
   return api
@@ -105,9 +123,10 @@ async function haggleOn(h) {
 }
 
 async function playPortrait(page, h) {
+  await h.begin(true)
   await h.screen('welcome')
   await h.shot('welcome', 'first launch: welcome card, Open shop')
-  await h.click('open-shop')
+  await h.open(true)
   await h.screen('counter')
   await h.shot('counter-open', 'shop open, nobody at the counter, Next customer')
   await h.click('next-customer')
@@ -246,15 +265,16 @@ async function playPortrait(page, h) {
   await h.click('settings-ledger')
   await h.click('text-100')
   await h.click('settings-close')
-  await h.click('open-shop')
+  await h.open()
   await h.screen('counter')
   await h.shot('day2', 'day 2 opened')
 }
 
 async function playShort(page, h) {
+  await h.begin()
   await h.screen('welcome')
   await h.shot('welcome', 'welcome card')
-  await h.click('open-shop')
+  await h.open()
   await h.screen('counter')
   await h.click('next-customer')
   await page.waitForTimeout(900)
@@ -346,7 +366,8 @@ async function main() {
     {
       const { context, page } = await newPage(browser, PORTRAIT, '?seed=1&perf=1')
       const h = helpers(page, 'perf')
-      await h.click('open-shop')
+      await h.begin()
+      await h.open()
       await h.click('next-customer')
       await page.waitForTimeout(1200)
       const counter = await page.locator('.perf-info').textContent()

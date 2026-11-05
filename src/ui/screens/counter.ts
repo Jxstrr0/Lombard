@@ -14,6 +14,9 @@ type Primary = 'counter/next' | 'day/close' | 'counter/inspect' | 'counter/dismi
 
 const OUTCOME: Record<VisitOutcome, string> = {
   bought: 'Bought',
+  pawned: 'Pawned',
+  sold: 'Sold',
+  redeemed: 'Redeemed',
   passed: 'Passed',
   walked: 'Walked out',
   left: 'Left',

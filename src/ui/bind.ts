@@ -3,10 +3,14 @@
  * each screen render itself. Screens read state and dispatch actions; they
  * never mutate state.
  *
+ *   career intro pending   → intro
  *   day closed, no history → welcome
  *   day closed             → ledger
+ *   today's paper unread   → news
  *   visit phase inspect    → inspect
  *   visit phase offer      → offer
+ *   buyer at the counter   → sale (until resolved)
+ *   pawner redeeming       → redeem (until resolved)
  *   otherwise              → counter (incl. the resolved outcome + Next)
  */
 import type { Action } from '../game/actions'
@@ -17,18 +21,26 @@ import { createButton, el } from './components/button'
 import { Hud } from './components/hud'
 import { CounterScreen } from './screens/counter'
 import { InspectScreen, type HotspotView } from './screens/inspect'
+import { IntroScreen } from './screens/intro'
 import { LedgerScreen } from './screens/ledger'
+import { NewsScreen } from './screens/news'
 import { OfferScreen } from './screens/offer'
+import { RedeemScreen } from './screens/redeem'
+import { SaleScreen } from './screens/sale'
 import { SettingsSheet } from './screens/settings'
 import { WelcomeScreen } from './screens/welcome'
 
-export type ScreenId = 'welcome' | 'counter' | 'inspect' | 'offer' | 'ledger'
+export type ScreenId = 'intro' | 'welcome' | 'news' | 'counter' | 'inspect' | 'offer' | 'sale' | 'redeem' | 'ledger'
 
 export function screenFor(state: GameState): ScreenId {
+  if (state.meta.intro) return 'intro'
   if (state.day.phase === 'closed') return state.history.length > 0 ? 'ledger' : 'welcome'
-  const phase = state.current?.phase
-  if (phase === 'inspect') return 'inspect'
-  if (phase === 'offer') return 'offer'
+  if (!state.day.newsRead) return 'news'
+  const c = state.current
+  if (c?.phase === 'inspect') return 'inspect'
+  if (c?.phase === 'offer') return 'offer'
+  if (c?.phase === 'present' && c.kind === 'buyer') return 'sale'
+  if (c?.phase === 'present' && c.kind === 'redeem') return 'redeem'
   return 'counter'
 }
 
@@ -55,6 +67,10 @@ export class Ui {
   private readonly offer: OfferScreen
   private readonly ledger: LedgerScreen
   private readonly welcome: WelcomeScreen
+  private readonly intro: IntroScreen
+  private readonly news: NewsScreen
+  private readonly sale: SaleScreen
+  private readonly redeem: RedeemScreen
   private readonly settings: SettingsSheet
   private readonly screens: Record<ScreenId, { root: HTMLElement }>
   private current: ScreenId | null = null
@@ -76,6 +92,10 @@ export class Ui {
     this.offer = new OfferScreen(dispatch)
     this.ledger = new LedgerScreen(dispatch, openSettings, gear('ledger'))
     this.welcome = new WelcomeScreen(dispatch, openSettings, gear('welcome'))
+    this.intro = new IntroScreen(dispatch)
+    this.news = new NewsScreen(dispatch)
+    this.sale = new SaleScreen(dispatch)
+    this.redeem = new RedeemScreen(dispatch)
     this.settings = new SettingsSheet({
       getState: () => deps.store.get(),
       dispatch,
@@ -89,6 +109,10 @@ export class Ui {
       offer: this.offer,
       ledger: this.ledger,
       welcome: this.welcome,
+      intro: this.intro,
+      news: this.news,
+      sale: this.sale,
+      redeem: this.redeem,
     }
     for (const s of Object.values(this.screens)) {
       s.root.hidden = true
@@ -112,7 +136,7 @@ export class Ui {
       this.current = id
       document.body.dataset.screen = id
     }
-    this.hud.root.hidden = id === 'welcome' || id === 'ledger'
+    this.hud.root.hidden = id === 'welcome' || id === 'ledger' || id === 'intro' || id === 'news'
     this.hud.render(state)
     switch (id) {
       case 'counter':
@@ -130,6 +154,18 @@ export class Ui {
       case 'welcome':
         this.welcome.render(state)
         break
+      case 'intro':
+        this.intro.render(state)
+        break
+      case 'news':
+        this.news.render(state)
+        break
+      case 'sale':
+        this.sale.render(state)
+        break
+      case 'redeem':
+        this.redeem.render(state)
+        break
     }
     if (this.settings.isOpen) this.settings.render(state)
     if (prev === null || screenFor(prev) !== id) this.onScreenChange?.(id)
@@ -145,8 +181,9 @@ export class Ui {
     const h = window.innerHeight
     const w = window.innerWidth
     let counterBottom = this.lastLayout?.counterBottom ?? h * 0.33
-    if (this.current === 'counter') {
-      const r = this.counter.strip.getBoundingClientRect()
+    const strip = this.current === 'counter' ? this.counter.strip : this.current === 'sale' ? this.sale.strip : this.current === 'redeem' ? this.redeem.strip : null
+    if (strip) {
+      const r = strip.getBoundingClientRect()
       if (r.height > 0) counterBottom = w > h && w >= 700 ? 0 : h - r.top
     } else if (this.current === 'offer') {
       const r = this.offer.root.querySelector('.offer-bubble')!.getBoundingClientRect()
@@ -196,6 +233,6 @@ export class Ui {
 
   /** Elements whose size changes should re-frame the camera. */
   observed(): HTMLElement[] {
-    return [this.counter.strip, this.inspect.panel, this.inspect.header, this.offer.panel, this.mount]
+    return [this.counter.strip, this.sale.strip, this.redeem.strip, this.inspect.panel, this.inspect.header, this.offer.panel, this.mount]
   }
 }

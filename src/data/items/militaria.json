@@ -61,6 +61,7 @@
       "A man at the flea market said you'd give a fair price. I hope he was right."
     ],
     "model": {
+      "glb": "medal_for_courage.glb",
       "placeholder": "medal",
       "color": "#c9c9c6",
       "scale": 1,
@@ -126,6 +127,7 @@
       "I don't want to sell it. I just need a bit of money until the end of the month."
     ],
     "model": {
+      "glb": "medal_combat_merit.glb",
       "placeholder": "medal",
       "color": "#c4c4c0",
       "scale": 1,
@@ -203,6 +205,7 @@
       "Bought it at the flea market in the nineties. I always knew it was worth something."
     ],
     "model": {
+      "glb": "order_red_star.glb",
       "placeholder": "order",
       "color": "#b3222a",
       "scale": 1,
@@ -267,6 +270,7 @@
       "Found it in a box of buttons at the dacha."
     ],
     "model": {
+      "glb": "medal_victory_germany.glb",
       "placeholder": "medal",
       "color": "#c39a5b",
       "scale": 1,
@@ -336,6 +340,7 @@
       "I need it for a costume. No, I mean I need the money for a costume."
     ],
     "model": {
+      "glb": "badge_guards.glb",
       "placeholder": "badge",
       "color": "#c6a14a",
       "scale": 1,

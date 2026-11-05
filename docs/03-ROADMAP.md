@@ -2,7 +2,7 @@
 
 Work one milestone at a time. Each has a definition of done. Update the status line as you go.
 
-## M0 — Skeleton (status: done Nov 5, 2026; awaiting Colby's phone check)
+## M0 — Skeleton (status: done Nov 5, 2026; phone check passed: 60 fps, occasional dips to 58–59)
 
 Goal: a page loads on a phone and shows the shop.
 
@@ -17,7 +17,7 @@ Goal: a page loads on a phone and shows the shop.
 
 Done when: deployed URL loads on a phone at 30+ fps with the perf overlay visible.
 
-## M1 — The counter loop, ugly (status: not started)
+## M1 — The counter loop, ugly (status: built; awaiting the 5-day phone playtest)
 
 Goal: play one day with placeholder art.
 

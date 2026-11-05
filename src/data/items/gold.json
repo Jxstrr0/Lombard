@@ -1,0 +1,258 @@
+[
+  {
+    "id": "gold_band_583",
+    "category": "gold",
+    "name": "583 gold wedding band",
+    "era": "1970s–1990s",
+    "baseValue": { "min": 10000, "max": 14000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 4.8, "tolerance": 0.4 },
+    "magnetic": false,
+    "rarity": 3,
+    "fakeChance": 0.25,
+    "tells": [
+      { "id": "hallmark", "tool": "loupe", "finding": "Inside the band: a crisp 583 stamp beside a star assay mark, the edges sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.25, "hotspot": "inner" },
+      { "id": "colour", "tool": "loupe", "finding": "Warm, slightly reddish gold. The scratches show the same colour as the surface.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35 },
+      { "id": "seam", "tool": "loupe", "finding": "A faint resizing seam at the bottom of the band, the same colour as the rest.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.5, "hotspot": "shank" },
+      { "id": "heft", "tool": "scale", "finding": "It settles into the pan with a dense little clink.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_seam", "tool": "magnet", "finding": "Even the resizing seam ignores the magnet. No steel pin in that repair.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "shank" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 2,
+        "weightFactor": 0.62,
+        "tells": [
+          { "id": "hallmark", "tool": "loupe", "finding": "Inside the band: a 583 stamp, but the digits are soft and shallow, as if cast rather than struck.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "inner" },
+          { "id": "colour", "tool": "loupe", "finding": "Where the band is worn thin, a paler, brassy yellow shows through.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45 },
+          { "id": "tarnish", "tool": "loupe", "finding": "A faint greenish tarnish sits in the crease inside the band.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "inner" },
+          { "id": "heft", "tool": "scale", "finding": "It barely settles the pan. Light for a band this wide.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "plated_steel",
+        "kind": "fake",
+        "valueMultiplier": 0.02,
+        "weight": 1,
+        "weightFactor": 0.6,
+        "magnetic": true,
+        "tells": [
+          { "id": "hallmark", "tool": "loupe", "finding": "The 583 inside is etched flat and perfectly even, with no assay mark beside it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "inner" },
+          { "id": "colour", "tool": "loupe", "finding": "Too yellow and too even, like paint. A grey edge peeks out of a deep scratch.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5 },
+          { "id": "heft", "tool": "scale", "finding": "Light in the pan for a band this wide.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "magnet_seam", "tool": "magnet", "finding": "The whole band follows the magnet across the counter, seam and all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1, "hotspot": "shank" }
+        ]
+      }
+    ],
+    "demandTags": ["gold"],
+    "claims": [
+      "It was my mother's wedding ring. I don't wear it anymore.",
+      "Real gold, 583, Soviet. You can see the stamp.",
+      "We got divorced in the spring. I don't want it in the house.",
+      "Found it in the sofa when we moved. Nobody's asking for it back."
+    ],
+    "model": {
+      "placeholder": "ring",
+      "color": "#d4a64a",
+      "scale": 1,
+      "inspectDistance": 0.08,
+      "hotspots": [
+        { "id": "inner", "label": "Inside of band", "position": [0, 0.0085, 0] },
+        { "id": "shank", "label": "Bottom of band", "position": [0, -0.01, 0] }
+      ]
+    }
+  },
+  {
+    "id": "gold_signet_583",
+    "category": "gold",
+    "name": "583 gold signet ring",
+    "era": "1960s–1980s",
+    "baseValue": { "min": 15000, "max": 21000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 7.6, "tolerance": 0.6 },
+    "magnetic": false,
+    "rarity": 1.5,
+    "fakeChance": 0.3,
+    "tells": [
+      { "id": "hallmark", "tool": "loupe", "finding": "Inside the shank: a struck 583 and a star assay mark, slightly worn but clear.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.25, "hotspot": "inner" },
+      { "id": "face", "tool": "loupe", "finding": "The initials on the face are hand-cut: the depth of each line wavers a little.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "face" },
+      { "id": "colour", "tool": "loupe", "finding": "Even reddish gold all over, deep scratches on the face included.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4 },
+      { "id": "heft", "tool": "scale", "finding": "Heavy for its size. It lands in the pan with a dull knock.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_face", "tool": "magnet", "finding": "Held flat against the face, the magnet finds nothing to grip.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "face" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 2,
+        "weightFactor": 0.63,
+        "tells": [
+          { "id": "hallmark", "tool": "loupe", "finding": "A 583 stamp inside, but the digits are soft and blobby, and there is no assay mark.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "inner" },
+          { "id": "face", "tool": "loupe", "finding": "The initials are crisp but shallow, every line the same depth, like a pressing.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "face" },
+          { "id": "colour", "tool": "loupe", "finding": "On the edges of the face the colour has worn through to a pale brassy yellow.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45 },
+          { "id": "heft", "tool": "scale", "finding": "Light for a signet this chunky. It barely knocks the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "gilded_silver",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "weightFactor": 0.78,
+        "tells": [
+          { "id": "hallmark", "tool": "loupe", "finding": "Under the 583 inside, a second, older stamp shows faintly: 875.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "inner" },
+          { "id": "colour", "tool": "loupe", "finding": "Where the gilding has rubbed off the edges, the metal underneath is whitish grey.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55 },
+          { "id": "heft", "tool": "scale", "finding": "A bit light for a signet this chunky.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 }
+        ]
+      }
+    ],
+    "demandTags": ["gold"],
+    "claims": [
+      "My grandfather's signet. Those are his initials on it.",
+      "Heavy, isn't it? Solid gold, they don't make them like that now.",
+      "A friend gave it to me to settle a debt. I'd rather have the money.",
+      "I wore it for twenty years. My fingers got too fat for it."
+    ],
+    "model": {
+      "placeholder": "signet",
+      "color": "#cf9c45",
+      "scale": 1,
+      "inspectDistance": 0.08,
+      "hotspots": [
+        { "id": "face", "label": "Signet face", "position": [0, 0.0118, 0] },
+        { "id": "inner", "label": "Inside of shank", "position": [0, -0.0085, 0] }
+      ]
+    }
+  },
+  {
+    "id": "gold_rope_chain_585",
+    "category": "gold",
+    "name": "585 gold rope chain",
+    "era": "1990s–2000s",
+    "baseValue": { "min": 20000, "max": 28000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 10.5, "tolerance": 0.8 },
+    "magnetic": false,
+    "rarity": 2,
+    "fakeChance": 0.3,
+    "tells": [
+      { "id": "clasp_stamp", "tool": "loupe", "finding": "The clasp tag is stamped 585 with a clear assay mark, struck deep.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "clasp" },
+      { "id": "links", "tool": "loupe", "finding": "The twisted links are tight and even; the solder joints are invisible.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "links" },
+      { "id": "colour", "tool": "loupe", "finding": "The same warm gold from the clasp to the far end, even down in the crevices.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4 },
+      { "id": "heft", "tool": "scale", "finding": "It pools in the pan like a heavy little rope.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_clasp", "tool": "magnet", "finding": "The clasp spring gives the faintest tug; the chain itself ignores the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "clasp" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 2,
+        "weightFactor": 0.64,
+        "tells": [
+          { "id": "clasp_stamp", "tool": "loupe", "finding": "The clasp says 585, but the stamp is shallow and the 8 is filled in.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "clasp" },
+          { "id": "links", "tool": "loupe", "finding": "The links are uneven, and a few crevices hold dark, greenish grime.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "links" },
+          { "id": "colour", "tool": "loupe", "finding": "Where the chain rubs the neck, the gold is gone and pale yellow metal shows.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5 },
+          { "id": "heft", "tool": "scale", "finding": "It rattles into the pan, light as a shoelace.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "clasp_swap",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "weightFactor": 0.7,
+        "tells": [
+          { "id": "links", "tool": "loupe", "finding": "Near the clasp, a fresh solder joint in a slightly different shade of gold.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "links" },
+          { "id": "colour", "tool": "loupe", "finding": "The clasp end is warm reddish gold; the far end of the chain looks yellower and flatter.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55 },
+          { "id": "heft", "tool": "scale", "finding": "Light for a rope this thick, though the clasp alone feels right.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 }
+        ]
+      }
+    ],
+    "demandTags": ["gold"],
+    "claims": [
+      "Bought it in Turkey on holiday. 585, the man swore on his mother.",
+      "My husband's. He won't be needing it where he's gone. The north, I mean. For work.",
+      "I need it gone by Friday. Rent.",
+      "It's been in a drawer since the nineties. Still shines, look."
+    ],
+    "model": {
+      "placeholder": "chain",
+      "color": "#c9973f",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        { "id": "clasp", "label": "Clasp", "position": [0, -0.025, 0] },
+        { "id": "links", "label": "Links", "position": [0, 0.025, 0] }
+      ]
+    }
+  },
+  {
+    "id": "gold_earrings_583",
+    "category": "gold",
+    "name": "583 gold drop earrings (pair)",
+    "era": "1980s",
+    "baseValue": { "min": 8500, "max": 12500 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 4.4, "tolerance": 0.4 },
+    "magnetic": false,
+    "rarity": 2,
+    "fakeChance": 0.25,
+    "tells": [
+      { "id": "lock_stamp", "tool": "loupe", "finding": "The left lock carries a tiny struck 583 and a star mark, clean and sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "lock_left" },
+      { "id": "lock_right", "tool": "loupe", "finding": "The right lock is stamped 583 too, the same tiny star beside it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "lock_right" },
+      { "id": "stones", "tool": "loupe", "finding": "The clear stones are clean and bright, each held by four even prongs.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "stones" },
+      { "id": "colour", "tool": "loupe", "finding": "The same soft reddish gold on both, in the scratches too.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4 },
+      { "id": "heft", "tool": "scale", "finding": "Weighed one at a time, the two come out the same.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_locks", "tool": "magnet", "finding": "The lock springs give a faint tick toward the magnet; the drops hang still.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "lock_left" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 2,
+        "weightFactor": 0.62,
+        "tells": [
+          { "id": "lock_stamp", "tool": "loupe", "finding": "The locks say 583, but the stamp is cast into the metal, soft-edged and shallow.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "lock_left" },
+          { "id": "stones", "tool": "loupe", "finding": "The stones are cloudy, and there is a smear of glue at the base of the prongs.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "stones" },
+          { "id": "colour", "tool": "loupe", "finding": "The hooks are worn to a pale brassy yellow where they pass through the ear.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5 },
+          { "id": "heft", "tool": "scale", "finding": "Light. The pair barely moves the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "mismatched_pair",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "weightFactor": 0.8,
+        "tells": [
+          { "id": "lock_right", "tool": "loupe", "finding": "The right lock has no stamp at all, and its hinge is shaped differently from the left.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "lock_right" },
+          { "id": "colour", "tool": "loupe", "finding": "Side by side, the right earring is a shade yellower than the left.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55 },
+          { "id": "heft", "tool": "scale", "finding": "Weighed one at a time, the right earring is noticeably lighter.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 }
+        ]
+      }
+    ],
+    "demandTags": ["gold"],
+    "claims": [
+      "My daughter's. She lost one and her friend made her a copy. No, wait, that's another pair.",
+      "From my first husband. The earrings were the best part of him.",
+      "Gold with diamonds, I think. Or something like diamonds.",
+      "Mama never took them off. I can't bear to look at them now."
+    ],
+    "model": {
+      "placeholder": "earrings",
+      "color": "#d6a94e",
+      "scale": 1,
+      "inspectDistance": 0.1,
+      "hotspots": [
+        { "id": "lock_left", "label": "Left lock", "position": [-0.009, 0.012, 0] },
+        { "id": "lock_right", "label": "Right lock", "position": [0.009, 0.012, 0] },
+        { "id": "stones", "label": "Stones", "position": [-0.009, -0.008, 0.002] }
+      ]
+    }
+  }
+]

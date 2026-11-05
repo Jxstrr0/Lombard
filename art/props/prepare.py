@@ -32,7 +32,8 @@ OUT = ROOT / "bake" / "props"
 
 # id: Poly Haven asset; tris: decimation budget; tex: base colour size in px;
 # keep / drop: regexes searched in the object names to keep (multi-object
-# assets; default all) or to leave out; scale: fix a model's size.
+# assets; default all) or to leave out; scale: fix a model's size; densify:
+# longest edge in metres, for big flat faces (lighting is baked per vertex).
 PROPS: dict[str, dict] = {
     # counter and behind it
     "cash_register": {"src": "CashRegister_01", "tris": 6000, "tex": 512},
@@ -80,11 +81,11 @@ PROPS: dict[str, dict] = {
     "chess_set": {"src": "chess_set", "tris": 4000, "tex": 512},
     "tea_set": {"src": "tea_set_01", "tris": 1500, "tex": 512, "keep": ["teapot"]},
     # clutter wave 2: counter, walls, ceiling
-    "notepads": {"src": "office_notepads", "tris": 700, "tex": 256, "keep": ["yellow_pad"]},
+    "notepads": {"src": "office_notepads", "tris": 700, "tex": 256, "keep": ["yellow_pad"], "densify": 0.06},
     "stapler": {"src": "vintage_stapler", "tris": 1000, "tex": 128},
     "pen_cup": {"src": "stationery_supplies", "tris": 1500, "tex": 256, "keep": ["pencilcup"]},
-    "painting": {"src": "hanging_picture_frame_02", "tris": 1000, "tex": 512},
-    "old_painting": {"src": "fancy_picture_frame_01", "tris": 1000, "tex": 512},
+    "painting": {"src": "hanging_picture_frame_02", "tris": 1000, "tex": 512, "densify": 0.06},
+    "old_painting": {"src": "fancy_picture_frame_01", "tris": 1000, "tex": 512, "densify": 0.06},
     "ceiling_fan": {"src": "ceiling_fan", "tris": 2500, "tex": 256},
     # clutter wave 2: storeroom
     "binder": {"src": "binder_notebook", "tris": 1500, "tex": 256, "keep": ["_closed$"]},
@@ -169,6 +170,22 @@ def simplify_material(mat: bpy.types.Material, prop_id: str, idx: int, tex_px: i
     mat["kind"] = "baked"
 
 
+def densify(me: bpy.types.Mesh, max_len: float) -> None:
+    """Subdivide (UVs interpolated) the faces that are big in both directions
+    (shortest edge over max_len metres) until none is; thin faces are left."""
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    for _ in range(6):
+        big = [f for f in bm.faces if min(e.calc_length() for e in f.edges) > max_len]
+        long = list({e for f in big for e in f.edges})
+        if not long:
+            break
+        bmesh.ops.subdivide_edges(bm, edges=long, cuts=1, use_grid_fill=True)
+        bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 3])
+    bm.to_mesh(me)
+    bm.free()
+
+
 def prepare(prop_id: str, spec: dict, cache: Path, tmp: Path) -> None:
     reset()
     gltf = fetch(spec["src"], cache)
@@ -203,6 +220,9 @@ def prepare(prop_id: str, spec: dict, cache: Path, tmp: Path) -> None:
         me.uv_layers.remove(me.uv_layers[-1])
     if me.uv_layers:
         me.uv_layers[0].name = "uv0"
+    # no vertex colours: the bake adds the one the game reads (baked lighting)
+    for attr in list(me.color_attributes):
+        me.color_attributes.remove(attr)
     if spec.get("scale"):
         me.transform(Matrix.Scale(spec["scale"], 4))
     # origin at the bottom centre
@@ -232,6 +252,10 @@ def prepare(prop_id: str, spec: dict, cache: Path, tmp: Path) -> None:
         bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.material_index in glass], context="FACES")
         bm.to_mesh(me)
         bm.free()
+    # big flat faces (a canvas, a pad of paper) get their lighting from their
+    # corners only (the bake is per vertex), so split edges longer than this
+    if spec.get("densify"):
+        densify(me, spec["densify"])
     # drop unused material slots, simplify the rest
     used = {p.material_index for p in me.polygons}
     for i in sorted(range(len(me.materials)), reverse=True):

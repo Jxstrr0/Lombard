@@ -1,0 +1,140 @@
+name: bake
+
+# Headless Blender lightmap bake for the shop (docs/04-ASSETS.md § Bake pipeline).
+#
+# From the GitHub app: Actions → bake → Run workflow → pick quality → Run.
+# Also runs (preview quality) when a push changes the bake inputs; it skips
+# itself if the committed bake already matches those inputs.
+#
+# Output (public/assets/shop/*, bake/out/preview*.jpg) is committed back to the
+# branch it ran on, then deploy.yml is dispatched for that branch (a push made
+# with the workflow token doesn't trigger workflows by itself). On main that
+# publishes to GitHub Pages; elsewhere it only runs the checks.
+on:
+  workflow_dispatch:
+    inputs:
+      quality:
+        description: 'preview = 512 px lightmap, a few minutes; full = 2048 px, ~10–40 min'
+        type: choice
+        options: [preview, full]
+        default: preview
+  push:
+    paths:
+      - 'bake/**'
+      - '!bake/out/**'
+      - 'scripts/bake-pack.mjs'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: bake-${{ github.ref }}
+  # Queue, never cancel: a later push must not kill a running full bake.
+  cancel-in-progress: false
+
+env:
+  # Pinned on purpose; bump deliberately (docs/04-ASSETS.md), never "latest".
+  BLENDER_VERSION: '4.5.15'
+  BLENDER_SERIES: '4.5'
+
+jobs:
+  bake:
+    # Standard runner only: larger runners are always billed.
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Decide whether to bake
+        id: plan
+        run: |
+          hash=$(cat bake/layout.json bake/materials.py bake/bake.py scripts/bake-pack.mjs | sha256sum | cut -c1-16)
+          quality='${{ inputs.quality }}'
+          quality=${quality:-preview}
+          current=$(jq -r '.inputHash // ""' public/assets/shop/shop.json 2>/dev/null || true)
+          run=true
+          if [ '${{ github.event_name }}' = 'push' ] && [ "$current" = "$hash" ]; then run=false; fi
+          echo "hash=$hash" >> "$GITHUB_OUTPUT"
+          echo "quality=$quality" >> "$GITHUB_OUTPUT"
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+          echo "inputs $hash, committed bake ${current:-none}, quality $quality, bake: $run"
+
+      - name: Cache Blender
+        if: steps.plan.outputs.run == 'true'
+        id: blender-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/blender
+          key: blender-${{ env.BLENDER_VERSION }}-linux-x64
+
+      - name: Download Blender ${{ env.BLENDER_VERSION }}
+        if: steps.plan.outputs.run == 'true' && steps.blender-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/blender
+          curl -fsSL --retry 3 "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+            | tar -xJ -C ~/blender --strip-components=1
+
+      - name: Blender system libraries
+        if: steps.plan.outputs.run == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends libxi6 libxxf86vm1 libxfixes3 libxrender1 libxkbcommon0 libsm6 libice6 libgl1 libegl1 libx11-6
+
+      - uses: actions/setup-node@v7
+        if: steps.plan.outputs.run == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: npm ci
+        if: steps.plan.outputs.run == 'true'
+        run: npm ci
+
+      - name: Bake (${{ steps.plan.outputs.quality }})
+        if: steps.plan.outputs.run == 'true'
+        env:
+          BAKE_INPUT_HASH: ${{ steps.plan.outputs.hash }}
+        run: ~/blender/blender --background --factory-startup --python bake/bake.py -- --quality ${{ steps.plan.outputs.quality }}
+
+      - name: Pack (Draco + KTX2)
+        if: steps.plan.outputs.run == 'true'
+        run: node scripts/bake-pack.mjs
+
+      - name: Upload bake output
+        if: steps.plan.outputs.run == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: bake-${{ steps.plan.outputs.quality }}
+          path: |
+            bake/out/
+            public/assets/shop/
+          retention-days: 14
+
+      - name: Commit the bake
+        if: steps.plan.outputs.run == 'true'
+        id: commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/assets/shop bake/out/preview.jpg bake/out/preview-wide.jpg
+          if git diff --cached --quiet; then
+            echo "bake unchanged, nothing to commit"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "M3: bake shop lighting (${{ steps.plan.outputs.quality }}, ${{ steps.plan.outputs.hash }})"
+          for i in 1 2 3 4; do
+            if git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME"; then
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep $((i * 5))
+          done
+          exit 1
+
+      - name: Deploy the new bake
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref "$GITHUB_REF_NAME"

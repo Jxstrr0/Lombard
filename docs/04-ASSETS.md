@@ -37,36 +37,46 @@ Built in Blender (free) by script, never by hand, exported to `shop.glb`:
 
 **Fallback only** (if the bake pipeline hits a wall): kitbash from CC0 props plus Poly Haven textures on primitives, lit by a strong HDRI and contact-shadow decals. About 70% as good. Do not switch to this without asking Colby.
 
-## Bake pipeline (decided Nov 2026)
+## Bake pipeline (decided Nov 2026, built in M3 task 1)
 
 Everything runs headless; no one opens the Blender UI.
 
-1. `bake/layout.json` describes the room: dimensions, wall/floor/ceiling materials, every prop (source glb, position, rotation, scale, jitter allowance), and the light rig (window sun + sky, ceiling pendants, counter lamp, with color temperature and strength).
-2. `bake/bake.py` (run as `blender --background --python bake/bake.py -- --quality preview|full`):
-   - builds the room and imports props per the layout, applying seeded jitter so placement isn't grid-perfect;
-   - assigns materials (`bake/materials.py`);
-   - joins static meshes by material where sensible, creates a second UV set with Lightmap Pack (no overlaps, margin set for the target resolution);
-   - bakes Cycles diffuse lighting (direct + indirect, no color) to that UV set and denoises;
-   - exports `shop.glb` (with both UV sets) and `shop_lightmap.png`;
-   - renders a preview image from the counter camera to `bake/out/preview.png` for review.
-3. `gltf-transform` compresses the glb (Draco) and converts the lightmap to KTX2.
-4. `.github/workflows/bake.yml`:
-   - triggers: `workflow_dispatch` with `quality` input (preview default), and push to `bake/**`;
-   - downloads a pinned Blender LTS Linux build and caches it with `actions/cache`;
-   - runs the bake on the standard `ubuntu-latest` runner (never a larger runner; those are always billed);
-   - commits `public/assets/shop/*` and the preview image back to `main`, which triggers `deploy.yml`.
+**Run it from a phone:** GitHub app → repo → Actions → **bake** → Run workflow → quality `preview` (default) or `full` → Run. A preview takes ~5 minutes including the Blender download on a cold cache; the result is committed and deployed automatically, and the build number in the game's corner then ends in `bake preview <commit>` (or `bake full …`). The two Cycles renders from the player's eye land in `bake/out/preview.jpg` (portrait) and `bake/out/preview-wide.jpg`; open them in the repo to judge layout and mood. Add `?nobake=1` to the game URL to see the old procedural grey box for comparison.
+
+1. `bake/layout.json` describes the room in three.js coordinates (metres, y up): room size, every object (box / cylinder / cone / sphere / torus for the grey box, glb props later) with position, rotation, material, optional `repeat` and seeded `jitter`, plus the light rig (ceiling pendants, counter lamp, overcast sky through window and door portals), and the two preview cameras.
+2. `bake/materials.py` is the single source for static materials: colour, roughness, metalness, and a `kind`:
+   - `baked`: diffuse, gets the lightmap; drawn as `MeshBasicMaterial` + lightmap at runtime so the two real-time lights (there for the item and the customer) don't light the room twice;
+   - `dynamic`: metals; not in the lightmap, lit at runtime by the env map and the two lights (they still cast shadows in the bake);
+   - `glass` and `unlit`: hidden during the bake, drawn transparent / flat at runtime.
+   `kind` and an optional procedural `runtime` texture id travel to the game as glTF material extras.
+3. `bake/bake.py` (`blender --background --factory-startup --python bake/bake.py -- --quality preview|full`):
+   - generates all geometry straight into four meshes, one per kind (so the shop costs about one draw call per material: ~30 instead of ~70–100 for the old grey box), applying the seeded jitter and culling faces nobody can see;
+   - uv0 = world-metre box projection (tiling textures), uv1 = Smart UV Project + pack with a margin for the target resolution;
+   - bakes Cycles diffuse lighting (direct + indirect, no colour) to uv1, denoises it with OpenImageDenoise, and stores it as an 8-bit sRGB PNG divided by `lightmapScale` (written to the manifest; the game multiplies back);
+   - exports `bake/out/shop_raw.glb` with both UV sets and renders the two previews (AgX, exposure matched to the game's ACES).
+4. `scripts/bake-pack.mjs` (glTF Transform + `ktx2-encoder`, both npm packages, no system tools): Draco-compresses the glb, converts the lightmap to KTX2 (UASTC + RDO + Zstd, mipmaps), and writes `public/assets/shop/{shop.glb, shop_lightmap.ktx2, shop.json}`. Preview bake: 60 KB + 180 KB.
+5. `.github/workflows/bake.yml`:
+   - triggers: `workflow_dispatch` with `quality` (preview default), and pushes that change `bake/**` or the pack script (preview; skipped if the committed `shop.json` already has the same input hash);
+   - downloads the pinned Blender LTS Linux build and caches it with `actions/cache`;
+   - runs on the standard `ubuntu-latest` runner (never a larger runner; those are always billed);
+   - commits `public/assets/shop/*` and the preview images back to the branch it ran on, then dispatches `deploy.yml` for that branch (a push made with the workflow token doesn't trigger workflows itself). `deploy.yml` publishes only from `main`; on other branches it just runs the checks.
+   - Runs on the same branch queue rather than cancel, so a push never kills a full bake in progress.
+6. Runtime (`src/render/bakedShop.ts`): loads `shop.json`, then the glb (Draco decoder) and the lightmap (Basis transcoder; both copied from three into `public/assets/decoders/` by `npm run dev`/`build`), builds the materials per kind, and replaces the grey box. If there's no bake, the grey box stays.
+
+Local run (for whoever has Blender; CI doesn't need this): `blender --background --factory-startup --python bake/bake.py -- --quality preview` then `npm run bake:pack`.
 
 Quality presets:
 
-| Preset | Lightmap | Samples | Expected runtime | Use |
+| Preset | Lightmap | Samples | Runtime on the Actions runner (4 vCPU) | Use |
 |---|---|---|---|---|
-| preview | 512 | low, denoised | a few minutes | layout and mood iteration |
-| full | 2048 (4096 optional desktop tier) | high, denoised | ~10–40 min | shipping |
+| preview | 512 | 96, denoised | ~30 s bake + ~2 min previews | layout and mood iteration |
+| full | 2048 (4096 optional desktop tier) | 768, denoised | ~10–40 min (estimate) | shipping |
 
 Rules:
-- Pin the Blender version in the workflow; bump it deliberately, never `latest`.
-- A layout change requires a rebake. Lock layout early in M3.
+- Pin the Blender version in the workflow (`BLENDER_VERSION`, currently 4.5.15 LTS); bump it deliberately, never `latest`.
+- A layout change requires a rebake (the push trigger does a preview automatically). Lock layout early in M3.
 - Moving props (items on the counter, customers) are not in the bake; they're lit by the env map and counter lamp at runtime.
+- Keep `bake/layout.json` anchors in step with `src/render/scene.ts` (counter top 0.94 m, mat at z −2.13, lamp light, eye at z −3.2).
 
 ## Items
 

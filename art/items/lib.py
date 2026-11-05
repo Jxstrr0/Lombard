@@ -460,7 +460,15 @@ def text(
 ) -> bpy.types.Object:
     """Raised lettering in the XY plane at `pos`, reading upright when seen from `facing`
     (+1 = from +Z, the front; -1 = from -Z, the back). Returns a mesh object.
-    The back faces of the letters are dropped unless `base` (they sit on the surface)."""
+    The back faces of the letters are dropped unless `base` (they sit on the surface).
+
+    Blender fills a text curve even-odd, and many of Inter's glyphs are drawn with
+    contours that cross themselves (e, R, A, K, N, И, Я, Ж …), so that fill punches
+    holes where strokes overlap. Unbevelled text is therefore filled by
+    `_text_filled` (end of this file): crossing contours are cut into simple loops
+    and each outer loop is filled with only its own counters as holes."""
+    if bevel <= 0:
+        return _text_filled(name, body, size, depth, mat, pos=pos, rot_z=rot_z, facing=facing, align=align, valign=valign, font_name=font_name, bold=bold, spacing=spacing, base=base)
     cu = bpy.data.curves.new(name, "FONT")
     cu.body = body
     cu.font = font(font_name)
@@ -772,3 +780,207 @@ def export_glb(path: Path) -> None:
         export_apply=True,
         export_draco_mesh_compression_enable=False,
     )
+
+
+# ---------------------------------------------------------------------------
+# Text filled without even-odd holes (used by `text`; ported from the militaria
+# builders' kinds/_award.py)
+
+
+def _text_filled(
+    name: str,
+    body: str,
+    size: float,
+    depth: float,
+    mat: bpy.types.Material | None,
+    *,
+    pos: Vec3,
+    rot_z: float,
+    facing: int,
+    align: str,
+    valign: str,
+    font_name: str,
+    bold: float,
+    spacing: float,
+    base: bool,
+) -> bpy.types.Object:
+    """`text` with every glyph contour filled solid (same placement rules)."""
+    loops = _glyph_loops(body, size, bold=bold, spacing=spacing, align=align, valign=valign, font_name=font_name)
+    bm = bmesh.new()
+    if loops:
+        main = max(loops, key=lambda l: abs(_loop_area(l)))
+        outer_sign = 1 if _loop_area(main) > 0 else -1
+        outers = [l for l in loops if _loop_area(l) * outer_sign > 0]
+        holes = [l for l in loops if _loop_area(l) * outer_sign < 0]
+        # a counter lies wholly inside one outer contour; a reversed contour that
+        # doesn't (an overlapping stroke drawn the other way round) is filled too
+        owned = []
+        for h in holes:
+            probe = h[:: max(1, len(h) // 16)]
+            owners = [o for o in outers if all(_inside_loop(q, o) for q in probe)]
+            if owners:
+                owned.append((h, min(owners, key=lambda o: abs(_loop_area(o)))))
+            else:
+                outers.append(h[::-1])
+        groups: dict[int, list] = {id(o): [] for o in outers}
+        for h, o in owned:
+            groups[id(o)].append(h)
+        for o in outers:
+            # each outer piece its own (jittered) height: overlapping pieces never share a top
+            _text_solid(bm, o, groups[id(o)], abs(jitter(depth)), base)
+    for f in bm.faces:
+        f.smooth = False
+    out = mesh_object(name, bm, mat)
+    m = Matrix.Translation(Vector(pos)) @ Matrix.Rotation(rot_z if facing > 0 else -rot_z, 4, "Z") @ Matrix.Rotation(math.pi if facing < 0 else 0.0, 4, "Y")
+    out.data.transform(m)
+    return out
+
+
+def _glyph_loops(body: str, size: float, *, bold: float, spacing: float, align: str, valign: str, font_name: str) -> list[list[tuple[float, float]]]:
+    """The text's outline as simple closed loops (text-local XY), emboldened by `bold`."""
+    cu = bpy.data.curves.new("glyphs", "FONT")
+    cu.body = body
+    cu.font = font(font_name)
+    cu.size = size
+    cu.align_x = align
+    cu.align_y = valign
+    cu.space_character = spacing
+    cu.resolution_u = 3
+    cu.fill_mode = "NONE"
+    ob = bpy.data.objects.new("glyphs", cu)
+    bpy.context.scene.collection.objects.link(ob)
+    dg = bpy.context.evaluated_depsgraph_get()
+    me = bpy.data.meshes.new_from_object(ob.evaluated_get(dg), depsgraph=dg)
+    bpy.data.objects.remove(ob)
+    bpy.data.curves.remove(cu)
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    bpy.data.meshes.remove(me)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=size * 1e-5)
+    loops, seen = [], set()
+    for v0 in bm.verts:
+        if v0.index in seen or len(v0.link_edges) != 2:
+            continue
+        loop, prev, v = [], None, v0
+        while True:
+            seen.add(v.index)
+            loop.append((v.co.x, v.co.y))
+            nxt = [e.other_vert(v) for e in v.link_edges if e.other_vert(v) is not prev]
+            if not nxt or len(v.link_edges) != 2:
+                break
+            prev, v = v, nxt[0]
+            if v is v0:
+                break
+        clean: list = []  # drop near-duplicate points (zero-length edges make the offset spike)
+        for q in loop:
+            if not clean or math.dist(q, clean[-1]) > size * 0.004:
+                clean.append(q)
+        if len(clean) > 1 and math.dist(clean[0], clean[-1]) <= size * 0.004:
+            clean.pop()
+        if len(clean) >= 3:
+            loops.append(clean)
+    bm.free()
+    loops = [q for l in loops for q in _split_simple(l) if abs(_loop_area(q)) > size * size * 1e-5]
+    b = bold * size * 0.02  # embolden: outer contours grow, counters shrink
+    if b and loops:
+        main = max(loops, key=lambda l: abs(_loop_area(l)))
+        sign = 1 if _loop_area(main) > 0 else -1
+        out = []
+        for l in loops:
+            d = -b if _loop_area(l) * sign > 0 else b
+            out += [q for q in _split_simple(_offset_loop(l, d)) if _loop_area(q) * _loop_area(l) > 0 and abs(_loop_area(q)) > size * size * 1e-5]
+        loops = out
+    return loops
+
+
+def _seg_cross(a, b, c, d):
+    """Intersection point of segments ab and cd if they properly cross, else None."""
+    r = (b[0] - a[0], b[1] - a[1])
+    q = (d[0] - c[0], d[1] - c[1])
+    den = r[0] * q[1] - r[1] * q[0]
+    if abs(den) < 1e-30:
+        return None
+    t = ((c[0] - a[0]) * q[1] - (c[1] - a[1]) * q[0]) / den
+    u = ((c[0] - a[0]) * r[1] - (c[1] - a[1]) * r[0]) / den
+    if 1e-9 < t < 1 - 1e-9 and 1e-9 < u < 1 - 1e-9:
+        return (a[0] + t * r[0], a[1] + t * r[1])
+    return None
+
+
+def _split_simple(pts, depth: int = 0) -> list:
+    """Cut a self-crossing loop at its crossings into simple loops."""
+    n = len(pts)
+    if depth < 24:
+        for i in range(n):
+            a, b = pts[i], pts[(i + 1) % n]
+            for j in range(i + 2, n):
+                if i == 0 and j == n - 1:
+                    continue
+                x = _seg_cross(a, b, pts[j], pts[(j + 1) % n])
+                if x is not None:
+                    one = pts[: i + 1] + [x] + pts[j + 1 :]
+                    two = [x] + pts[i + 1 : j + 1]
+                    return [q for part in (one, two) if len(part) >= 3 for q in _split_simple(part, depth + 1)]
+    return [pts]
+
+
+def _loop_area(pts) -> float:
+    return sum(pts[i][0] * pts[(i + 1) % len(pts)][1] - pts[(i + 1) % len(pts)][0] * pts[i][1] for i in range(len(pts))) / 2
+
+
+def _inside_loop(p, poly) -> bool:
+    x, y = p
+    c = False
+    n = len(poly)
+    for i in range(n):
+        x1, y1 = poly[i]
+        x2, y2 = poly[(i + 1) % n]
+        if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1 + 1e-30) + x1:
+            c = not c
+    return c
+
+
+def _offset_loop(pts, d: float) -> list[tuple[float, float]]:
+    """Move every edge of a simple polygon inwards by `d` (mitred corners, clamped)."""
+    pts = list(pts)
+    n = len(pts)
+    sgn = 1 if _loop_area(pts) > 0 else -1
+    out = []
+    for i in range(n):
+        p0, p1, p2 = Vector(pts[i - 1]), Vector(pts[i]), Vector(pts[(i + 1) % n])
+        e1 = (p1 - p0).normalized()
+        e2 = (p2 - p1).normalized()
+        n1 = Vector((-e1.y, e1.x)) * sgn
+        n2 = Vector((-e2.y, e2.x)) * sgn
+        k = 1 + n1.dot(n2)
+        off = (n1 + n2) * (d / k) if k > 1e-6 else n1 * d
+        if off.length > 2.5 * abs(d):
+            off = off.normalized() * 2.5 * abs(d)
+        v = p1 + off
+        out.append((v.x, v.y))
+    return out
+
+
+def _text_solid(bm: bmesh.types.BMesh, outer, holes, dz: float, base: bool) -> None:
+    """One outer loop with its counters as a prism from z = 0 to dz (text-local)."""
+    rings = []
+    for k, loop in enumerate([outer] + holes):
+        pts = list(loop)
+        if (k == 0) != (_loop_area(pts) > 0):  # outer anticlockwise, counters clockwise
+            pts.reverse()
+        lo = [bm.verts.new((x, y, 0.0)) for x, y in pts]
+        hi = [bm.verts.new((x, y, dz)) for x, y in pts]
+        for i in range(len(pts)):
+            j = (i + 1) % len(pts)
+            bm.faces.new((lo[i], lo[j], hi[j], hi[i]))
+        rings.append((lo, hi))
+    for level, want in ((1, 1.0), (0, -1.0)):
+        if level == 0 and not base:
+            continue
+        edges = [bm.edges.get((r[level][i], r[level][(i + 1) % len(r[level])])) for r in rings for i in range(len(r[level]))]
+        res = bmesh.ops.triangle_fill(bm, use_beauty=True, use_dissolve=False, edges=edges)
+        for f in res["geom"]:
+            if isinstance(f, bmesh.types.BMFace):
+                f.normal_update()
+                if f.normal.z * want < 0:
+                    f.normal_flip()

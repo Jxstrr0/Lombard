@@ -95,11 +95,17 @@ export async function runGallery(
     camera.position.set(0, 0, Math.max(gridH / 2 / t, gridW / 2 / (t * camera.aspect)) * 1.04)
     camera.updateProjectionMatrix()
   }
+  // A still scene: render on demand. With every glb in view a frame is slow in
+  // software GL (the shots browser), and a running loop starves the screenshot.
+  const render = () => renderer.render(scene, camera)
   resize()
-  window.addEventListener('resize', resize)
-  let frames = 0
-  renderer.setAnimationLoop(() => {
-    renderer.render(scene, camera)
-    if (++frames === 3) onReady()
+  render()
+  window.addEventListener('resize', () => {
+    resize()
+    render()
+  })
+  requestAnimationFrame(() => {
+    render()
+    onReady()
   })
 }

@@ -52,6 +52,7 @@
       "My cousin brought it from Moscow. Still had the film on the screen."
     ],
     "model": {
+      "glb": "phone_mangosteen_m5.glb",
       "placeholder": "phone",
       "color": "#2b2b2e",
       "scale": 1,
@@ -118,6 +119,7 @@
       "A Mangosteen. They hold their value, everyone says so."
     ],
     "model": {
+      "glb": "phone_mangosteen_m4s.glb",
       "placeholder": "phone",
       "color": "#e8e8e6",
       "scale": 1,
@@ -182,6 +184,7 @@
       "Practically new. I kept it in the box most of the time."
     ],
     "model": {
+      "glb": "phone_galaxia_stella4.glb",
       "placeholder": "phone",
       "color": "#2a3550",
       "scale": 1,
@@ -246,6 +249,7 @@
       "A colleague owed me money and gave me this instead. I'd rather have the money."
     ],
     "model": {
+      "glb": "phone_galaxia_nota3.glb",
       "placeholder": "phone",
       "color": "#e9e6df",
       "scale": 1,
@@ -309,6 +313,7 @@
       "Indestructible. I dropped it in the canal once, and it rang."
     ],
     "model": {
+      "glb": "phone_severin_k1.glb",
       "placeholder": "phone",
       "color": "#3a3a3a",
       "scale": 0.85,

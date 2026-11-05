@@ -52,6 +52,7 @@
       "A collector in Moscow offered me a fortune. I said no. Now I'm saying yes, to you."
     ],
     "model": {
+      "glb": "watch_pobeda_gold.glb",
       "placeholder": "watch",
       "color": "#c8a04c",
       "scale": 1,
@@ -116,6 +117,7 @@
       "Got it at the flea market by the bridge. The man said it's the special one."
     ],
     "model": {
+      "glb": "watch_vostok_komandirskie.glb",
       "placeholder": "watch",
       "color": "#a9adb1",
       "scale": 1,
@@ -199,6 +201,7 @@
       "It's the diver's model. It went to the bottom of the Volga and back."
     ],
     "model": {
+      "glb": "watch_rolland_abyssal.glb",
       "placeholder": "watch",
       "color": "#c9ccd0",
       "scale": 1,
@@ -274,6 +277,7 @@
       "It's been in my desk since the factory closed. Time someone used it."
     ],
     "model": {
+      "glb": "watch_poljot_strela.glb",
       "placeholder": "watch",
       "color": "#b9bcbf",
       "scale": 1,
@@ -350,6 +354,7 @@
       "It is the diver model. Waterproof to two hundred metres. I tested it in the bath."
     ],
     "model": {
+      "glb": "watch_omeca_aquastar.glb",
       "placeholder": "watch",
       "color": "#c3c7cb",
       "scale": 1,
@@ -420,6 +425,7 @@
       "It comes with papers. I left them at home. I can bring them tomorrow."
     ],
     "model": {
+      "glb": "watch_brequet_classique.glb",
       "placeholder": "watch",
       "color": "#d7b264",
       "scale": 1,

@@ -3,6 +3,7 @@ import { archetypes, firstNames } from '../../data/customers/walkins'
 import { ITEM_DEFS } from '../../data/items'
 import { tuning } from '../../data/tuning'
 import { generateItem, pickItemDef } from '../items/generate'
+import { pawnChance, pawnOpeningLine } from '../loans/loans'
 import type { Rng } from '../rng'
 import type { QueuedVisit, Temperament, WalkIn } from '../types'
 
@@ -35,7 +36,14 @@ export function generateDayQueue(rng: Rng, count: number, nextId: (prefix: strin
     const item = generateItem(def, rng, nextId('i'))
     // People further back in the line have waited less when you reach them; give them more patience.
     const patience = Math.round(rng.range(pMin, pMax) + i * 25)
-    queue.push({ visitId: nextId('v'), kind: 'seller', wants: 'sell', customer, item, patience })
+    const visitId = nextId('v')
+    // Sell or pawn from a forked stream, so loans don't reshuffle the rest of the day.
+    const pawnRng = rng.fork(`pawn:${visitId}`)
+    if (pawnRng.chance(pawnChance(customer, item))) {
+      queue.push({ visitId, kind: 'seller', wants: 'pawn', customer, item, patience, line: pawnOpeningLine(customer, item, pawnRng) })
+    } else {
+      queue.push({ visitId, kind: 'seller', wants: 'sell', customer, item, patience })
+    }
   }
   return queue
 }

@@ -9,6 +9,7 @@ import type { LedgerEntry } from '../../game/types'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
 import { itemNameOf, longDate, rub, signedRub, WEEKDAYS } from '../format'
 import { icons } from '../icons'
+import { LedgerLoans } from './ledgerLoans'
 
 export const SHOP_NAME = 'Lombard No. 7'
 
@@ -32,6 +33,7 @@ export class LedgerScreen {
   private log: HTMLElement
   private stock: HTMLElement
   private open: HTMLButtonElement
+  private loans = new LedgerLoans()
   private key = ''
 
   constructor(
@@ -61,6 +63,8 @@ export class LedgerScreen {
       this.summary,
       el('h3', 'receipt-h', 'Today'),
       this.log,
+      el('h3', 'receipt-h', 'Pawn loans'),
+      this.loans.root,
       el('h3', 'receipt-h', 'In stock'),
       this.stock,
       el('div', 'receipt-foot', 'Thank you · Спасибо'),
@@ -78,6 +82,7 @@ export class LedgerScreen {
 
   render(state: GameState): void {
     setButtonLabel(this.open, `Open shop — Day ${state.calendar.day}`, 'door')
+    this.loans.render(state)
     const last = state.history[state.history.length - 1]
     const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last])
     if (key === this.key) return

@@ -189,6 +189,36 @@ html {
   pointer-events: none;
 }
 
+/* One-time hint over the 3D view (counter, nobody at the counter yet). */
+.look-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 38%;
+  margin: 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: rgba(250, 249, 245, 0.72);
+  text-shadow: 0 1px 3px rgba(20, 20, 19, 0.8);
+  pointer-events: none;
+  animation: look-hint-in 600ms ease 400ms both;
+}
+
+@keyframes look-hint-in {
+  from {
+    opacity: 0;
+  }
+}
+
+#scene canvas {
+  cursor: grab;
+}
+
+#scene canvas.is-looking {
+  cursor: grabbing;
+}
+
 /* --- HUD ----------------------------------------------------------------- */
 
 .hud {

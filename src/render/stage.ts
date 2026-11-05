@@ -26,6 +26,8 @@ const ZOOM_MAX = 2.6
 const PITCH_LIMIT = 1.35
 const DEFAULT_YAW = -0.42
 const DEFAULT_PITCH = -0.22
+/** Finger-sized margin around the item's footprint for a counter tap, CSS px. */
+const TAP_SLOP_PX = 26
 
 export interface HotspotScreen {
   id: string
@@ -237,6 +239,29 @@ export class ItemStage {
     this.shadow.visible = shadowK > 0.05
     ;(this.shadow.material as THREE.MeshBasicMaterial).opacity = 0.7 * shadowK
     this.shadow.position.z = counterPos.z
+  }
+
+  /**
+   * Did a tap at (x, y) CSS px land on the item resting on the mat? Uses the
+   * live camera, so it works from any head turn. Small items get a finger-sized
+   * margin around their projected footprint.
+   */
+  hitOnCounter(camera: THREE.Camera, x: number, y: number, width: number, height: number): boolean {
+    const model = this.model
+    if (!model || !this.pivot.visible || this.inspecting || this.exit) return false
+    this.pivot.updateMatrixWorld(true)
+    const centre = this.pivot.getWorldPosition(new THREE.Vector3())
+    // Behind the camera (head turned away): nothing to hit.
+    if (centre.clone().applyMatrix4(camera.matrixWorldInverse).z >= 0) return false
+    const toScreen = (v: THREE.Vector3) => {
+      const ndc = v.clone().project(camera)
+      return { x: ((ndc.x + 1) / 2) * width, y: ((1 - ndc.y) / 2) * height }
+    }
+    const c = toScreen(centre)
+    const camRight = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0)
+    const edge = toScreen(centre.clone().addScaledVector(camRight, (this.size * this.pivot.scale.x) / 2))
+    const radius = Math.hypot(edge.x - c.x, edge.y - c.y)
+    return Math.hypot(x - c.x, y - c.y) <= radius + TAP_SLOP_PX
   }
 
   /** Screen positions of the current item's hotspots (CSS px), with an occlusion test. */

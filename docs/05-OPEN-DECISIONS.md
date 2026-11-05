@@ -49,6 +49,7 @@
 | Nov 5, 2026 | **Day length: 10–12 real minutes** (Colby). A day is a fixed queue (8 walk-in sellers for now, plus buyers and redeemers), not a timer: the customer at the counter is always finished. `tuning.day.customersPerDay` stays 8 until Colby times a real day on the phone; then it and the shop clock's scale (`CLOCK_MINUTES_PER_SECOND` in `src/ui/format.ts`, which should read ~18:00 at closing) get tuned to the measurement. |
 | Nov 5, 2026 | **Surface textures (M3 dressing):** the room's big surfaces get CC0 ambientCG colour maps, recoloured to average each material's authored colour so the tuned palette and the bake's bounce light stay the same. Prepared once by `art/materials/prepare.py` and committed in `bake/textures/`; they ride inside `shop.glb` as KTX2. Only colour maps, since the shop is unlit plus lightmap. See 04-ASSETS § Surface textures. |
 | Nov 5, 2026 | **Props (M3 dressing):** 22 CC0 Poly Haven models (25 placed), vetted for real brands, prepared by `art/props/prepare.py` into committed `bake/props/*.glb`, placed from `bake/layout.json`. Their lighting is baked per vertex (a colour attribute) rather than into the room's lightmap, which can't hold their thousands of tiny UV islands. See 04-ASSETS § Props. |
+| Nov 5, 2026 | **Clutter (M3 dressing):** a second wave of 29 Poly Haven props (59 instances of 51 kinds in all) replaces the placeholder boxes on the shelves, in the cases and in the storeroom. Draw calls are about 106 of 150, so a prop texture atlas is held back for quality tiers. Big flat faces are subdivided (`densify`) because per-vertex lighting only sees corners. |
 
 ## Open, decide at the milestone listed
 
@@ -64,6 +65,7 @@ When an open item is decided, move it to the Decided table with the date.
 
 ## Parked (do not build without a decision)
 
+- Prop texture atlas (all prop base-colour maps in one texture, one material): cuts ~60 draw calls to 1 if the quality-tiers measurement asks for it.
 - Phone landscape: the dialogue strip covers most of the counter. Revisit in the M6 desktop/landscape layout pass.
 - Loan extensions/renewals (pay interest only), reputation effects of forfeits and lowballing pawners, regulars who re-pawn the same item (M4 Student's Laptop).
 - Selling state awards (militaria) is a legal grey area: a hook for the M5 crime layer. Militaria heirloom provenance needs `tuning.items.heirloomCategories`.

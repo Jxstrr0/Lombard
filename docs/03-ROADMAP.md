@@ -53,7 +53,7 @@ Done when: the simulator shows a careful policy growing ~15%/month and a careles
 - Dress the shop: CC0 props, Poly Haven / ambientCG materials, deliberate clutter and slight misalignment (scripted jitter) so it doesn't look procedurally tidy. Surface textures ✅ (ambientCG colour maps on the room's surfaces). Props ✅ first pass (22 Poly Haven models, lighting baked per vertex). Clutter ✅ (a second wave of 29 props replacing the placeholder boxes). Lighting pass next.
 - Lighting pass with Colby on preview bakes (warmth, window light, dark corners), then one full bake. Glass cases, shelves, lamp, window with a canal backdrop card.
 - First 30 items as real models, Draco + KTX2 pipeline. Decided Nov 5: scripted in Blender (`art/items/`), since CC0 sources had almost nothing usable. **Done:** all 30 defs have a scripted glb (coins #7, gold #8, watches #9, militaria #10, phones #11, cameras #12). Review any one on the phone with `?gallery=1&item=<id>`.
-- Customer representation decided (Plan A rigged models vs Plan B portrait cards) after a 1-day test of what CC0 humanoids look like in-scene on phone.
+- Customer representation decided (Plan A rigged models vs Plan B portrait cards) after a 1-day test of what CC0 humanoids look like in-scene on phone. ✅ Colby picked Plan A with Microsoft Rocketbox (Nov 5); a 25-person cast now plays the walk-ins.
 - Audio: ambience, door, counter, tools. ✅ 13 CC0 sounds from OpenGameArt (Kenney, rubberduck, laleksic, ignasd, randommind, LEGIT Audio) plus two generated tones, ~387 KB, plain WebAudio keyed to state changes, Sound on/off and an ambience level in Settings.
 - Quality tiers wired and measured on a real mid-range Android.
 

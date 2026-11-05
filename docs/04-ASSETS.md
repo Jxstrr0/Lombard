@@ -6,6 +6,7 @@ Goal: as realistic as free-and-open content allows, on a phone. The strategy is 
 
 - Preferred: CC0 (no attribution required, but we attribute anyway).
 - Acceptable: CC BY 4.0 (attribution required, in `ATTRIBUTION.md` and the in-game credits screen).
+- Accepted for one library: MIT for the Microsoft Rocketbox avatars and animations (Colby, Nov 5, 2026). Like CC BY, it needs attribution plus the licence notice, which `ATTRIBUTION.md` carries in full.
 - Not acceptable: CC BY-NC (we may sell this later), CC BY-SA (viral), anything "free for personal use", Sketchfab "Standard" license, anything scraped from games.
 - Every asset gets a line in `ATTRIBUTION.md`: name, author, source URL, license, what we changed.
 - When unsure of a license, do not use the asset. Ask.

@@ -16,7 +16,8 @@ import type { GameState } from '../game/state'
 import { loadCanalBackdrop, type CanalBackdrop } from './backdrop'
 import { loadBakedShop, type BakedShop, type ShopManifest } from './bakedShop'
 import { INSPECT_POINT } from './camera'
-import type { CustomerModel } from './customerModel'
+import { lookFor } from '../game/customers/look'
+import type { CustomerCast, CustomerModel } from './customerModel'
 import { canalBackdropTexture, contactShadowTexture, parquetTexture, plasterTexture } from './textures'
 
 const ROOM = { halfW: 3, halfD: 4, height: 4.2 }
@@ -48,10 +49,22 @@ export class ShopScene {
   private customer: THREE.Group
   private customerFade = 0
   private customerTarget = 0
-  /** Materials the customer fade drives (the silhouette's, or a test model's). */
+  /** Materials the customer fade drives (the silhouette's, or a cast model's). */
   private customerMats: THREE.Material[] = []
   private customerOpaque = false
   private customerMixer: THREE.AnimationMixer | null = null
+  /** Stand-in drawn when there's no cast, or a cast model fails to load. */
+  private silhouette!: THREE.Group
+  private silhouetteMats: THREE.Material[] = []
+  private cast: CustomerCast | null = null
+  private castOverride: string | null = null
+  private model: CustomerModel | null = null
+  /** Cast id the customer group shows now, the one the current customer needs, and the next in line. */
+  private shownLook: string | null = null
+  private wantLook: string | null = null
+  private nextLook: string | null = null
+  /** A loaded look waiting for the customer to be out of sight before it swaps in (model null = silhouette). */
+  private pending: { look: string; model: CustomerModel | null } | null = null
   private disposables: { dispose(): void }[] = []
   private lights!: LightRig
   /** Canvas card outside the window until the rendered canal backdrop loads (and if it doesn't). */
@@ -131,8 +144,66 @@ export class ShopScene {
   sync(state: GameState): void {
     this.backdropState = { clock: state.day.clock, reduceMotion: state.settings.reduceMotion }
     this.backdrop?.setState(state.day.clock, state.settings.reduceMotion)
-    // Dim the customer while inspecting so the silhouette doesn't fight the item.
+    // Dim the customer while inspecting so they don't fight the item.
     this.customerTarget = !state.current ? 0 : state.current.phase === 'inspect' ? INSPECT_CUSTOMER_OPACITY : 1
+    const look = state.current ? this.lookOf(state.current.customer) : null
+    if (look !== this.wantLook) {
+      this.wantLook = look
+      if (look) this.requestLook(look)
+    }
+    const next = state.queue[0]
+    this.nextLook = next ? this.lookOf(next.customer) : null
+    // Fetch the next person while this one talks.
+    if (this.cast && this.nextLook) this.cast.get(this.nextLook).catch(() => {})
+    this.cast?.retain([this.shownLook, this.wantLook, this.nextLook])
+  }
+
+  /** Play customers with the 3D cast (otherwise the silhouette stands in). `override`: everyone is that cast id. */
+  setCast(cast: CustomerCast, override: string | null = null): void {
+    this.cast = cast
+    this.castOverride = override
+  }
+
+  private lookOf(customer: Parameters<typeof lookFor>[0]): string | null {
+    return this.castOverride ?? lookFor(customer) ?? customer.archetype
+  }
+
+  private requestLook(look: string): void {
+    if (look === this.shownLook) {
+      this.pending = null
+      return
+    }
+    if (!this.cast) {
+      this.pending = { look, model: null }
+      return
+    }
+    this.cast.get(look).then(
+      (model) => {
+        if (this.wantLook === look) this.pending = { look, model }
+      },
+      () => {
+        if (this.wantLook === look) this.pending = { look, model: null }
+      },
+    )
+  }
+
+  /** Swap in a loaded look (only while the customer is out of sight). */
+  private installLook(p: { look: string; model: CustomerModel | null }): void {
+    this.model?.root.removeFromParent()
+    this.model = p.model
+    this.silhouette.visible = !p.model
+    if (p.model) this.customer.add(p.model.root)
+    this.customerMats = p.model ? p.model.materials : this.silhouetteMats
+    this.customerMixer = p.model ? p.model.mixer : null
+    for (const m of this.customerMats) {
+      m.opacity = this.customerFade
+      m.transparent = true
+      m.needsUpdate = true
+    }
+    this.customerOpaque = false
+    this.shownLook = p.look
+    this.pending = null
+    this.cast?.retain([this.shownLook, this.wantLook, this.nextLook])
   }
 
   /**
@@ -157,7 +228,10 @@ export class ShopScene {
   update(dt: number): void {
     this.backdrop?.update(dt)
     const speed = 3
-    this.customerFade += (this.customerTarget - this.customerFade) * Math.min(1, dt * speed)
+    if (this.pending && this.customerFade < 0.01) this.installLook(this.pending)
+    // Hold the customer back until their own look is in (a first-time model can take a moment).
+    const target = this.wantLook !== null && this.shownLook === this.wantLook ? this.customerTarget : 0
+    this.customerFade += (target - this.customerFade) * Math.min(1, dt * speed)
     this.customer.visible = this.customerFade > 0.01
     this.customer.position.z = -1.45 + (1 - this.customerFade) * 0.6
     // Fully faded in, draw opaque (a transparent skinned body sorts badly against itself).
@@ -173,19 +247,9 @@ export class ShopScene {
     if (this.customer.visible) this.customerMixer?.update(dt)
   }
 
-  /** M3 customer test: put a rigged test model where the silhouette stands. */
-  setCustomerModel(model: CustomerModel): void {
-    disposeTree(this.customer)
-    this.customer.clear()
-    // The test glbs face +z (towards the street); the customer faces the player.
-    model.root.rotation.y = Math.PI
-    this.customer.add(model.root)
-    this.customerMats = model.materials
-    this.customerOpaque = false
-    this.customerMixer = model.mixer
-  }
-
   dispose(): void {
+    this.model?.root.removeFromParent()
+    this.cast?.dispose()
     if (this.baked) {
       this.scene.remove(this.baked.group)
       this.baked.dispose()
@@ -548,8 +612,9 @@ export class ShopScene {
   }
 
   private buildCustomer(): THREE.Group {
-    // Stand-in silhouette until M3 decides between rigged models and portrait cards.
+    // The customer slot: a cast model goes in here; the silhouette stands in without one.
     const g = new THREE.Group()
+    const sil = new THREE.Group()
     const mat = () =>
       new THREE.MeshStandardMaterial({ color: '#4c5560', roughness: 0.85, transparent: true, opacity: 0 })
     const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.85, 4, 12), mat())
@@ -557,8 +622,11 @@ export class ShopScene {
     body.scale.set(1, 1, 0.6)
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 12), mat())
     head.position.y = 1.68
-    g.add(body, head)
-    this.customerMats = [body.material, head.material]
+    sil.add(body, head)
+    g.add(sil)
+    this.silhouette = sil
+    this.silhouetteMats = [body.material, head.material]
+    this.customerMats = this.silhouetteMats
     g.position.set(-0.15, 0, -1.45)
     g.visible = false
     this.scene.add(g)

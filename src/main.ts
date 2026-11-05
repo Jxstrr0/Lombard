@@ -37,7 +37,7 @@ import { PerfOverlay, TIER_SETTINGS, TierBenchmark, initialTier } from './render
 import { ShopScene } from './render/scene'
 import { ItemStage } from './render/stage'
 import { createItemLoader } from './render/loaders'
-import { customerTestName, loadCustomerModel } from './render/customerModel'
+import { CustomerCast, castOverride } from './render/customerModel'
 import { Ui, screenFor, type ScreenId } from './ui/bind'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
@@ -189,6 +189,8 @@ async function boot(): Promise<void> {
   canvasHost.appendChild(renderer.domElement)
 
   const shop = new ShopScene()
+  // Customers are 3D cast members (Rocketbox); ?nocast=1 keeps the old silhouette, ?customer=<id> casts one person as everyone.
+  if (params.get('nocast') !== '1') shop.setCast(new CustomerCast(import.meta.env.BASE_URL, __BUILD_SHA__), castOverride(params))
   const rig = new CameraRig()
   const look = lookParam(params)
   if (look) rig.setHeadOffset(look.yaw, look.pitch)
@@ -310,16 +312,6 @@ async function boot(): Promise<void> {
           if (m) ui.setBakeInfo(`bake ${m.quality}${m.commit ? ` ${m.commit}` : ''}`)
           return m
         })
-  // M3 customer test: ?customer=<name> stands a rigged test model at the counter.
-  const customerName = customerTestName(params)
-  if (customerName) {
-    loadCustomerModel(import.meta.env.BASE_URL, customerName, __BUILD_SHA__)
-      .then((model) => {
-        shop.setCustomerModel(model)
-        console.info(`[customer] ${customerName}: ${Math.round(model.triangles)} triangles, ${model.materials.length} materials${model.mixer ? ', idle clip' : ''}`)
-      })
-      .catch((err) => console.warn('[customer] test model failed to load, keeping the silhouette', err))
-  }
   // The canal outside the window comes after the shop; ?nobackdrop=1 keeps the old canvas card.
   const backdropLoad = params.get('nobackdrop') === '1' ? Promise.resolve(false) : bakeLoad.then(() => shop.loadBackdrop(renderer, import.meta.env.BASE_URL))
   void Promise.all([envLoad, bakeLoad, backdropLoad]).finally(() => {

@@ -4,7 +4,8 @@
 //
 // Portrait plays a whole day with ?seed=1: welcome → open → customer → inspect
 // (every tool) → estimate → offer/haggle → resolved → the rest of the queue
-// (one inspect shot per item shape, the rest passed) → close up → ledger (sell one) → settings.
+// (one inspect shot per item shape, the rest passed) → close up → ledger (sell one) → settings
+// → shop sheet (stock the counter case, tag prices) → day 2 → a walk-in buyer → sale result.
 // Landscape and desktop shoot counter, inspect, offer and ledger.
 // Portrait runs in one browser while landscape, desktop, the gallery and the perf
 // readout run in a second. Rendering is SwiftShader (software), so shots use DPR 1.
@@ -265,9 +266,57 @@ async function playPortrait(page, h) {
   await h.click('settings-ledger')
   await h.click('text-100')
   await h.click('settings-close')
+  await shopFlow(page, h)
   await h.open()
   await h.screen('counter')
   await h.shot('day2', 'day 2 opened')
+  await buyerFlow(page, h)
+}
+
+/** Ledger → Shop sheet: put the stock in the counter case and tag it a little under value, so day 2 has buyers. */
+async function shopFlow(page, h) {
+  await h.click('shop-ledger')
+  await page.waitForTimeout(200)
+  const s = await h.state()
+  const items = s.inventory.slice(0, 6)
+  for (const [i, it] of items.entries()) {
+    // Tap the item in the safe, tap an empty slot (it stays selected), then price it.
+    await h.click(`safe-${it.id}`)
+    await h.click(`slot-counter-${i + 1}`)
+    await h.click('shop-price')
+    await h.click('tag-clear')
+    for (const ch of String(Math.max(100, Math.round((it.trueValue * 0.85) / 100) * 100))) await h.click(`tag-key-${ch}`)
+    if (i === items.length - 1) await h.shot('shop-price', 'shop sheet: tag price pad (paid chips, never the true value)')
+    await h.click('tag-set')
+  }
+  await page.evaluate(() => document.querySelector('.shop-body')?.scrollTo(0, 0))
+  await page.waitForTimeout(150)
+  await h.shot('shop-placed', 'shop sheet: counter case stocked with paper tags, wall/back shelves, safe')
+  await h.click('shop-close')
+}
+
+/** Day 2: serve the queue until a walk-in buyer reaches the counter, counter once, then take the result. */
+async function buyerFlow(page, h) {
+  for (let i = 0; i < 20 && (await h.visible('next-customer')); i++) {
+    await h.click('next-customer')
+    await page.waitForTimeout(150)
+    const screen = await page.evaluate(() => document.body.dataset.screen)
+    if (screen === 'sale') {
+      await page.waitForTimeout(500)
+      await h.shot('sale-buyer', 'walk-in buyer at the counter: line, item + your tag, their offer; Refuse / Counter / Sell')
+      await h.click('sale-counter')
+      await h.click('sale-chip-split')
+      await h.click('sale-ask')
+      for (let r = 0; r < 4 && (await page.evaluate(() => document.body.dataset.screen)) === 'sale'; r++) await h.click('sale-accept')
+      await h.screen('counter')
+      await h.shot('sale-result', 'sale resolved: buyer’s line + Sold stamp with the price')
+      return
+    }
+    if (screen === 'redeem') await h.click('redeem-return')
+    else if (await h.visible('pass')) await h.click('pass')
+    await h.click('dismiss')
+  }
+  console.warn('portrait: no walk-in buyer came on day 2; sale shots skipped')
 }
 
 async function playShort(page, h) {

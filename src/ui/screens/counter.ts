@@ -35,7 +35,13 @@ export class CounterScreen {
   private secondary: HTMLButtonElement
   private primaryAction: Primary = 'counter/next'
 
-  constructor(dispatch: (a: Action) => void, openSettings: () => void, gear: (onPress: () => void) => HTMLButtonElement) {
+  constructor(
+    dispatch: (a: Action) => void,
+    openSettings: () => void,
+    gear: (onPress: () => void) => HTMLButtonElement,
+    /** Opens the shop sheet; shown only while nobody is at the counter. */
+    private readonly shopButton?: HTMLButtonElement,
+  ) {
     const root = el('section', 'screen counter-screen')
     root.dataset.screen = 'counter'
     const strip = el('div', 'strip')
@@ -61,7 +67,7 @@ export class CounterScreen {
       variant: 'primary',
       onPress: () => dispatch({ type: this.primaryAction }),
     })
-    actions.append(gear(openSettings), this.secondary, this.primary)
+    actions.append(gear(openSettings), ...(shopButton ? [shopButton] : []), this.secondary, this.primary)
     strip.append(dialogue, actions)
     root.append(strip)
     this.root = root
@@ -83,12 +89,13 @@ export class CounterScreen {
     const resolved = c?.phase === 'resolved'
     this.stamp.hidden = !resolved
     if (resolved && c.outcome) {
-      const text = c.outcome === 'bought' && c.price !== undefined ? `${OUTCOME.bought} · ${rub(c.price)}` : OUTCOME[c.outcome]
+      const text = (c.outcome === 'bought' || c.outcome === 'sold') && c.price !== undefined ? `${OUTCOME[c.outcome]} · ${rub(c.price)}` : OUTCOME[c.outcome]
       setText(this.stamp, text)
       this.stamp.dataset.outcome = c.outcome
     }
 
     this.secondary.hidden = !c || c.phase !== 'present'
+    if (this.shopButton) this.shopButton.hidden = !!c
     if (!c) {
       if (state.queue.length > 0) this.setPrimary('counter/next', 'next-customer', 'Next customer', 'person')
       else this.setPrimary('day/close', 'close-up', 'Close up', 'door')

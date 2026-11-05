@@ -28,6 +28,7 @@ import { OfferScreen } from './screens/offer'
 import { RedeemScreen } from './screens/redeem'
 import { SaleScreen } from './screens/sale'
 import { SettingsSheet } from './screens/settings'
+import { ShopSheet } from './screens/shop'
 import { WelcomeScreen } from './screens/welcome'
 
 export type ScreenId = 'intro' | 'welcome' | 'news' | 'counter' | 'inspect' | 'offer' | 'sale' | 'redeem' | 'ledger'
@@ -72,6 +73,7 @@ export class Ui {
   private readonly sale: SaleScreen
   private readonly redeem: RedeemScreen
   private readonly settings: SettingsSheet
+  private readonly shop: ShopSheet
   private readonly screens: Record<ScreenId, { root: HTMLElement }>
   private current: ScreenId | null = null
   private lastLayout: UiLayout | null = null
@@ -87,10 +89,14 @@ export class Ui {
     const gear = (suffix: string) => (onPress: () => void) =>
       createButton({ id: `settings-${suffix}`, label: '', icon: 'gear', ariaLabel: 'Settings', className: 'btn-icon', onPress })
 
-    this.counter = new CounterScreen(dispatch, openSettings, gear('counter'))
+    this.shop = new ShopSheet({ getState: () => deps.store.get(), dispatch })
+    const shopButton = (suffix: string) =>
+      createButton({ id: `shop-${suffix}`, label: 'Shop', icon: 'tag', ariaLabel: 'Shop floor: display and price tags', className: 'btn-shop', onPress: () => this.shop.open() })
+
+    this.counter = new CounterScreen(dispatch, openSettings, gear('counter'), shopButton('counter'))
     this.inspect = new InspectScreen(dispatch)
     this.offer = new OfferScreen(dispatch)
-    this.ledger = new LedgerScreen(dispatch, openSettings, gear('ledger'))
+    this.ledger = new LedgerScreen(dispatch, openSettings, gear('ledger'), shopButton('ledger'))
     this.welcome = new WelcomeScreen(dispatch, openSettings, gear('welcome'))
     this.intro = new IntroScreen(dispatch)
     this.news = new NewsScreen(dispatch)
@@ -119,6 +125,7 @@ export class Ui {
       mount.appendChild(s.root)
     }
     mount.appendChild(this.hud.root)
+    mount.appendChild(this.shop.root)
     mount.appendChild(this.settings.root)
 
     const build = el('div', 'build-number', `${__BUILD_SHA__} · ${__BUILD_DATE__}`)
@@ -167,6 +174,7 @@ export class Ui {
         this.redeem.render(state)
         break
     }
+    if (this.shop.isOpen) this.shop.render(state)
     if (this.settings.isOpen) this.settings.render(state)
     if (prev === null || screenFor(prev) !== id) this.onScreenChange?.(id)
   }
@@ -214,6 +222,7 @@ export class Ui {
       }
       return false
     }
+    if (this.shop.isOpen) return this.shop.keyPress(k)
     const s = this.deps.store
     switch (this.current) {
       case 'inspect':
@@ -226,6 +235,8 @@ export class Ui {
           return true
         }
         return this.offer.key(k)
+      case 'sale':
+        return this.sale.key(k)
       default:
         return false
     }

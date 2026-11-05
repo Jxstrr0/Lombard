@@ -38,6 +38,8 @@ export class LedgerScreen {
     private readonly dispatch: (a: Action) => void,
     openSettings: () => void,
     gear: (onPress: () => void) => HTMLButtonElement,
+    /** Opens the shop sheet (display and tags). */
+    shopButton?: HTMLButtonElement,
   ) {
     const root = el('section', 'screen ledger-screen')
     root.dataset.screen = 'ledger'
@@ -68,7 +70,7 @@ export class LedgerScreen {
 
     const footer = el('footer', 'ledger-actions actions')
     this.open = createButton({ id: 'open-shop', label: 'Open shop', variant: 'primary', icon: 'door', onPress: () => dispatch({ type: 'day/open' }) })
-    footer.append(gear(openSettings), this.open)
+    footer.append(gear(openSettings), ...(shopButton ? [shopButton] : []), this.open)
     root.append(scroll, footer)
     this.root = root
   }

@@ -9,6 +9,7 @@
 import { getItemDef } from '../data/items'
 import type { Action } from '../game/actions'
 import { claimedValue } from '../game/appraise/value'
+import { availableTools } from '../game/inspect/available'
 import type { ToolId } from '../game/schema/item'
 import type { GameState } from '../game/state'
 import type { Finding } from '../game/types'
@@ -102,8 +103,11 @@ export function makePolicy(p: PolicyParams): Policy {
       // seller
       if (c.phase === 'present') return { type: 'counter/inspect' }
       if (c.phase === 'inspect') {
+        // Walk the tool plan in order, skipping tools that are locked for this item.
+        const usable = new Set(availableTools(state, getItemDef(c.item.defId)).filter((t) => t.usable).map((t) => t.tool))
+        const plan = p.tools.filter((t) => usable.has(t))
         const uses = Object.values(state.inspect?.toolUses ?? {}).reduce((a, n) => a + (n ?? 0), 0)
-        const tool = p.tools[uses]
+        const tool = plan[uses]
         return tool ? { type: 'inspect/useTool', tool } : { type: 'inspect/done' }
       }
       // offer phase

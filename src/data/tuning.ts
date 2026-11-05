@@ -68,6 +68,10 @@ export const tuning = {
   save: {
     /** Day summaries kept in full; older days are folded into career stats. */
     historyDays: 60,
+    /** Longest save code (characters, after whitespace is stripped) that decoding will even try. */
+    maxCodeChars: 1_000_000,
+    /** Largest JSON a save code may inflate to (bytes); guards against decompression bombs. */
+    maxInflatedBytes: 8_000_000,
   },
 } as const
 

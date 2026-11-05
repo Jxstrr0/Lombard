@@ -172,6 +172,28 @@ Plan B (fallback if Plan A looks cheap on phone): no 3D customer; a hand-painted
 - Foley: door bell, item set on glass, loupe click, scale beep, drawer, coins, cash register. Freesound CC0 or Kenney.
 - Music: optional, low-key. Only CC0 or CC BY tracks; prefer none over a license risk.
 
+### As built (decided Nov 2026, M3)
+
+Freesound and kenney.nl were not reachable from the build container (403), so every sound comes from **OpenGameArt**, each pack's page checked for a CC0 licence (Kenney's packs there carry CC0 licence files too). Rows per source in `ATTRIBUTION.md`.
+
+| File (`public/assets/audio/`) | What | Source | Plays on |
+|---|---|---|---|
+| `ambience.mp3` (54 s loop, 48 kbps, ~317 KB) | a street through the window, faint canal water, fridge hum as room tone | ignasd's street traffic + randommind's Vistula waves + LEGIT Audio's fridge drone | from the first tap, while sound is on |
+| `door_bell.mp3` | a small bell, three strikes | rubberduck `bell_03` | a customer steps up |
+| `set_down.mp3` | soft thud + faint glass tick | Kenney `bookPlace2` + rubberduck `glass_02` | their item lands on the mat (0.9 s after the bell); an item put in a display slot |
+| `cash.mp3` | cash drawer + coins | laleksic `drawer_open` + Kenney `handleCoins` | bought, pawned, sold, redeemed |
+| `coins.mp3` | coins | Kenney `handleCoins` | dealer sale, upgrade, acid refill, specialist retainer |
+| `tool_loupe` / `tool_magnet` / `tool_page` / `tool_acid` / `tool_switch` | metal click / latch / page flip / drop / switch | Kenney `metalClick`, `metalLatch`, `bookFlip1`; rubberduck `plop_01`; laleksic `switch_on` | loupe / magnet / reference / acid / UV |
+| `tool_scale.mp3`, `tool_phone.mp3` | a piezo beep; three keypad tones (DTMF 7-3-1) | generated from sine tones in `art/audio/build.py` (no third-party audio) | scale / phone and specialist |
+| `ui_tap.mp3` | a short click, very quiet | Kenney `click_001` | any button tap that made no other sound |
+
+- `art/audio/build.py` (system Python with numpy, plus ffmpeg with libmp3lame; needs the network) downloads the sources into `art/out/audio/` (gitignored), layers and filters them per its `RECIPES`, trims silence, and writes mono 44.1 kHz MP3s (80–96 kbps one-shots, 48 kbps ambience). Outputs are committed; CI never downloads anything.
+- Loudness: one-shots to −20 LUFS momentary (loudest 400 ms), with at most 6 dB of lookahead limiting on transients and peaks under −1 dBFS; very short clicks stay a few LU under. The ambience is −26 LUFS integrated. The mix between cues is runtime gain in `src/data/audio.ts`, so a level change never needs a rebuild.
+- The ambience is filtered to sound heard through glass (street low-passed to ~1.1 kHz, water to 650 Hz, hum to 380 Hz) and baked into a seamless loop (the last 3 s crossfaded, equal power, into the head). At runtime it still plays as overlapping passes with 2.5 s equal-power fades, so MP3 encoder padding can't click at the seam in any browser.
+- Whole set: 13 files, ~387 KB.
+- Add or change a sound: edit `RECIPES` (or `AMBIENCE`), run `python3 art/audio/build.py --only <name>`, add the id to `SOUND_IDS`/`SOUND_GAIN` in `src/data/audio.ts`, map it in `src/audio/cues.ts`, add its ATTRIBUTION line.
+- Not yet: seasonal ambience (rain, winter wind), trams (no CC0 tram recording found on OpenGameArt), music.
+
 ## UI
 
 Space Grotesk for menus (Longlight brand). A receipt-style mono font for tags and ledger. Paper/plastic textures from ambientCG for tag and card backgrounds. Icons: Kenney game icons or Lucide (ISC license, fine).
@@ -185,4 +207,5 @@ npm run assets:check      # verify every file in public/assets has an ATTRIBUTIO
 # canal backdrop: art/backdrop/build.py in Blender, then npm run backdrop:pack (see Canal backdrop above)
 # surface textures: python3 art/materials/prepare.py, then push (the bake runs; see Surface textures above)
 # props: art/props/prepare.py in Blender, then place them in bake/layout.json and push (see Props above)
+# audio: python3 art/audio/build.py [--only <name>], outputs in public/assets/audio/ (see Audio above)
 ```

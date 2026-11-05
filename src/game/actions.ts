@@ -385,7 +385,8 @@ function makeOffer(state: GameState, amount: number, approach: Approach, evidenc
   return withRng(state, (s, rng) => {
     const h0 = s.haggle ?? startHaggle(ctx, rng)
     const { state: h, response } = haggleRound(h0, { offer, approach, evidenceId }, ctx, rng)
-    const line = pickLine(response.lineKey, rng, { price: rub(response.price), name: c.customer.name })
+    const lineKey = c.wants === 'pawn' && response.kind === 'accept' ? `pawn.${response.lineKey}` : response.lineKey
+    const line = pickLine(lineKey, rng, { price: rub(response.price), name: c.customer.name })
     let next: GameState = { ...s, haggle: h, current: { ...c, line } }
     next = advanceTime(next, tuning.day.haggleRoundSeconds)
     if (!next.current) return next // they gave up during the round (cannot happen at the counter, but stay safe)
@@ -442,7 +443,7 @@ function pawn(state: GameState, principal: number, line?: string): GameState {
       cash: s.cash - principal,
       loans: [...s.loans, loan],
     }
-    return resolve(next, 'pawned', line ?? visitLines.thanks[0], {
+    return resolve(next, 'pawned', line ?? pickLine('pawn.thanks', rng, { name: c.customer.name, item: def.name }), {
       kind: 'loan',
       amount: -principal,
       text: `Lent ${rub(principal)} on ${def.name} to ${c.customer.name}`,

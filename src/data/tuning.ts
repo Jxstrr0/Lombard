@@ -212,6 +212,37 @@ export const tuning = {
     termDays: 30,
     /** Interest per 30 days (GDD: ~10%/month). */
     monthlyRate: 0.1,
+    /** Interest is prorated by days held, but never less than this many days' worth. */
+    minInterestDays: 7,
+    /** Amounts due are rounded up to this many rubles. */
+    roundTo: 10,
+    /** Days after dueDay the item is still held before it is forfeited. */
+    graceDays: 3,
+
+    // --- who pawns (generateDayQueue) ---
+    /** Chance a seller wants a loan instead of a sale: base + desperation × perDesperation (+ heirloom). */
+    pawnChance: { base: 0.12, perDesperation: 0.3, heirloom: 0.3, max: 0.75 },
+
+    // --- will they come back (createLoan) ---
+    /** Redeem chance before adjustments. */
+    redeemBase: 0.75,
+    /** Added when the item is an heirloom (sentiment brings people back). */
+    redeemHeirloom: 0.22,
+    /** Added for proud customers (family honour). */
+    redeemProud: 0.08,
+    /** Subtracted × desperation (some people never get back on their feet). */
+    redeemDesperation: 0.3,
+    /** Multiplies the chance by authenticity: someone pawning a fake rarely comes back. */
+    redeemAuthenticity: { genuine: 1, restored: 0.9, frankenstein: 0.45, fake: 0.2 },
+    /** Lent more than this share of trueValue: × overLentFactor (why repay more than it's worth?). */
+    overLentRatio: 0.9,
+    overLentFactor: 0.5,
+    redeemMin: 0.03,
+    redeemMax: 0.95,
+    /** Earliest redemption, in days after the loan starts (latest is dueDay). */
+    minRedeemDays: 3,
+    /** In-game seconds a redeeming customer will wait in the queue, [min, max]. */
+    redeemPatience: [320, 480] as [number, number],
   },
 
   /** M2 rent, bills, upgrades, specialists (owner: economy worker). */

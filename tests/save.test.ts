@@ -30,7 +30,8 @@ function serveCurrent(s0: GameState, wantBuy: boolean, multiple: number, stopAtO
   let s = s0
   for (let guard = 0; guard < 60 && s.current; guard++) {
     const c = s.current
-    if (c.phase === 'present') s = step(s, { type: 'counter/inspect' })
+    if (c.phase === 'present' && c.kind === 'redeem') s = step(s, { type: 'loan/return' })
+    else if (c.phase === 'present') s = step(s, { type: 'counter/inspect' })
     else if (c.phase === 'inspect') {
       for (const tool of TOOLS) s = step(s, { type: 'inspect/useTool', tool })
       s = step(s, { type: 'inspect/done' })

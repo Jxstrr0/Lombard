@@ -101,7 +101,7 @@ export class OfferScreen {
     this.approachHint = el('p', 'approach-hint')
 
     const actions = el('div', 'actions offer-actions')
-    const back = createButton({ id: 'back-to-inspect', label: 'Inspect', icon: 'back', ariaLabel: 'Back to inspect', onPress: () => dispatch({ type: 'inspect/back' }) })
+    const back = createButton({ id: 'back-to-inspect', label: 'Back', icon: 'back', ariaLabel: 'Back to inspect', onPress: () => dispatch({ type: 'inspect/back' }) })
     const pass = createButton({ id: 'offer-pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) })
     this.submit = createButton({ id: 'make-offer', label: 'Offer', variant: 'primary', onPress: () => this.onSubmit() })
     actions.append(back, pass, this.submit)

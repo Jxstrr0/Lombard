@@ -219,7 +219,7 @@ export class InspectScreen {
   private playFx(fresh: readonly Finding[], state: GameState): void {
     const f = fresh[fresh.length - 1]!
     const { x, y } = this.itemCenter
-    const node = el('div', `fx fx-${f.tool}`)
+    const node = el('div', `fx fx-for-${f.tool}`)
     node.style.setProperty('--x', `${Math.round(x)}px`)
     node.style.setProperty('--y', `${Math.round(y)}px`)
     if (f.tool === 'loupe') {
@@ -230,8 +230,16 @@ export class InspectScreen {
       }
       node.innerHTML = `<span class="fx-lens"></span>`
     } else if (f.tool === 'scale') {
-      const m = /(\d+(?:[.,]\d+)?)\s?(?:g|grams?)\b/i.exec(f.text)
-      const reading = m ? `${m[1]!.replace(',', '.')} g` : 'weighed'
+      // The reading is the first number in grams among this use's findings (the
+      // weight finding comes first; tells found on the same use follow it).
+      let reading = 'weighed'
+      for (const g of fresh) {
+        const m = /(\d+(?:[.,]\d+)?)\s?(?:g|grams?)\b/i.exec(g.text)
+        if (m) {
+          reading = `${m[1]!.replace(',', '.')} g`
+          break
+        }
+      }
       node.innerHTML = `<span class="fx-scale">${icons.scale}<span class="fx-scale-lcd">${reading}</span></span>`
     } else if (f.tool === 'magnet') {
       let magnetic = false

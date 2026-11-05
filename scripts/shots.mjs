@@ -6,7 +6,8 @@
 // (every tool) → estimate → offer/haggle → resolved → the rest of the queue
 // (one inspect shot per item shape, the rest passed) → close up → ledger (sell one) → settings
 // → shop sheet (stock the counter case, tag prices) → day 2 → a walk-in buyer → sale result.
-// Landscape and desktop shoot counter, inspect, offer and ledger.
+// Landscape and desktop shoot counter, inspect, offer and ledger. Four portrait
+// head-look views (?look=) show the empty counter turned left, right, round and up.
 // Portrait runs in one browser while landscape, desktop, the gallery and the perf
 // readout run in a second. Rendering is SwiftShader (software), so shots use DPR 1.
 // Fails on any page error or console error.
@@ -523,6 +524,24 @@ async function main() {
       await h.screen('redeem')
       await page.waitForTimeout(600)
       await h.shot('redeem', 'redeem visit: who, item, pawn ticket (lent + interest = total), Take X, hand it over')
+      out.push(...h.shots)
+      await context.close()
+    }
+    // Head look (?look=<yawDeg>,<pitchDeg>, +yaw = right, +pitch = up): the empty counter view, head turned.
+    // Screen right is world −X (the window side); world +X (the left wall, x = 3) is on the player's left.
+    for (const [slug, look, what] of [
+      ['left-70', '-70,0', 'head turned left ~70°: counter end with the lamp, left wall beyond (world +X side, where x = 3 is)'],
+      ['right-85', '85,0', 'head turned right ~85°: right wall and the display cases (world −X side)'],
+      ['back-180', '180,0', 'head turned round 180°: the back wall 0.8 m behind the eye (safe and office door sit just outside this frame)'],
+      ['up-18', '0,18', 'looking up 18°: window and the canal street outside'],
+    ]) {
+      const { context, page } = await newPage(browser, PORTRAIT, `?seed=1&look=${look}`)
+      const h = helpers(page, `look-${slug}`)
+      await h.begin()
+      await h.open()
+      await h.screen('counter')
+      await page.waitForTimeout(300)
+      await h.shot('counter', `${what} (?look=${look})`)
       out.push(...h.shots)
       await context.close()
     }

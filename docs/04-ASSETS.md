@@ -166,6 +166,12 @@ Plan A: 2–3 rigged CC0 humanoid bases (check Quaternius "Universal Base Charac
 
 Plan B (fallback if Plan A looks cheap on phone): no 3D customer; a hand-painted or AI-free illustrated portrait card in the dialogue strip, item appears on the counter from the right. Many successful shop games do this. Decide at M3 after a one-day test.
 
+**The 1-day test (Nov 5, 2026).** A survey found no fetchable CC0 / CC BY realistic everyday adults: Quaternius's free characters are superhero bodies under an unclear licence, OpenGameArt's are fantasy-styled, Mixamo needs an account, Sketchfab CC0 scans aren't rigged. Two sources were good enough to test, both built headless in Blender and dropped into the shop with `?customer=<name>` (review only; the glbs live in `public/assets/customer-test/` and load lazily, only with the flag):
+- `mpfb_middleaged_man`: MakeHuman system assets (CC0) assembled by the MPFB 2 add-on. 18.9k tris, 3 materials, 1.1 MB, no animation (posed arms-down). Only the CC0 system pack is used (the CC-BY packs are skipped). Two MakeHuman suits print the MakeHuman logo on the shirt, so they're avoided, and the suit used carries a tiny CC0/makehuman.org mark at the edge of its texture that isn't visible. MakeHuman took its asset repository offline in Oct 2026; the static pack site still works and local copies are kept. MPFB can generate any body, age and outfit from its parameters, so it scales to a cast.
+- `rocketbox_male_adult_03`: the Microsoft Rocketbox library (115 rigged avatars, MIT). 7.2k tris, 3 materials, 1.0 MB, a looping breathing idle. MIT isn't in the licence list above. It's permissive (attribution plus the notice, like CC BY), so Colby accepted it for the test; using it for real means adding it to the list.
+
+The silhouette stays the default without the flag. Hair cards use alpha test; `src/render/customerModel.ts` keeps their blend mode through the fade-in. See 05 for the decision.
+
 ## Audio
 
 - Ambience: canal water, distant trams, rain, wind for winter. Freesound CC0.

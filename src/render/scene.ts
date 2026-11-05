@@ -16,6 +16,7 @@ import type { GameState } from '../game/state'
 import { loadCanalBackdrop, type CanalBackdrop } from './backdrop'
 import { loadBakedShop, type BakedShop, type ShopManifest } from './bakedShop'
 import { INSPECT_POINT } from './camera'
+import type { CustomerModel } from './customerModel'
 import { canalBackdropTexture, contactShadowTexture, parquetTexture, plasterTexture } from './textures'
 
 const ROOM = { halfW: 3, halfD: 4, height: 4.2 }
@@ -47,6 +48,10 @@ export class ShopScene {
   private customer: THREE.Group
   private customerFade = 0
   private customerTarget = 0
+  /** Materials the customer fade drives (the silhouette's, or a test model's). */
+  private customerMats: THREE.Material[] = []
+  private customerOpaque = false
+  private customerMixer: THREE.AnimationMixer | null = null
   private disposables: { dispose(): void }[] = []
   private lights!: LightRig
   /** Canvas card outside the window until the rendered canal backdrop loads (and if it doesn't). */
@@ -155,10 +160,29 @@ export class ShopScene {
     this.customerFade += (this.customerTarget - this.customerFade) * Math.min(1, dt * speed)
     this.customer.visible = this.customerFade > 0.01
     this.customer.position.z = -1.45 + (1 - this.customerFade) * 0.6
-    for (const child of this.customer.children) {
-      const mat = (child as THREE.Mesh).material as THREE.MeshStandardMaterial
+    // Fully faded in, draw opaque (a transparent skinned body sorts badly against itself).
+    const opaque = this.customerFade > 0.99
+    for (const mat of this.customerMats) {
       mat.opacity = this.customerFade
+      if (opaque !== this.customerOpaque) {
+        mat.transparent = !opaque || mat.userData.blend === true
+        mat.needsUpdate = true
+      }
     }
+    this.customerOpaque = opaque
+    if (this.customer.visible) this.customerMixer?.update(dt)
+  }
+
+  /** M3 customer test: put a rigged test model where the silhouette stands. */
+  setCustomerModel(model: CustomerModel): void {
+    disposeTree(this.customer)
+    this.customer.clear()
+    // The test glbs face +z (towards the street); the customer faces the player.
+    model.root.rotation.y = Math.PI
+    this.customer.add(model.root)
+    this.customerMats = model.materials
+    this.customerOpaque = false
+    this.customerMixer = model.mixer
   }
 
   dispose(): void {
@@ -534,6 +558,7 @@ export class ShopScene {
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 12), mat())
     head.position.y = 1.68
     g.add(body, head)
+    this.customerMats = [body.material, head.material]
     g.position.set(-0.15, 0, -1.45)
     g.visible = false
     this.scene.add(g)

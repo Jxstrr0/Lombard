@@ -17,6 +17,7 @@ export class CounterScreen {
   private next: HTMLButtonElement
   private inspect: HTMLButtonElement
   private pass: HTMLButtonElement
+  private primaryAction: 'day/open' | 'counter/next' | 'day/close' | 'counter/dismiss' = 'day/open'
 
   constructor(dispatch: (a: Action) => void) {
     const root = document.createElement('section')
@@ -39,7 +40,12 @@ export class CounterScreen {
     this.line = q('line')
     this.cash = q('cash')
     this.day = q('day')
-    this.next = createButton({ id: 'next', label: 'Next customer', variant: 'primary', onPress: () => dispatch({ type: 'counter/next' }) })
+    this.next = createButton({
+      id: 'next',
+      label: 'Next customer',
+      variant: 'primary',
+      onPress: () => dispatch({ type: this.primaryAction }),
+    })
     this.inspect = createButton({ id: 'inspect', label: 'Inspect', onPress: () => dispatch({ type: 'counter/inspect' }) })
     this.pass = createButton({ id: 'pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) })
     q('actions').append(this.inspect, this.pass, this.next)
@@ -47,14 +53,24 @@ export class CounterScreen {
 
   render(state: GameState): void {
     const c = state.current
-    this.speaker.textContent = c ? c.customerName : ''
+    this.speaker.textContent = c ? c.customer.name : ''
     this.speaker.hidden = !c
     this.line.textContent = c ? `“${c.line}”` : state.narration
     this.line.classList.toggle('narration', !c)
     this.cash.textContent = `${rub.format(state.cash)} ₽`
     this.day.textContent = `Day ${state.calendar.day}`
-    this.inspect.disabled = !c
-    this.pass.disabled = !c
-    this.next.disabled = !!c
+    this.inspect.disabled = !c || c.phase !== 'present'
+    this.pass.disabled = !c || c.phase === 'resolved'
+    if (state.day.phase === 'closed') this.setPrimary('day/open', 'Open shop')
+    else if (c?.phase === 'resolved') this.setPrimary('counter/dismiss', 'Next')
+    else if (c) this.setPrimary('counter/next', 'Next customer', true)
+    else if (state.queue.length > 0) this.setPrimary('counter/next', 'Next customer')
+    else this.setPrimary('day/close', 'Close up')
+  }
+
+  private setPrimary(action: CounterScreen['primaryAction'], label: string, disabled = false): void {
+    this.primaryAction = action
+    this.next.textContent = label
+    this.next.disabled = disabled
   }
 }

@@ -2,7 +2,7 @@
 import { reducer, type Action } from './actions'
 import type { GameState } from './state'
 
-export type Listener = (state: GameState, prev: GameState, action: Action) => void
+export type Listener = (state: GameState, prev: GameState, action: Action | { type: 'store/replace' }) => void
 
 export class Store {
   private state: GameState
@@ -22,6 +22,13 @@ export class Store {
     if (next === prev) return
     this.state = next
     for (const l of this.listeners) l(next, prev, action)
+  }
+
+  /** Swap in a whole state (loading a save or a save code). */
+  replace(state: GameState): void {
+    const prev = this.state
+    this.state = state
+    for (const l of this.listeners) l(state, prev, { type: 'store/replace' })
   }
 
   subscribe(listener: Listener): () => void {

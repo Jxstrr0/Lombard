@@ -1,0 +1,43 @@
+[
+  {
+    "id": "gold_band_583",
+    "category": "gold",
+    "name": "583 gold wedding band",
+    "era": "1970s–1990s",
+    "baseValue": { "min": 8000, "max": 12000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 4.8, "tolerance": 0.4 },
+    "magnetic": false,
+    "rarity": 3,
+    "fakeChance": 0.3,
+    "tells": [
+      { "id": "hallmark", "tool": "loupe", "finding": "Inside the band: a crisp 583 stamp and a star assay mark, edges sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2, "hotspot": "inner" },
+      { "id": "colour", "tool": "loupe", "finding": "Warm, slightly reddish gold, the same colour in the scratches as on the surface.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet", "tool": "magnet", "finding": "No pull at all from the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0 }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weightFactor": 0.62,
+        "tells": [
+          { "id": "hallmark", "tool": "loupe", "finding": "Inside the band: a 583 stamp, but the digits are soft and shallow, as if cast rather than struck.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "inner" },
+          { "id": "colour", "tool": "loupe", "finding": "Where the band is worn, a paler yellow shows through the gold.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5 }
+        ]
+      }
+    ],
+    "demandTags": ["gold"],
+    "claims": [
+      "It was my mother's wedding ring. I don't wear it anymore.",
+      "Real gold, 583, Soviet. You can see the stamp."
+    ],
+    "model": {
+      "placeholder": "ring",
+      "color": "#d4a64a",
+      "scale": 1,
+      "inspectDistance": 0.12,
+      "hotspots": [{ "id": "inner", "label": "Inside of band", "position": [0, 0, 0.008] }]
+    }
+  }
+]

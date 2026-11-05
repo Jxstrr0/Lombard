@@ -211,5 +211,225 @@
         { "id": "lugs", "label": "Between the lugs", "position": [0, 0.0215, 0] }
       ]
     }
+  },
+  {
+    "id": "watch_poljot_strela",
+    "category": "watches",
+    "name": "Poljot Strela chronograph",
+    "brand": "Poljot",
+    "era": "1960s–1970s",
+    "baseValue": { "min": 18000, "max": 30000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 72, "tolerance": 4 },
+    "magnetic": false,
+    "rarity": 0.8,
+    "fakeChance": 0.45,
+    "tells": [
+      { "id": "dial", "tool": "loupe", "finding": "Three subdials sit evenly; the Cyrillic logo and tachymeter scale are crisp but aged.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "dial" },
+      { "id": "movement", "tool": "loupe", "finding": "Inside the caseback: a chronograph movement with a serial in the same old font as the case.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "caseback" },
+      { "id": "pushers", "tool": "loupe", "finding": "The chronograph pushers are worn evenly with the rest of the case plating.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.5, "hotspot": "pushers" },
+      { "id": "crown", "tool": "loupe", "finding": "The crown is plain and worn smooth, the tube around it lightly scratched.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.5, "hotspot": "crown" },
+      { "id": "heft", "tool": "scale", "finding": "Solid in the pan; there is a proper chronograph movement in there.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35 },
+      { "id": "magnet_case", "tool": "magnet", "finding": "The case shrugs off the magnet; only the movement inside stirs a little.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "caseback" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "dial_swap",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.45,
+        "weight": 1.5,
+        "tells": [
+          { "id": "dial", "tool": "loupe", "finding": "The dial is a later civilian print, too bright against a case worn through to the brass.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "dial" },
+          { "id": "movement", "tool": "loupe", "finding": "The movement serial is a decade younger than the caseback's markings.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "caseback" }
+        ]
+      },
+      {
+        "id": "air_force_redial",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          { "id": "dial", "tool": "loupe", "finding": "A freshly printed air-force emblem sits on the dial; the paint is thicker than the scale around it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "dial" },
+          { "id": "hands", "tool": "loupe", "finding": "The hands are bright and new, their lume a modern greenish white.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "dial" }
+        ]
+      },
+      {
+        "id": "modern_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "weightFactor": 0.85,
+        "tells": [
+          { "id": "movement", "tool": "loupe", "finding": "Behind the caseback: a modern movement, its plates stamped with no factory mark at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "caseback" },
+          { "id": "dial", "tool": "loupe", "finding": "The subdials sit slightly off their printed rings.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "dial" },
+          { "id": "heft", "tool": "scale", "finding": "Lighter in the pan than a chronograph should be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 }
+        ]
+      }
+    ],
+    "demandTags": ["watches", "soviet"],
+    "claims": [
+      "My father was a navigator. This flew with him to the Arctic and back.",
+      "A Strela. Collectors abroad go crazy for these, I read it online.",
+      "The stopwatch still works. Press the button, go on.",
+      "It's been in my desk since the factory closed. Time someone used it."
+    ],
+    "model": {
+      "placeholder": "watch",
+      "color": "#b9bcbf",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        { "id": "dial", "label": "Dial", "position": [0, 0.007, 0.0065] },
+        { "id": "caseback", "label": "Caseback", "position": [0, 0, -0.0065] },
+        { "id": "crown", "label": "Crown", "position": [0.0215, 0, 0] },
+        { "id": "pushers", "label": "Pushers", "position": [0.0185, 0.0105, 0] },
+        { "id": "lugs", "label": "Lugs", "position": [0, 0.0215, 0.002] }
+      ]
+    }
+  },
+  {
+    "id": "watch_omeca_aquastar",
+    "category": "watches",
+    "name": "Omeca Aquastar automatic diver",
+    "brand": "Omeca",
+    "era": "2000s",
+    "baseValue": { "min": 90000, "max": 130000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 120, "tolerance": 7 },
+    "magnetic": false,
+    "rarity": 0.45,
+    "fakeChance": 0.8,
+    "tells": [
+      { "id": "dial", "tool": "loupe", "finding": "An applied logo, polished and sharp-edged; the minute track is printed evenly to the last tick.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "dial" },
+      { "id": "bezel", "tool": "loupe", "finding": "The bezel turns one way only, with firm, even clicks.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "bezel" },
+      { "id": "caseback", "tool": "loupe", "finding": "A solid caseback with a deep engraved seahorse and a crisp, sharp-cornered serial.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "caseback" },
+      { "id": "crown", "tool": "loupe", "finding": "The crown screws down and carries a small logo, deep and centred.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "crown" },
+      { "id": "heft", "tool": "scale", "finding": "Dense steel; it sits in the pan like a stone.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_case", "tool": "magnet", "finding": "The steel case doesn't respond to the magnet at all.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "caseback" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "market_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.02,
+        "weight": 2,
+        "weightFactor": 0.78,
+        "tells": [
+          { "id": "dial", "tool": "loupe", "finding": "The logo is printed, not applied; under the loupe the letters bleed slightly at the edges.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "dial" },
+          { "id": "bezel", "tool": "loupe", "finding": "The bezel turns both ways and clicks loosely.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "bezel" },
+          { "id": "caseback", "tool": "loupe", "finding": "The seahorse on the back is a shallow etching, flat as a sticker.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "caseback" },
+          { "id": "heft", "tool": "scale", "finding": "Light in the pan for a steel diver this size.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      },
+      {
+        "id": "heavy_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.04,
+        "weight": 1,
+        "weightFactor": 0.97,
+        "tells": [
+          { "id": "dial", "tool": "loupe", "finding": "An applied logo, very clean. But the date magnifier sits a hair off the date window.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.65, "hotspot": "dial" },
+          { "id": "caseback", "tool": "loupe", "finding": "The serial is lasered: flat-bottomed and soft-cornered, not engraved.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.6, "hotspot": "caseback" }
+        ]
+      },
+      {
+        "id": "aftermarket_bezel",
+        "kind": "restored",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          { "id": "bezel", "tool": "loupe", "finding": "The bezel insert's lume pip glows a brighter green than the dial's markers.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "bezel" }
+        ]
+      }
+    ],
+    "demandTags": ["watches", "luxury"],
+    "claims": [
+      "A gift from my company when I retired from the port. Swiss.",
+      "I bought it in the duty-free in Helsinki. I have the box somewhere.",
+      "My ex left it. He'll want it back, so let's be quick.",
+      "It is the diver model. Waterproof to two hundred metres. I tested it in the bath."
+    ],
+    "model": {
+      "placeholder": "watch",
+      "color": "#c3c7cb",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        { "id": "dial", "label": "Dial", "position": [0, 0.007, 0.0065] },
+        { "id": "bezel", "label": "Bezel", "position": [0, 0.019, 0.0068] },
+        { "id": "crown", "label": "Crown", "position": [0.0225, 0, 0] },
+        { "id": "caseback", "label": "Caseback", "position": [0, 0, -0.0065] },
+        { "id": "lugs", "label": "Between the lugs", "position": [0, 0.0215, 0] }
+      ]
+    }
+  },
+  {
+    "id": "watch_brequet_classique",
+    "category": "watches",
+    "name": "Brequet-Fils Classique, 750 gold dress watch",
+    "brand": "Brequet-Fils",
+    "era": "1990s",
+    "baseValue": { "min": 260000, "max": 380000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 52, "tolerance": 3 },
+    "magnetic": false,
+    "rarity": 0.2,
+    "fakeChance": 0.92,
+    "tells": [
+      { "id": "dial", "tool": "loupe", "finding": "An engine-turned dial, the pattern sharp and deep; blued hands with hollow moon tips.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "dial" },
+      { "id": "signature", "tool": "loupe", "finding": "Tilted to the light, a tiny secret signature appears beside the twelve.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.6, "hotspot": "dial" },
+      { "id": "caseback", "tool": "loupe", "finding": "Inside the caseback: 750 marks, an assay hallmark and a hand-engraved serial.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "caseback" },
+      { "id": "lugs", "tool": "loupe", "finding": "The lugs are welded straight bars, the screws between them perfectly flush.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "lugs" },
+      { "id": "heft", "tool": "scale", "finding": "Heavy for a slim watch; that is a lot of gold.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_case", "tool": "magnet", "finding": "The case and lugs ignore the magnet completely.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "caseback" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_steel",
+        "kind": "fake",
+        "valueMultiplier": 0.01,
+        "weight": 2,
+        "weightFactor": 0.8,
+        "magnetic": true,
+        "removeTells": ["signature"],
+        "tells": [
+          { "id": "dial", "tool": "loupe", "finding": "The engine-turned pattern is a printed texture: flat under the loupe, no depth at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "dial" },
+          { "id": "caseback", "tool": "loupe", "finding": "The caseback reads 750 in a modern font, with no hallmark beside it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "caseback" },
+          { "id": "heft", "tool": "scale", "finding": "Too light in the pan for a gold case.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "magnet_case", "tool": "magnet", "finding": "The case jumps to the magnet and holds.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1, "hotspot": "caseback" }
+        ]
+      },
+      {
+        "id": "gilded_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 1,
+        "weightFactor": 0.75,
+        "tells": [
+          { "id": "signature", "tool": "loupe", "finding": "No secret signature anywhere on the dial, however you tilt it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.6, "hotspot": "dial" },
+          { "id": "lugs", "tool": "loupe", "finding": "Where the lugs meet the case, the gold has worn through to a coppery brass.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "lugs" },
+          { "id": "heft", "tool": "scale", "finding": "Lighter in the pan than its colour promises.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 }
+        ]
+      }
+    ],
+    "demandTags": ["watches", "luxury", "gold"],
+    "claims": [
+      "My father bought it in Geneva in the nineties. Back when he had money.",
+      "Look at the dial. Hand-made, the real thing. I just need it to be cash today.",
+      "A businessman left it as a deposit for a car. He never came back for the car.",
+      "It comes with papers. I left them at home. I can bring them tomorrow."
+    ],
+    "model": {
+      "placeholder": "watch",
+      "color": "#d7b264",
+      "scale": 1,
+      "inspectDistance": 0.14,
+      "hotspots": [
+        { "id": "dial", "label": "Dial", "position": [0, 0.006, 0.0055] },
+        { "id": "caseback", "label": "Caseback", "position": [0, 0, -0.0055] },
+        { "id": "crown", "label": "Crown", "position": [0.0205, 0, 0] },
+        { "id": "lugs", "label": "Lugs", "position": [0, 0.0205, 0.002] }
+      ]
+    }
   }
 ]

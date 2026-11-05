@@ -76,15 +76,36 @@ export const Hotspot = z.object({
 })
 export type Hotspot = z.infer<typeof Hotspot>
 
-/** M1 items are primitives; `placeholder` picks a procedural model in src/render/items.ts. */
-export const PLACEHOLDER_MODELS = ['ring', 'signet', 'chain', 'earrings', 'watch', 'phone'] as const
+/** Items are primitives until M3; `placeholder` picks a procedural model in src/render/items.ts. */
+export const PLACEHOLDER_MODELS = [
+  'ring',
+  'signet',
+  'chain',
+  'earrings',
+  'watch',
+  'phone',
+  // M2
+  'pendant',
+  'camera',
+  'lens',
+  'medal',
+  'order',
+  'badge',
+  'coin',
+] as const
+
+const HexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/)
 
 export const ItemModel = z.object({
   glb: z.string().optional(),
   placeholder: z.enum(PLACEHOLDER_MODELS),
   /** Main material colour for the placeholder (hex). */
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  color: HexColor,
   scale: z.number().positive().default(1),
+  /** Medal ribbons: equal-width vertical stripes, left to right. */
+  ribbon: z.array(HexColor).min(1).optional(),
+  /** Which relief/print a medal or coin placeholder draws (free-form key, see src/render/items.ts). */
+  emblem: z.string().optional(),
   /** Camera distance in inspect mode, metres. */
   inspectDistance: z.number().positive(),
   hotspots: z.array(Hotspot).default([]),

@@ -70,6 +70,14 @@ function helpers(page, name) {
       if ((await page.evaluate(() => document.body.dataset.screen)) !== 'intro') return
       await page.waitForTimeout(250)
       if (shotIt) await api.shot('intro', 'career start: name your shop')
+      // Tap Next through the story cards to Begin; shoot the first story card.
+      for (let i = 0; i < 8 && !(await api.visible('intro-begin')); i++) {
+        await api.click('intro-next')
+        if (shotIt && i === 0) {
+          await page.waitForTimeout(150)
+          await api.shot('intro-card', 'career start: first story card (tap or Next)')
+        }
+      }
       await api.click('intro-begin')
     },
     /** Open the shop and read past the morning paper if there is one. */
@@ -87,11 +95,12 @@ function helpers(page, name) {
   return api
 }
 
-/** Coarse item shape from a def id (gold_band_583 → gold_band, watch_x → watch). */
+/** Coarse item family from a def id (gold_band_583 → gold, lens_x → camera, order_x → militaria). */
 function kindOf(defId) {
-  if (defId.startsWith('watch_')) return 'watch'
-  if (defId.startsWith('phone_')) return 'phone'
-  return defId.split('_').slice(0, 2).join('_')
+  const head = defId.split('_')[0]
+  if (head === 'lens') return 'camera'
+  if (head === 'medal' || head === 'order' || head === 'badge') return 'militaria'
+  return head
 }
 
 /** Type a number on the offer pad. */
@@ -346,7 +355,7 @@ async function playShort(page, h) {
   await h.begin()
   await h.screen('welcome')
   await h.shot('welcome', 'welcome card')
-  await h.open()
+  await h.open(page.viewportSize()?.height < 500)
   await h.screen('counter')
   await h.click('next-customer')
   await page.waitForTimeout(900)

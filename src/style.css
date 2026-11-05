@@ -2358,3 +2358,275 @@ html {
   animation: none !important;
   transition: none !important;
 }
+
+/* --- M2 content: career-start intro, day-1 safe, morning paper ---------------------- */
+
+.intro-screen {
+  background:
+    radial-gradient(120% 70% at 50% 100%, rgba(123, 63, 196, 0.22), transparent 60%),
+    linear-gradient(rgba(20, 19, 19, 0.55), rgba(20, 19, 19, 0.92) 50%);
+}
+
+.intro-card {
+  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+}
+
+.intro-card.is-story {
+  cursor: pointer;
+}
+
+.intro-body {
+  flex: 1;
+}
+
+.shop-name-input {
+  width: 100%;
+  min-height: 52px;
+  margin: 2px 0 14px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(217, 119, 87, 0.55);
+  background: var(--surface);
+  color: var(--ivory);
+  font: 600 1.125rem var(--font);
+  letter-spacing: 0.01em;
+}
+
+.shop-name-input:focus {
+  outline: 2px solid var(--lilac);
+  outline-offset: 1px;
+}
+
+.intro-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 14px;
+}
+
+.intro-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(250, 249, 245, 0.22);
+}
+
+.intro-dot.is-on {
+  width: 20px;
+  border-radius: 4px;
+  background: var(--clay);
+}
+
+.intro-actions > .btn-ghost {
+  flex: 0 0 96px;
+}
+
+.welcome-safe-h {
+  margin: 4px 0 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lilac);
+}
+
+.welcome-safe {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: rgba(250, 249, 245, 0.9);
+}
+
+.welcome-safe li {
+  padding: 3px 0 3px 18px;
+  position: relative;
+}
+
+.welcome-safe li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.75em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--clay);
+}
+
+.welcome-safe-empty {
+  color: var(--muted);
+}
+
+/* The paper: newsprint, a fold, a coffee ring. Serif from the system (no web font). */
+.news-screen {
+  pointer-events: auto;
+  justify-content: stretch;
+  background: radial-gradient(130% 80% at 50% 0%, rgba(40, 34, 26, 0.55), rgba(12, 11, 10, 0.92));
+}
+
+.news-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: calc(18px + var(--safe-top)) 14px 18px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.paper {
+  --newsprint: #ece4cf;
+  --newsprint-dark: #ddd2b6;
+  --newsink: #24201a;
+  position: relative;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 18px 18px 22px;
+  color: var(--newsink);
+  font-family: Georgia, 'Times New Roman', 'Liberation Serif', serif;
+  background:
+    radial-gradient(circle at 82% 78%, transparent 26px, rgba(120, 82, 40, 0.13) 27px, rgba(120, 82, 40, 0.06) 31px, transparent 33px),
+    linear-gradient(90deg, transparent 49.6%, rgba(60, 45, 25, 0.12) 50%, rgba(255, 255, 255, 0.25) 50.5%, transparent 51%),
+    radial-gradient(120% 90% at 30% 20%, var(--newsprint), var(--newsprint-dark));
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.55),
+    inset 0 0 40px rgba(120, 95, 50, 0.22);
+  transform: rotate(-0.6deg);
+}
+
+.paper-mast {
+  text-align: center;
+  padding-bottom: 8px;
+  border-bottom: 3px double var(--newsink);
+}
+
+.paper-cyr {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+}
+
+.paper-name {
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  font-style: italic;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.paper-motto {
+  margin-top: 2px;
+  font-size: 0.6875rem;
+  color: rgba(36, 32, 26, 0.65);
+}
+
+.paper-dateline {
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(36, 32, 26, 0.55);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.paper-story {
+  padding: 12px 0 10px;
+  border-bottom: 1px solid rgba(36, 32, 26, 0.3);
+}
+
+.paper-story:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.paper-headline {
+  margin: 0 0 6px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.paper-story.is-lead .paper-headline {
+  font-size: 1.5rem;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+.paper-body {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.paper-story.is-lead .paper-body::first-letter {
+  float: left;
+  margin: 3px 6px 0 0;
+  font-size: 2.6em;
+  line-height: 0.8;
+  font-weight: 700;
+}
+
+.news-actions {
+  padding: 12px 16px calc(14px + var(--safe-bottom));
+  background: var(--strip-bg);
+  border-top: 1px solid var(--strip-edge);
+}
+
+@media (orientation: landscape) and (min-width: 700px) {
+  .paper {
+    max-width: 640px;
+  }
+
+  .paper-stories {
+    columns: 2;
+    column-gap: 22px;
+    column-rule: 1px solid rgba(36, 32, 26, 0.3);
+  }
+
+  .paper-story {
+    break-inside: avoid;
+  }
+
+  .paper-story.is-lead {
+    column-span: all;
+  }
+
+  .news-actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  .news-actions > .btn {
+    flex: 0 1 360px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .intro-card {
+    min-height: 0;
+  }
+
+  .welcome-screen:not(.intro-screen) .welcome-text,
+  .welcome-screen .welcome-studio {
+    display: none;
+  }
+
+  .welcome-safe {
+    columns: 2;
+    font-size: 0.8125rem;
+    margin-bottom: 6px;
+  }
+
+  .news-scroll {
+    padding-top: calc(10px + var(--safe-top));
+  }
+
+  .news-actions {
+    padding-top: 8px;
+    padding-bottom: calc(8px + var(--safe-bottom));
+  }
+}

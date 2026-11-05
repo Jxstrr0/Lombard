@@ -107,8 +107,10 @@ describe('day loop', () => {
     s = reducer(s, { type: 'day/close' })
     const item = s.inventory[0]!
     const cash = s.cash
+    const before = s.inventory.length // includes the previous owner's leftovers
     s = reducer(s, { type: 'ledger/sell', itemId: item.id })
-    expect(s.inventory).toHaveLength(0)
+    expect(s.inventory).toHaveLength(before - 1)
+    expect(s.inventory.some((i) => i.id === item.id)).toBe(false)
     expect(s.cash).toBeGreaterThanOrEqual(cash)
     expect(s.stats.itemsSold).toBe(1)
   })

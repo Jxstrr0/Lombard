@@ -270,10 +270,11 @@ def mangosteen(it: lib.Item, m4s: bool) -> None:
         shell = lib.material(it, "alu", color, metal=0.85, rough=0.42)
         back_mat = shell
         polish = lib.material(it, "polished", "#a9abb0", metal=1.0, rough=0.08)
-        ink = lib.material(it, "ink", "#c9cacd", rough=0.5)
+        ink = lib.material(it, "ink", "#c9cacd", rough=0.5, ao=False)
     glass = lib.material(it, "glass", "#050607", rough=0.04, ao=False)
     dark = lib.material(it, "dark", "#121314", metal=0.3, rough=0.55)
-    ink = ink or dark
+    # printed lettering is clean, and its strokes are thinner than an AO texel: no AO
+    ink = ink or lib.material(it, "print", "#2a2b2d", rough=0.5, ao=False)
     r = 0.0085
     shape = rr_shape(W, H, r, 10)
 
@@ -344,9 +345,9 @@ def mangosteen(it: lib.Item, m4s: bool) -> None:
     serial = "C39H 7RKQ DTC1" if m4s else "F2LJ 9X4M DTTP"
     slab(lambda i: pill(0.0148 - 2 * i, 0.0028 - 2 * i, 8), [(0, -0.0006, shell), (0, -0.00002, shell)], cap_lo=shell, cap_hi=shell, m=tray_m)
     disc(tray_m @ lib.at(0.0052, 0, 0), 0.0004, -0.00002, 0.0, dark, n=12)
-    text_on(tray_m, serial, 0.00052, dark, x=-0.0012, y=-0.00002, depth=0.000012)
+    text_on(tray_m, serial, 0.00052, ink, x=-0.0012, y=-0.00002, depth=0.000012)
     if m4s:
-        text_on(F("px", (HW, sy + 0.0122, sz)), serial, 0.0005, dark, depth=0.00001)
+        text_on(F("px", (HW, sy + 0.0122, sz)), serial, 0.0005, ink, depth=0.00001)
         # antenna gaps in the band
         for x, y in ((-0.0215, HH), (0.0215, -HH), (-0.0215, -HH)):
             face = "top" if y > 0 else "bottom"
@@ -386,12 +387,12 @@ def galaxia(it: lib.Item, nota: bool) -> None:
         cover = lib.material(it, "leather", color, rough=0.78)
         rim = lib.material(it, "rim", "#c9c2b4", metal=1.0, rough=0.25)
         bezel = lib.material(it, "bezel", lib.shade(color, 1.02), rough=0.06, ao=False)
-        ink = lib.material(it, "ink", "#6f6a62", metal=0.7, rough=0.35)
+        ink = lib.material(it, "ink", "#6f6a62", metal=0.7, rough=0.35, ao=False)
     else:
         cover = lib.material(it, "cover", color, rough=0.18)
         rim = lib.material(it, "rim", "#b7bcc4", metal=1.0, rough=0.18)
         bezel = lib.material(it, "bezel", lib.shade(color, 0.8), rough=0.05, ao=False)
-        ink = lib.material(it, "ink", "#c9ced8", metal=0.5, rough=0.3)
+        ink = lib.material(it, "ink", "#c9ced8", metal=0.5, rough=0.3, ao=False)
     glass = lib.material(it, "glass", "#050607", rough=0.04, ao=False)
     dark = lib.material(it, "dark", "#111214", metal=0.2, rough=0.6)
     r = 0.0065 if nota else 0.0095
@@ -574,7 +575,7 @@ def severin(it: lib.Item) -> None:
     dark = lib.material(it, "dark", "#0f1011", rough=0.5)
     glass = lib.material(it, "window", "#07080a", rough=0.05, ao=False)
     lcd = lib.material(it, "lcd", "#46523f", rough=0.22, ao=False)
-    ink = lib.material(it, "ink", "#e6e7e2", rough=0.5)
+    ink = lib.material(it, "ink", "#e6e7e2", rough=0.5, ao=False)
     r = 0.0115
     shape = rr_shape(W, H, r, 12)
     rings = [(0.0030, -0.004, body_m), (0.0012, -0.0035, body_m), (0.0003, -0.0025, body_m), (0, -0.0012, body_m),

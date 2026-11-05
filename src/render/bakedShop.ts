@@ -3,11 +3,14 @@
  * the `bake` GitHub Actions workflow (bake/bake.py + scripts/bake-pack.mjs)
  * into public/assets/shop/.
  *
- * Each glTF material carries `kind` (and optionally `runtime`, `opacity`,
- * `doubleSided`) as extras, set in bake/materials.py:
- *   baked    MeshBasicMaterial + lightmap on uv1. Unlit by the real-time lights,
+ * Each glTF material carries `kind` (and optionally `opacity`, `doubleSided`)
+ * as extras, set in bake/materials.py:
+ *   baked    MeshBasicMaterial + lightmap on uv1, plus its tiling surface texture
+ *            (KTX2, on uv0) when it has one. Unlit by the real-time lights,
  *            so the lamp and window fill (which exist for the item and the
  *            customer) don't light the room a second time.
+ *   prop     the CC0 props: MeshBasicMaterial with their own texture, lit by the
+ *            bake's per-vertex lighting (COLOR_0, scaled like the lightmap).
  *   dynamic  metals: MeshStandardMaterial, env map + the two real-time lights.
  *   glass    transparent standard material, no depth write.
  *   unlit    flat colour (bulbs, door glass, cords).
@@ -19,7 +22,6 @@ import * as THREE from 'three'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
-import { parquetTexture, plasterTexture } from './textures'
 
 export interface ShopManifest {
   version: number
@@ -39,16 +41,7 @@ export interface BakedShop {
   dispose(): void
 }
 
-type Kind = 'baked' | 'dynamic' | 'glass' | 'unlit'
-
-/**
- * Procedural tiling textures on uv0, which the bake lays out in world metres
- * (glTF flips v, hence the negative repeat to keep "up the wall" = up the texture).
- */
-const RUNTIME_TEXTURES: Record<string, { make: () => THREE.Texture; tileU: number; tileV: number; tint: string }> = {
-  parquet: { make: parquetTexture, tileU: 2, tileV: 2, tint: '#ffffff' },
-  plaster: { make: plasterTexture, tileU: 2, tileV: 4.2, tint: '#f2ead8' },
-}
+type Kind = 'baked' | 'prop' | 'dynamic' | 'glass' | 'unlit'
 
 export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string): Promise<BakedShop> {
   const dir = `${base}assets/shop/`
@@ -60,7 +53,7 @@ export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string)
 
   const draco = new DRACOLoader().setDecoderPath(`${base}assets/decoders/draco/`)
   const ktx2 = new KTX2Loader().setTranscoderPath(`${base}assets/decoders/basis/`).detectSupport(renderer)
-  const gltfLoader = new GLTFLoader().setDRACOLoader(draco)
+  const gltfLoader = new GLTFLoader().setDRACOLoader(draco).setKTX2Loader(ktx2)
   const owned: { dispose(): void }[] = []
   try {
     const [gltf, lightmap] = await Promise.all([gltfLoader.loadAsync(`${dir}${manifest.files.glb}${v}`), ktx2.loadAsync(`${dir}${manifest.files.lightmap}${v}`)])
@@ -70,7 +63,6 @@ export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string)
     lightmap.anisotropy = 4
     owned.push(lightmap)
 
-    const runtimeTex = new Map<string, THREE.Texture>()
     const cache = new Map<THREE.Material, THREE.Material>()
     const group = gltf.scene
     group.name = 'baked-shop'
@@ -80,7 +72,7 @@ export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string)
       const src = mesh.material as THREE.MeshStandardMaterial
       let mat = cache.get(src)
       if (!mat) {
-        mat = convert(src, lightmap, manifest.lightmapScale, runtimeTex)
+        mat = convert(src, lightmap, manifest.lightmapScale, mesh.geometry.hasAttribute('color'))
         cache.set(src, mat)
         owned.push(mat)
         src.dispose()
@@ -91,7 +83,15 @@ export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string)
       owned.push(mesh.geometry)
       if ((mat as THREE.Material).transparent) mesh.renderOrder = 2
     })
-    for (const t of runtimeTex.values()) owned.push(t)
+    const maps = new Set<THREE.Texture>()
+    group.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.MeshBasicMaterial | undefined
+      if (m?.map) maps.add(m.map)
+    })
+    for (const t of maps) {
+      t.anisotropy = 4
+      owned.push(t)
+    }
     group.updateMatrixWorld(true)
     return {
       group,
@@ -106,31 +106,34 @@ export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string)
   }
 }
 
-function convert(src: THREE.MeshStandardMaterial, lightmap: THREE.Texture, scale: number, runtimeTex: Map<string, THREE.Texture>): THREE.Material {
-  const extras = src.userData as { kind?: Kind; runtime?: string; opacity?: number; doubleSided?: boolean }
+function convert(src: THREE.MeshStandardMaterial, lightmap: THREE.Texture, scale: number, vertexLighting: boolean): THREE.Material {
+  const extras = src.userData as { kind?: Kind; opacity?: number; doubleSided?: boolean }
   const kind: Kind = extras.kind ?? 'dynamic'
   const side = extras.doubleSided ? THREE.DoubleSide : THREE.FrontSide
   const name = src.name
   switch (kind) {
     case 'baked': {
-      const rt = extras.runtime ? RUNTIME_TEXTURES[extras.runtime] : undefined
-      let map: THREE.Texture | null = null
-      if (rt && extras.runtime) {
-        map = runtimeTex.get(extras.runtime) ?? rt.make()
-        map.repeat.set(1 / rt.tileU, -1 / rt.tileV)
-        map.offset.set(0, 1 / rt.tileV)
-        runtimeTex.set(extras.runtime, map)
-      }
+      // A textured surface's texture already averages to its authored colour
+      // (art/materials/prepare.py), and glTF stores base colour factor 1 with it.
       const m = new THREE.MeshBasicMaterial({
         name,
-        color: rt ? new THREE.Color(rt.tint) : src.color.clone(),
-        map,
+        color: src.color.clone(),
+        map: src.map,
         lightMap: lightmap,
         lightMapIntensity: Math.PI * scale,
         side,
       })
       return m
     }
+    case 'prop':
+      // No colour attribute means an unbaked (--no-bake) export: show it flat.
+      return new THREE.MeshBasicMaterial({
+        name,
+        color: new THREE.Color(1, 1, 1).multiplyScalar(vertexLighting ? scale : 0.6),
+        map: src.map,
+        vertexColors: vertexLighting,
+        side,
+      })
     case 'glass':
       return new THREE.MeshStandardMaterial({
         name,

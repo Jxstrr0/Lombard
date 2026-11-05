@@ -194,6 +194,11 @@ export class Ui {
     if (prev === null || screenFor(prev) !== id) this.onScreenChange?.(id)
   }
 
+  /** The player dragged to look around (retires the one-time hint). */
+  lookUsed(): void {
+    this.counter.lookUsed()
+  }
+
   /** Per-frame: hotspot markers follow the turning item. */
   frame(hotspots: HotspotView[]): void {
     if (this.current === 'inspect') this.inspect.updateHotspots(hotspots)

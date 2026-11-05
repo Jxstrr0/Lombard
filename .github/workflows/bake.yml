@@ -114,18 +114,37 @@ jobs:
       - name: Commit the bake
         if: steps.plan.outputs.run == 'true'
         id: commit
+        env:
+          HASH: ${{ steps.plan.outputs.hash }}
+          QUALITY: ${{ steps.plan.outputs.quality }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add public/assets/shop bake/out/preview.jpg bake/out/preview-wide.jpg
-          if git diff --cached --quiet; then
-            echo "bake unchanged, nothing to commit"
-            echo "pushed=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          git commit -m "M3: bake shop lighting (${{ steps.plan.outputs.quality }}, ${{ steps.plan.outputs.hash }})"
+          # Commit onto the branch as it is *now*, not the commit this run started from
+          # (a re-run of an old run, or a bake that finished after someone pushed).
+          out=$(mktemp -d)
+          cp -r public/assets/shop "$out/shop"
+          cp bake/out/preview.jpg bake/out/preview-wide.jpg "$out/"
           for i in 1 2 3 4; do
-            if git pull --rebase origin "$GITHUB_REF_NAME" && git push origin "HEAD:$GITHUB_REF_NAME"; then
+            git fetch -q origin "$GITHUB_REF_NAME"
+            git reset -q --hard FETCH_HEAD
+            now=$(cat bake/layout.json bake/materials.py bake/bake.py scripts/bake-pack.mjs | sha256sum | cut -c1-16)
+            if [ "$now" != "$HASH" ]; then
+              echo "::warning::The bake inputs on $GITHUB_REF_NAME changed since this run started ($HASH → $now); not committing a stale bake. Run the workflow again."
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            rm -rf public/assets/shop
+            cp -r "$out/shop" public/assets/shop
+            cp "$out"/preview.jpg "$out"/preview-wide.jpg bake/out/
+            git add -A public/assets/shop bake/out/preview.jpg bake/out/preview-wide.jpg
+            if git diff --cached --quiet; then
+              echo "bake unchanged, nothing to commit"
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git commit -q -m "M3: bake shop lighting ($QUALITY, $HASH)"
+            if git push -q origin "HEAD:$GITHUB_REF_NAME"; then
               echo "pushed=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi

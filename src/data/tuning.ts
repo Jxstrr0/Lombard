@@ -32,6 +32,14 @@ export const tuning = {
     /** Multiplies every def's fakeChance. */
     fakeChanceScale: 1,
     condition: [35, 98] as [number, number],
+    /** Restored items look refinished: their condition is the best of this many draws. */
+    restoredConditionDraws: 2,
+    /** Instance weight varies within ± this share of the def's weight tolerance (fakes: × weightFactor). */
+    weightSpread: 0.5,
+    /** Provenance roll for M1 walk-ins (stolen arrives in M5). */
+    provenanceWeights: { unknown: 0.55, clean: 0.33, heirloom: 0.12 },
+    /** Only these categories can be heirlooms. */
+    heirloomCategories: ['gold', 'watches'] as readonly string[],
   },
 
   inspect: {
@@ -41,8 +49,16 @@ export const tuning = {
     missFactor: 0.8,
     /** Each repeat use of the same tool lowers the miss chance by this factor. */
     repeatMissDecay: 0.6,
+    /** Loupe aimed at a tell's own hotspot: miss chance × this. */
+    hotspotFocus: 0.5,
+    /** Loupe not aimed at any hotspot: hotspot tells get this much extra miss chance (before repeat decay). */
+    offHotspotMiss: 0.4,
+    /** No tell is ever missed more often than this. */
+    maxMiss: 0.95,
     /** Scale reading noise, ± grams as a fraction of expected weight. */
-    scaleNoise: 0.02,
+    scaleNoise: 0.01,
+    /** Loupe condition finding bands (lower bounds). Below `worn` the finding is negative evidence. */
+    conditionBands: { mint: 85, good: 65, worn: 45 },
   },
 
   appraise: {
@@ -51,6 +67,14 @@ export const tuning = {
       linear: [0.35, 1.05] as [number, number],
       collector: [0.15, 1.15] as [number, number],
     },
+    /** Collector curve: condition is raised to this power, so wear costs more. */
+    collectorExponent: 1.5,
+    /** Values are rounded to `step` while below `below` rubles. */
+    roundSteps: [
+      { below: 1_000, step: 10 },
+      { below: 10_000, step: 50 },
+      { below: Number.POSITIVE_INFINITY, step: 100 },
+    ] as readonly { below: number; step: number }[],
     /** M1 resale: the dealer pays this share of trueValue. */
     dealerRate: 0.8,
     /** ± noise on the dealer's price. */

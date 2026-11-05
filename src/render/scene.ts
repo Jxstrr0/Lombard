@@ -31,6 +31,9 @@ export interface SceneOptions {
   envUrl: string
 }
 
+/** Customer silhouette opacity behind the item in inspect view (presentation only). */
+const INSPECT_CUSTOMER_OPACITY = 0.25
+
 export class ShopScene {
   readonly scene = new THREE.Scene()
   private customer: THREE.Group
@@ -66,7 +69,8 @@ export class ShopScene {
 
   /** Sync render-owned objects to game state. Never mutates state. */
   sync(state: GameState): void {
-    this.customerTarget = state.current ? 1 : 0
+    // Dim the customer while inspecting so the silhouette doesn't fight the item.
+    this.customerTarget = !state.current ? 0 : state.current.phase === 'inspect' ? INSPECT_CUSTOMER_OPACITY : 1
   }
 
   /**

@@ -17,7 +17,7 @@ Goal: a page loads on a phone and shows the shop.
 
 Done when: deployed URL loads on a phone at 30+ fps with the perf overlay visible.
 
-## M1 — The counter loop, ugly (status: in progress)
+## M1 — The counter loop, ugly (status: built; awaiting the 5-day phone playtest)
 
 Goal: play one day with placeholder art.
 

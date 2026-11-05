@@ -29,6 +29,8 @@
 | Nov 5, 2026 | **Delivery:** each task goes on a branch with a PR; Claude Code squash-merges it once checks pass, and the merge to `main` deploys. |
 | Nov 5, 2026 | **M1 resale path:** until display cases and walk-in buyers land in M2, bought items sell to a dealer after closing at 80% of true value (± noise, `tuning.appraise.dealerRate`). It exists only to close the loop and test the economy; M2 replaces it as the main way to sell. |
 | Nov 5, 2026 | **Built-in findings:** the scale, condition, and magnet checks produce findings with reserved tell ids starting with `@` (`@weight`, `@condition`, `@magnet`). They are not entries in an item's `tells`. Code that looks up `def.tells` by id skips them. A `source` field on `Finding` may replace this convention later. |
+| Nov 5, 2026 | **Shop clock:** 1 real second = 1 shop minute (`CLOCK_MINUTES_PER_SECOND`, display only). Tool buttons show their cost in real seconds; the HUD clock shows shop time. |
+| Nov 5, 2026 | **New career** overwrites the autosave: the new career is written first, then the old one is deleted. 3 career slots come with the M4 title screen. |
 | Nov 5, 2026 | **M1 economy check (throwaway sim, 40 seeds × 5 days):** a careful policy (scale, loupe, and magnet, then pass on authenticity red flags and open at ~45% of the claim) took 80k to ~129k with near-zero fake losses. A careless policy (open at 90% of the claim and take the counter-ask) bought ~6 fakes and went broke in 40/40 runs. Meets M1's "lose money on fakes, make money on real gold". The proper headless simulator comes in M2. |
 
 ## Open, decide at the milestone listed

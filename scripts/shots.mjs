@@ -7,7 +7,7 @@
 // (one inspect shot per item shape, the rest passed) → close up → ledger (sell one) → settings
 // → shop sheet (stock the counter case, tag prices) → day 2 → a walk-in buyer → sale result.
 // Landscape and desktop shoot counter, inspect, offer and ledger. Four portrait
-// head-look views (?look=) show the empty counter turned left, right, round and up.
+// head-look views (?look=) show the empty counter turned left (storeroom), right (wing case), round and up.
 // Portrait runs in one browser while landscape, desktop, the gallery and the perf
 // readout run in a second. Rendering is SwiftShader (software), so shots use DPR 1.
 // Fails on any page error or console error.
@@ -528,11 +528,11 @@ async function main() {
       await context.close()
     }
     // Head look (?look=<yawDeg>,<pitchDeg>, +yaw = right, +pitch = up): the empty counter view, head turned.
-    // Screen right is world −X (the window side); world +X (the left wall, x = 3) is on the player's left.
+    // The player looks along +z, so world +X (the storeroom doorway at x = 3) is on their left.
     for (const [slug, look, what] of [
-      ['left-70', '-70,0', 'head turned left ~70°: counter end with the lamp, left wall beyond (world +X side, where x = 3 is)'],
-      ['right-85', '85,0', 'head turned right ~85°: right wall and the display cases (world −X side)'],
-      ['back-180', '180,0', 'head turned round 180°: the back wall 0.8 m behind the eye (safe and office door sit just outside this frame)'],
+      ['left-90', '-90,-4', 'head turned left 90°: the storeroom doorway behind the counter (world +X side)'],
+      ['right-95', '95,-18', 'head turned right ~95°: the low glass wing case behind the counter, tall wall cases beyond (world −X side)'],
+      ['back-160', '160,-8', 'head turned round ~160°: the back wall 0.8 m behind the eye, safe and pinboard'],
       ['up-18', '0,18', 'looking up 18°: window and the canal street outside'],
     ]) {
       const { context, page } = await newPage(browser, PORTRAIT, `?seed=1&look=${look}`)

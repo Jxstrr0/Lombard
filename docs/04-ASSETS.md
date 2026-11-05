@@ -29,7 +29,7 @@ Goal: as realistic as free-and-open content allows, on a phone. The strategy is 
 ## Shop scene
 
 Built in Blender (free) by script, never by hand, exported to `shop.glb`:
-- Room: 6 m × 8 m, high ceiling (old building), one large street window with canal backdrop as a lit card or small cube-mapped exterior.
+- Room: 6 m × 8 m, high ceiling (old building), one large street window (and the door glass) looking out on the canal: a Cycles render made from the player's eye, shown on one plane outside (see § Canal backdrop).
 - Glass showcase counter, a low glass case behind it, a freestanding glass case on the floor, two tall wall cases, glass shelves on brackets, a safe door, a storeroom through a side doorway behind the counter (shelving, workbench, bare bulb), counter lamp, ceiling pendants, a radiator, a worn parquet floor (linoleum in the storeroom).
 - Materials from Poly Haven / ambientCG: dark wood, scuffed laminate, plaster with stains, brass trim, glass.
 - Lighting baked in Cycles to a single 2048 lightmap (4096 on desktop high tier) covering the static room. Dynamic items get lit by the env map plus the counter lamp.
@@ -77,6 +77,7 @@ Rules:
 - A layout change requires a rebake (the push trigger does a preview automatically). Lock layout early in M3.
 - Moving props (items on the counter, customers) are not in the bake; they're lit by the env map and counter lamp at runtime.
 - Keep `bake/layout.json` anchors in step with `src/render/scene.ts` (counter top 0.94 m, mat at z −2.13, lamp light, eye at z −3.2).
+- The canal view outside is not part of the bake (see § Canal backdrop), but it is rendered for the window and door openings and the eye in `bake/layout.json`. If either opening or the eye moves, rerun `art/backdrop/build.py`; `tests/backdrop.test.ts` fails until you do.
 
 ## Items
 
@@ -111,6 +112,30 @@ Run locally (Blender 4.5.15 at `~/blender`):
 node scripts/items-pack.mjs
 ```
 
+## Canal backdrop (decided Nov 2026, M3)
+
+What the player sees through the window and the door glass: the pavement, a granite embankment with a cast-iron railing, the canal with a moored boat, a humpbacked granite bridge, and a row of 19th-century plastered houses (with shop fronts, invented Cyrillic signs, a side street, a lime tree and a church dome behind). Overcast northern daylight, like the bake's sky.
+
+It is a **single Cycles render made from the player's eye**, not a 3D scene. The counter camera only rotates (plus a couple of centimetres of sway), so a picture taken from the eye with the camera's lens shifted onto a rectangle 7 m beyond the window is exactly right through both openings. It is drawn as one flat plane in the game, so it costs one draw call.
+
+- `art/backdrop/scene.py` builds the street, embankments, water, bridge, boat and houses as geometry (helpers in `art/backdrop/geo.py`), in three.js coordinates like the bake. Everything is seeded; there are no third-party assets. The sign lettering is Inter, the copy bundled with Blender (see `ATTRIBUTION.md`).
+- `art/backdrop/build.py` works out the smallest rectangle on the plane `z = 11` that covers the window and the door glass from the eye, from the sway extremes and from the inspect camera, plus a 1.5% margin. It renders that rectangle at 1280 px wide (about 1.5× what a DPR-2 portrait phone needs when it looks straight at the window) with 256 samples and OpenImageDenoise. A `water` AOV pass becomes the alpha channel (the water mask), and a mist pass adds the distance haze. It tone-maps with the game's ACES curve so the picture matches the room. It writes `art/out/backdrop/canal.png` and `canal.json` (git-ignored), and the committed `art/backdrop/preview.jpg` for review.
+- `scripts/backdrop-pack.mjs` (`npm run backdrop:pack`) encodes the PNG as KTX2 (ETC1S with mipmaps, sRGB, about 180 KB) and writes `public/assets/backdrop/{canal.ktx2, canal.json}`. `--mode uastc` gives a sharper but much bigger file.
+- At runtime, `src/render/backdrop.ts` loads after the shop. It is one `ShaderMaterial`. Inside the water mask, two layers of a small scrolling noise, laid out on the water surface in metres, nudge the lookup by a few texels so the reflections shimmer, and add faint glints. Reduce motion stops the ripples. A gentle daylight tint follows the shop clock (cool morning, neutral midday, warmer afternoon, dimming after 18:00).
+- If loading fails, the old canvas card (`canalBackdropTexture()` in `src/render/textures.ts`) stays. `?nobackdrop=1` forces the card, for comparison.
+- `tests/backdrop.test.ts` checks that the render still covers both openings as `bake/layout.json` places them, that it was made from the layout's eye, and that the committed render matches the scripts (input hash).
+
+Rebuild it (Blender 4.5.15 at `~/blender`; about 9 minutes on 4 cores at 256 samples; there is no CI workflow, so commit the result together with the script change):
+
+```
+~/blender/blender --background --factory-startup --python art/backdrop/build.py -- --samples 256
+npm run backdrop:pack
+```
+
+`--samples 64` is enough for composition work. `--develop` re-runs only the haze and tone step on the last render's passes, and `--exposure` sets the brightness for that step.
+
+Limits: the water reads as a band seen through the railing. The window sill hides everything nearer than about 20 m, so the canal is drawn 30 m wide with the water at a high spring level. The inspect camera and the idle sway see a few centimetres of parallax, which nobody notices at that distance.
+
 ## Customers
 
 Plan A: 2–3 rigged CC0 humanoid bases (check Quaternius "Universal Base Characters" and Sketchfab CC0 rigged scans), 6 outfit texture variants each, 6 upper-body poses (neutral, nervous, proud, impatient, pleased, angry) baked as animation clips. Faces: a portrait card in the dialogue strip carries the identity; the 3D model only needs silhouette and posture. Target under 15k tris per character.
@@ -133,4 +158,5 @@ Space Grotesk for menus (Longlight brand). A receipt-style mono font for tags an
 npm run assets:optimize   # gltf-transform: draco + ktx2 + prune + dedup on public/assets
 npm run assets:check      # verify every file in public/assets has an ATTRIBUTION.md line
 # bake: GitHub Actions 'bake' workflow (see Bake pipeline above)
+# canal backdrop: art/backdrop/build.py in Blender, then npm run backdrop:pack (see Canal backdrop above)
 ```

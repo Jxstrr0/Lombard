@@ -51,8 +51,9 @@ Everything runs headless; no one opens the Blender UI.
    `kind` and an optional procedural `runtime` texture id travel to the game as glTF material extras.
 3. `bake/bake.py` (`blender --background --factory-startup --python bake/bake.py -- --quality preview|full`):
    - generates all geometry straight into four meshes, one per kind (so the shop costs about one draw call per material: ~30 instead of ~70–100 for the old grey box), applying the seeded jitter and culling faces nobody can see;
-   - uv0 = world-metre box projection (tiling textures), uv1 = Smart UV Project + pack with a margin for the target resolution;
-   - bakes Cycles diffuse lighting (direct + indirect, no colour) to uv1, denoises it with OpenImageDenoise, and stores it as an 8-bit sRGB PNG divided by `lightmapScale` (written to the manifest; the game multiplies back);
+   - welds the baked mesh so boxes that meet act as one surface: drops faces pressed flat against another opaque box (cut along that box's sides first if only partly covered), splits edges at T-junctions and beauty-triangulates the result. Each flat wall then unwraps as one lightmap island, and no hidden face sits at a visible edge to depth-fight. Without this, a wall built from several boxes shows a dark or bright line at every joint;
+   - uv0 = world-metre box projection (tiling textures), uv1 = Smart UV Project + pack (all islands selected) with a margin for the target resolution;
+   - bakes Cycles diffuse lighting (direct + indirect, no colour) to uv1, denoises it with OpenImageDenoise, regrows the margin from each island's own texels (before and after the denoiser, which blurs across islands), and stores it as an 8-bit sRGB PNG divided by `lightmapScale` (written to the manifest; the game multiplies back);
    - exports `bake/out/shop_raw.glb` with both UV sets and renders the two previews (AgX, exposure matched to the game's ACES).
 4. `scripts/bake-pack.mjs` (glTF Transform + `ktx2-encoder`, both npm packages, no system tools): Draco-compresses the glb, converts the lightmap to KTX2 (UASTC + RDO + Zstd, mipmaps), and writes `public/assets/shop/{shop.glb, shop_lightmap.ktx2, shop.json}`. Preview bake: 60 KB + 180 KB.
 5. `.github/workflows/bake.yml`:

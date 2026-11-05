@@ -198,6 +198,8 @@ class Builder:
         self.room = room
         self.kinds = {k: {"bm": bmesh.new(), "mats": []} for k in ("baked", "dynamic", "glass", "unlit")}
         self.names: set[str] = set()
+        # opaque boxes (Blender-space matrix, size) that can hide faces pressed against them
+        self.solids: list[tuple[Matrix, list[float]]] = []
 
     def mat_index(self, name: str) -> tuple[bmesh.types.BMesh, int]:
         if name not in MATERIALS:
@@ -240,8 +242,11 @@ class Builder:
             dpos, dyaw = self.jitter(f"{name}#{i}", obj.get("jitter"))
             pos = pos + dpos
             m = parent @ Matrix.Translation(pos) @ Matrix.Rotation(math.radians(dyaw), 4, "Y") @ euler_three(obj.get("rotation") or [0, 0, 0])
-            bm, idx = self.mat_index(mats[i % len(mats)] if mats else obj["material"])
+            mat = mats[i % len(mats)] if mats else obj["material"]
+            bm, idx = self.mat_index(mat)
             add_shape(bm, o, THREE_TO_BLENDER @ m, idx)
+            if o["shape"] == "box" and MATERIALS[mat]["kind"] in ("baked", "dynamic"):
+                self.solids.append((THREE_TO_BLENDER @ m, o["size"]))
 
 
 def cull_hidden_faces(bm: bmesh.types.BMesh, room: dict) -> int:
@@ -265,6 +270,146 @@ def cull_hidden_faces(bm: bmesh.types.BMesh, room: dict) -> int:
             gone.append(f)
     bmesh.ops.delete(bm, geom=gone, context="FACES")
     return len(gone)
+
+
+def drop_twins(bm: bmesh.types.BMesh, tol: float) -> int:
+    """Delete faces with the same corners as another face: back-to-back pairs
+    go entirely (they are inside a solid), same-facing copies keep one."""
+    seen: dict[frozenset, bmesh.types.BMFace] = {}
+    gone: set[bmesh.types.BMFace] = set()
+    for f in bm.faces:
+        key = frozenset(tuple(round(c / tol) for c in v.co) for v in f.verts)
+        twin = seen.get(key)
+        if twin is None:
+            seen[key] = f
+        elif twin.normal.dot(f.normal) < -0.99:
+            gone |= {twin, f}
+            del seen[key]
+        else:
+            gone.add(f)
+    bmesh.ops.delete(bm, geom=list(gone), context="FACES")
+    return len(gone)
+
+
+def drop_covered(bm: bmesh.types.BMesh, solids: list[tuple[Matrix, list[float]]], eps: float = 1e-3) -> int:
+    """Delete faces pressed flat against another opaque box: the end caps
+    inside a joined wall, the wall behind the dado, the floor under a plinth.
+    Left in, they cost lightmap space, and where they meet a visible surface at
+    an edge they depth-fight with it and show as a hairline. A face only
+    partly covered is first cut along the covering box's sides."""
+    if not solids:
+        return 0
+    inv = [m.inverted() for m, _ in solids]
+    rot = np.array([[list(r) for r in mi.to_3x3()] for mi in inv])
+    off = np.array([list(mi.translation) for mi in inv])
+    half = np.array([[abs(c) / 2 for c in size] for _, size in solids])
+
+    def local(b: int, pts: np.ndarray) -> np.ndarray:
+        return pts @ rot[b].T + off[b]
+
+    def against(f: bmesh.types.BMFace) -> list[tuple[int, int]]:
+        """(box, axis) for boxes whose side lies in f's plane, facing f, and
+        overlapping it."""
+        pts = np.array([list(v.co) for v in f.verts])
+        n = np.array(list(f.normal))
+        out = []
+        # f points into the box: the box side under f has outward normal -n
+        for b in range(len(solids)):
+            lp = local(b, pts)
+            ln = rot[b] @ n
+            ax = int(np.argmax(np.abs(ln)))
+            if abs(ln[ax]) < 0.999:
+                continue
+            side = -np.sign(ln[ax]) * half[b][ax]
+            if np.max(np.abs(lp[:, ax] - side)) > 1e-4:
+                continue
+            o = [i for i in range(3) if i != ax]
+            if all(min(lp[:, i].max(), half[b][i]) - max(lp[:, i].min(), -half[b][i]) > 1e-4 for i in o):
+                out.append((b, ax))
+        return out
+
+    def covered(f: bmesh.types.BMFace) -> bool:
+        c = f.calc_center_median()
+        pts = np.array([list(p + f.normal * eps) for p in [c] + [c.lerp(v.co, 0.9) for v in f.verts]])
+        inside = np.zeros(len(pts), dtype=bool)
+        for b, _ in against(f):
+            inside |= np.all(np.abs(local(b, pts)) < half[b] - 1e-5, axis=1)
+        return bool(inside.all())
+
+    for f in list(bm.faces):
+        work = [f]
+        for b, ax in against(f):
+            m, size = solids[b]
+            for i in (i for i in range(3) if i != ax):
+                no = Vector(m.to_3x3().col[i]).normalized()
+                for sgn in (-1, 1):
+                    lc = Vector((0, 0, 0))
+                    lc[i] = sgn * size[i] / 2
+                    co = m @ lc
+                    nxt = []
+                    for g in work:
+                        if not g.is_valid:
+                            continue
+                        d = [(v.co - co).dot(no) for v in g.verts]
+                        if min(d) < -1e-4 and max(d) > 1e-4:
+                            res = bmesh.ops.bisect_plane(bm, geom=[g, *g.edges, *g.verts], dist=1e-5, plane_co=co, plane_no=no)
+                            cut_verts = {e for e in res["geom_cut"] if isinstance(e, bmesh.types.BMVert)}
+                            nxt += list({lf for v in cut_verts for lf in v.link_faces if lf.normal.dot(f.normal) > 0.999})
+                        else:
+                            nxt.append(g)
+                    work = list(dict.fromkeys(nxt))
+    gone = [f for f in bm.faces if covered(f)]
+    bmesh.ops.delete(bm, geom=gone, context="FACES")
+    return len(gone)
+
+
+def weld_surfaces(bm: bmesh.types.BMesh, solids: list[tuple[Matrix, list[float]]], min_len: float = 0.2, tol: float = 1e-4) -> tuple[int, int]:
+    """Join boxes that meet (wall segments around the doorway, the front wall
+    around the window) into one surface, so the lightmap unwrap gives each flat
+    wall a single island instead of one per box. Separate islands bleed at the
+    shared edge and show as a dark or bright line down the wall.
+
+    Two steps: drop face pairs that sit back to back inside a joined wall,
+    then split long edges wherever another box's corner sits on them
+    (T-junctions, e.g. the lintel against the wall beside the doorway) so the
+    pieces share edges. Runs before the general remove_doubles, which would
+    otherwise merge the twins into one stray inner face."""
+    # back-to-back twins first, while each box still owns its vertices
+    hidden = drop_twins(bm, tol)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=tol)
+    bm.normal_update()
+    hidden += drop_covered(bm, solids)
+    bm.verts.ensure_lookup_table()
+    co = np.array([v.co[:] for v in bm.verts], dtype=np.float64)
+    splits = 0
+    for e in [e for e in bm.edges if e.calc_length() > min_len]:
+        v0, v1 = e.verts
+        a = np.array(v0.co[:])
+        d = np.array(v1.co[:]) - a
+        length = float(np.linalg.norm(d))
+        u = d / length
+        rel = co - a
+        t = rel @ u
+        perp = np.linalg.norm(rel - np.outer(t, u), axis=1)
+        ts = sorted({round(float(x), 6) for x in t[(perp < tol) & (t > tol) & (t < length - tol)]})
+        cur, start, done = e, v0, 0.0
+        for x in ts:
+            _, nv = bmesh.utils.edge_split(cur, start, (x - done) / (length - done))
+            nv.co = Vector(a + u * x)
+            cur = next(le for le in nv.link_edges if le.other_vert(nv) is v1)
+            start, done = nv, x
+            splits += 1
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=tol)
+    # The split faces now have runs of collinear corners. Left as n-gons, the
+    # exporter's ear clipping can fan them into zero-area slivers, which
+    # brings the crack straight back; beauty triangulation keeps every
+    # triangle fat so the shared edges rasterise watertight.
+    ngons = [f for f in bm.faces if len(f.verts) > 4]
+    bmesh.ops.triangulate(bm, faces=ngons, quad_method="BEAUTY", ngon_method="BEAUTY")
+    # a hidden back face lying flat on a wall (the dado's) can now triangulate
+    # into the wall's own triangles
+    hidden += drop_twins(bm, tol)
+    return splits, hidden
 
 
 def box_project_uv(bm: bmesh.types.BMesh, layer) -> None:
@@ -380,6 +525,8 @@ def build_objects(layout: dict) -> dict[str, bpy.types.Object]:
             bm.free()
             continue
         culled = cull_hidden_faces(bm, layout["room"])
+        bm.normal_update()
+        welds = weld_surfaces(bm, b.solids) if kind == "baked" else (0, 0)
         bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
         bm.normal_update()
         uv0 = bm.loops.layers.uv.new("uv0")
@@ -393,7 +540,7 @@ def build_objects(layout: dict) -> dict[str, bpy.types.Object]:
         ob["kind"] = kind
         bpy.context.scene.collection.objects.link(ob)
         out[kind] = ob
-        log(f"{ob.name}: {len(mesh.polygons)} faces, {len(k['mats'])} materials, {culled} hidden faces culled")
+        log(f"{ob.name}: {len(mesh.polygons)} faces, {len(k['mats'])} materials, {culled} hidden faces culled, {welds[0]} edges split, {welds[1]} hidden faces dropped by welding")
     return out
 
 
@@ -412,6 +559,9 @@ def lightmap_unwrap(ob: bpy.types.Object, size: int, margin_px: int) -> None:
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=0.0, area_weight=0.0, correct_aspect=True, scale_to_bounds=False)
+    # pack only moves selected UVs, and a fresh layer starts unselected: without
+    # this the islands overlap and share texels
+    bpy.ops.uv.select_all(action="SELECT")
     bpy.ops.uv.pack_islands(rotate=True, scale=True, margin_method="FRACTION", margin=margin_px / size)
     bpy.ops.object.mode_set(mode="OBJECT")
 
@@ -430,6 +580,56 @@ def configure_cycles(samples: int, threads: int) -> None:
     if threads:
         scene.render.threads_mode = "FIXED"
         scene.render.threads = threads
+
+
+def coverage_mask(ob: bpy.types.Object, size: int) -> np.ndarray:
+    """Texels whose centre lies inside a lightmap triangle (what Cycles
+    actually bakes), as a (row from the bottom, column) bool array."""
+    me = ob.data
+    me.calc_loop_triangles()
+    uv = me.uv_layers["lightmap"].data
+    mask = np.zeros((size, size), dtype=bool)
+    for t in me.loop_triangles:
+        p = np.array([list(uv[li].uv) for li in t.loops]) * size
+        x0, y0 = np.floor(p.min(axis=0)).astype(int).clip(0, size - 1)
+        x1, y1 = np.ceil(p.max(axis=0)).astype(int).clip(0, size - 1)
+        xs, ys = np.meshgrid(np.arange(x0, x1 + 1) + 0.5, np.arange(y0, y1 + 1) + 0.5)
+        (ax, ay), (bx, by), (cx, cy) = p
+        den = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy)
+        if abs(den) < 1e-12:
+            continue
+        l1 = ((by - cy) * (xs - cx) + (cx - bx) * (ys - cy)) / den
+        l2 = ((cy - ay) * (xs - cx) + (ax - cx) * (ys - cy)) / den
+        inside = (l1 >= 0) & (l2 >= 0) & (l1 + l2 <= 1)
+        mask[y0 : y1 + 1, x0 : x1 + 1] |= inside
+    return mask
+
+
+def dilate(rgb: np.ndarray, mask: np.ndarray, steps: int) -> np.ndarray:
+    """Overwrite every texel outside the islands, out to `steps` px, with the
+    average of its baked neighbours. Bilinear filtering and mipmaps read those
+    texels at island edges; left to Blender's margin and the denoiser they
+    pick up a neighbouring island's light and draw a line along the edge."""
+    rgb = rgb.copy()
+    done = mask.copy()
+    rgb[~done] = 0
+    for _ in range(steps):
+        acc = np.zeros_like(rgb)
+        cnt = np.zeros(mask.shape, dtype=np.float32)
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if dx == 0 and dy == 0:
+                    continue
+                src = np.roll(np.roll(done, dy, axis=0), dx, axis=1)
+                val = np.roll(np.roll(rgb, dy, axis=0), dx, axis=1)
+                acc += val * src[..., None]
+                cnt += src
+        grow = ~done & (cnt > 0)
+        if not grow.any():
+            break
+        rgb[grow] = acc[grow] / cnt[grow][:, None]
+        done |= grow
+    return rgb
 
 
 def bake_lightmap(ob: bpy.types.Object, hidden: list[bpy.types.Object], q: dict, out: Path) -> float:
@@ -464,11 +664,20 @@ def bake_lightmap(ob: bpy.types.Object, hidden: list[bpy.types.Object], q: dict,
         for n in [n for n in nt.nodes if n.name == "lightmap_target" or n.bl_idname == "ShaderNodeUVMap"]:
             nt.nodes.remove(n)
 
+    # Replace Blender's margin with one grown from each island's own texels,
+    # before and again after the denoiser (which blurs across islands).
+    mask = coverage_mask(ob, size)
+    steps = q["margin"] * 2
+    px = np.empty(size * size * 4, dtype=np.float32)
+    img.pixels.foreach_get(px)
+    px = px.reshape(size, size, 4)
+    px[..., :3] = dilate(px[..., :3], mask, steps)
+    img.pixels.foreach_set(px.ravel())
     raw = out / "lightmap_raw.exr"
     img.filepath_raw = str(raw)
     img.file_format = "OPEN_EXR"
     img.save()
-    denoised = denoise(raw, size, out)
+    denoised = dilate(denoise(raw, size, out), mask, steps)
     return encode_png(denoised, out / "shop_lightmap.png", size)
 
 

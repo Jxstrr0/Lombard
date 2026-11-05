@@ -9,5 +9,6 @@ public/assets/decoders/
 bake/out/*
 !bake/out/preview.jpg
 !bake/out/preview-wide.jpg
+!bake/out/preview-*.jpg
 __pycache__/
 art/out/

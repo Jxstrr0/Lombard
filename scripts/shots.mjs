@@ -59,7 +59,7 @@ function helpers(page, name) {
     async shot(label, what) {
       n++
       const file = `${OUT}/${name}-${String(n).padStart(2, '0')}-${label}.png`
-      await page.screenshot({ path: file })
+      await page.screenshot({ path: file, timeout: 90_000 })
       shots.push(`${file}  ${what}`)
     },
     state: () => page.evaluate(() => window.__lombardState?.()),

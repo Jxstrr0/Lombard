@@ -10,6 +10,7 @@ import { createButton, el, setButtonLabel, setText } from '../components/button'
 import { itemNameOf, longDate, rub, signedRub, WEEKDAYS } from '../format'
 import { icons } from '../icons'
 
+/** @deprecated The shop's name is state.shop.name (chosen at career start); kept for imports that predate it. */
 export const SHOP_NAME = 'Lombard No. 7'
 
 const KIND_LABEL: Record<LedgerEntry['kind'], string> = {
@@ -26,6 +27,7 @@ const KIND_LABEL: Record<LedgerEntry['kind'], string> = {
 
 export class LedgerScreen {
   readonly root: HTMLElement
+  private shopName: HTMLElement
   private title: HTMLElement
   private date: HTMLElement
   private summary: HTMLElement
@@ -45,7 +47,8 @@ export class LedgerScreen {
     const receipt = el('article', 'receipt')
     receipt.dataset.id = 'ledger'
     const head = el('header', 'receipt-head')
-    head.append(el('div', 'receipt-shop', SHOP_NAME.toUpperCase()), el('div', 'receipt-cyr', 'ЛОМБАРД № 7 · МОСТОГРАД'))
+    this.shopName = el('div', 'receipt-shop')
+    head.append(this.shopName, el('div', 'receipt-cyr', 'ЛОМБАРД · МОСТОГРАД'))
     this.title = el('div', 'receipt-title')
     this.date = el('div', 'receipt-date')
     head.append(this.title, this.date)
@@ -75,6 +78,7 @@ export class LedgerScreen {
 
   render(state: GameState): void {
     setButtonLabel(this.open, `Open shop — Day ${state.calendar.day}`, 'door')
+    setText(this.shopName, state.shop.name.toUpperCase())
     const last = state.history[state.history.length - 1]
     const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last])
     if (key === this.key) return

@@ -351,6 +351,8 @@ def add_lights(layout: dict) -> None:
                 data.spot_blend = spec.get("spotBlend", 0.5)
             ob = bpy.data.objects.new(spec["name"], data)
             ob.location = pos
+            # the lamp itself never shows in the preview renders (the game has no light sprites)
+            ob.visible_camera = False
             if "target" in spec:
                 direction = (THREE_TO_BLENDER @ Vector(spec["target"])) - pos
                 ob.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()

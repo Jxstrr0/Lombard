@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { reducer, type Action } from '../src/game/actions'
 import { createInitialState, seasonOf, weekdayOf, type GameState } from '../src/game/state'
 import { tuning } from '../src/data/tuning'
+import { getItemDef } from '../src/data/items'
+import { claimedValue } from '../src/game/appraise/value'
+import type { ItemInstance } from '../src/game/types'
+
+/** Customers anchor on claimedValue (fakes included), so a generous offer is measured against that. */
+const generous = (item: ItemInstance, cash: number) => Math.min(cash, Math.max(100, claimedValue(getItemDef(item.defId), item) * 2))
 
 const run = (s: GameState, ...actions: Action[]) => actions.reduce(reducer, s)
 
@@ -62,7 +68,7 @@ describe('day loop', () => {
     let s = run(createInitialState(11, 'c1'), { type: 'day/open' }, { type: 'counter/next' }, { type: 'counter/inspect' }, { type: 'inspect/done' })
     const item = s.current!.item
     // Offer the item's full value: any sane haggle accepts that.
-    s = run(s, { type: 'offer/make', amount: Math.max(100, item.trueValue * 2), approach: 'straight' })
+    s = run(s, { type: 'offer/make', amount: generous(item, s.cash), approach: 'straight' })
     expect(s.current?.outcome).toBe('bought')
     expect(s.inventory.map((i) => i.id)).toContain(item.id)
     expect(s.cash).toBe(tuning.career.startingCash - s.current!.price!)
@@ -95,7 +101,7 @@ describe('day loop', () => {
 
   it('selling to the dealer pays cash and removes the item', () => {
     let s = run(createInitialState(11, 'c1'), { type: 'day/open' }, { type: 'counter/next' }, { type: 'counter/inspect' }, { type: 'inspect/done' })
-    s = run(s, { type: 'offer/make', amount: Math.max(100, s.current!.item.trueValue * 2), approach: 'straight' }, { type: 'counter/dismiss' })
+    s = run(s, { type: 'offer/make', amount: generous(s.current!.item, s.cash), approach: 'straight' }, { type: 'counter/dismiss' })
     while (s.queue.length > 0) s = run(s, { type: 'counter/next' }, { type: 'counter/pass' }, { type: 'counter/dismiss' })
     s = reducer(s, { type: 'day/close' })
     const item = s.inventory[0]!

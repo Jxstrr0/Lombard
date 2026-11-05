@@ -32,6 +32,14 @@ export const tuning = {
     /** Multiplies every def's fakeChance. */
     fakeChanceScale: 1,
     condition: [35, 98] as [number, number],
+    /** Restored items look refinished: their condition is the best of this many draws. */
+    restoredConditionDraws: 2,
+    /** Instance weight varies within ± this share of the def's weight tolerance (fakes: × weightFactor). */
+    weightSpread: 0.5,
+    /** Provenance roll for M1 walk-ins (stolen arrives in M5). */
+    provenanceWeights: { unknown: 0.55, clean: 0.33, heirloom: 0.12 },
+    /** Only these categories can be heirlooms. */
+    heirloomCategories: ['gold', 'watches'] as readonly string[],
   },
 
   inspect: {
@@ -41,8 +49,16 @@ export const tuning = {
     missFactor: 0.8,
     /** Each repeat use of the same tool lowers the miss chance by this factor. */
     repeatMissDecay: 0.6,
+    /** Loupe aimed at a tell's own hotspot: miss chance × this. */
+    hotspotFocus: 0.5,
+    /** Loupe not aimed at any hotspot: hotspot tells get this much extra miss chance (before repeat decay). */
+    offHotspotMiss: 0.4,
+    /** No tell is ever missed more often than this. */
+    maxMiss: 0.95,
     /** Scale reading noise, ± grams as a fraction of expected weight. */
-    scaleNoise: 0.02,
+    scaleNoise: 0.01,
+    /** Loupe condition finding bands (lower bounds). Below `worn` the finding is negative evidence. */
+    conditionBands: { mint: 85, good: 65, worn: 45 },
   },
 
   appraise: {
@@ -51,6 +67,14 @@ export const tuning = {
       linear: [0.35, 1.05] as [number, number],
       collector: [0.15, 1.15] as [number, number],
     },
+    /** Collector curve: condition is raised to this power, so wear costs more. */
+    collectorExponent: 1.5,
+    /** Values are rounded to `step` while below `below` rubles. */
+    roundSteps: [
+      { below: 1_000, step: 10 },
+      { below: 10_000, step: 50 },
+      { below: Number.POSITIVE_INFINITY, step: 100 },
+    ] as readonly { below: number; step: number }[],
     /** M1 resale: the dealer pays this share of trueValue. */
     dealerRate: 0.8,
     /** ± noise on the dealer's price. */
@@ -58,9 +82,110 @@ export const tuning = {
   },
 
   haggle: {
+    /** Hard cap on rounds (GDD: 2–5). */
     maxRounds: 5,
-    /** Below this share of trueValue an offer is an insult. */
+    /** Fewest rounds any customer gives you. */
+    minRounds: 2,
+    /** Rounds each temperament gives before a final answer (capped by maxRounds). */
+    roundsByTemperament: { stubborn: 4, flexible: 5, desperate: 5, proud: 4 },
+    /** Chance a customer has one round less patience than their temperament allows. */
+    shortRoundChance: 0.3,
+    /**
+     * Below this share of claimedValue an offer is an insult (the customer
+     * anchors on what it would be worth if genuine; they don't know trueValue).
+     * Only applies while the offer is also under their current floor.
+     */
     insultRatio: 0.25,
+
+    // --- opening position (startHaggle) ---
+    /** ± spread of the customer's perceived value at knowledge 0 (shrinks linearly to 0 at knowledge 1). */
+    perceptionNoise: 0.3,
+    /** Knowledgeable sellers lean slightly high: perceived × (1 + this × knowledge). */
+    knowledgeBias: 0.06,
+    /** Opening ask = perceived × this. */
+    askMarkup: { stubborn: 1.06, flexible: 0.97, desperate: 0.88, proud: 1.12 },
+    /** Floor = perceived × (share − desperationFloorDrop × desperation). */
+    floorShare: { stubborn: 0.74, flexible: 0.64, desperate: 0.6, proud: 0.72 },
+    desperationFloorDrop: 0.25,
+    /** The floor never starts below this share of perceived value. */
+    minFloorShare: 0.3,
+    /** Tidy prices: round to `big` at or above `bigFrom` ₽, else to `small`. */
+    roundTo: { bigFrom: 2_000, big: 100, small: 10 },
+
+    // --- per round ---
+    /** Share of the gap (ask − offer) a counter gives up, by temperament. */
+    concession: { stubborn: 0.2, flexible: 0.45, desperate: 0.42, proud: 0.25 },
+    /** Concession grows by this much per round already played (they tire). */
+    concessionPerRound: 0.05,
+    /** Chance to accept an offer that is at or above the floor but under the ask. */
+    acceptBase: { stubborn: 0.12, flexible: 0.45, desperate: 0.5, proud: 0.22 },
+    /** Added to the accept chance per round already played. */
+    acceptPerRound: 0.1,
+    /** Added × (offer − floor) / (ask − floor): offers nearer the ask land more often. */
+    acceptCloseness: 0.3,
+    /** Added × desperation. */
+    acceptDesperation: 0.15,
+    /** Irritation added by every counter, by temperament. */
+    irritationPerRound: { stubborn: 0.08, flexible: 0.04, desperate: 0.03, proud: 0.1 },
+    /** Extra irritation × how far the offer falls under gapGrace of the ask. */
+    gapIrritation: 0.3,
+    gapGrace: 0.6,
+    /** Irritation at which a counter carries a warning line. */
+    warnIrritation: 0.75,
+
+    // --- insults ---
+    insultIrritation: { stubborn: 0.35, flexible: 0.25, desperate: 0.15, proud: 0.6 },
+    /** Chance a proud seller walks out on an insult even before irritation hits 1. */
+    proudInsultWalkChance: 0.5,
+
+    // --- Evidence ---
+    /** Strong evidence (negative, reveals authenticity/condition): floor × (1 − drop). */
+    evidenceDrop: 0.08,
+    /** Extra drop × knowledge (they know you're right). */
+    evidenceKnowledgeDrop: 0.08,
+    /** Extra drop when the finding reveals authenticity and the item really isn't genuine. */
+    evidenceFakeDrop: 0.25,
+    /** …plus this × knowledge (a knowing faker caught out folds hard). */
+    evidenceFakeKnowledgeDrop: 0.2,
+    /** The ask drops by drop × this. */
+    evidenceAskFactor: 1.3,
+    /** Proud sellers bristle at being corrected even when you're right. */
+    evidenceProudIrritation: 0.1,
+    /** Weak evidence (negative, reveals provenance or nothing): this share of a strong drop. */
+    evidenceWeakFactor: 0.4,
+    evidenceWeakIrritation: 0.12,
+    /** Citing a positive/neutral/missing finding. */
+    evidenceBackfireIrritation: 0.25,
+    /** Backfire firms the floor by this share (capped at the ask). */
+    evidenceBackfireFloorRise: 0.04,
+    /** Citing a finding you already used. */
+    evidenceRepeatIrritation: 0.08,
+
+    // --- Sympathy ---
+    /** Irritation change when sympathy lands (proud, desperate). */
+    sympathyIrritation: -0.15,
+    /** Concession multiplier when sympathy lands. */
+    sympathyConcession: 1.4,
+    /** Accept-chance bonus when sympathy lands. */
+    sympathyAccept: 0.2,
+    /** The margin it costs: floor × (1 + this), first use only. */
+    sympathyFloorRise: 0.07,
+    /** Irritation change when sympathy falls flat, by temperament. */
+    sympathyFlatIrritation: { stubborn: 0.06, flexible: 0 },
+
+    // --- Walk (threaten to pass) ---
+    /** Floor × (1 − this × (0.5 + desperation)), by temperament; halves with each repeat. */
+    threatFloorDrop: { stubborn: 0, flexible: 0.05, desperate: 0.14, proud: 0 },
+    /** Concession multiplier when the threat works. */
+    threatConcession: 1.5,
+    /** Accept-chance bonus when the threat works. */
+    threatAccept: 0.15,
+    /** Irritation added, by temperament. */
+    threatIrritation: { stubborn: 0.1, flexible: 0.06, desperate: 0.02, proud: 0.35 },
+    /** Chance a proud seller tells you to go ahead and pass. */
+    proudThreatWalkChance: 0.3,
+    /** Chance a stubborn seller calls your bluff on a lowball threat (offer under floor). */
+    stubbornThreatWalkChance: 0.15,
   },
 
   economy: {},
@@ -68,6 +193,10 @@ export const tuning = {
   save: {
     /** Day summaries kept in full; older days are folded into career stats. */
     historyDays: 60,
+    /** Longest save code (characters, after whitespace is stripped) that decoding will even try. */
+    maxCodeChars: 1_000_000,
+    /** Largest JSON a save code may inflate to (bytes); guards against decompression bombs. */
+    maxInflatedBytes: 8_000_000,
   },
 } as const
 

@@ -1,4 +1,5 @@
 /** Apply story effects (src/game/schema/story.ts) to the state. Pure. */
+import { flagAxis, nudgeAxis } from '../endings/axes'
 import { adjustRep } from '../reputation'
 import type { Effect } from '../schema/story'
 import type { GameState } from '../state'
@@ -8,8 +9,13 @@ import { applyChange, sellToSpecialist, startBoost, walkoutOne } from './special
 
 export function applyEffect(state: GameState, e: Effect, arc: string): GameState {
   switch (e.do) {
-    case 'flag':
-      return state.story.flags.includes(e.flag) ? state : { ...state, story: { ...state.story, flags: [...state.story.flags, e.flag] } }
+    case 'flag': {
+      if (state.story.flags.includes(e.flag)) return state
+      const next = { ...state, story: { ...state.story, flags: [...state.story.flags, e.flag] } }
+      // M5: heart.* and dirty.* choices count on the ending axes, once.
+      const move = flagAxis(e.flag)
+      return move ? nudgeAxis(next, move.axis, move.delta, `story:${arc}`) : next
+    }
     case 'unflag':
       return { ...state, story: { ...state.story, flags: state.story.flags.filter((f) => f !== e.flag) } }
     case 'trust':

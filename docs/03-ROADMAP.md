@@ -72,7 +72,7 @@ Done when: screenshots look like a real shop and the phone still holds 30 fps.
 
 Done when: a 30-day playthrough has recurring characters the tester can name.
 
-## M5 — Crime layer (status: not started)
+## M5 — Crime layer (status: in progress. Foundation in: save v8 with homes for heat, Volkova, the fence, the bulletin and crime events, the ending axes and endCareer)
 
 - Heat and Volkova visits, stolen bulletin, cooperate / lie / bribe branches.
 - Pressure and the full Protection arc, vandalism events, mob fenced goods.

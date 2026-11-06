@@ -195,7 +195,92 @@ PAINT_OUT: dict[str, dict[str, list[dict]]] = {
     'male_adult_14': {'head': [
         dict(box=b, soft=(60, 130), **_GREY_HAIR) for b in _around((700, 540, 1330, 1100), 1100)
     ]},
+    # ---- M6: twenty more regulars. Seven new Adults avatars, then thirteen recoloured
+    # variants (`<base>_b`) of regular-only Adults avatars, cast as that regular's relative
+    # (docs/05, Nov 2026): Rocketbox has no more usable adult faces outside Professions.
+    'male_adult_09': {'body': [
+        # "END OF THE ROAD" lettering on the tee, front and hem (orange): healed into the cloth
+        dict(box=(990, 1210, 1150, 1390), dx=-300, dy=120, mode='heal', hue=(5, 50), sat=(0.3, 1), feather=0),
+        dict(box=(1100, 1650, 1240, 1710), dx=-300, dy=-60, mode='heal', hue=(5, 50), sat=(0.3, 1), feather=0),
+    ]},
 }
+
+
+def _keep_text(base):
+    """A variant keeps its base's paint-outs (logos, monograms) but not its recolours."""
+    return {k: [op for op in ops if op.get('mode') != 'grey'] for k, ops in PAINT_OUT.get(base, {}).items()}
+
+
+def _dye(color, *boxes, **kw):
+    """Dye cloth in these boxes `color` (common.paint mode 'tone'), keeping its shading."""
+    return [dict(box=b, mode='tone', color=color, feather=0, **kw) for b in boxes]
+
+
+def _hair(color, opacity=True, head=True, hole=(540, 330, 1520, 1000), bottom=1000, extra=(), **kw):
+    """Dye dark hair: the hair cards (opacity texture) and the hair painted round the face on the
+    head texture (dark pixels only, outside the face and neck)."""
+    out = {}
+    if opacity:
+        out['opacity'] = [dict(box=(0, 0, 2048, 2048), mode='tone', color=color, feather=0, **kw)]
+    if head:
+        out['head'] = [dict(box=b, mode='tone', color=color, feather=0, lum=(0, 140), **kw) for b in (*_around(hole, bottom), *extra)]
+    return out
+
+
+def _merge(*parts):
+    out: dict[str, list[dict]] = {}
+    for p in parts:
+        for k, ops in p.items():
+            out.setdefault(k, []).extend(ops)
+    return out
+
+
+# Each variant is a different person in the same body: different clothes colours and, where the
+# hair is dark enough to dye cleanly, different hair. Cast as a relative of the base's regular.
+# Long hair also runs down the head texture below the face (beside the eye and mouth parts).
+_LONG_HAIR = ((640, 1250, 2048, 2048),)
+_MALE_SHIRT = ((640, 40, 1400, 1950), (0, 860, 620, 1240), (1400, 860, 2048, 1240))
+VARIANTS: dict[str, dict[str, list[dict]]] = {
+    # Grisha Zubov (Zhora's older brother): Zhora's black shirt is olive in the source; his is faded work blue.
+    'male_adult_11_b': _merge(_keep_text('male_adult_11'), {'body': _dye((92, 112, 146), *_MALE_SHIRT, noskin=True)}),
+    # Vitya Gruzdev (Ruslan's brother, hockey dad): the blue of the zip hoodie goes team red.
+    'male_adult_17_b': _merge(_keep_text('male_adult_17'), {'body': _dye((168, 34, 40), (0, 0, 2048, 2048), hue=(195, 255), sat=(0.25, 1))}),
+    # Prokhor Lukich (Yevstafy's brother, fisherman): bottle-green shirt, dark work trousers, his own hair (not greyed).
+    'male_adult_14_b': {'body': [
+        *_dye((62, 88, 66), (600, 280, 1400, 1960), (0, 870, 580, 1660), (1380, 870, 2048, 1660), noskin=True),
+        *_dye((58, 62, 74), (0, 0, 580, 860), (1360, 0, 1940, 860)),
+    ]},
+    # Zakhar Svirelin (Gleb's older brother, chess hustler): maroon sweater, greying hair.
+    'male_adult_02_b': {
+        'body': _dye((90, 28, 40), (600, 200, 1420, 1990), (0, 860, 600, 1720), (1420, 860, 2048, 1720)),
+        'opacity': [dict(box=(0, 0, 2048, 2048), **{**_GREY_HAIR, 'level': 0.5, 'amount': 0.85})],
+        'head': [dict(box=b, soft=(60, 130), **{**_GREY_HAIR, 'amount': 0.8}) for b in _around((700, 540, 1330, 1100), 1100)],
+    },
+    # Ernest Ramonovich (Mikhail's brother, restaurant trumpeter): the denim jacket goes wine.
+    'male_adult_12_b': _merge(_keep_text('male_adult_12'), {'body': _dye((82, 28, 38), (620, 170, 1420, 1960), (0, 840, 640, 1620), (1400, 840, 2048, 1620), hue=(190, 250), sat=(0.15, 1))}),
+    # Styopa Ryabov (Fedya's younger brother): the red henley goes forest green.
+    'male_adult_06_b': _merge(_keep_text('male_adult_06'), {'body': _dye((52, 92, 58), (0, 0, 2048, 2048), hue=(340, 20), sat=(0.35, 1))}),
+    # Jamshid Rakhimov (Bakhtiyor's cousin): the white kurta and trousers in slate grey.
+    'male_adult_15_b': {'body': _dye((62, 76, 98), (0, 0, 2048, 2048), sat=(0, 0.22), lum=(150, 255))},
+    # Klava Bortnik (Ulyana's sister, tram driver): the grey waistcoat is a tram-company orange vest.
+    'female_adult_13_b': {'body': _dye((226, 112, 36), (600, 0, 1420, 2048), (0, 480, 640, 1020), (1400, 480, 2048, 1020), sat=(0, 0.2), lum=(70, 255), noskin=True)},
+    # Elvira Venchikova (Inessa's sister, teacher): burgundy blouse, near-black hair.
+    'female_adult_15_b': _merge({'body': _dye((118, 34, 54), (0, 0, 2048, 2048), hue=(200, 260), sat=(0.15, 1))}, _hair((52, 40, 34), extra=_LONG_HAIR)),
+    # Zhanna Kuzovkina (Rimma's cousin, postwoman): the brown knit dress goes post-office navy.
+    'female_adult_11_b': {'body': _dye((46, 56, 102), (0, 480, 2048, 2048), lum=(0, 110), noskin=True)},
+    # Nonna Karavaeva (Lyusya's older sister, night nurse): a teal cardigan instead of oatmeal.
+    'female_adult_09_b': {'body': _dye((92, 138, 146), (0, 500, 640, 1010), (1400, 500, 2048, 1010),
+                                     (600, 0, 1420, 780), (600, 780, 900, 2048), (1120, 780, 1420, 2048), (900, 1000, 1120, 2048), sat=(0.08, 1))},
+    # Zoya Chernykh (Yana's older sister, tattooist): black tee, dyed oxblood hair.
+    'female_adult_08_b': _merge({'body': _dye((34, 34, 37), (600, 0, 1420, 1650), noskin=True)}, _hair((112, 34, 40), extra=_LONG_HAIR)),
+    # Larisa Kovrigina (Alisa's twin, the sensible one): a camel hoodie, the trim navy, no headphones print.
+    'female_adult_12_b': {'body': [
+        *_dye((150, 120, 88), (0, 0, 2048, 2048), lum=(0, 70), noskin=True, contrast=0.7),
+        *_dye((40, 50, 86), (0, 0, 2048, 2048), hue=(90, 170), sat=(0.3, 1)),
+        *_dye((150, 120, 88), (0, 0, 2048, 2048), hue=(260, 330), sat=(0.25, 1)),
+    ]},
+}
+PAINT_OUT.update(VARIANTS)
 
 
 def log(msg: str) -> None:

@@ -30,6 +30,7 @@ const lines = [
   [policies.mobFriendly, {}, 'mobFriendly'],
   [policies.careless, {}, 'careless'],
   [policies.trader, {}, 'trader'],
+  [policies.appraiser, {}, 'appraiser'],
   [policies.neighbour, {}, 'neighbour'],
 ]
 for (const [policy, options, label] of lines) {
@@ -53,7 +54,7 @@ for (const [policy, options, label] of lines) {
   const mid = runs.slice().sort((a, b) => a.finalWorth - b.finalWorth)[Math.floor(runs.length / 2)]
   console.log('          worth by day: ' + mid.days.filter((d) => d.day % 10 === 0).map((d) => `${d.day}:${Math.round(d.worth / 1000)}k`).join('  '))
   // Regulars (M4): visits per regular over the whole run, averaged across seeds.
-  const ids = [...new Set(runs.flatMap((r) => Object.keys(r.customers)))].sort()
+  const ids = [...new Set(runs.flatMap((r) => Object.keys(r.customers)))].filter((id) => id !== 'appraiser').sort() // Lev: staff, not a regular
   const avg = (id) => runs.reduce((a, r) => a + (r.customers[id]?.visits ?? 0), 0) / runs.length
   console.log(`          regular visits in ${days} days: ` + ids.map((id) => `${id} ${avg(id).toFixed(1)}`).join('  '))
   // M5: the crime dials and the ending axes, averaged across seeds.
@@ -84,6 +85,18 @@ for (const [policy, options, label] of lines) {
       `  father sold ${has('volkova.father_sold')}  honest ${branch(['volkova.source', 'volkova.rang'])}  bought ${branch(['dirty.volkova_loan', 'volkova.reported', 'dirty.volkova_audit'])}` +
       `  lied ${branch(['heart.volkova_truth', 'volkova.grudge'])}  informed ${has('volkova.informed')} leaked ${has('volkova.leaked')} crackdown ${has('volkova.crackdown')}`,
   )
+  // M6 the appraiser: shops that hired him, his record (averaged over those), and how his arc went.
+  const hired = runs.filter((r) => r.staff.hired || r.staff.gone)
+  if (hired.length) {
+    const per = (f) => (hired.reduce((a, r) => a + f(r), 0) / hired.length).toFixed(1)
+    console.log(
+      `          appraiser: hired ${hired.length}/${runs.length} (median day ${hired.map((r) => r.staff.sinceDay).sort((a, b) => a - b)[Math.floor(hired.length / 2)]})` +
+        `  served ${per((r) => r.staff.record.served)}  bought ${per((r) => r.staff.record.bought)}  lent ${per((r) => r.staff.record.lent)}` +
+        `  fakes ${per((r) => r.staff.record.fakes)}  insults ${per((r) => r.staff.record.insults)}  wages ₽${per((r) => r.staff.record.wages)}` +
+        `  | confided ${has('heart.appraiser_kept')} tin→crew ${has('appraiser.debt_paid')} yuri ${has('appraiser.yuri_home')} police ${has('appraiser.tin_police')} split ${has('dirty.appraiser_tin')}` +
+        `  vanished ${has('appraiser.vanished')} let go ${has('appraiser.told_go') + has('appraiser.let_go')}`,
+    )
+  }
   // M6 the Flood: its day, how ready the shop was, what the water cost, hero and vulture choices.
   const prep = (p) => runs.filter((r) => r.flood.prep === p).length
   console.log(

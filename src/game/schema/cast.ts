@@ -23,6 +23,11 @@ export const CastEntry = z.object({
    * walk-in, so a regular's face only ever belongs to that regular. Absent = walk-in cast.
    */
   regular: z.literal(true).optional(),
+  /**
+   * M6: a look kept for the hired appraiser (src/data/appraiser.ts): like `regular`, never given to
+   * a walk-in, and never to a regular either.
+   */
+  staff: z.literal(true).optional(),
   /** Who this looks like, for casting by description: age band, gender, build, clothes, hair. */
   note: z.string().min(1),
 })

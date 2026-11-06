@@ -7,7 +7,7 @@
  * Cast entries marked `regular` (M4) belong to authored regulars and are never
  * drawn for a walk-in: they are filtered out before any pick or hash, so the
  * walk-in pool, and every look already derived from it, is the same as before
- * they were added.
+ * they were added. M6: the same goes for the appraiser's look (`staff`).
  */
 import { CAST } from '../../data/customers/cast'
 import { femaleFirstNames } from '../../data/customers/walkins'
@@ -23,7 +23,7 @@ export function genderOf(name: string): Gender {
 
 /** The cast members random walk-ins can be played by (everyone not kept for a regular). */
 export function walkInCast(cast: readonly CastEntry[] = CAST): readonly CastEntry[] {
-  return cast.filter((c) => !c.regular)
+  return cast.filter((c) => !c.regular && !c.staff)
 }
 
 /** The looks kept for authored regulars (each regular names one as its portraitKey). */

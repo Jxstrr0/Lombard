@@ -10,6 +10,7 @@ import { SPECIALISTS } from '../src/data/specialists'
 import { FENCE } from '../src/data/fence'
 import { COLLECTOR } from '../src/data/collector'
 import { VOLKOVA } from '../src/data/police'
+import { APPRAISER } from '../src/data/appraiser'
 import { FLOOD_PERSON } from '../src/data/flood'
 import { REGULARS, getRegular } from '../src/data/regulars'
 import { ARCS, getBeat } from '../src/data/stories'
@@ -78,8 +79,8 @@ describe('story content', () => {
       for (const beat of arc.beats) {
         const v = beat.visit
         // M4: a regular, or a specialist (their own arcs); `as` someone they sent.
-        // M5: or the fence, the Collector or Detective Volkova (their own arcs).
-        const person = v.who === FENCE.id ? FENCE : v.who === COLLECTOR.id ? COLLECTOR : v.who === VOLKOVA.id ? VOLKOVA : v.who === FLOOD_PERSON.id ? FLOOD_PERSON : undefined
+        // M5: or the fence, the Collector or Detective Volkova (their own arcs). M6: or the appraiser, or the Flood's person.
+        const person = v.who === FENCE.id ? FENCE : v.who === COLLECTOR.id ? COLLECTOR : v.who === VOLKOVA.id ? VOLKOVA : v.who === APPRAISER.id ? APPRAISER : v.who === FLOOD_PERSON.id ? FLOOD_PERSON : undefined
         expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who) ?? person, `${beat.id} who`).toBeDefined()
         if (v.as) expect(looks.has(v.as.look), `${beat.id} as.look`).toBe(true)
         if (v.item) {
@@ -92,11 +93,11 @@ describe('story content', () => {
         const conds: readonly Condition[] = beat.when
         for (const c of conds) {
           if (c.if === 'beat') expect(beats.has(c.beat), `${beat.id} → ${c.beat}`).toBe(true)
-          if (c.if === 'trust' || c.if === 'visits' || c.if === 'loan') expect(getRegular(c.who), `${beat.id} ${c.who}`).toBeDefined()
+          if (c.if === 'trust' || c.if === 'visits' || c.if === 'loan') expect(getRegular(c.who) ?? (c.who === APPRAISER.id ? APPRAISER : undefined), `${beat.id} ${c.who}`).toBeDefined()
           if (c.if === 'specialist') expect(specialists.has(c.id), `${beat.id} ${c.id}`).toBe(true)
         }
         const effects = [...(v.scene?.choices.flatMap((c) => c.effects) ?? []), ...Object.values(v.after).flatMap((a) => a?.effects ?? [])]
-        for (const e of effects) if (e.do === 'trust') expect(getRegular(e.who), `${beat.id} ${e.who}`).toBeDefined()
+        for (const e of effects) if (e.do === 'trust') expect(getRegular(e.who) ?? (e.who === APPRAISER.id ? APPRAISER : undefined), `${beat.id} ${e.who}`).toBeDefined()
       }
     }
   })

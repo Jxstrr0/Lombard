@@ -75,6 +75,16 @@ export const UPGRADES: readonly UpgradeDef[] = [
     group: 'security',
     effects: { security: u.security.camera, records: true },
   },
+  // --- M6 staff (src/game/staff/appraiser.ts) ---
+  {
+    id: 'second_counter',
+    name: 'A second counter',
+    blurb: 'The floor case gets a mat, a till drawer and a bell: room for a second pair of hands. Lets you hire an appraiser for the overflow.',
+    cost: tuning.upgrades.cost.second_counter,
+    group: 'staff',
+    fromDay: tuning.appraiser.counterDay,
+    effects: {},
+  },
 ].map((raw) => UpgradeDef.parse(raw))
 
 export const REFERENCE_BOOKS: readonly ReferenceBook[] = [

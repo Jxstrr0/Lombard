@@ -11,7 +11,7 @@
 import { z } from 'zod'
 import { tuning } from '../../data/tuning'
 import { flagAxis } from '../endings/axes'
-import { addDays, createCrimeState, createSlots, STATE_VERSION, type GameState } from '../state'
+import { addDays, createCrimeState, createSlots, createStaffState, STATE_VERSION, type GameState } from '../state'
 
 export const CURRENT_VERSION = STATE_VERSION
 
@@ -252,8 +252,20 @@ const v7ToV8: Migration = {
   },
 }
 
+/**
+ * v8 (M5) → v9 (M6): the appraiser at the second counter (`staff`). Nobody was hired before
+ * the second counter existed, so every older career starts with nobody on staff.
+ */
+const v8ToV9: Migration = {
+  from: 8,
+  to: 9,
+  up(raw) {
+    return { ...raw, staff: createStaffState() }
+  },
+}
+
 /** Ordered, contiguous chain. Append new steps at the end. */
-export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5, v5ToV6, v6ToV7, v7ToV8]
+export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5, v5ToV6, v6ToV7, v7ToV8, v8ToV9]
 
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())
@@ -293,6 +305,7 @@ const GameStateShape = z.looseObject({
   history: z.array(z.unknown()),
   crime: z.looseObject({ heat: num, pressure: num, bulletin: z.array(z.unknown()), volkova: rec, fence: rec, events: z.array(z.unknown()) }),
   career: z.looseObject({ axes: z.looseObject({ clean: num, heart: num }), end: rec.nullable() }),
+  staff: z.looseObject({ hired: z.boolean(), sinceDay: num, mode: z.string(), categories: z.array(z.string()), record: rec }),
   story: rec,
   reputation: rec,
   stats: z.looseObject({ customersSeen: num }),

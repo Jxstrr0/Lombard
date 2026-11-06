@@ -16,7 +16,10 @@ import { matchesBulletin } from '../game/crime/bulletin'
 import { NO_PASSPORT_TELL, passportAsked } from '../game/crime/ledger'
 import { availableTools } from '../game/inspect/available'
 import type { ToolId } from '../game/schema/item'
-import type { GameState } from '../game/state'
+import { upgradeStatus } from '../game/economy/upgrades'
+import { hireStatus, SECOND_COUNTER } from '../game/staff/appraiser'
+import type { GameState, StaffMode } from '../game/state'
+import { tuning } from '../data/tuning'
 import type { Finding, ItemVisit } from '../game/types'
 
 export interface PolicyContext {
@@ -85,6 +88,11 @@ export interface PolicyParams {
    * like anyone else at the counter.
    */
   fence?: 'refuse' | 'deal'
+  /**
+   * M6: buys the second counter once it's offered and the till can spare it (its cost and a month of
+   * wages over the bills reserve), then hires the appraiser with this rule.
+   */
+  hire?: { mode: StaffMode; categories?: string[] }
 }
 
 /** M5: a brick is due tonight, or the case has no glass yet. */
@@ -247,9 +255,26 @@ function closedStep(state: GameState, ctx: PolicyContext, p: PolicyParams): Acti
       return { type: 'ledger/sell', itemId: it.id }
     }
   }
+  const hire = hireStep(state, p)
+  if (hire) return hire
   return { type: 'day/open' }
 }
 
+function hireStep(state: GameState, p: PolicyParams): Action | null {
+  if (!p.hire) return null
+  const status = hireStatus(state)
+  if (status === 'noCounter') {
+    const cost = tuning.upgrades.cost.second_counter
+    if (upgradeStatus(state, SECOND_COUNTER) === 'available' && spendable(state, p) >= cost + tuning.appraiser.salary) return { type: 'upgrade/buy', id: SECOND_COUNTER }
+    return null
+  }
+  if (status === 'available') return { type: 'staff/hire' }
+  const want = p.hire
+  if (status === 'hired' && (state.staff.mode !== want.mode || (want.categories && want.categories.join() !== state.staff.categories.join()))) {
+    return { type: 'staff/rule', mode: want.mode, ...(want.categories ? { categories: [...want.categories].sort() } : {}) }
+  }
+  return null
+}
 /**
  * M6 the Flood (src/data/stories/flood.ts). A sensible decent shop: sandbags at the door, lends the
  * pump, stores Nina's things for nothing, turns Misha's loan down politely, and refunds the pump if
@@ -291,6 +316,18 @@ const CAREFUL: PolicyParams = {
 }
 
 export const careful = makePolicy(CAREFUL)
+
+/**
+ * M6: the careful shop with an appraiser at the second counter (the overflow), as soon as it can
+ * afford him. It treats him well (welcomes him, asks him rather than Zhora, keeps him on) and pays
+ * Yura's debt with the tin.
+ */
+export const appraiser = makePolicy({
+  ...CAREFUL,
+  name: 'appraiser',
+  hire: { mode: 'next' },
+  prefer: ['welcome', 'ask_lev', 'keep_on', 'tin_crew', 'pay_back', 'pay_some', ...(CAREFUL.prefer ?? [])],
+})
 
 /**
  * M6 the Flood: the careful shop, except that it lends Misha the money too (credit_lend, the one

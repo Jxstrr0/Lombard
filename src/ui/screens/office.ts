@@ -4,9 +4,12 @@
  * security (with how many things sit on open shelves tonight), and the
  * specialists on retainer (retain / release, fees, calls left).
  *
- * Release asks for a second tap (no refund for the month); everything else
- * applies at once. The reducer only accepts these actions while closed.
+ * M6 Staff: the second counter (an upgrade) and the appraiser: hire him, choose which
+ * walk-ins he takes (the overflow, or only some categories), see his record, let him go.
+ *
+ * Release and letting him go ask for a second tap; everything else applies at once. The reducer only accepts these actions while closed.
  */
+import { APPRAISER, APPRAISER_TEXT } from '../../data/appraiser'
 import { SPAWN_DEFS } from '../../data/items'
 import { getSpecialist, SPECIALISTS } from '../../data/specialists'
 import { tuning } from '../../data/tuning'
@@ -15,6 +18,7 @@ import type { Action } from '../../game/actions'
 import { monthName, upcomingBills } from '../../game/economy/expenses'
 import { callsLeft, monthlyCalls, retainCost } from '../../game/economy/specialists'
 import { canRestockAcid, hasUpgrade, protectedAreas, upgradeStatus } from '../../game/economy/upgrades'
+import { accuracyOf, hireStatus, wagesDue } from '../../game/staff/appraiser'
 import { addDays, type GameState } from '../../game/state'
 import { createButton, el, setText } from '../components/button'
 import { rub } from '../format'
@@ -57,6 +61,7 @@ export class OfficeSheet {
   private exposure: HTMLElement
   private acid: HTMLElement
   private specialists: HTMLElement
+  private staff: HTMLElement
   private confirmRelease: string | null = null
   private key = ''
 
@@ -106,7 +111,12 @@ export class OfficeSheet {
     const spSec = this.section('Specialists on retainer', 'A monthly fee buys a few calls; extra calls cost more. Retaining mid-month charges the rest of the month.')
     spSec.append(this.specialists)
 
-    sheet.append(head, this.cash, billsSec, upSec, secSec, spSec)
+    this.staff = el('ul', 'office-list')
+    this.staff.dataset.id = 'office-staff'
+    const staffSec = this.section('Staff', 'A second pair of hands for the line you can’t get to. His deals land in your books, and so do his mistakes.')
+    staffSec.append(this.staff)
+
+    sheet.append(head, this.cash, billsSec, upSec, secSec, staffSec, spSec)
     root.append(sheet)
     this.root = root
     this.sheet = sheet
@@ -130,13 +140,14 @@ export class OfficeSheet {
   }
 
   render(state: GameState): void {
-    const key = JSON.stringify([state.cash, state.shop.upgrades, state.shop.acidCharges, state.shop.slots, state.specialists, state.calendar.date, this.confirmRelease])
+    const key = JSON.stringify([state.cash, state.shop.upgrades, state.shop.acidCharges, state.shop.slots, state.specialists, state.calendar.date, state.staff, this.confirmRelease])
     if (key === this.key) return
     this.key = key
     setText(this.cash, `Cash in the till: ${rub(state.cash)}`)
     this.renderBills(state)
     this.renderUpgrades(state)
     this.renderSpecialists(state)
+    this.renderStaff(state)
   }
 
   private section(title: string, text: string): HTMLElement {
@@ -167,6 +178,7 @@ export class OfficeSheet {
   private renderUpgrades(state: GameState): void {
     this.upgrades.replaceChildren()
     this.security.replaceChildren()
+    this.staff.replaceChildren()
     const shielded = protectedAreas(state)
     const open = state.shop.slots.filter((sl) => sl.itemId && sl.area !== 'counter' && !shielded.has(sl.area)).length
     setText(
@@ -189,12 +201,12 @@ export class OfficeSheet {
         li.append(tag)
       } else {
         const needs = u.requires.filter((r) => !hasUpgrade(state, r)).map((r) => UPGRADES.find((x) => x.id === r)?.name ?? r)
-        const label = status === 'locked' ? `Needs ${needs.join(', ')}` : status === 'short' ? 'Not enough cash' : `Buy — ${rub(u.cost)}`
+        const label = status === 'locked' ? (needs.length ? `Needs ${needs.join(', ')}` : `From day ${u.fromDay ?? ''}`) : status === 'short' ? 'Not enough cash' : `Buy — ${rub(u.cost)}`
         const b = createButton({ id: `buy-${u.id}`, label, variant: status === 'available' ? 'primary' : 'secondary', onPress: () => this.deps.dispatch({ type: 'upgrade/buy', id: u.id }) })
         b.disabled = status !== 'available'
         li.append(b)
       }
-      const list = u.group === 'security' ? this.security : this.upgrades
+      const list = u.group === 'security' ? this.security : u.group === 'staff' ? this.staff : this.upgrades
       list.append(li)
     }
 
@@ -211,6 +223,108 @@ export class OfficeSheet {
       b.disabled = !canRestockAcid(state)
       this.acid.append(b)
     }
+  }
+
+  /** The appraiser's card (after the second counter's, which renderUpgrades puts in the same list). */
+  private renderStaff(state: GameState): void {
+    const status = hireStatus(state)
+    const st = state.staff
+    const A = tuning.appraiser
+    const li = el('li', `office-card${status === 'hired' ? ' is-owned' : ''}`)
+    li.dataset.id = 'staff-appraiser'
+    const top = el('div', 'office-card-top')
+    top.append(el('span', 'office-name', APPRAISER.name), el('span', 'office-amt', `${rub(A.salary)}/mo`))
+    li.append(top, el('p', 'office-role', `Appraiser · eye ${Math.round(accuracyOf(state) * 100)}%`))
+    if (status === 'gone') {
+      li.append(el('p', 'office-quiet', st.gone === 'fired' ? APPRAISER_TEXT.fired : APPRAISER_TEXT.gone))
+      this.staff.append(li)
+      return
+    }
+    if (status !== 'hired') {
+      li.append(el('p', 'office-blurb', APPRAISER_TEXT.pitch))
+      li.append(el('p', 'office-terms', `Paid at month end with the rent, from the day he starts. He never spends the till below ${rub(A.cashFloor)}.`))
+      const b = createButton({
+        id: 'staff-hire',
+        label: status === 'noCounter' ? 'Needs a second counter' : 'Hire — starts tomorrow',
+        variant: 'primary',
+        onPress: () => this.deps.dispatch({ type: 'staff/hire' }),
+      })
+      b.disabled = status !== 'available'
+      li.append(b)
+      this.staff.append(li)
+      return
+    }
+    li.append(el('p', 'office-quote', APPRAISER_TEXT.hello))
+    const r = st.record
+    li.append(
+      el(
+        'p',
+        'office-terms',
+        `Served ${r.served} · bought ${r.bought} · lent on ${r.lent} · spent ${rub(r.spent)}${r.fakes ? ` · ${r.fakes} fake${r.fakes === 1 ? '' : 's'}` : ''}${r.insults ? ` · ${r.insults} insulted` : ''}. Owed so far this month: ${rub(wagesDue(state))}.`,
+      ),
+    )
+    // Which walk-ins he takes.
+    li.append(el('div', 'settings-label', 'He takes'))
+    const rule = el('div', 'segmented office-rule')
+    rule.setAttribute('role', 'radiogroup')
+    rule.setAttribute('aria-label', 'Which walk-ins he takes')
+    const modes = [
+      { mode: 'next' as const, label: 'The overflow' },
+      { mode: 'categories' as const, label: 'Only these' },
+    ]
+    for (const m of modes) {
+      const b = el('button', `segment${st.mode === m.mode ? ' is-selected' : ''}`, m.label)
+      b.type = 'button'
+      b.dataset.id = `staff-mode-${m.mode}`
+      b.setAttribute('role', 'radio')
+      b.setAttribute('aria-checked', String(st.mode === m.mode))
+      b.addEventListener('click', () => this.deps.dispatch({ type: 'staff/rule', mode: m.mode }))
+      rule.append(b)
+    }
+    li.append(rule)
+    li.append(
+      el(
+        'p',
+        'office-quiet',
+        st.mode === 'next'
+          ? `When ${A.overflowAt} or more are waiting, he takes the next seller after the first in line. Never a regular, a story, a buyer or a pawner coming back.`
+          : 'Any seller in line bringing one of these (after the first in line), however short the line.',
+      ),
+    )
+    if (st.mode === 'categories') {
+      const cats = el('div', 'office-cats')
+      for (const c of [...STOCKED].sort()) {
+        const on = st.categories.includes(c)
+        const b = el('button', `segment${on ? ' is-selected' : ''}`, CATEGORY_LABEL[c] ?? c)
+        b.type = 'button'
+        b.dataset.id = `staff-cat-${c}`
+        b.setAttribute('aria-pressed', String(on))
+        b.addEventListener('click', () => {
+          const next = on ? st.categories.filter((x) => x !== c) : [...st.categories, c]
+          this.deps.dispatch({ type: 'staff/rule', mode: 'categories', categories: next })
+        })
+        cats.append(b)
+      }
+      li.append(cats)
+    }
+    const confirming = this.confirmRelease === 'staff'
+    const fire = createButton({
+      id: 'staff-fire',
+      label: confirming ? 'Tap again to let him go (for good)' : 'Let him go',
+      variant: confirming ? 'danger' : 'secondary',
+      onPress: () => {
+        if (this.confirmRelease === 'staff') {
+          this.confirmRelease = null
+          this.deps.dispatch({ type: 'staff/fire' })
+        } else {
+          this.confirmRelease = 'staff'
+          this.key = ''
+          this.render(this.deps.getState())
+        }
+      },
+    })
+    li.append(fire)
+    this.staff.append(li)
   }
 
   private renderSpecialists(state: GameState): void {

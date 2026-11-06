@@ -297,8 +297,9 @@ export interface InspectState {
 /**
  * story (M4): cash a story beat moved outside a deal (a gift, an old debt).
  * theft: shoplifted off an open shelf (M4). deterred: security stopped one (a note, no cash).
+ * staff: a note about the appraiser's work (M6): a mistake found at closing, an insulted seller (no cash).
  */
-export type LedgerKind = 'buy' | 'sell' | 'walkout' | 'pass' | 'expense' | 'loan' | 'redeem' | 'forfeit' | 'story' | 'theft' | 'deterred'
+export type LedgerKind = 'buy' | 'sell' | 'walkout' | 'pass' | 'expense' | 'loan' | 'redeem' | 'forfeit' | 'story' | 'theft' | 'deterred' | 'staff'
 
 export interface LedgerEntry {
   kind: LedgerKind

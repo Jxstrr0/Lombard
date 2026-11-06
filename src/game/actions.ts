@@ -21,20 +21,23 @@ import { claimedValue, dealerPrice } from './appraise/value'
 import { leftoverStock } from './career/start'
 import { generateDayQueue } from './customers/walkins'
 import { planStory, storyRng } from './story/plan'
-import { afterVisit, sceneChoose, sceneFor, sceneNext } from './story/visit'
+import { afterVisit, playPaperBeats, sceneChoose, sceneFor, sceneNext } from './story/visit'
+import { boostSellers, noteBought, noteCall, pruneBoosts, referralBuyers } from './story/specialists'
+import { noteForfeits, pledgeRedeemLines } from './story/pledges'
 import { updateMarket } from './economy/demand'
 import { chargeExpenses } from './economy/expenses'
 import { releaseSpecialist, retainSpecialist } from './economy/specialists'
 import { buyUpgrade, restockAcid } from './economy/upgrades'
 import { haggleRound, startHaggle, type HaggleContext } from './haggle/machine'
 import { payForTool, toolExtras } from './inspect/available'
-import { useTool } from './inspect/tools'
+import { SPECIALIST_TELL, useTool } from './inspect/tools'
 import { amountDue, createLoan, forfeitOverdue, pawnClaim, planRedemptions } from './loans/loans'
 import { patienceRepFactor, repAfterDeal, repAfterInsult, repAfterRedeem, repAfterSale, repAfterWalkout, syncSpecialistsRep } from './reputation'
 import { Rng } from './rng'
 import type { ToolId } from './schema/item'
 import { planBuyers, saleRound, startSale } from './sell/buyer'
-import { clearItem, placeItem, setPrice } from './shop/display'
+import { placeItem, setPrice } from './shop/display'
+import { removeSold } from './shop/sold'
 import { rollShoplifting } from './shop/theft'
 import { addDays, createInitialState, seasonOf, weekdayOf, type GameState, type Settings } from './state'
 import type { Approach, DaySummary, ItemVisit, LedgerEntry, QueuedVisit, VisitOutcome, VisitState } from './types'
@@ -283,9 +286,10 @@ function openDay(state: GameState): GameState {
   return withRng(state, (s0, rng) => {
     // Start today's log first so forfeits land in it.
     let s: GameState = { ...s0, day: { phase: 'open', clock: 0, served: 0, total: 0, openingCash: s0.cash, log: [], newsRead: true } }
-    s = forfeitOverdue(s)
-    const market = updateMarket(s, rng)
-    s = { ...s, market }
+    const pledged = s.loans
+    // Story beats hear about their pledges forfeited this morning.
+    s = pruneBoosts(noteForfeits(forfeitOverdue(s), pledged))
+    s = { ...s, market: updateMarket(s, rng) }
     const ids = idAllocator(s)
     // Regulars and story beats first: their sellers take walk-in places. Their ids are keyed by
     // day and person (each person comes at most once a day) and their queue places come from a
@@ -294,9 +298,15 @@ function openDay(state: GameState): GameState {
     // ids, nor the game Rng.
     const storyId = (prefix: string, who: string) => `${prefix}s${s.calendar.day.toString(36)}_${who}`
     const story = planStory(s, storyId)
-    const sellers = generateDayQueue(rng, tuning.day.customersPerDay - story.sellerPlaces, ids.next)
+    // M4 specialist warnings: while one runs, some walk-in sellers bring that piece (own streams; no boost, no change).
+    const sellers = boostSellers(s, generateDayQueue(rng, tuning.day.customersPerDay - story.sellerPlaces, ids.next))
     const buyers = planBuyers(s, rng, ids.next)
-    const redeemers = planRedemptions(s, ids.next)
+    const redeemers = pledgeRedeemLines(s, planRedemptions(s, ids.next))
+    // M4: the buyer a specialist sends once a month (Faina), and beats that land in the morning paper.
+    const referred = referralBuyers(s, ids.next)
+    s = playPaperBeats(referred.state, story.paper)
+    buyers.push(...referred.visits)
+    const market = s.market
     const later = story.visits.filter((v) => !v.first).map((v) => v.visit)
     const first = story.visits.filter((v) => v.first).map((v) => v.visit)
     // Neighbourhood standing stretches (or shortens) how long people wait. No draws.
@@ -387,6 +397,7 @@ function nextCustomer(state: GameState): GameState {
     phase: scene ? ('scene' as const) : ('present' as const),
     ...(visit.beatId ? { beatId: visit.beatId } : {}),
     ...(scene ? { scene } : {}),
+    ...(visit.via ? { via: visit.via } : {}),
   }
   const current: VisitState =
     visit.kind === 'scene'
@@ -401,6 +412,7 @@ function nextCustomer(state: GameState): GameState {
     stats: { ...state.stats, customersSeen: state.stats.customersSeen + 1 },
   }
   if (visit.kind !== 'buyer') return base
+  if (visit.offer !== undefined) return offerCall(base, visit.offer)
   // Buyer: the item must still be on display with a tag.
   return withRng(base, (s, rng) => {
     const c = itemVisit(s)!
@@ -415,6 +427,18 @@ function nextCustomer(state: GameState): GameState {
   })
 }
 
+/**
+ * M4: a specialist's take-it-or-leave-it phone offer for a piece in stock (Gennady's first refusal).
+ * One round: their offer is their ceiling. Gone from stock (sold, stolen): they ring off.
+ */
+function offerCall(state: GameState, offer: number): GameState {
+  const c = itemVisit(state)!
+  const live = state.inventory.find((i) => i.id === c.item.id)
+  if (!live) return { ...state, current: { ...c, phase: 'resolved', outcome: 'left', line: 'Sold it already? Never mind. Next time.' } }
+  const tag = Math.max(offer, state.shop.prices[live.id] ?? 0)
+  return { ...state, current: { ...c, item: live, sale: { itemId: live.id, tag, offer, ceiling: offer, round: 0, maxRounds: 1, status: 'open', history: [] } } }
+}
+
 function applyTool(state: GameState, tool: ToolId, hotspot?: string): GameState {
   const c = itemVisit(state)
   const insp = state.inspect
@@ -422,11 +446,15 @@ function applyTool(state: GameState, tool: ToolId, hotspot?: string): GameState 
   const def = getItemDef(c.item.defId)
   const paidFor = payForTool(state, tool, def)
   if (!paidFor) return state
-  return withRng(paidFor, (s, rng) => {
+  return withRng(paidFor, (s0, rng) => {
     const uses = insp.toolUses[tool] ?? 0
-    const result = useTool({ item: c.item, def, tool, hotspot, previous: insp.findings, uses, rng, extras: toolExtras(s, def) })
+    const extras = toolExtras(s0, def)
+    const result = useTool({ item: c.item, def, tool, hotspot, previous: insp.findings, uses, rng, extras })
     const revealed = new Set(c.item.revealed)
     for (const f of result.findings) if (f.tellId) revealed.add(f.tellId)
+    // M4 specialist arcs: count what the call turned out to be.
+    const called = tool === 'specialist' ? result.findings.find((f) => f.tellId === SPECIALIST_TELL && f.verdict)?.verdict : undefined
+    const s = called && extras.specialist ? noteCall(s0, extras.specialist.id, c.item, called) : s0
     const next: GameState = {
       ...s,
       current: { ...c, item: { ...c.item, revealed: [...revealed] } },
@@ -486,7 +514,8 @@ function buy(state: GameState, price: number, line?: string): GameState {
       fakesBought: state.stats.fakesBought + (fake ? 1 : 0),
     },
   }
-  return resolve(repAfterDeal(next, c.customer, c.item, price, 'buy'), 'bought', line ?? visitLines.thanks[0], {
+  // M4 specialist arcs: a missed call, a lowball, or Gennady's first refusal on what you just bought.
+  return resolve(noteBought(repAfterDeal(next, c.customer, c.item, price, 'buy'), c.item), 'bought', line ?? visitLines.thanks[0], {
     kind: 'buy',
     amount: -price,
     text: `Bought ${def.name} from ${c.customer.name}`,
@@ -570,27 +599,6 @@ function sellToBuyer(state: GameState, price: number, line?: string): GameState 
       price,
     ),
   )
-}
-
-/** Cash in, item out of inventory/display/prices/paid, career stats updated. */
-function removeSold(state: GameState, itemId: string, price: number): GameState {
-  const paid = state.paid[itemId] ?? 0
-  const profit = price - paid
-  const { [itemId]: _drop, ...restPaid } = state.paid
-  return {
-    ...state,
-    cash: state.cash + price,
-    inventory: state.inventory.filter((i) => i.id !== itemId),
-    paid: restPaid,
-    shop: clearItem(state.shop, itemId),
-    stats: {
-      ...state.stats,
-      itemsSold: state.stats.itemsSold + 1,
-      totalEarned: state.stats.totalEarned + price,
-      bestDeal: Math.max(state.stats.bestDeal, profit),
-      worstDeal: Math.min(state.stats.worstDeal, profit),
-    },
-  }
 }
 
 function resolve(state: GameState, outcome: VisitOutcome, line: string, entry: LedgerEntry | null, price?: number): GameState {

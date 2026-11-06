@@ -11,6 +11,8 @@ import { RegularDef } from '../../game/schema/story'
 import alisa from './alisa'
 import darya from './darya'
 import eduard from './eduard'
+import edik from './edik'
+import fedya from './fedya'
 import gleb from './gleb'
 import inessa from './inessa'
 import lyusya from './lyusya'
@@ -45,6 +47,9 @@ export const REGULARS: readonly RegularDef[] = [
   ulyana,
   yevstafy,
   mikhail,
+  // Arc people: Edik (The Dubai Rolex Guy) visits on his own only from day 45; Fedya (The Student's Laptop) comes in only for his arc.
+  edik,
+  fedya,
   // Arc-only (Protection): no ordinary visits.
   eduard,
   zhora,

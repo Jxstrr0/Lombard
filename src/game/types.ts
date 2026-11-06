@@ -35,7 +35,12 @@ export interface Finding {
   reveals?: Reveals
   polarity: Polarity
   hotspot?: string
+  /** M4: a specialist's call, what they said (the story engine reads it when you buy). */
+  verdict?: SpecialistVerdict
 }
+
+/** What a specialist's call said: sound, redone, mixed, doubt, or a lowball (sound, but "not worth much"). */
+export type SpecialistVerdict = 'sound' | 'redone' | 'mixed' | 'doubt' | 'lowball'
 
 export type Temperament = 'stubborn' | 'flexible' | 'desperate' | 'proud'
 
@@ -51,6 +56,8 @@ export interface WalkIn {
   portraitKey: string
   /** M4: set when this is one of the authored regulars (src/data/regulars); their memory is state.customers[regularId]. */
   regularId?: string
+  /** M4: set when a specialist (src/data/specialists) is the one talking, at the counter or on the phone. */
+  specialistId?: string
 }
 
 export type Approach = 'straight' | 'evidence' | 'sympathy' | 'walk'
@@ -116,6 +123,10 @@ interface QueuedBase {
   line?: string
   /** M4: the story beat this visit plays (src/data/stories); its script lives in the data, not the save. */
   beatId?: string
+  /** M4: a phone call between customers (nobody walks in). */
+  via?: 'phone'
+  /** M4 buyer only: a specialist's take-it-or-leave-it offer for a piece in stock (Gennady's first refusal). */
+  offer?: number
 }
 
 /** A visit in the line outside. Scene visitors (M4) bring no item. */
@@ -157,6 +168,8 @@ interface VisitBase {
   beatId?: string
   /** M4: the beat's conversation, while phase is 'scene' (kept after, with the choice made). */
   scene?: SceneState
+  /** M4: a phone call (nobody stands at the counter). */
+  via?: 'phone'
 }
 
 /** The customer at the counter. Scene visitors (M4) bring no item. */
@@ -226,6 +239,52 @@ export interface SpecialistState {
   callsUsed: number
   /** Day the current retainer started (or 0). */
   sinceDay: number
+  /** M4 arcs (save v6): retainers paid in full since sinceDay (reset when released). */
+  months: number
+  /** M4 arcs: what their calls turned out to be (see SpecialistEvent). */
+  events: Partial<Record<SpecialistEvent, number>>
+  /** M4 arcs: what their small arc changed about them. */
+  mods: SpecialistMods
+  /** M4 arcs: items they lowballed that you then bought, until you sell them. */
+  lowballed: string[]
+  /** M4 arcs: the last day you let them go (their arc's last beat is skipped if it was under way). */
+  releasedDay?: number
+  /** M4 arcs: gone for good; can't be retained again. */
+  retired?: boolean
+}
+
+/**
+ * Counted per specialist (M4 arcs). soundBig: a sound call on a genuine piece worth ≥ specialistArcs.bigValue.
+ * wrong: the call missed (not counting lowballs). wrongSound: called sound, wasn't. wrongBought: a missed call
+ * on a piece you then bought. lowballSold: they lowballed a piece you bought and later sold.
+ */
+export type SpecialistEvent = 'soundBig' | 'wrong' | 'wrongSound' | 'wrongBought' | 'lowballSold'
+
+/** How a specialist's arc changed them (M4). Absent fields = as on the roster. */
+export interface SpecialistMods {
+  /** Added to roster accuracy (Ilya's drift, Zhenya slowing down). */
+  accuracy?: number
+  /** Added to accuracy at each month end on retainer (negative: slipping). */
+  driftPerMonth?: number
+  /** Their lowball chance × this. */
+  lowball?: number
+  /** Their call takes this many seconds (overrides the roster). */
+  callSeconds?: number
+  freeMonths?: number
+  freeCalls?: number
+  firstRefusal?: boolean
+  /** One referred buyer a month for these categories; referralMonth = 'YYYY-MM' of the last one. */
+  referral?: string[]
+  referralMonth?: string
+  sellBoost?: { categories: string[]; factor: number }
+  rentIn?: number
+}
+
+/** An active "turns up more for a while" (M4 specialist warnings): tuning.specialistArcs.boosts[id] until this day. */
+export interface StoryBoost {
+  id: string
+  /** Last day it runs (inclusive). */
+  until: number
 }
 
 export interface InspectState {

@@ -36,6 +36,11 @@ function onlyZinaida(s: GameState): GameState {
   return { ...s, customers }
 }
 
+/** Every arc ended, so no story beat (of any arc) changes the day. */
+function noArcs(s: GameState): GameState {
+  return { ...s, story: { ...s.story, arcs: Object.fromEntries(ARCS.map((a) => [a.id, { beats: {}, ended: true }])) } }
+}
+
 /** An open day with this story visit first in line. */
 function withVisit(s: GameState, visit: Partial<QueuedVisit> & { beatId?: string }): GameState {
   const open = reducer(s, { type: 'day/open' })
@@ -68,7 +73,9 @@ describe('story content', () => {
     for (const arc of ARCS) {
       for (const beat of arc.beats) {
         const v = beat.visit
-        expect(getRegular(v.who), `${beat.id} who`).toBeDefined()
+        // M4: a regular, or a specialist (their own arcs); `as` someone they sent.
+        expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who), `${beat.id} who`).toBeDefined()
+        if (v.as) expect(looks.has(v.as.look), `${beat.id} as.look`).toBe(true)
         if (v.item) {
           expect(items.has(v.item.defId), `${beat.id} item`).toBe(true)
           if (v.item.fakeProfileId) {
@@ -88,8 +95,10 @@ describe('story content', () => {
     }
   })
 
+  // Specialists' arcs (M4) are the exception: their beats trigger on their own (GDD § 2b: months, relationship, events).
   it('every beat after the first depends on an earlier beat of its arc', () => {
     for (const arc of ARCS) {
+      if (arc.specialist) continue
       for (const beat of arc.beats.slice(1)) {
         expect(beat.when.some((c) => c.if === 'beat' && c.beat.startsWith(`${arc.id}.`)), beat.id).toBe(true)
       }
@@ -164,7 +173,8 @@ describe('planning', () => {
     const s = onDay(startedState(1, 'c1'), 3)
     const played = recordBeat(s, 'medals.roof', { day: 3, outcome: 'passed' })
     expect(pickBeats(played).some((b) => b.id === 'medals.roof')).toBe(false)
-    expect(pickBeats(only(s))).toEqual([])
+    const ended = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
+    expect(pickBeats(ended).filter((b) => b.id.startsWith('medals.'))).toEqual([])
   })
 
   it('a beat seller takes a walk-in place and the day keeps its length; planning is deterministic', () => {
@@ -188,8 +198,8 @@ describe('planning', () => {
   it('a regular comes in on schedule with one of their items, then not again for a while', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    const s = only(onlyZinaida(onDay(startedState(5, 'c1'), day)))
-    // Keep the arcs out of the way.
+    // Keep every arc out of the way.
+    const s = noArcs(onlyZinaida(onDay(startedState(5, 'c1'), day)))
     let id = 0
     const plan = planStory(s, (p) => `${p}${id++}`)
     const visit = plan.visits.find((v) => v.visit.customer.regularId === 'zinaida')
@@ -204,11 +214,11 @@ describe('planning', () => {
     expect(opened.queue).toHaveLength(tuning.day.customersPerDay)
   })
 
-  it('a regular holding a pledge does not come in to sell', () => {
+  it('a regular coming back for a pledge does not come in to sell', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    let s = only(onlyZinaida(onDay(startedState(5, 'c1'), day)))
-    const fake = { customer: regularCustomer(def) } as unknown as GameState['loans'][number]
+    let s = noArcs(onlyZinaida(onDay(startedState(5, 'c1'), day)))
+    const fake = { customer: regularCustomer(def), redeemDay: day + 5 } as unknown as GameState['loans'][number]
     s = { ...s, loans: [fake] }
     let id = 0
     expect(planStory(s, (p) => `${p}${id++}`).visits).toEqual([])
@@ -242,6 +252,16 @@ describe('planning', () => {
     const s = only(onDay(startedState(3, 'c1'), 12), 'protection')
     const ids = (t: GameState) => pickBeats(t).map((b) => b.id)
     for (const rng of [1, 77, 123_456]) expect(ids({ ...s, meta: { ...s.meta, rng } })).toEqual(ids(s))
+  })
+
+  it('a regular who has given up on a pledge still drops in on schedule', () => {
+    const def = zina()
+    const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
+    let s = noArcs(onlyZinaida(onDay(startedState(5, 'c1'), day)))
+    const fake = { customer: regularCustomer(def), redeemDay: null } as unknown as GameState['loans'][number]
+    s = { ...s, loans: [fake] }
+    let id = 0
+    expect(planStory(s, (p) => `${p}${id++}`).visits.map((v) => v.visit.customer.regularId)).toEqual(['zinaida'])
   })
 })
 
@@ -307,8 +327,8 @@ describe('at the counter', () => {
   it('trust softens the regular’s opening ask', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    const base = onlyZinaida(onDay(startedState(9, 'c1'), day))
-    const quiet = only(base)
+    // Only Zinaida's ordinary visit changes the day: no other regular due, every arc ended.
+    const quiet = noArcs(onlyZinaida(onDay(startedState(9, 'c1'), day)))
     const askWith = (trust: number) => {
       let s = setMemory(quiet, 'zinaida', { trust })
       s = reducer(s, { type: 'day/open' })

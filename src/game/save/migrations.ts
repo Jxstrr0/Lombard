@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { tuning } from '../../data/tuning'
-import { createSlots, STATE_VERSION, type GameState } from '../state'
+import { addDays, createSlots, STATE_VERSION, type GameState } from '../state'
 
 export const CURRENT_VERSION = STATE_VERSION
 
@@ -170,8 +170,53 @@ const v4ToV5: Migration = {
   },
 }
 
+/** Month ends (billing days) on or after `from` and before `to` (ISO dates). */
+function monthEndsBetween(from: string, to: string): number {
+  let n = 0
+  for (let d = from; d < to; d = addDays(d, 1)) if (addDays(d, 1).slice(5, 7) !== d.slice(5, 7)) n++
+  return n
+}
+
+/**
+ * v5 → v6 (M4 specialists' small arcs): each specialist record gets `months` (retainers paid in full
+ * since sinceDay; estimated as the billing days since then, as if every one was paid), `events`,
+ * `mods` and `lowballed`; the story gets `boosts`.
+ */
+const v5ToV6: Migration = {
+  from: 5,
+  to: 6,
+  up(raw) {
+    const calendar = isRecord(raw.calendar) ? raw.calendar : {}
+    const day = typeof calendar.day === 'number' ? calendar.day : 1
+    const date = typeof calendar.date === 'string' ? calendar.date : tuning.career.startDate
+    const specialists: Raw = {}
+    for (const [id, sp] of Object.entries(isRecord(raw.specialists) ? raw.specialists : {})) {
+      if (!isRecord(sp)) continue
+      const since = typeof sp.sinceDay === 'number' ? sp.sinceDay : 0
+      const months = sp.retained === true && since > 0 && since <= day ? monthEndsBetween(addDays(date, since - day), date) : 0
+      specialists[id] = { ...sp, months, events: {}, mods: {}, lowballed: [] }
+    }
+    const story = isRecord(raw.story) ? raw.story : {}
+    return { ...raw, specialists, story: { ...story, boosts: [] } }
+  },
+}
+
+/**
+ * v6 → v7 (M4 story pledges): a beat that ended in a pawn now remembers its
+ * loan and how the loan ended (`story.arcs[*].beats[*].loan`, optional). Beats
+ * recorded before had no link to follow, so nothing is filled in: their
+ * pledge conditions read as "never pawned". Only the version moves.
+ */
+const v6ToV7: Migration = {
+  from: 6,
+  to: 7,
+  up(raw) {
+    return raw
+  },
+}
+
 /** Ordered, contiguous chain. Append new steps at the end. */
-export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5]
+export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5, v5ToV6, v6ToV7]
 
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())

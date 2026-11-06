@@ -10,8 +10,9 @@
  *    (and who aren't already in for a beat), most overdue first, up to
  *    tuning.regulars.maxPerDay. They bring one of their own items.
  * Seller visits from both take walk-in places (the day keeps its length);
- * scene visits come on top. All draws come from a stream forked off the
- * game Rng without advancing it.
+ * scene visits come on top. All draws come from storyRng (the career seed,
+ * the day and a label) and ids from the caller's per-person StoryIds, so
+ * planning never touches the game Rng or the shared id counter.
  */
 import { getItemDef } from '../../data/items'
 import { REGULARS } from '../../data/regulars'
@@ -20,12 +21,13 @@ import { tuning } from '../../data/tuning'
 import { generateItem } from '../items/generate'
 import { pawnOpeningLine } from '../loans/loans'
 import { Rng } from '../rng'
-import type { Beat, RegularDef } from '../schema/story'
+import type { Arc, Beat, RegularDef } from '../schema/story'
 import type { CustomerState, GameState } from '../state'
 import type { QueuedVisit, WalkIn } from '../types'
 import { allHold } from './conditions'
 import { beatRecord, memoryOf, warmthOf } from './progress'
 import { scriptedItem } from './scripted'
+import { specialistCustomer } from './specialists'
 
 export interface StoryPlan {
   /** Visits to merge into today's queue; `first` ones go to the front. */
@@ -34,6 +36,8 @@ export interface StoryPlan {
   sellerPlaces: number
   /** Regulars' memory with next scheduled days updated. */
   customers: Record<string, CustomerState>
+  /** M4: beats that land in this morning's paper (story/visit.ts playPaperBeats). */
+  paper: Beat[]
 }
 
 /**
@@ -60,12 +64,26 @@ export function regularCustomer(def: RegularDef): WalkIn {
   }
 }
 
-function eligibleBeats(state: GameState): Beat[] {
+/**
+ * M4 (GDD § 2b): a specialist's arc waits while they're off retainer or retired, and once they were
+ * let go while it was under way (a beat had played by then), its final beat never plays.
+ */
+function specialistAllows(state: GameState, arc: Arc, beat: Beat): boolean {
+  if (!arc.specialist) return true
+  const sp = state.specialists[arc.specialist]
+  if (!sp?.retained || sp.retired) return false
+  if (!beat.final || sp.releasedDay === undefined) return true
+  return !Object.values(state.story.arcs[arc.id]?.beats ?? {}).some((r) => r.day <= sp.releasedDay!)
+}
+
+/** Beats that could play this morning (before the daily chance). Exported for tests. */
+export function eligibleBeats(state: GameState): Beat[] {
   const out: Beat[] = []
   for (const arc of ARCS) {
     if (state.story.arcs[arc.id]?.ended) continue
     for (const beat of arc.beats) {
       if (beatRecord(state, beat.id)) continue
+      if (!specialistAllows(state, arc, beat)) continue
       if (!allHold(beat.when, state)) continue
       out.push(beat)
     }
@@ -90,21 +108,37 @@ export function pickBeats(state: GameState): Beat[] {
   return picked
 }
 
-/** Makes a story visit's ids. `who` is the regular: planStory gives each person at most one visit a day. */
+/**
+ * Makes a story visit's ids. `who` is the beat's `who` (a regular or a specialist) or the regular:
+ * planStory gives each of them at most one visit a day, so the ids are unique without touching the
+ * shared id counter.
+ */
 export type StoryIds = (prefix: string, who: string) => string
 
-function beatVisit(state: GameState, beat: Beat, nextId: StoryIds): QueuedVisit | null {
-  const who = REGULARS.find((r) => r.id === beat.visit.who)
-  if (!who) return null
-  const customer = regularCustomer(who)
-  const visitId = nextId('v', who.id)
+/** Who plays a beat at the counter: a regular, a specialist (M4), or someone `who` sent (M4 `as`). */
+function beatCustomer(beat: Beat): WalkIn | null {
+  const v = beat.visit
+  if (v.as) {
+    return { id: `as_${beat.id.replace('.', '_')}`, name: v.as.name, archetype: v.as.archetype, temperament: v.as.temperament, knowledge: v.as.knowledge, desperation: v.as.desperation, portraitKey: v.as.look }
+  }
+  const regular = REGULARS.find((r) => r.id === v.who)
+  return regular ? regularCustomer(regular) : specialistCustomer(v.who)
+}
+
+/** The visit that plays a beat: its person, and its scripted item or scene. Exported for dev scenarios. */
+export function beatVisit(state: GameState, beat: Beat, nextId: StoryIds): QueuedVisit | null {
+  const customer = beatCustomer(beat)
+  if (!customer) return null
+  const visitId = nextId('v', beat.visit.who)
   const v = beat.visit
   const patience = tuning.story.patience
   if (v.kind === 'scene' || !v.item) {
-    return { visitId, kind: 'scene', customer, patience, beatId: beat.id, line: v.scene?.lines[0] }
+    return { visitId, kind: 'scene', customer, patience, beatId: beat.id, line: v.scene?.lines[0], ...(v.via === 'phone' ? { via: 'phone' as const } : {}) }
   }
   const def = getItemDef(v.item.defId)
-  const item = scriptedItem(def, v.item, storyRng(state, `item:${beat.id}`), nextId('i', who.id))
+  // `same`: one stream per career and key, so the same thing comes back every time.
+  const rng = v.item.same ? new Rng(state.meta.seed).fork(`story:item:${v.item.same}`) : storyRng(state, `item:${beat.id}`)
+  const item = scriptedItem(def, v.item, rng, nextId('i', beat.visit.who))
   return { visitId, kind: 'seller', wants: v.wants, customer, item, patience, beatId: beat.id, line: v.line }
 }
 
@@ -159,10 +193,15 @@ export function planStory(state: GameState, nextId: StoryIds): StoryPlan {
   const day = state.calendar.day
   const customers = { ...state.customers }
   const visits: StoryPlan['visits'] = []
+  const paper: Beat[] = []
   let sellerPlaces = 0
   const busy = new Set<string>()
 
   for (const beat of pickBeats(state)) {
+    if (beat.visit.via === 'paper') {
+      paper.push(beat)
+      continue
+    }
     const visit = beatVisit(state, beat, nextId)
     if (!visit) continue
     visits.push({ visit, first: beat.visit.first })
@@ -170,8 +209,9 @@ export function planStory(state: GameState, nextId: StoryIds): StoryPlan {
     busy.add(beat.visit.who)
   }
 
-  // Someone already holding a pledge with you comes in to redeem it, not to sell; skip them today.
-  for (const l of state.loans) if (l.customer.regularId) busy.add(l.customer.regularId)
+  // Someone coming back to redeem a pledge comes in for that, not to sell; skip them today. Someone who has
+  // given up on theirs (redeemDay null) keeps dropping in as usual while it waits out its term.
+  for (const l of state.loans) if (l.customer.regularId && l.redeemDay !== null) busy.add(l.customer.regularId)
 
   const due: { def: RegularDef; nextDay: number }[] = []
   for (const def of REGULARS) {
@@ -188,5 +228,5 @@ export function planStory(state: GameState, nextId: StoryIds): StoryPlan {
     sellerPlaces++
     customers[def.id] = { ...customers[def.id]!, nextDay: nextVisitDay(state, def, customers[def.id]!) }
   }
-  return { visits, sellerPlaces, customers }
+  return { visits, sellerPlaces, customers, paper }
 }

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Lombard app icon: a pawnbroker's sign, three clay balls hanging from an
+       ivory bracket, on a slate tile. Longlight palette only.
+       scripts/make-icons.mjs renders the PNGs from this file: it squares the
+       tile (#tile) for the apple-touch icon and shrinks the art (#art) for
+       the maskable icon, so keep those two ids. -->
+  <defs>
+    <radialGradient id="ball" cx="0.36" cy="0.32" r="0.75">
+      <stop offset="0" stop-color="#FAF9F5" stop-opacity="0.55"/>
+      <stop offset="0.28" stop-color="#FAF9F5" stop-opacity="0"/>
+      <stop offset="1" stop-color="#141413" stop-opacity="0.38"/>
+    </radialGradient>
+  </defs>
+  <rect id="tile" width="512" height="512" rx="112" fill="#141413"/>
+  <g id="art">
+    <!-- bracket: wall plate on the left, arm across the top -->
+    <rect x="84" y="92" width="22" height="70" rx="6" fill="#FAF9F5"/>
+    <rect x="96" y="104" width="332" height="20" rx="10" fill="#FAF9F5"/>
+    <!-- hangers from the arm to the balls -->
+    <g stroke="#B48CE8" stroke-width="8" stroke-linecap="round">
+      <line x1="172" y1="124" x2="172" y2="176"/>
+      <line x1="340" y1="124" x2="340" y2="176"/>
+      <line x1="256" y1="124" x2="256" y2="316"/>
+    </g>
+    <!-- the three balls -->
+    <g fill="#D97757">
+      <circle cx="172" cy="246" r="76"/>
+      <circle cx="340" cy="246" r="76"/>
+      <circle cx="256" cy="372" r="76"/>
+    </g>
+    <g fill="url(#ball)">
+      <circle cx="172" cy="246" r="76"/>
+      <circle cx="340" cy="246" r="76"/>
+      <circle cx="256" cy="372" r="76"/>
+    </g>
+  </g>
+</svg>

@@ -258,7 +258,7 @@ export class SettingsSheet {
     }
     comfort.append(this.motion, sizeLabel, sizeRow)
 
-    const foot = el('p', 'settings-foot', `Lombard · build ${__BUILD_SHA__} · ${__BUILD_DATE__} · A Longlight Interactive game`)
+    const foot = el('p', 'settings-foot', `Lombard v${__GAME_VERSION__} · build ${__BUILD_SHA__} · ${__BUILD_DATE__} · A Longlight Interactive game`)
     sheet.append(head, copySec, loadSec, menuSec, soundSec, gfxSec, comfort, foot)
     root.append(sheet)
     this.root = root

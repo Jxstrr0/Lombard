@@ -41,6 +41,13 @@ Design every screen portrait-first. Landscape and desktop adapt from the portrai
 - Keep commits small and scoped to one roadmap task. Commit message format: `M2: add haggling state machine`.
 - After every milestone, update `docs/03-ROADMAP.md` status and add any new decisions to `docs/05-OPEN-DECISIONS.md` (resolved or open).
 
+## Versions
+
+- The game version has four numbers, Major.Minor.Patch.Build (for example `0.1.0.0`), the same scheme as every Longlight game. It lives in the `VERSION` file at the repo root; `vite.config.ts` reads it as `__GAME_VERSION__` and the build fails if it isn't four numbers.
+- It shows in the corner build number (`v0.1.0.0 · <sha> · <date>`) and in the Settings footer. The short commit hash and date stay so a fresh deploy is easy to spot.
+- Bump rule: **Major** = overhaul, **Minor** = a milestone or feature batch, **Patch** = a fix, **Build** = a republish with no gameplay change. Bump `VERSION` in the PR that makes the change.
+- `package.json` keeps a three-part semver (`0.1.0`, npm requires it); it isn't shown to players and doesn't need to track `VERSION`.
+
 ## Branding
 
 Longlight Interactive palette (match Kelbo.Website `style.css`):

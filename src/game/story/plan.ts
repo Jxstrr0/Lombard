@@ -10,8 +10,9 @@
  *    (and who aren't already in for a beat), most overdue first, up to
  *    tuning.regulars.maxPerDay. They bring one of their own items.
  * Seller visits from both take walk-in places (the day keeps its length);
- * scene visits come on top. All draws come from a stream forked off the
- * game Rng without advancing it.
+ * scene visits come on top. All draws come from storyRng (the career seed,
+ * the day and a label) and ids from the caller's per-person StoryIds, so
+ * planning never touches the game Rng or the shared id counter.
  */
 import { getItemDef } from '../../data/items'
 import { REGULARS } from '../../data/regulars'
@@ -39,8 +40,14 @@ export interface StoryPlan {
   paper: Beat[]
 }
 
+/**
+ * Story draws (which beats come, regulars' days, items and wishes, queue places) fork from the
+ * career seed, not the running game Rng: they depend only on the career, the day and the label,
+ * so one arc's visits (or any other difference in what happened at the counter) never reroll
+ * another arc's beats or a regular's visits.
+ */
 export function storyRng(state: GameState, label: string): Rng {
-  return Rng.from(state.meta.rng).fork(`story:${state.calendar.day}:${label}`)
+  return new Rng(state.meta.seed).fork(`story:${state.calendar.day}:${label}`)
 }
 
 /** The regular as a customer at the counter. */
@@ -101,6 +108,13 @@ export function pickBeats(state: GameState): Beat[] {
   return picked
 }
 
+/**
+ * Makes a story visit's ids. `who` is the beat's `who` (a regular or a specialist) or the regular:
+ * planStory gives each of them at most one visit a day, so the ids are unique without touching the
+ * shared id counter.
+ */
+export type StoryIds = (prefix: string, who: string) => string
+
 /** Who plays a beat at the counter: a regular, a specialist (M4), or someone `who` sent (M4 `as`). */
 function beatCustomer(beat: Beat): WalkIn | null {
   const v = beat.visit
@@ -112,10 +126,10 @@ function beatCustomer(beat: Beat): WalkIn | null {
 }
 
 /** The visit that plays a beat: its person, and its scripted item or scene. Exported for dev scenarios. */
-export function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string) => string): QueuedVisit | null {
+export function beatVisit(state: GameState, beat: Beat, nextId: StoryIds): QueuedVisit | null {
   const customer = beatCustomer(beat)
   if (!customer) return null
-  const visitId = nextId('v')
+  const visitId = nextId('v', beat.visit.who)
   const v = beat.visit
   const patience = tuning.story.patience
   if (v.kind === 'scene' || !v.item) {
@@ -124,7 +138,7 @@ export function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string)
   const def = getItemDef(v.item.defId)
   // `same`: one stream per career and key, so the same thing comes back every time.
   const rng = v.item.same ? new Rng(state.meta.seed).fork(`story:item:${v.item.same}`) : storyRng(state, `item:${beat.id}`)
-  const item = scriptedItem(def, v.item, rng, nextId('i'))
+  const item = scriptedItem(def, v.item, rng, nextId('i', beat.visit.who))
   return { visitId, kind: 'seller', wants: v.wants, customer, item, patience, beatId: beat.id, line: v.line }
 }
 
@@ -148,12 +162,12 @@ function nextVisitDay(state: GameState, def: RegularDef, m: CustomerState): numb
 }
 
 /** One of a regular's ordinary visits (their greeting by warmth, one of their items). Exported for the dev ?regular= scenario. */
-export function regularVisit(state: GameState, def: RegularDef, nextId: (prefix: string) => string): QueuedVisit {
+export function regularVisit(state: GameState, def: RegularDef, nextId: StoryIds): QueuedVisit {
   const rng = storyRng(state, `visit:${def.id}`)
   const m = memoryOf(state, def.id)
   const entry = rng.weighted(def.items.map((e) => ({ item: e, weight: e.weight })))
   const itemDef = getItemDef(entry.defId)
-  const id = nextId('i')
+  const id = nextId('i', def.id)
   const story = entry.story ? rng.pick(entry.story) : undefined
   let item = entry.authenticity
     ? scriptedItem(
@@ -166,7 +180,7 @@ export function regularVisit(state: GameState, def: RegularDef, nextId: (prefix:
   if (!entry.authenticity && (story || entry.provenance)) item = { ...item, story: story ?? item.story, provenance: entry.provenance ?? item.provenance }
   const customer = regularCustomer(def)
   const hello = rng.pick(def.lines[warmthOf(m)])
-  const visitId = nextId('v')
+  const visitId = nextId('v', def.id)
   const [pMin, pMax] = tuning.day.queuePatience
   const patience = Math.round(rng.range(pMin, pMax) + tuning.regulars.extraPatience)
   if (rng.chance(def.pawn)) {
@@ -175,7 +189,7 @@ export function regularVisit(state: GameState, def: RegularDef, nextId: (prefix:
   return { visitId, kind: 'seller', wants: 'sell', customer, item, patience, line: `${hello} ${item.story}` }
 }
 
-export function planStory(state: GameState, nextId: (prefix: string) => string): StoryPlan {
+export function planStory(state: GameState, nextId: StoryIds): StoryPlan {
   const day = state.calendar.day
   const customers = { ...state.customers }
   const visits: StoryPlan['visits'] = []

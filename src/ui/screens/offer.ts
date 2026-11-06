@@ -7,13 +7,14 @@
  * only changed by dispatching actions.
  */
 import { getItemDef } from '../../data/items'
+import { t, type PlainKey } from '../../data/strings'
 import type { Action } from '../../game/actions'
 import type { GameState } from '../../game/state'
 import type { Approach } from '../../game/types'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
 import { findingCard } from '../components/findings'
 import { NumPad } from '../components/numpad'
-import { archetypeLabel, itemNameOf, rub } from '../format'
+import { archetypeLabel, itemNameOf, percent, rub } from '../format'
 import type { IconName } from '../icons'
 import { dayLabel, monthlyRateLabel } from '../loanFormat'
 import { loanTerms } from '../../game/loans/loans'
@@ -21,11 +22,11 @@ import '../loans.css'
 
 const CHIPS = [0.25, 0.4, 0.6] as const
 
-const APPROACHES: { id: Approach; label: string; icon: IconName; hint: string }[] = [
-  { id: 'straight', label: 'Straight', icon: 'coins', hint: 'Just the number.' },
-  { id: 'evidence', label: 'Evidence', icon: 'receipt', hint: 'Point at something you found.' },
-  { id: 'sympathy', label: 'Sympathy', icon: 'heart', hint: 'Soften it. Works on proud, sentimental sellers.' },
-  { id: 'walk', label: 'Walk', icon: 'walk', hint: 'Threaten to pass. Works on the desperate.' },
+const APPROACHES: { id: Approach; label: PlainKey; icon: IconName; hint: PlainKey }[] = [
+  { id: 'straight', label: 'offer.straight', icon: 'coins', hint: 'offer.straightHint' },
+  { id: 'evidence', label: 'offer.evidence', icon: 'receipt', hint: 'offer.evidenceHint' },
+  { id: 'sympathy', label: 'offer.sympathy', icon: 'heart', hint: 'offer.sympathyHint' },
+  { id: 'walk', label: 'offer.walk', icon: 'walk', hint: 'offer.walkHint' },
 ]
 
 export class OfferScreen {
@@ -74,12 +75,12 @@ export class OfferScreen {
     // Their ask after a counter
     this.askRow = el('div', 'offer-row ask-row')
     this.askText = el('div', 'ask-text')
-    this.acceptBtn = createButton({ id: 'accept-ask', label: 'Accept', variant: 'primary', onPress: () => dispatch({ type: 'offer/acceptAsk' }) })
+    this.acceptBtn = createButton({ id: 'accept-ask', label: t('offer.accept'), variant: 'primary', onPress: () => dispatch({ type: 'offer/acceptAsk' }) })
     this.askRow.append(this.askText, this.acceptBtn)
     // Estimate summary (step 2)
     this.estimateRow = el('div', 'offer-row estimate-row')
     this.estimateText = el('div', 'estimate-text')
-    const editEst = createButton({ id: 'edit-estimate', label: 'Change', variant: 'ghost', onPress: () => this.editEstimate() })
+    const editEst = createButton({ id: 'edit-estimate', label: t('offer.change'), variant: 'ghost', onPress: () => this.editEstimate() })
     this.estimateRow.append(this.estimateText, editEst)
     // Price tag display
     const tag = el('div', 'price-tag')
@@ -98,9 +99,9 @@ export class OfferScreen {
 
     this.approachRow = el('div', 'approaches')
     this.approachRow.setAttribute('role', 'radiogroup')
-    this.approachRow.setAttribute('aria-label', 'Approach')
+    this.approachRow.setAttribute('aria-label', t('offer.approach'))
     for (const a of APPROACHES) {
-      const b = createButton({ id: `approach-${a.id}`, label: a.label, icon: a.icon, className: 'approach', onPress: () => this.pickApproach(a.id) })
+      const b = createButton({ id: `approach-${a.id}`, label: t(a.label), icon: a.icon, className: 'approach', onPress: () => this.pickApproach(a.id) })
       b.setAttribute('role', 'radio')
       this.approachBtns.set(a.id, b)
       this.approachRow.append(b)
@@ -108,9 +109,9 @@ export class OfferScreen {
     this.approachHint = el('p', 'approach-hint')
 
     const actions = el('div', 'actions offer-actions')
-    const back = createButton({ id: 'back-to-inspect', label: 'Back', icon: 'back', ariaLabel: 'Back to inspect', onPress: () => dispatch({ type: 'inspect/back' }) })
-    const pass = createButton({ id: 'offer-pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) })
-    this.submit = createButton({ id: 'make-offer', label: 'Offer', variant: 'primary', onPress: () => this.onSubmit() })
+    const back = createButton({ id: 'back-to-inspect', label: t('common.back'), icon: 'back', ariaLabel: t('offer.backAria'), onPress: () => dispatch({ type: 'inspect/back' }) })
+    const pass = createButton({ id: 'offer-pass', label: t('common.pass'), onPress: () => dispatch({ type: 'counter/pass' }) })
+    this.submit = createButton({ id: 'make-offer', label: t('offer.offer'), variant: 'primary', onPress: () => this.onSubmit() })
     actions.append(back, pass, this.submit)
 
     panel.append(this.askRow, this.estimateRow, tag, this.terms, this.pad.root, this.approachRow, this.approachHint, actions)
@@ -120,12 +121,12 @@ export class OfferScreen {
     this.picker = el('div', 'sheet evidence-picker')
     this.picker.dataset.id = 'evidence-picker'
     this.picker.setAttribute('role', 'dialog')
-    this.picker.setAttribute('aria-label', 'Choose a finding to cite')
+    this.picker.setAttribute('aria-label', t('offer.pickerAria'))
     this.picker.hidden = true
     const pickerHead = el('div', 'sheet-head')
     pickerHead.append(
-      el('h2', '', 'Cite a finding'),
-      createButton({ id: 'evidence-close', label: '', icon: 'close', variant: 'ghost', ariaLabel: 'Close', onPress: () => this.closePicker() }),
+      el('h2', '', t('offer.pickerTitle')),
+      createButton({ id: 'evidence-close', label: '', icon: 'close', variant: 'ghost', ariaLabel: t('common.close'), onPress: () => this.closePicker() }),
     )
     this.pickerList = el('div', 'picker-list')
     this.picker.append(pickerHead, this.pickerList)
@@ -157,7 +158,7 @@ export class OfferScreen {
     }
     this.bubbleName.innerHTML = ''
     this.bubbleName.append(el('span', 'speaker-name', c.customer.name), el('span', 'speaker-tag', archetypeLabel(c.customer.archetype)))
-    setText(this.bubbleLine, `“${c.line}”`)
+    setText(this.bubbleLine, t('common.quote', { text: c.line }))
     this.refresh()
   }
 
@@ -189,48 +190,48 @@ export class OfferScreen {
     // Ask row (after a counter offer)
     this.askRow.hidden = estimating || !countered
     if (countered && h) {
-      setText(this.askText, pawn ? `They want a ${rub(h.ask)} loan` : `They want ${rub(h.ask)}`)
-      setButtonLabel(this.acceptBtn, pawn ? `Lend ${rub(h.ask)}` : `Accept ${rub(h.ask)}`)
+      setText(this.askText, pawn ? t('offer.wantLoan', { amount: rub(h.ask) }) : t('offer.want', { amount: rub(h.ask) }))
+      setButtonLabel(this.acceptBtn, pawn ? t('offer.lendAmount', { amount: rub(h.ask) }) : t('offer.acceptAmount', { amount: rub(h.ask) }))
       this.acceptBtn.disabled = h.ask > s.cash
     }
     // Estimate row
     this.estimateRow.hidden = estimating || countered
-    const name = itemNameOf(s.current.item?.defId ?? '', 'item')
-    setText(this.estimateText, `You think the ${name} is worth ${rub(est)}`)
+    const name = itemNameOf(s.current.item?.defId ?? '', t('common.item'))
+    setText(this.estimateText, t('offer.estimate', { item: name, amount: rub(est) }))
 
     // Price tag
     const v = this.amount
-    setText(this.tagLabel, estimating ? 'What is it worth?' : pawn ? 'Loan amount' : 'Your offer')
-    setText(this.tagValue, v > 0 ? rub(v) : '— ₽')
+    setText(this.tagLabel, estimating ? t('offer.worthLabel') : pawn ? t('offer.loanLabel') : t('offer.offerLabel'))
+    setText(this.tagValue, v > 0 ? rub(v) : t('common.noAmount'))
     const over = !estimating && v > s.cash
     this.root.classList.toggle('is-over', over)
-    if (estimating) setText(this.tagNote, 'Your own estimate. The customer never sees it.')
-    else if (over) setText(this.tagNote, `More than your cash (${rub(s.cash)})`)
-    else setText(this.tagNote, `Cash ${rub(s.cash)}`)
+    if (estimating) setText(this.tagNote, t('offer.estimateNote'))
+    else if (over) setText(this.tagNote, t('offer.overCash', { cash: rub(s.cash) }))
+    else setText(this.tagNote, t('offer.cash', { cash: rub(s.cash) }))
 
     // Loan terms (pawn mode, after the estimate)
     this.terms.hidden = !pawn || estimating
     if (pawn && !estimating) {
-      const t = loanTerms(v, s.calendar.day)
-      const parts = [`Due ${dayLabel(s, t.dueDay)}`, monthlyRateLabel(t.monthlyRate)]
-      if (v > 0) parts.push(`owes ${rub(t.owedAtDue)}`)
+      const terms = loanTerms(v, s.calendar.day)
+      const parts = [t('offer.due', { date: dayLabel(s, terms.dueDay) }), monthlyRateLabel(terms.monthlyRate)]
+      if (v > 0) parts.push(t('offer.owes', { amount: rub(terms.owedAtDue) }))
       this.terms.replaceChildren()
       parts.forEach((p, i) => {
-        if (i > 0) this.terms.append(el('span', 'loan-terms-sep', ' · '))
+        if (i > 0) this.terms.append(el('span', 'loan-terms-sep', t('common.dotSep')))
         this.terms.append(el('span', 'loan-terms-part', p))
       })
     }
 
     // Side keys: chips in step 2, clear in step 1
     if (estimating) {
-      this.pad.setSideKeys([null, null, null, { id: 'key-clear', label: 'Clear', onPress: () => this.pad.set(0) }])
+      this.pad.setSideKeys([null, null, null, { id: 'key-clear', label: t('common.clear'), onPress: () => this.pad.set(0) }])
     } else {
       this.pad.setSideKeys([
         ...CHIPS.map((p) => {
           const val = Math.round((est * p) / 100) * 100
-          return { id: `chip-${Math.round(p * 100)}`, label: `${Math.round(p * 100)}%`, sub: est > 0 ? rub(val) : undefined, disabled: est <= 0, onPress: () => this.pad.set(val) }
+          return { id: `chip-${Math.round(p * 100)}`, label: percent(p * 100), sub: est > 0 ? rub(val) : undefined, disabled: est <= 0, onPress: () => this.pad.set(val) }
         }),
-        { id: 'key-clear', label: 'Clear', onPress: () => this.pad.set(0) },
+        { id: 'key-clear', label: t('common.clear'), onPress: () => this.pad.set(0) },
       ])
     }
 
@@ -245,23 +246,24 @@ export class OfferScreen {
       if (id === 'evidence') b.disabled = !hasFindings
     }
     const a = APPROACHES.find((x) => x.id === this.approach)!
-    let hint = a.hint
+    let hint = t(a.hint)
     if (this.approach === 'evidence' && this.evidenceId) {
       const f = s.inspect.findings.find((x) => x.id === this.evidenceId)
-      if (f) hint = `Citing: ${f.text}`
+      if (f) hint = t('offer.citing', { text: f.text })
     } else if (!hasFindings && this.approach === 'straight') {
-      hint = 'Straight: just the number. (Evidence needs a finding.)'
+      hint = t('offer.noFindings')
     }
     setText(this.approachHint, hint)
 
     // Submit
     if (estimating) {
-      setButtonLabel(this.submit, 'Set estimate')
+      setButtonLabel(this.submit, t('offer.setEstimate'))
       this.submit.dataset.id = 'set-estimate'
       this.submit.disabled = v <= 0
     } else {
-      const verb = pawn ? 'Lend' : 'Offer'
-      setButtonLabel(this.submit, v > 0 ? `${verb} ${rub(v)}` : verb)
+      const amount = rub(v)
+      if (v > 0) setButtonLabel(this.submit, pawn ? t('offer.lendAmount', { amount }) : t('offer.offerAmount', { amount }))
+      else setButtonLabel(this.submit, pawn ? t('offer.lend') : t('offer.offer'))
       this.submit.dataset.id = 'make-offer'
       this.submit.disabled = v <= 0 || over || s.current.phase !== 'offer'
     }

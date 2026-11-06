@@ -9,6 +9,7 @@
  * Nothing here throws to callers. Missing APIs (old browsers, Node in tests)
  * read as "unknown" and are skipped quietly.
  */
+import { t } from '../data/strings'
 import { tuning } from '../data/tuning'
 
 /** Device-only key (like the sound settings): when the last backup was made, ms since epoch. */
@@ -89,9 +90,9 @@ export function backupReminderDue(hasProgress: boolean, last: number | null, now
 
 /** Pure: "today", "yesterday", "5 days ago" or "never". */
 export function backupAgeText(last: number | null, now: number): string {
-  if (last === null) return 'never'
+  if (last === null) return t('backup.age.never')
   const days = Math.floor(Math.max(0, now - last) / DAY_MS)
-  return days === 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`
+  return days === 0 ? t('backup.age.today') : days === 1 ? t('backup.age.yesterday') : t('backup.age.days', { count: days })
 }
 
 // --- backup files ----------------------------------------------------------------
@@ -146,6 +147,6 @@ export async function saveBackupFile(text: string, name = backupFileName()): Pro
 /** The text of a chosen backup file, trimmed. Throws a player-safe message for files far too big to be a code. */
 export async function readBackupFile(file: File): Promise<string> {
   // A code is plain ASCII, so its byte size is its length; allow a little slack for line breaks.
-  if (file.size > tuning.save.maxCodeChars + 1024) throw new Error('That file is far too big to be a Lombard backup.')
+  if (file.size > tuning.save.maxCodeChars + 1024) throw new Error(t('backup.fileTooBig'))
   return (await file.text()).trim()
 }

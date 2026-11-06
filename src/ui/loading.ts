@@ -5,6 +5,7 @@
  * the progress bar, the fade-out when the first screen is ready, and the
  * error line with a Reload button if boot fails.
  */
+import { t } from '../data/strings'
 
 /** Fade length in ms; matches the transition in index.html. */
 const FADE_MS = 400
@@ -34,7 +35,7 @@ export function bindLoadingScreen(doc: Document = document): LoadingScreen {
     // The bar is indeterminate (a sliding shimmer) until the first real number arrives.
     root?.classList.add('ld-known')
     if (fill) fill.style.transform = `scaleX(${shown})`
-    if (pct) pct.textContent = `${whole}%`
+    if (pct) pct.textContent = t('fmt.percent', { n: whole })
     bar?.setAttribute('aria-valuenow', String(whole))
   }
 

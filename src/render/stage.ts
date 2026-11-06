@@ -21,11 +21,17 @@ import type { GlbLoader } from './loaders'
 import { contactShadowTexture } from './textures'
 
 const COUNTER_READ_SIZE = 0.09
+/** Items with a largest side over this (m) sit on the counter at true size. */
+const BIG_ITEM = 0.2
+/** Most a hotspot may sit behind the first surface hit and still count as visible, m. */
+const OCCLUDE_SLACK_MAX = 0.006
 const ZOOM_MIN = 0.45
 const ZOOM_MAX = 2.6
 const PITCH_LIMIT = 1.35
 const DEFAULT_YAW = -0.42
 const DEFAULT_PITCH = -0.22
+/** Upright items (a laptop) start tipped further towards the camera, so the keyboard shows too. */
+const UPRIGHT_PITCH = -0.5
 /** Finger-sized margin around the item's footprint for a counter tap, CSS px. */
 const TAP_SLOP_PX = 26
 
@@ -67,6 +73,7 @@ export class ItemStage {
 
   private readonly shadow: THREE.Mesh
   private readonly qCounter = new THREE.Quaternion()
+  private upright = false
   private readonly qFront = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI)
   private readonly qTmp = new THREE.Quaternion()
   private readonly qTmp2 = new THREE.Quaternion()
@@ -119,7 +126,7 @@ export class ItemStage {
       this.visitId = c.visitId
       this.setItem(c.item.defId)
       this.yaw = DEFAULT_YAW
-      this.pitch = DEFAULT_PITCH
+      this.pitch = this.upright ? UPRIGHT_PITCH : DEFAULT_PITCH
       this.zoom = 1
       this.velYaw = this.velPitch = 0
       this.exit = null
@@ -213,7 +220,8 @@ export class ItemStage {
     const qInspect = qPitch.multiply(qYaw).multiply(this.qFront)
 
     this.pivot.position.copy(counterPos).lerp(INSPECT_POINT, b)
-    this.pivot.quaternion.copy(this.qCounter).slerp(qInspect, b)
+    // Upright items stand on the mat as modelled, front towards the player: the inspect pose, unturned.
+    this.pivot.quaternion.copy(this.upright ? this.qFront : this.qCounter).slerp(qInspect, b)
     const s = this.counterScale + (1 - this.counterScale) * b
     this.pivot.scale.setScalar(s * (1 - exitK * 0.7))
 
@@ -284,7 +292,8 @@ export class ItemStage {
         this.raycaster.far = dist
         const hits = this.raycaster.intersectObject(proxyOf(model), true)
         const first = hits[0]
-        if (first && first.distance < dist - this.size * 0.06) visible = false
+        // Slack for the proxy's rough shape, capped so a mark behind a thin wall (a laptop lid) is hidden.
+        if (first && first.distance < dist - Math.min(this.size * 0.06, OCCLUDE_SLACK_MAX)) visible = false
       }
       out.push({
         id: h.id,
@@ -301,6 +310,7 @@ export class ItemStage {
     if (this.model) this.pivot.remove(this.model)
     this.model = null
     this.def = null
+    this.upright = false
     let def: ItemDef
     try {
       def = getItemDef(defId)
@@ -314,6 +324,7 @@ export class ItemStage {
     this.pivot.add(model)
     this.model = model
     this.def = def
+    this.upright = def.model.rest === 'upright'
     this.fit()
   }
 
@@ -329,11 +340,12 @@ export class ItemStage {
     parent?.add(model)
     const size = box.getSize(new THREE.Vector3())
     this.size = Math.max(size.x, size.y, size.z, 0.005)
-    this.counterScale = THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, 1.2, 5)
-    // Lying flat: model −Z points down, so lift by the depth below the origin.
-    this.lift = -box.min.z
-    // Footprint for the contact shadow: model X × Y on the mat.
-    this.shadow.scale.set(size.x * this.counterScale * 1.5, size.y * this.counterScale * 1.5, 1)
+    // Big items (a laptop) already read from the counter: shown at true size, not blown up.
+    this.counterScale = THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, this.size > BIG_ITEM ? 1 : 1.2, 5)
+    // Lying flat: model −Z points down, so lift by the depth below the origin (upright: −Y).
+    this.lift = this.upright ? -box.min.y : -box.min.z
+    // Footprint for the contact shadow: model X × Y on the mat (upright: X × Z).
+    this.shadow.scale.set(size.x * this.counterScale * 1.5, (this.upright ? size.z : size.y) * this.counterScale * 1.5, 1)
   }
 
   dispose(): void {

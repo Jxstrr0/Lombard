@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ITEM_DEFS, getItemDef } from '../src/data/items'
 import { tuning } from '../src/data/tuning'
-import { CONDITION_TELL, MAGNET_TELL, WEIGHT_TELL, effectiveTells, missChance, useTool } from '../src/game/inspect/tools'
+import { CONDITION_TELL, MAGNET_TELL, WEIGHT_TELL, effectiveTells, missChance, referenceRange, useTool } from '../src/game/inspect/tools'
 import { generateItem } from '../src/game/items/generate'
 import { Rng } from '../src/game/rng'
 import type { FakeProfile, ItemDef, Tell, ToolId } from '../src/game/schema/item'
@@ -294,11 +294,11 @@ describe('magnet', () => {
     expect(magnetNote(def, steel).text).toMatch(/jumps to the magnet/)
   })
 
-  it('watch cases are judged against the def; phones are admitted to be uninformative', () => {
+  it('watch cases are judged against the def; phones and laptops are admitted to be uninformative', () => {
     const rolland = getItemDef('watch_rolland_abyssal')
     expect(magnetNote(rolland, undefined).polarity).toBe('neutral')
     expect(magnetNote(rolland, rolland.fakeProfiles.find((p) => p.magnetic)).polarity).toBe('negative')
-    for (const def of ITEM_DEFS.filter((d) => d.category === 'phones')) {
+    for (const def of ITEM_DEFS.filter((d) => d.category === 'phones' || d.category === 'electronics')) {
       for (const p of profiles(def)) {
         const n = magnetNote(def, p)
         expect(n.polarity).toBe('neutral')
@@ -312,6 +312,33 @@ describe('magnet', () => {
     const f = inspect(def, makeItem(def, undefined, 1), Array.from({ length: 5 }, () => ({ tool: 'magnet' as const })), 1)
     expect(f.filter((x) => x.tellId === MAGNET_TELL)).toHaveLength(1)
     expect(f[f.length - 1]!.text).toBe('Nothing new from the magnet.')
+  })
+})
+
+describe('the student\'s laptop (electronics)', () => {
+  const def = getItemDef('laptop_tosaki_orbita_c40')
+
+  it('stands upright on the counter and has a laptop condition note', () => {
+    expect(def.category).toBe('electronics')
+    expect(def.model.rest).toBe('upright')
+    const f = inspect(def, makeItem(def, undefined, 2), [{ tool: 'loupe' }], 2)
+    expect(f.find((x) => x.tellId === CONDITION_TELL)!.text).toMatch(/lid|keys|palm rest|screen/)
+  })
+
+  it('weighs light with the aftermarket battery, and right with any other profile', () => {
+    for (const p of profiles(def)) {
+      for (let s = 0; s < 30; s++) {
+        const w = inspect(def, makeItem(def, p, s), [{ tool: 'scale' }], s).find((x) => x.tellId === WEIGHT_TELL)!
+        expect(w.polarity, `${p?.id ?? 'genuine'} ${s}`).toBe(p?.id === 'aftermarket_battery' ? 'negative' : 'positive')
+      }
+    }
+  })
+
+  it('is missing from the old price guide and listed from the 2013 edition', () => {
+    expect(referenceRange(def, 1)).toBeNull()
+    const r = referenceRange(def, 2)!
+    expect(r.lo).toBeLessThan(r.hi)
+    expect(r.lo).toBeGreaterThan(def.baseValue.min * 0.6)
   })
 })
 

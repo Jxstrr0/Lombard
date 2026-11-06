@@ -128,6 +128,10 @@ A survey of CC0 / CC BY sources found almost nothing for our items: no Soviet wa
 - `scripts/items-pack.mjs` writes `public/assets/items/<id>.glb`: Draco geometry, plus textures as KTX2 (ETC1S for the AO/colour, UASTC for any data map). A coin is ~230 KB.
 - A def opts in with `"glb": "<id>.glb"` in its `model`. The game shows the placeholder at once and swaps the glb in when it loads. The hidden placeholder stays as the cheap raycast proxy for hotspot occlusion. `?noglb=1` forces placeholders. `?gallery=1&item=<id>` shows one model large, front and back, which is how Kelbo reviews a model on the phone.
 - `tests/itemModels.test.ts` checks that defs and packed files agree.
+- **Laptop (M4, `art/items/kinds/laptop.py`)**, the Tosaki Orbita C40 for The Student's Laptop: a 14-inch 2013 machine, 336 × 236 × 26 mm base, lid open at 110°. It is built in two local frames, one for the base and one for the lid, each turned into three.js item coordinates. Keyboard with Latin and red Cyrillic legends (a few keys in gloss for the worn shine), palm-rest spec sticker, ports on both sides, battery bay with its label, service hatch, rating sticker with serial and barcode, and a metal wordmark on the lid. 33.9k triangles, 11 draw calls, AO 1024 px, ~240 KB packed.
+  - Printed things (key legends, sticker text, the screen) stand **60 µm** proud. Draco quantizes positions to about 21 µm over the laptop's 34 cm, so 10 µm print collapses into its surface and disappears.
+  - Print that thin drops its side walls, about two thirds of the text triangles.
+  - The def sets `"rest": "upright"`. The counter and the inspect view then show the laptop standing on its base, not laid on its back like the flat items, and `src/render/items.ts` has a matching `laptop` placeholder.
 - The `items` workflow (`.github/workflows/items.yml`) rebuilds and commits the models when a push to `main` changes `art/items/` or the pack script, or on demand from the GitHub app (Actions → items → Run workflow). Normally the models are built and committed together with the builder change.
 
 Run locally (Blender 4.5.15 at `~/blender`):

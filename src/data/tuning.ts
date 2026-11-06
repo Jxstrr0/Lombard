@@ -452,7 +452,7 @@ export const tuning = {
     /**
      * Season multiplier per demandTag (GDD § 7). Missing tag or season = 1.
      * Cameras peak with the tourists and white nights, electronics before the school year,
-     * gold and watches over the New Year gift season.
+     * laptops before term starts, gold and watches over the New Year gift season.
      */
     seasons: {
       gold: { winter: 1.05, spring: 1, summer: 1.05, autumn: 0.95 },
@@ -463,6 +463,8 @@ export const tuning = {
       militaria: { winter: 0.9, spring: 1.1, summer: 1.05, autumn: 0.95 },
       electronics: { winter: 1.05, spring: 0.95, summer: 0.9, autumn: 1.1 },
       phones: { winter: 1.05, spring: 0.95, summer: 0.9, autumn: 1.1 },
+      /** Students: buy before term, sell (or pawn) in the dead summer months. */
+      laptops: { winter: 1, spring: 1, summer: 0.85, autumn: 1.15 },
       cameras: { winter: 0.85, spring: 1.05, summer: 1.2, autumn: 0.9 },
       coins: { winter: 1.05, spring: 1, summer: 0.95, autumn: 1 },
       silver: { winter: 1, spring: 1, summer: 1, autumn: 1 },
@@ -473,12 +475,12 @@ export const tuning = {
      * first week (the career starts 3 March).
      */
     holidays: [
-      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, cameras: 1.1 } },
+      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, laptops: 1.1, cameras: 1.1 } },
       { id: 'defender_day', from: '02-16', to: '02-23', boost: { watches: 1.15, militaria: 1.1 } },
       { id: 'womens_day', from: '02-28', to: '03-08', boost: { jewelry: 1.35, gold: 1.2, watches: 1.05 } },
       { id: 'victory_day', from: '04-25', to: '05-10', boost: { militaria: 1.45, soviet: 1.15 } },
       { id: 'white_nights', from: '06-01', to: '07-10', boost: { cameras: 1.2, soviet: 1.1 } },
-      { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25 } },
+      { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25, laptops: 1.35 } },
     ] as readonly { id: string; from: string; to: string; boost: Readonly<Record<string, number>> }[],
     /** Per-tag random walk, stepped once a day at day open: d += U(−step, step) + revert × (1 − d), clamped. */
     drift: { step: 0.025, revert: 0.05, min: 0.8, max: 1.25 },
@@ -489,7 +491,7 @@ export const tuning = {
     shockChance: 0.12,
     shocks: [
       { id: 'ruble_wobble', weight: 3, delta: { gold: 0.12, coins: 0.1, watches: 0.06, luxury: 0.05, electronics: -0.04 } },
-      { id: 'import_prices', weight: 2, delta: { phones: 0.1, electronics: 0.08 } },
+      { id: 'import_prices', weight: 2, delta: { phones: 0.1, electronics: 0.08, laptops: 0.1 } },
       { id: 'phone_launch', weight: 2, delta: { phones: -0.1 } },
       { id: 'flea_market_raid', weight: 1.5, delta: { militaria: -0.12 } },
       { id: 'collectors_fair', weight: 2, delta: { coins: 0.1, militaria: 0.06, cameras: 0.05 } },

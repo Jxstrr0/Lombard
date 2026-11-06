@@ -6,6 +6,7 @@ import { COLLECTOR, ROOFER } from '../src/data/collector'
 import { CAST } from '../src/data/customers/cast'
 import { archetypes, femaleFirstNames, firstNames } from '../src/data/customers/walkins'
 import { FENCE } from '../src/data/fence'
+import { FLOOD_PEOPLE, FLOOD_PERSON } from '../src/data/flood'
 import { VOLKOVA } from '../src/data/police'
 import { REGULARS } from '../src/data/regulars'
 import { SPECIALISTS } from '../src/data/specialists'
@@ -211,10 +212,12 @@ describe('M6 looks', () => {
       ['the fence', FENCE.look],
       ['Volkova', VOLKOVA.look],
       ['the Collector', COLLECTOR.look],
+      ['Kuzmich (the Flood)', FLOOD_PERSON.look],
     ]
     // One-off strangers, by name (Seryozha the roofer is one, and comes in more than once).
     const strangers = new Map<string, string>([[ROOFER.name, ROOFER.look]])
     for (const arc of ARCS) for (const b of arc.beats) if (b.visit.as) strangers.set(b.visit.as.name, b.visit.as.look)
+    for (const p of Object.values(FLOOD_PEOPLE)) strangers.set(p.name, p.look)
     // Volkova off duty comes in under her own name (her arc's `as`): the same person.
     strangers.delete('Alla Volkova')
     for (const [name, look] of strangers) people.push([`stranger ${name}`, look])

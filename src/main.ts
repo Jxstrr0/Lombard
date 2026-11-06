@@ -9,6 +9,8 @@
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
+ * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
+ * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint) for review.
  */
 import '@fontsource/space-grotesk/400.css'
 import '@fontsource/space-grotesk/500.css'
@@ -44,6 +46,8 @@ import { ShopScene } from './render/scene'
 import { ItemStage } from './render/stage'
 import { createItemLoader } from './render/loaders'
 import { CustomerCast, castOverride } from './render/customerModel'
+import type { ShopLife } from './render/life'
+import { clockForTime } from './render/life/timeOfDay'
 import { Ui, screenFor, type ScreenId } from './ui/bind'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
@@ -215,8 +219,10 @@ async function boot(): Promise<void> {
   // Quality tier: Auto steps down under 30 fps (see render/perf.ts); ?tier= pins one.
   let graphics: GraphicsChoice = tierStart.choice
   const governor = new TierGovernor(tierStart.tier, graphics === 'auto' && !tierStart.pinned)
+  let life: ShopLife | null = null
   const applyTier = (t: QualityTier) => {
     governor.reset(t)
+    life?.setTier(t)
     setTextureAnisotropy(TIER_SETTINGS[t].anisotropy)
     // setPixelRatio resizes the drawing buffer itself.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, TIER_SETTINGS[t].pixelRatioCap))
@@ -234,6 +240,8 @@ async function boot(): Promise<void> {
   }
   // ?walk=0: customers appear at the counter instead of walking in from the door (screenshots).
   if (params.get('walk') === '0') shop.setWalking(false)
+  const timeOverride = clockForTime(params.get('time'))
+  shop.setClockOverride(timeOverride)
   const stage = new ItemStage(shop.scene, shop.matPoint, itemLoader?.load)
 
   // --- UI --------------------------------------------------------------------
@@ -291,6 +299,7 @@ async function boot(): Promise<void> {
   const sync = (state: GameState, prev: GameState | null) => {
     // The scene first: it knows whether a new customer is still walking in, which the UI waits for.
     shop.sync(state)
+    life?.sync(state)
     ui.setCustomerArrivedQuiet(shop.customerState !== 'arriving')
     ui.render(state, prev)
     stage.sync(state)
@@ -381,6 +390,7 @@ async function boot(): Promise<void> {
     const dt = Math.min(raw, 0.1)
     perf?.begin()
     shop.update(dt)
+    life?.update(dt, renderer.domElement.height)
     const customerState = shop.customerState
     if (document.body.dataset.customer !== customerState) {
       document.body.dataset.customer = customerState
@@ -407,6 +417,16 @@ async function boot(): Promise<void> {
     if (envReady && !window.__lombardReady && ++readyFrames > 2) {
       window.__lombardReady = true
       document.body.classList.add('ready')
+      // Shop life comes after the shop is up, as its own chunk (?life=0 leaves it out).
+      if (params.get('life') !== '0') {
+        void import('./render/life').then(({ ShopLife }) => {
+          life = new ShopLife()
+          life.setClockOverride(timeOverride)
+          life.setTier(governor.current)
+          life.sync(store.get())
+          shop.scene.add(life.group)
+        })
+      }
     }
   })
 }

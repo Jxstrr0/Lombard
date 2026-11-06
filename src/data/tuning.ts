@@ -470,6 +470,8 @@ export const tuning = {
     maxCodeChars: 1_000_000,
     /** Largest JSON a save code may inflate to (bytes); guards against decompression bombs. */
     maxInflatedBytes: 8_000_000,
+    /** Days after the last backup (code copied or file saved) before the quiet reminder shows again. */
+    backupReminderDays: 14,
   },
 } as const
 

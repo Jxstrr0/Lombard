@@ -11,10 +11,10 @@
  * wandered far, and city flavour to fill the page.
  */
 import type { Season } from '../game/state'
-import { HOLIDAY_MORE, SEASON_FLAVOUR, SEASON_HINTS } from './newsSeasons'
+import { DRY_DAYS_ONLY, HOLIDAY_MORE, SEASON_FLAVOUR, SEASON_HINTS } from './newsSeasons'
 
-/** M6: seasonal market notes (src/data/newsSeasons.ts). */
-export { SEASON_HINTS }
+/** M6: seasonal market notes, and the flavour kept out of the paper while the Flood is on (src/data/newsSeasons.ts). */
+export { DRY_DAYS_ONLY, SEASON_HINTS }
 
 export interface NewsTemplate {
   id: string

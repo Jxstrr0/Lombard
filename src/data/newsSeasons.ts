@@ -123,6 +123,25 @@ export const SEASON_HINTS: Readonly<Record<Season, readonly NewsTemplate[]>> = {
   ],
 }
 
+/**
+ * City flavour the paper leaves out while the Flood's stories run (src/game/city/flood.ts floodNews):
+ * boats, ice cream and the dacha trains don't sit well beside the canal in the ground floors, and
+ * the canal's own spring stories would say the same thing twice.
+ */
+export const DRY_DAYS_ONLY: ReadonlySet<string> = new Set([
+  'sp_boats',
+  'sp_ice_cream',
+  'sp_dacha',
+  'sp_canal_level',
+  'sp_hydro',
+  'sp_ice_out',
+  'sp_balconies',
+  'sp_starlings',
+  'sp_potholes',
+  'sp_mud',
+  'wn_bridges',
+])
+
 /** More stories for holidays already in tuning.demand.holidays, and the news-only city days. */
 export const HOLIDAY_MORE: Readonly<Record<string, readonly NewsTemplate[]>> = {
   womens_day: [

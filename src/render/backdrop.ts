@@ -161,7 +161,7 @@ void main() {
       vec3 skyc = texture2D(map, vec2(vUv.x + fn.x * 0.03, 0.96)).rgb;
       vec3 murk = vec3(0.29, 0.26, 0.19);
       float graze = clamp(1.0 - (-fd.y / length(fd)) * 4.0, 0.0, 1.0);
-      vec3 water = mix(murk, skyc * 0.85, 0.2 + 0.5 * graze);
+      vec3 water = mix(murk, skyc * 0.6, 0.12 + 0.3 * graze);
       // shallow at its edge: a ghost of the street under it
       float shallow = 1.0 - smoothstep(0.0, 0.2, floodY - ys);
       water = mix(water, col * 0.55 + murk * 0.35, shallow * 0.55);

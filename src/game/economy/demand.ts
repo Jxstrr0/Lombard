@@ -18,7 +18,7 @@
  * updateMarket draws from a fork of the day's rng, so adding stories never reshuffles the queue.
  */
 import { ITEM_DEFS } from '../../data/items'
-import { FIRST_DAY, FLAVOUR_NEWS, HINT_ALIAS, HINT_NEWS, HOLIDAY_NEWS, SEASON_HINTS, SHOCK_NEWS, type NewsTemplate } from '../../data/news'
+import { DRY_DAYS_ONLY, FIRST_DAY, FLAVOUR_NEWS, HINT_ALIAS, HINT_NEWS, HOLIDAY_NEWS, SEASON_HINTS, SHOCK_NEWS, type NewsTemplate } from '../../data/news'
 import { tuning } from '../../data/tuning'
 import { floodFactor, floodNews } from '../city/flood'
 import { Rng } from '../rng'
@@ -102,7 +102,7 @@ function applyShock(drift: Record<string, number>, shock: (typeof T.shocks)[numb
  * round again until the deck has been through (about a week and a half for thirty stories), and the
  * next year deals the same season in a different order.
  */
-function flavourDeck(state: Pick<GameState, 'meta' | 'calendar'>, pool: readonly NewsTemplate[]): { deck: NewsTemplate[]; at: number } {
+function flavourDeck(state: Pick<GameState, 'meta' | 'calendar'>, pool: readonly NewsTemplate[], label = 'deck', perDay: number = T.news.storyCountWeights.length): { deck: NewsTemplate[]; at: number } {
   const { date } = state.calendar
   const season = seasonOf(date)
   const month = Number(date.slice(5, 7))
@@ -111,8 +111,8 @@ function flavourDeck(state: Pick<GameState, 'meta' | 'calendar'>, pool: readonly
   const startMonth = { winter: 12, spring: 3, summer: 6, autumn: 9 }[season]
   const start = Date.UTC(year, startMonth - 1, 1)
   const day = Math.round((Date.parse(`${date}T00:00:00Z`) - start) / 86_400_000)
-  const deck = new Rng(state.meta.seed).fork(`news:deck:${year}:${season}`).shuffle(pool.slice())
-  return { deck, at: day * T.news.storyCountWeights.length }
+  const deck = new Rng(state.meta.seed).fork(`news:${label}:${year}:${season}`).shuffle(pool.slice())
+  return { deck, at: day * perDay }
 }
 
 function toNews(t: NewsTemplate, shopName: string, tags: string[], direction: NewsItem['direction']): NewsItem {
@@ -179,16 +179,21 @@ export function updateMarket(state: GameState, rng0: Rng): MarketState {
       add(pickFresh(rng, hints ? (up ? hints.up : hints.down) : [], yesterday), [best.tag], up ? 'up' : 'down')
     }
   }
-  // M6: a seasonal market note now and then (SEASON_HINTS agree with tuning.demand.seasons; tests check).
-  if (news.length < target && rng.chance(T.news.seasonHintChance)) {
-    const t = pickFresh(rng, SEASON_HINTS[season].filter((h) => !used.has(h.id)), yesterday)
-    if (t) add(t, [...(t.tags ?? [])], t.direction ?? 'flat')
+  // M6: a seasonal market note now and then (SEASON_HINTS agree with tuning.demand.seasons; tests check),
+  // dealt one a day from the season's own deck so the same note doesn't come round for days. Not while
+  // the water is about: the flood's own stories say where trade has gone.
+  const floodDays = flood !== undefined
+  if (!floodDays && news.length < target && rng.chance(T.news.seasonHintChance)) {
+    const hints = flavourDeck(state, SEASON_HINTS[season], 'hints', 1)
+    const t = hints.deck[hints.at % hints.deck.length]
+    if (t && !yesterday.has(t.id)) add(t, [...(t.tags ?? [])], t.direction ?? 'flat')
   }
   const flavour = FLAVOUR_NEWS.filter((t) => !t.seasons || t.seasons.includes(season))
   const { deck, at } = flavourDeck(state, flavour)
   for (let i = 0; news.length < target && i < deck.length; i++) {
     const t = deck[(at + i) % deck.length]!
-    if (used.has(t.id) || yesterday.has(t.id)) continue
+    // (the deck is the whole season's, so leaving some out on flood days doesn't reshuffle it)
+    if (used.has(t.id) || yesterday.has(t.id) || (floodDays && DRY_DAYS_ONLY.has(t.id))) continue
     add(t, [], 'flat')
   }
   return { drift, news: news.slice(0, T.news.storyCountWeights.length) }

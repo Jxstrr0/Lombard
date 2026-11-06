@@ -17,11 +17,13 @@ const LOOK = {
   bag: { size: [0.3, 0.12, 0.2] as const, rows: 2, perRow: 5, colour: 0x8b7b5c },
   /** The water's patch on the floor by the door (x0, x1, z0, z1) and its depth of colour by how ready the shop was. */
   puddle: {
-    none: { rect: [-0.6, 2.9, 0.6, 3.95], opacity: 0.78 },
-    lifted: { rect: [-0.6, 2.9, 0.6, 3.95], opacity: 0.72 },
-    sandbags: { rect: [1.0, 2.5, 2.9, 3.6], opacity: 0.55 },
+    none: { rect: [-0.6, 2.9, 0.6, 3.95], opacity: 0.6 },
+    lifted: { rect: [-0.6, 2.9, 0.6, 3.95], opacity: 0.55 },
+    sandbags: { rect: [1.0, 2.5, 2.9, 3.6], opacity: 0.45 },
   } satisfies Record<FloodPrep, { rect: number[]; opacity: number }>,
-  colour: 0x2a2a22,
+  colour: 0x050403,
+  /** How much of the room's environment map the water's surface shows (a sheen, not a mirror). */
+  sheen: 0.12,
   /** Opacity × this through the phases after the flood morning (receding, drying); then gone. */
   fade: { flood: 1, receding: 0.75, drying: 0.35 } as Partial<Record<FloodPhase, number>>,
 }
@@ -67,8 +69,9 @@ export class FloodInside {
       new THREE.PlaneGeometry(1, 1),
       new THREE.MeshStandardMaterial({
         color: LOOK.colour,
-        roughness: 0.06,
+        roughness: 0.25,
         metalness: 0,
+        envMapIntensity: LOOK.sheen,
         transparent: true,
         alphaMap: this.mask,
         depthWrite: false,
@@ -122,9 +125,10 @@ function puddleMask(n: number): THREE.DataTexture {
       const v = (y + 0.5) / n - 0.5
       const a = Math.atan2(v, u)
       const r = Math.hypot(u * 1.0, v * 1.0)
-      const edge = 0.42 + 0.04 * Math.sin(a * 3 + 1.3) + 0.025 * Math.sin(a * 7 + 0.4) + 0.015 * Math.sin(a * 13)
-      const t = Math.min(1, Math.max(0, (edge - r) / 0.08))
-      const k = t * t * (3 - 2 * t)
+      const edge = 0.4 + 0.05 * Math.sin(a * 3 + 1.3) + 0.035 * Math.sin(a * 5 + 2.1) + 0.02 * Math.sin(a * 11 + 0.4)
+      // a hard-ish rim, as water has, with a thinner film just inside it
+      const t = Math.min(1, Math.max(0, (edge - r) / 0.025))
+      const k = (t * t * (3 - 2 * t)) * (0.75 + 0.25 * Math.min(1, (edge - r) / 0.12))
       const i = (y * n + x) * 4
       data[i] = data[i + 1] = data[i + 2] = Math.round(k * 255)
       data[i + 3] = 255

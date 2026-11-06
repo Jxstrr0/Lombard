@@ -223,10 +223,16 @@ const CONDITION_TEXT: Record<string, Record<Band, string>> = {
     poor: 'A cracked screen corner, a dented frame, buttons worn shiny.',
   },
   electronics: {
-    mint: 'Lid and palm rest unmarked, the keys still matte, the screen spotless.',
-    good: 'Light scuffs on the lid corners and a shine on the most-used keys.',
-    worn: 'A scratched lid, a palm rest worn pale, a dead pixel near one corner.',
-    poor: 'A cracked hinge cover, missing key caps, a screen scratched right across.',
+    mint: 'Not a scuff on it, the buttons crisp, the screen or glass spotless.',
+    good: 'Light scuffs on the corners and a shine on the most-used buttons.',
+    worn: 'Scratched all over, the buttons worn shiny, a chip out of one corner.',
+    poor: 'A cracked casing, a loose button or two, the screen or glass scratched right across.',
+  },
+  media: {
+    mint: 'Clean as the day it left the shop, the panel and controls unmarked.',
+    good: 'Light scuffs on the corners; the buttons and knobs move smoothly.',
+    worn: 'A scratched lid, worn lettering on the buttons, a knob that wobbles.',
+    poor: 'A cracked panel, a missing knob, dust and cigarette yellow in every seam.',
   },
   cameras: {
     mint: 'Chrome bright, leatherette intact, the glass clean.',
@@ -280,12 +286,34 @@ const CONDITION_TEXT: Record<string, Record<Band, string>> = {
 }
 const CONDITION_FALLBACK = CONDITION_TEXT.gold!
 
+/** M6: shapes whose wear reads differently from the rest of their category (checked first). */
+const CONDITION_BY_SHAPE: Partial<Record<ItemDef['model']['placeholder'], Record<Band, string>>> = {
+  laptop: {
+    mint: 'Lid and palm rest unmarked, the keys still matte, the screen spotless.',
+    good: 'Light scuffs on the lid corners and a shine on the most-used keys.',
+    worn: 'A scratched lid, a palm rest worn pale, a dead pixel near one corner.',
+    poor: 'A cracked hinge cover, missing key caps, a screen scratched right across.',
+  },
+  record: {
+    mint: 'The vinyl is glossy black with no scuffs; the sleeve corners are sharp.',
+    good: 'A few hairlines on the vinyl, a ring of wear on the sleeve.',
+    worn: 'Scuffs across the grooves, a split along the sleeve’s spine, a biro name on the back.',
+    poor: 'Deep scratches across the tracks, a warp you can see, the sleeve held together with tape.',
+  },
+  book: {
+    mint: 'Tight spine, clean edges, the gilt on the cover bright.',
+    good: 'A little rubbing at the corners; the spine is tight and the pages clean.',
+    worn: 'A sunned spine, bumped corners, a few foxed pages.',
+    poor: 'A cracked spine, loose pages, water stains along the bottom edge.',
+  },
+}
+
 function conditionFinding(def: ItemDef, item: ItemInstance): Omit<Finding, 'id' | 'tool'> {
   const b = tuning.inspect.conditionBands
   const c = item.condition
   const band: Band = c >= b.mint ? 'mint' : c >= b.good ? 'good' : c >= b.worn ? 'worn' : 'poor'
   const polarity: Polarity = band === 'mint' ? 'positive' : band === 'poor' ? 'negative' : 'neutral'
-  const text = (CONDITION_TEXT[def.category] ?? CONDITION_FALLBACK)[band]
+  const text = (CONDITION_BY_SHAPE[def.model.placeholder] ?? CONDITION_TEXT[def.category] ?? CONDITION_FALLBACK)[band]
   return { text, tellId: CONDITION_TELL, reveals: 'condition', polarity }
 }
 
@@ -306,6 +334,9 @@ const WEIGHT_SUBJECT: Record<ItemDef['model']['placeholder'], string> = {
   coin: 'A coin of this issue weighs',
   laptop: 'This model usually weighs',
   icon: 'A panel this size under a silver cover usually weighs',
+  box: 'One like this usually weighs',
+  record: 'A pressing like this, in its sleeve, usually weighs',
+  book: 'This edition usually weighs',
   accordion: 'This model usually weighs',
   balalaika: 'An instrument like this usually weighs',
   guitar: 'An instrument like this usually weighs',
@@ -360,11 +391,12 @@ function magnetFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Fin
       : 'Hardly any pull, even near the speaker. Phones vary, so it tells you little.'
     return { ...base, text, polarity: 'neutral' }
   }
-  if (def.category === 'electronics') {
-    // Speakers, drive and screws: every laptop has steel and magnets in it somewhere.
+  if (def.category === 'electronics' || (def.category === 'media' && def.magnetic)) {
+    // Speakers, drive, chassis and screws: every machine has steel and magnets in it somewhere.
+    const what = def.model.placeholder === 'laptop' ? 'laptop' : 'machine like it'
     const text = pulls
-      ? 'The magnet catches at the speakers and the screws, as it would on any laptop. It tells you little.'
-      : 'Barely a tug anywhere. Laptops vary inside, so it tells you little.'
+      ? `The magnet catches at the speakers and the screws, as it would on any ${what}. It tells you little.`
+      : `Barely a tug anywhere. They vary inside, so it tells you little.`
     return { ...base, text, polarity: 'neutral' }
   }
   // A pull where the genuine article has none (or the reverse) is negative evidence.

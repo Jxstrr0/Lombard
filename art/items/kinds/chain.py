@@ -1,6 +1,7 @@
 """
 Gold chains lying in a loose loop: a rope chain with a lobster clasp and a stamped
-tag, or a Bismarck-weave bracelet with a box clasp (585 + maker's mark on the tongue).
+tag (or, M6 wave B, an anchor chain of alternating oval links
+with the same clasp), or a Bismarck-weave bracelet with a box clasp (585 + maker's mark on the tongue).
 
 Placeholder convention (src/render/items.ts): loose loop ≈ 0.05 across in XY,
 clasp at −Y. Hotspots: clasp (0, −0.025, 0), links (0, 0.025, 0).
@@ -87,22 +88,30 @@ def end_cap(name: str, at: Vector, direction: Vector, mat, *, r0: float, r1: flo
 # Rope chain
 
 
-def rope(it: lib.Item, gold, stamp) -> None:
+def rope(it: lib.Item, gold, stamp, *, anchor: bool = False) -> None:
     x_end_r, x_end_l = 0.0016, -0.0066
-    path = open_run(x_end_r, x_end_l, 0.00044)
+    path = open_run(x_end_r, x_end_l, 0.00125 if anchor else 0.00044)
     fr = G.frames(path, closed=False)
     bm = bmesh.new()
-    tilt = math.radians(64)
-    dphi = math.radians(57)
-    R, r = 0.00088, 0.00027
-    for i, (p, (t, n, b)) in enumerate(zip(path, fr)):
-        phi = i * dphi
-        d = n * math.cos(phi) + b * math.sin(phi)  # direction the ring leans towards
-        nr = (t * math.cos(tilt) + d * math.sin(tilt)).normalized()  # ring plane normal
-        u = d.cross(t).normalized()  # stays in the ring plane
-        v = nr.cross(u).normalized()
-        m = Matrix(((u.x, v.x, nr.x, p.x), (u.y, v.y, nr.y, p.y), (u.z, v.z, nr.z, p.z), (0, 0, 0, 1)))
-        G.oval_into(bm, m, R, R * 1.12, r, seg=10, sides=5)
+    if anchor:
+        # anchor (cable) chain: solid oval links, each turned at right angles to the next,
+        # a little flattened like a worn, diamond-cut chain
+        for i, (p, (t, n, b)) in enumerate(zip(path, fr)):
+            u, v = (n, b) if i % 2 else (b, -n)
+            m = Matrix(((t.x, u.x, v.x, p.x), (t.y, u.y, v.y, p.y), (t.z, u.z, v.z, p.z), (0, 0, 0, 1)))
+            G.oval_into(bm, m, 0.00098, 0.00062, 0.00029, seg=14, sides=6, sz=0.85)
+    else:
+        tilt = math.radians(64)
+        dphi = math.radians(57)
+        R, r = 0.00088, 0.00027
+        for i, (p, (t, n, b)) in enumerate(zip(path, fr)):
+            phi = i * dphi
+            d = n * math.cos(phi) + b * math.sin(phi)  # direction the ring leans towards
+            nr = (t * math.cos(tilt) + d * math.sin(tilt)).normalized()  # ring plane normal
+            u = d.cross(t).normalized()  # stays in the ring plane
+            v = nr.cross(u).normalized()
+            m = Matrix(((u.x, v.x, nr.x, p.x), (u.y, v.y, nr.y, p.y), (u.z, v.z, nr.z, p.z), (0, 0, 0, 1)))
+            G.oval_into(bm, m, R, R * 1.12, r, seg=10, sides=5)
     for f in bm.faces:
         f.smooth = True
     lib.mesh_object("rope", bm, gold)
@@ -199,4 +208,4 @@ def build(it: lib.Item) -> None:
     if "bracelet" in it.id or "bismarck" in it.d.get("name", "").lower():
         bismarck(it, gold, stamp)
     else:
-        rope(it, gold, stamp)
+        rope(it, gold, stamp, anchor="anchor" in it.id)

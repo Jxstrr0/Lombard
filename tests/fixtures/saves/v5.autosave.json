@@ -1,0 +1,2003 @@
+{
+ "careerId": "career-7003",
+ "savedAt": 1793946013000,
+ "version": 5,
+ "state": {
+  "meta": {
+   "version": 5,
+   "seed": 7003,
+   "careerId": "career-7003",
+   "rng": 1017577919,
+   "nextId": 893,
+   "intro": false
+  },
+  "calendar": {
+   "day": 34,
+   "date": "2014-04-05",
+   "weekday": 5,
+   "season": "spring"
+  },
+  "cash": 26615,
+  "shop": {
+   "name": "Zoloto i Kamni",
+   "slots": [
+    {
+     "id": "counter-1",
+     "area": "counter",
+     "itemId": "imp"
+    },
+    {
+     "id": "counter-2",
+     "area": "counter",
+     "itemId": null
+    },
+    {
+     "id": "counter-3",
+     "area": "counter",
+     "itemId": null
+    },
+    {
+     "id": "counter-4",
+     "area": "counter",
+     "itemId": null
+    },
+    {
+     "id": "counter-5",
+     "area": "counter",
+     "itemId": "ii9"
+    },
+    {
+     "id": "counter-6",
+     "area": "counter",
+     "itemId": "il9"
+    },
+    {
+     "id": "wall-1",
+     "area": "wall",
+     "itemId": "im2"
+    },
+    {
+     "id": "wall-2",
+     "area": "wall",
+     "itemId": "ims"
+    },
+    {
+     "id": "wall-3",
+     "area": "wall",
+     "itemId": "ilz"
+    },
+    {
+     "id": "wall-4",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-5",
+     "area": "wall",
+     "itemId": "imv"
+    },
+    {
+     "id": "wall-6",
+     "area": "wall",
+     "itemId": "imk"
+    },
+    {
+     "id": "wall-7",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-8",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-9",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-10",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-11",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-12",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "back-1",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-2",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-3",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-4",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-5",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-6",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-7",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-8",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-9",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-10",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-11",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-12",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-13",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-14",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-15",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-16",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-17",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-18",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-19",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-20",
+     "area": "back",
+     "itemId": null
+    }
+   ],
+   "prices": {
+    "ii9": 1418,
+    "il9": 6143,
+    "im2": 2457,
+    "ilz": 10962,
+    "imp": 879,
+    "ims": 1748,
+    "imv": 1512,
+    "imk": 6332
+   },
+   "upgrades": [
+    "acid_kit",
+    "door_chime"
+   ],
+   "acidCharges": 0,
+   "security": 0.5
+  },
+  "inventory": [
+   {
+    "id": "ii9",
+    "defId": "coin_olympiad_10r",
+    "condition": 86,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 1200,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "relief",
+     "edge",
+     "@magnet",
+     "@reference"
+    ],
+    "story": "From the Olympics set. My father bought the whole series. I have one.",
+    "weightGrams": 32.91
+   },
+   {
+    "id": "il9",
+    "defId": "phone_galaxia_stella4",
+    "condition": 43,
+    "authenticity": "genuine",
+    "provenance": "clean",
+    "trueValue": 6150,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "screen",
+     "@magnet",
+     "magnet_speaker",
+     "logo",
+     "battery",
+     "port",
+     "@reference"
+    ],
+    "story": "The screen was replaced once, but by a proper shop.",
+    "weightGrams": 130.03
+   },
+   {
+    "id": "im2",
+    "defId": "lens_helios_44",
+    "condition": 92,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 2450,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "name_ring",
+     "glass",
+     "@magnet",
+     "magnet_barrel",
+     "mount",
+     "@reference"
+    ],
+    "story": "I have three of these. My father never threw anything away.",
+    "weightGrams": 233.27
+   },
+   {
+    "id": "ilz",
+    "defId": "gold_signet_583",
+    "condition": 42,
+    "authenticity": "genuine",
+    "provenance": "clean",
+    "trueValue": 11000,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "face",
+     "@magnet",
+     "magnet_face",
+     "hallmark",
+     "colour",
+     "@reference"
+    ],
+    "story": "A man at the market said a signet ring makes you look like old money. I look like new debt.",
+    "weightGrams": 7.44
+   },
+   {
+    "id": "imp",
+    "defId": "coin_poltinnik_1924",
+    "condition": 96,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 760,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "@magnet",
+     "edge",
+     "@reference"
+    ],
+    "story": "From my grandfather's collection. He had a whole album of these.",
+    "weightGrams": 9.88
+   },
+   {
+    "id": "ims",
+    "defId": "medal_victory_germany",
+    "condition": 76,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 1600,
+    "revealed": [
+     "@weight",
+     "@condition",
+     "relief",
+     "reverse",
+     "@magnet",
+     "ribbon",
+     "@reference"
+    ],
+    "story": "Found it in a box of buttons at the dacha.",
+    "weightGrams": 15.58
+   },
+   {
+    "id": "imv",
+    "defId": "lens_helios_44",
+    "condition": 62,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 1350,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "mount",
+     "@magnet",
+     "magnet_barrel",
+     "@reference"
+    ],
+    "story": "Video people buy these for the swirly background. I saw it online.",
+    "weightGrams": 232.17
+   },
+   {
+    "id": "imk",
+    "defId": "gold_cross_585",
+    "condition": 78,
+    "authenticity": "genuine",
+    "provenance": "heirloom",
+    "trueValue": 7750,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "colour",
+     "@magnet",
+     "magnet_bail",
+     "hallmark",
+     "@reference"
+    ],
+    "story": "Gran gave me this when I was christened. I don’t really… but I’m coming back for it. Write that down somewhere.",
+    "weightGrams": 3.11
+   }
+  ],
+  "paid": {
+   "ii9": 743,
+   "il9": 2925,
+   "im2": 1170,
+   "ilz": 4698,
+   "imp": 419,
+   "ims": 900,
+   "imv": 792,
+   "imk": 3015
+  },
+  "loans": [
+   {
+    "id": "l36",
+    "item": {
+     "id": "i2v",
+     "defId": "watch_poljot_strela",
+     "condition": 44,
+     "authenticity": "frankenstein",
+     "provenance": "unknown",
+     "trueValue": 4500,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "magnet_case",
+      "pushers",
+      "crown",
+      "@reference"
+     ],
+     "story": "It's been in my desk since the factory closed. Time someone used it.",
+     "fakeProfileId": "dial_swap",
+     "weightGrams": 70.44
+    },
+    "customer": {
+     "id": "c2u",
+     "name": "Dmitri",
+     "archetype": "tradesman",
+     "temperament": "stubborn",
+     "knowledge": 0.46,
+     "desperation": 0.46,
+     "portraitKey": "gardener_male_01"
+    },
+    "principal": 4600,
+    "startDay": 4,
+    "dueDay": 34,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "l5c",
+    "item": {
+     "id": "i4z",
+     "defId": "phone_severin_k1",
+     "condition": 67,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 900,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "magnet_speaker",
+      "logo",
+      "screen",
+      "@reference"
+     ],
+     "story": "The battery lasts a week. You can hammer nails with it.",
+     "weightGrams": 81.93
+    },
+    "customer": {
+     "id": "c4y",
+     "name": "Kostya",
+     "archetype": "hustler",
+     "temperament": "desperate",
+     "knowledge": 0.87,
+     "desperation": 0.14,
+     "portraitKey": "male_adult_07"
+    },
+    "principal": 410,
+    "startDay": 7,
+    "dueDay": 37,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "l7q",
+    "item": {
+     "id": "i78",
+     "defId": "gold_rope_chain_585",
+     "condition": 73,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 20000,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "links",
+      "colour",
+      "@magnet",
+      "magnet_clasp",
+      "clasp_stamp",
+      "@reference"
+     ],
+     "story": "I need it gone by Friday. Rent.",
+     "weightGrams": 10.71
+    },
+    "customer": {
+     "id": "c77",
+     "name": "Lida",
+     "archetype": "pensioner",
+     "temperament": "proud",
+     "knowledge": 0.11,
+     "desperation": 0.83,
+     "portraitKey": "female_adult_02"
+    },
+    "principal": 6521,
+    "startDay": 10,
+    "dueDay": 40,
+    "monthlyRate": 0.1,
+    "redeemDay": 36
+   },
+   {
+    "id": "l7r",
+    "item": {
+     "id": "i7b",
+     "defId": "gold_band_583",
+     "condition": 59,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 7650,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "hallmark",
+      "seam",
+      "@magnet",
+      "magnet_seam",
+      "colour",
+      "@reference"
+     ],
+     "story": "Real gold, 583, Soviet. You can see the stamp.",
+     "weightGrams": 4.95
+    },
+    "customer": {
+     "id": "c7a",
+     "name": "Alla",
+     "archetype": "pensioner",
+     "temperament": "desperate",
+     "knowledge": 0.42,
+     "desperation": 0.64,
+     "portraitKey": "female_adult_14"
+    },
+    "principal": 2471,
+    "startDay": 10,
+    "dueDay": 40,
+    "monthlyRate": 0.1,
+    "redeemDay": 35
+   },
+   {
+    "id": "l96",
+    "item": {
+     "id": "i8q",
+     "defId": "medal_victory_germany",
+     "condition": 83,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 1450,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "ribbon",
+      "@magnet",
+      "magnet_disc",
+      "@reference"
+     ],
+     "story": "For the Victory Day parade my son wants a new phone. So.",
+     "weightGrams": 15.62
+    },
+    "customer": {
+     "id": "c8p",
+     "name": "Sasha",
+     "archetype": "student",
+     "temperament": "flexible",
+     "knowledge": 0.3,
+     "desperation": 0.73,
+     "portraitKey": "male_adult_01"
+    },
+    "principal": 800,
+    "startDay": 12,
+    "dueDay": 42,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "l9u",
+    "item": {
+     "id": "i9d",
+     "defId": "gold_band_583",
+     "condition": 86,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 10600,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "hallmark",
+      "colour",
+      "@magnet",
+      "magnet_seam",
+      "@reference"
+     ],
+     "story": "We got divorced in the spring. I don't want it in the house.",
+     "weightGrams": 4.76
+    },
+    "customer": {
+     "id": "c9c",
+     "name": "Vadim",
+     "archetype": "tradesman",
+     "temperament": "proud",
+     "knowledge": 0.54,
+     "desperation": 0.54,
+     "portraitKey": "gardener_male_01"
+    },
+    "principal": 5600,
+    "startDay": 13,
+    "dueDay": 43,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lak",
+    "item": {
+     "id": "ia0",
+     "defId": "phone_mangosteen_m4s",
+     "condition": 61,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 5450,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "logo",
+      "@magnet",
+      "back_glass",
+      "screws",
+      "@reference"
+     ],
+     "story": "A Mangosteen. They hold their value, everyone says so.",
+     "weightGrams": 138.12
+    },
+    "customer": {
+     "id": "c9z",
+     "name": "Raisa",
+     "archetype": "pensioner",
+     "temperament": "flexible",
+     "knowledge": 0.37,
+     "desperation": 0.6,
+     "portraitKey": "female_adult_14"
+    },
+    "principal": 1960,
+    "startDay": 14,
+    "dueDay": 44,
+    "monthlyRate": 0.1,
+    "redeemDay": 39
+   },
+   {
+    "id": "lbw",
+    "item": {
+     "id": "ibo",
+     "defId": "gold_bracelet_585",
+     "condition": 86,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 32800,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "colour",
+      "@magnet",
+      "magnet_clasp",
+      "@reference"
+     ],
+     "story": "From the gold market on the ring road. The man had a certificate.",
+     "weightGrams": 13.37
+    },
+    "customer": {
+     "id": "cbn",
+     "name": "Oleg",
+     "archetype": "student",
+     "temperament": "flexible",
+     "knowledge": 0.42,
+     "desperation": 0.6,
+     "portraitKey": "male_adult_16"
+    },
+    "principal": 12400,
+    "startDay": 16,
+    "dueDay": 46,
+    "monthlyRate": 0.1,
+    "redeemDay": 43
+   },
+   {
+    "id": "lcm",
+    "item": {
+     "id": "ic0",
+     "defId": "lens_helios_44",
+     "condition": 39,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 980,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "magnet_barrel",
+      "name_ring",
+      "aperture",
+      "mount",
+      "@reference"
+     ],
+     "story": "Video people buy these for the swirly background. I saw it online.",
+     "weightGrams": 227.61
+    },
+    "customer": {
+     "id": "cbz",
+     "name": "Vadim",
+     "archetype": "office",
+     "temperament": "flexible",
+     "knowledge": 0.44,
+     "desperation": 0.13,
+     "portraitKey": "male_adult_08"
+    },
+    "principal": 350,
+    "startDay": 17,
+    "dueDay": 47,
+    "monthlyRate": 0.1,
+    "redeemDay": 46
+   },
+   {
+    "id": "lep",
+    "item": {
+     "id": "ie8",
+     "defId": "gold_cross_585",
+     "condition": 76,
+     "authenticity": "genuine",
+     "provenance": "heirloom",
+     "trueValue": 6750,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "hallmark",
+      "colour",
+      "@magnet",
+      "magnet_bail",
+      "@reference"
+     ],
+     "story": "My husband wore it every day. He doesn't need it now.",
+     "weightGrams": 3.09
+    },
+    "customer": {
+     "id": "ce7",
+     "name": "Lida",
+     "archetype": "hustler",
+     "temperament": "stubborn",
+     "knowledge": 0.69,
+     "desperation": 0.26,
+     "portraitKey": "female_adult_07"
+    },
+    "principal": 3200,
+    "startDay": 20,
+    "dueDay": 50,
+    "monthlyRate": 0.1,
+    "redeemDay": 45
+   },
+   {
+    "id": "lfg",
+    "item": {
+     "id": "if3",
+     "defId": "lens_helios_44",
+     "condition": 66,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 1850,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "aperture",
+      "glass",
+      "@magnet",
+      "name_ring",
+      "mount",
+      "@reference"
+     ],
+     "story": "Video people buy these for the swirly background. I saw it online.",
+     "weightGrams": 226.65
+    },
+    "customer": {
+     "id": "cf2",
+     "name": "Lida",
+     "archetype": "tradesman",
+     "temperament": "stubborn",
+     "knowledge": 0.51,
+     "desperation": 0.25,
+     "portraitKey": "female_adult_04"
+    },
+    "principal": 790,
+    "startDay": 21,
+    "dueDay": 51,
+    "monthlyRate": 0.1,
+    "redeemDay": 48
+   },
+   {
+    "id": "lgv",
+    "item": {
+     "id": "igh",
+     "defId": "gold_earrings_583",
+     "condition": 94,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 11600,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "lock_right",
+      "stones",
+      "@magnet",
+      "colour",
+      "@reference"
+     ],
+     "story": "Gold with diamonds, I think. Or something like diamonds.",
+     "weightGrams": 4.43
+    },
+    "customer": {
+     "id": "cgg",
+     "name": "Pavel",
+     "archetype": "student",
+     "temperament": "proud",
+     "knowledge": 0.25,
+     "desperation": 0.65,
+     "portraitKey": "male_adult_01"
+    },
+    "principal": 5100,
+    "startDay": 23,
+    "dueDay": 53,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lhn",
+    "item": {
+     "id": "ih7",
+     "defId": "gold_signet_583",
+     "condition": 91,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 20000,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "hallmark",
+      "colour",
+      "@magnet",
+      "face",
+      "@reference"
+     ],
+     "story": "Heavy, isn't it? Solid gold, they don't make them like that now.",
+     "weightGrams": 7.66
+    },
+    "customer": {
+     "id": "ch6",
+     "name": "Boris",
+     "archetype": "student",
+     "temperament": "desperate",
+     "knowledge": 0.33,
+     "desperation": 0.89,
+     "portraitKey": "male_adult_18"
+    },
+    "principal": 4806,
+    "startDay": 24,
+    "dueDay": 54,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lie",
+    "item": {
+     "id": "ihu",
+     "defId": "gold_cross_585",
+     "condition": 37,
+     "authenticity": "genuine",
+     "provenance": "heirloom",
+     "trueValue": 4600,
+     "revealed": [
+      "@weight",
+      "@condition",
+      "colour",
+      "@magnet",
+      "magnet_bail",
+      "hallmark",
+      "@reference"
+     ],
+     "story": "My godmother gave it to me at my christening. I don't go to church, but still.",
+     "weightGrams": 3.12
+    },
+    "customer": {
+     "id": "cht",
+     "name": "Misha",
+     "archetype": "student",
+     "temperament": "flexible",
+     "knowledge": 0.21,
+     "desperation": 0.76,
+     "portraitKey": "male_adult_18"
+    },
+    "principal": 1850,
+    "startDay": 25,
+    "dueDay": 55,
+    "monthlyRate": 0.1,
+    "redeemDay": 36
+   },
+   {
+    "id": "lj4",
+    "item": {
+     "id": "iix",
+     "defId": "coin_olympiad_10r",
+     "condition": 94,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 2000,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "edge",
+      "@magnet",
+      "magnet_coin",
+      "emblem",
+      "@reference"
+     ],
+     "story": "Proof condition. It says so on the plastic. Well, the plastic broke.",
+     "weightGrams": 33.67
+    },
+    "customer": {
+     "id": "ciw",
+     "name": "Yura",
+     "archetype": "student",
+     "temperament": "flexible",
+     "knowledge": 0.27,
+     "desperation": 0.66,
+     "portraitKey": "male_adult_01"
+    },
+    "principal": 459,
+    "startDay": 26,
+    "dueDay": 56,
+    "monthlyRate": 0.1,
+    "redeemDay": 42
+   },
+   {
+    "id": "lmj",
+    "item": {
+     "id": "im5",
+     "defId": "gold_earrings_583",
+     "condition": 38,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 5950,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "lock_stamp",
+      "stones",
+      "@magnet",
+      "lock_right",
+      "colour",
+      "@reference"
+     ],
+     "story": "From my first husband. The earrings were the best part of him.",
+     "weightGrams": 4.52
+    },
+    "customer": {
+     "id": "cm4",
+     "name": "Raisa",
+     "archetype": "student",
+     "temperament": "flexible",
+     "knowledge": 0.37,
+     "desperation": 0.56,
+     "portraitKey": "female_adult_17"
+    },
+    "principal": 2600,
+    "startDay": 31,
+    "dueDay": 61,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   }
+  ],
+  "specialists": {
+   "jeweler": {
+    "retained": true,
+    "relationship": 0.25,
+    "callsUsed": 0,
+    "sinceDay": 3
+   },
+   "collector": {
+    "retained": true,
+    "relationship": 0.25,
+    "callsUsed": 0,
+    "sinceDay": 14
+   }
+  },
+  "market": {
+   "drift": {
+    "cameras": 0.914,
+    "coins": 1.06,
+    "electronics": 0.94,
+    "gold": 1.094,
+    "jewelry": 0.957,
+    "laptops": 0.93,
+    "luxury": 0.984,
+    "militaria": 0.948,
+    "phones": 0.986,
+    "silver": 1.011,
+    "soviet": 1.016,
+    "watches": 0.996
+   },
+   "news": [
+    {
+     "id": "fl_snow",
+     "headline": "Snow falls off the roofs; one bench and a parked car lost",
+     "body": "Caretakers ask residents to walk in the middle of the street, where the cars are.",
+     "tags": [],
+     "direction": "flat"
+    }
+   ]
+  },
+  "customers": {
+   "zinaida": {
+    "trust": 0.17,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 28,
+    "nextDay": 42,
+    "lastOutcome": "passed"
+   },
+   "valentin": {
+    "trust": -0.38,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 32,
+    "nextDay": 42,
+    "lastOutcome": "walked"
+   },
+   "alisa": {
+    "trust": 0.32,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 32,
+    "nextDay": 42,
+    "lastOutcome": "bought"
+   },
+   "darya": {
+    "trust": -0.18,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 31,
+    "nextDay": 42,
+    "lastOutcome": "passed"
+   },
+   "yana": {
+    "trust": -0.18,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 26,
+    "nextDay": 45,
+    "lastOutcome": "passed"
+   },
+   "lyusya": {
+    "trust": 0.04,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 27,
+    "nextDay": 35,
+    "lastOutcome": "passed"
+   },
+   "rimma": {
+    "trust": -0.18,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 29,
+    "nextDay": 40,
+    "lastOutcome": "passed"
+   },
+   "ruslan": {
+    "trust": -0.24,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 24,
+    "nextDay": 44,
+    "lastOutcome": "passed"
+   },
+   "inessa": {
+    "trust": -0.24,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 33,
+    "nextDay": 41,
+    "lastOutcome": "walked"
+   },
+   "nika": {
+    "trust": 0.14,
+    "flags": [],
+    "visits": 2,
+    "lastDay": 27,
+    "nextDay": 36,
+    "lastOutcome": "redeemed"
+   },
+   "gleb": {
+    "trust": -0.08,
+    "flags": [],
+    "visits": 2,
+    "lastDay": 27,
+    "nextDay": 35,
+    "lastOutcome": "passed"
+   },
+   "timofei": {
+    "trust": -0.1,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 31,
+    "nextDay": 38,
+    "lastOutcome": "bought"
+   },
+   "margarita": {
+    "trust": -0.34,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 23,
+    "nextDay": 36,
+    "lastOutcome": "passed"
+   },
+   "ulyana": {
+    "trust": -0.18,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 29,
+    "nextDay": 40,
+    "lastOutcome": "passed"
+   },
+   "yevstafy": {
+    "trust": -0.34,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 30,
+    "nextDay": 38,
+    "lastOutcome": "walked"
+   },
+   "mikhail": {
+    "trust": -0.24,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 28,
+    "nextDay": 40,
+    "lastOutcome": "passed"
+   }
+  },
+  "queue": [
+   {
+    "visitId": "vog",
+    "kind": "seller",
+    "wants": "sell",
+    "customer": {
+     "id": "coe",
+     "name": "Nadia",
+     "archetype": "pensioner",
+     "temperament": "stubborn",
+     "knowledge": 0.45,
+     "desperation": 0.87,
+     "portraitKey": "female_adult_14"
+    },
+    "item": {
+     "id": "iof",
+     "defId": "gold_earrings_583",
+     "condition": 38,
+     "authenticity": "fake",
+     "provenance": "unknown",
+     "trueValue": 170,
+     "revealed": [],
+     "story": "My daughter's. She lost one and her friend made her a copy. No, wait, that's another pair.",
+     "fakeProfileId": "plated_brass",
+     "weightGrams": 2.63
+    },
+    "patience": 98
+   },
+   {
+    "visitId": "voj",
+    "kind": "seller",
+    "wants": "sell",
+    "customer": {
+     "id": "coh",
+     "name": "Vera",
+     "archetype": "office",
+     "temperament": "flexible",
+     "knowledge": 0.41,
+     "desperation": 0.26,
+     "portraitKey": "business_female_02"
+    },
+    "item": {
+     "id": "ioi",
+     "defId": "watch_vostok_komandirskie",
+     "condition": 62,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 5550,
+     "revealed": [],
+     "story": "Issued to my father in the army. Officers only, those dials.",
+     "weightGrams": 58.8
+    },
+    "patience": 152
+   },
+   {
+    "visitId": "vo2",
+    "kind": "seller",
+    "wants": "sell",
+    "customer": {
+     "id": "reg_ruslan",
+     "name": "Ruslan Gruzdev",
+     "archetype": "tradesman",
+     "temperament": "flexible",
+     "knowledge": 0.35,
+     "desperation": 0.25,
+     "portraitKey": "male_adult_17",
+     "regularId": "ruslan"
+    },
+    "item": {
+     "id": "io1",
+     "defId": "phone_severin_k1",
+     "condition": 82,
+     "authenticity": "fake",
+     "provenance": "unknown",
+     "trueValue": 90,
+     "revealed": [],
+     "story": "The lady had three of these. Never threw a phone away in her life. Respect.",
+     "fakeProfileId": "clone",
+     "weightGrams": 64.74
+    },
+    "patience": 269,
+    "line": "Another one gone to God, and the van still starts. Morning! The lady had three of these. Never threw a phone away in her life. Respect."
+   },
+   {
+    "visitId": "vom",
+    "kind": "seller",
+    "wants": "sell",
+    "customer": {
+     "id": "cok",
+     "name": "Vera",
+     "archetype": "tradesman",
+     "temperament": "flexible",
+     "knowledge": 0.49,
+     "desperation": 0.25,
+     "portraitKey": "female_adult_04"
+    },
+    "item": {
+     "id": "iol",
+     "defId": "coin_poltinnik_1924",
+     "condition": 76,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 720,
+     "revealed": [],
+     "story": "From my grandfather's collection. He had a whole album of these.",
+     "weightGrams": 10.08
+    },
+    "patience": 192
+   }
+  ],
+  "current": {
+   "visitId": "vo4",
+   "wants": "sell",
+   "sale": null,
+   "customer": {
+    "id": "reg_yana",
+    "name": "Yana Chernykh",
+    "archetype": "student",
+    "temperament": "proud",
+    "knowledge": 0.6,
+    "desperation": 0.5,
+    "portraitKey": "female_adult_08",
+    "regularId": "yana"
+   },
+   "elapsed": 53,
+   "phase": "offer",
+   "kind": "seller",
+   "item": {
+    "id": "io3",
+    "defId": "camera_zenit_e",
+    "condition": 78,
+    "authenticity": "genuine",
+    "provenance": "clean",
+    "trueValue": 3200,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "nameplate",
+     "shutter",
+     "@magnet",
+     "magnet_body",
+     "serial",
+     "@reference"
+    ],
+    "story": "A Zenit. It’ll outlive both of us. Most things do.",
+    "weightGrams": 951.73
+   },
+   "line": "You insult the object, not me. 3,100 ₽."
+  },
+  "inspect": {
+   "findings": [
+    {
+     "id": "f1",
+     "tool": "scale",
+     "text": "Reads 947 g. This model usually weighs 920–1000 g.",
+     "reveals": "authenticity",
+     "polarity": "positive",
+     "tellId": "@weight"
+    },
+    {
+     "id": "f2",
+     "tool": "scale",
+     "text": "A brick in the pan. Built to survive a tank rolling over it.",
+     "tellId": "heft",
+     "reveals": "authenticity",
+     "polarity": "positive"
+    },
+    {
+     "id": "f3",
+     "tool": "loupe",
+     "text": "Light brassing on the corners; the controls turn smoothly.",
+     "tellId": "@condition",
+     "reveals": "condition",
+     "polarity": "neutral"
+    },
+    {
+     "id": "f4",
+     "tool": "loupe",
+     "text": "ЗЕНИТ in raised letters on the prism housing, the paint worn down in the hollows.",
+     "tellId": "nameplate",
+     "reveals": "authenticity",
+     "polarity": "positive",
+     "hotspot": "prism"
+    },
+    {
+     "id": "f5",
+     "tool": "loupe",
+     "text": "Through the open back, the cloth shutter curtains are whole, no pinholes against the light.",
+     "tellId": "shutter",
+     "reveals": "condition",
+     "polarity": "positive",
+     "hotspot": "back"
+    },
+    {
+     "id": "f6",
+     "tool": "magnet",
+     "tellId": "@magnet",
+     "reveals": "authenticity",
+     "text": "The magnet catches on steel somewhere inside the body.",
+     "polarity": "neutral"
+    },
+    {
+     "id": "f7",
+     "tool": "magnet",
+     "text": "The magnet clings to the steel shutter frame through the top plate.",
+     "tellId": "magnet_body",
+     "reveals": "authenticity",
+     "polarity": "neutral",
+     "hotspot": "top"
+    },
+    {
+     "id": "f8",
+     "tool": "loupe",
+     "text": "The body serial on the top plate opens with the year's two digits, the factory badge beside it.",
+     "tellId": "serial",
+     "reveals": "authenticity",
+     "polarity": "positive",
+     "hotspot": "top"
+    },
+    {
+     "id": "f9",
+     "tool": "reference",
+     "tellId": "@reference",
+     "text": "The old price guide lists the Zenit-E 35 mm SLR at 2,200 ₽–4,600 ₽ in good condition.",
+     "polarity": "neutral"
+    }
+   ],
+   "toolUses": {
+    "scale": 1,
+    "loupe": 2,
+    "magnet": 1,
+    "reference": 1
+   },
+   "estimate": null
+  },
+  "haggle": {
+   "ask": 3100,
+   "floor": 2026,
+   "round": 1,
+   "maxRounds": 4,
+   "irritation": 0.1961578947368421,
+   "status": "open",
+   "history": [
+    {
+     "offer": 1062,
+     "approach": "straight",
+     "response": {
+      "kind": "counter",
+      "price": 3100,
+      "mood": "neutral",
+      "lineKey": "counter.proud"
+     }
+    }
+   ]
+  },
+  "day": {
+   "phase": "open",
+   "clock": 212,
+   "served": 6,
+   "total": 11,
+   "openingCash": 3845,
+   "log": [
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on 585 gold bracelet, Bismarck weave from Arkady",
+     "defId": "gold_bracelet_585"
+    },
+    {
+     "kind": "sell",
+     "amount": 6200,
+     "text": "Sold the Tosaki Orbita C40 laptop to Lida",
+     "itemId": "ii0",
+     "defId": "laptop_tosaki_orbita_c40"
+    },
+    {
+     "kind": "sell",
+     "amount": 1570,
+     "text": "Sold the Zenit-E 35 mm SLR to Inna",
+     "itemId": "iha",
+     "defId": "camera_zenit_e"
+    },
+    {
+     "kind": "sell",
+     "amount": 15000,
+     "text": "Sold the 583 gold signet ring to Kostya",
+     "itemId": "iio",
+     "defId": "gold_signet_583"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on Brequet-Fils Classique, 750 gold dress watch from Marina",
+     "defId": "watch_brequet_classique"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on Poljot Strela chronograph from Olga",
+     "defId": "watch_poljot_strela"
+    }
+   ],
+   "newsRead": true,
+   "nextArrival": 177.55899218469858
+  },
+  "history": [
+   {
+    "day": 1,
+    "openingCash": 80000,
+    "closingCash": 69035,
+    "bought": 1,
+    "spent": 495,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 3500,
+    "loaned": 6970,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 2,
+    "openingCash": 69035,
+    "closingCash": 54815,
+    "bought": 1,
+    "spent": 4590,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 5250,
+    "loaned": 4380,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 3,
+    "openingCash": 54815,
+    "closingCash": 53754,
+    "bought": 1,
+    "spent": 2430,
+    "sold": 1,
+    "earned": 1879,
+    "walkouts": 4,
+    "expenses": 0,
+    "loaned": 510,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 4,
+    "openingCash": 53754,
+    "closingCash": 51731,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 4400,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 6423,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 5,
+    "openingCash": 51731,
+    "closingCash": 49182,
+    "bought": 1,
+    "spent": 2549,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 4,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 6,
+    "openingCash": 49182,
+    "closingCash": 58233,
+    "bought": 1,
+    "spent": 6500,
+    "sold": 1,
+    "earned": 4721,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 10830,
+    "stolen": 0
+   },
+   {
+    "day": 7,
+    "openingCash": 58233,
+    "closingCash": 51623,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 6610,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 8,
+    "openingCash": 51623,
+    "closingCash": 34653,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 4,
+    "expenses": 1200,
+    "loaned": 16570,
+    "redeemed": 800,
+    "stolen": 0
+   },
+   {
+    "day": 9,
+    "openingCash": 34653,
+    "closingCash": 75405,
+    "bought": 2,
+    "spent": 5309,
+    "sold": 1,
+    "earned": 47941,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 1880,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 10,
+    "openingCash": 75405,
+    "closingCash": 73631,
+    "bought": 1,
+    "spent": 4982,
+    "sold": 1,
+    "earned": 11700,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 10362,
+    "redeemed": 1870,
+    "stolen": 0
+   },
+   {
+    "day": 11,
+    "openingCash": 73631,
+    "closingCash": 73429,
+    "bought": 2,
+    "spent": 7616,
+    "sold": 1,
+    "earned": 1604,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 5810,
+    "stolen": 1
+   },
+   {
+    "day": 12,
+    "openingCash": 73429,
+    "closingCash": 81979,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 9350,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 800,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 13,
+    "openingCash": 81979,
+    "closingCash": 73529,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 2850,
+    "loaned": 5600,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 14,
+    "openingCash": 73529,
+    "closingCash": 69793,
+    "bought": 1,
+    "spent": 3186,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 1960,
+    "redeemed": 1410,
+    "stolen": 0
+   },
+   {
+    "day": 15,
+    "openingCash": 69793,
+    "closingCash": 69793,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 16,
+    "openingCash": 69793,
+    "closingCash": 57393,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 12400,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 17,
+    "openingCash": 57393,
+    "closingCash": 53743,
+    "bought": 2,
+    "spent": 4370,
+    "sold": 1,
+    "earned": 1070,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 350,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 18,
+    "openingCash": 53743,
+    "closingCash": 65013,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 4,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 11270,
+    "stolen": 0
+   },
+   {
+    "day": 19,
+    "openingCash": 65013,
+    "closingCash": 65013,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 4,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 20,
+    "openingCash": 65013,
+    "closingCash": 61813,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 3200,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 21,
+    "openingCash": 61813,
+    "closingCash": 60503,
+    "bought": 1,
+    "spent": 1620,
+    "sold": 3,
+    "earned": 1100,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 790,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 22,
+    "openingCash": 60503,
+    "closingCash": 57203,
+    "bought": 1,
+    "spent": 3300,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 23,
+    "openingCash": 57203,
+    "closingCash": 60720,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 8617,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 5100,
+    "redeemed": 0,
+    "stolen": 1
+   },
+   {
+    "day": 24,
+    "openingCash": 60720,
+    "closingCash": 59559,
+    "bought": 1,
+    "spent": 855,
+    "sold": 1,
+    "earned": 7600,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 7906,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 25,
+    "openingCash": 59559,
+    "closingCash": 59446,
+    "bought": 2,
+    "spent": 4843,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 1850,
+    "redeemed": 6580,
+    "stolen": 0
+   },
+   {
+    "day": 26,
+    "openingCash": 59446,
+    "closingCash": 55457,
+    "bought": 1,
+    "spent": 7830,
+    "sold": 1,
+    "earned": 4300,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 459,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 27,
+    "openingCash": 55457,
+    "closingCash": 57457,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 2000,
+    "stolen": 0
+   },
+   {
+    "day": 28,
+    "openingCash": 57457,
+    "closingCash": 57457,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 29,
+    "openingCash": 57457,
+    "closingCash": 3017,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 55000,
+    "loaned": 0,
+    "redeemed": 560,
+    "stolen": 0
+   },
+   {
+    "day": 30,
+    "openingCash": 3017,
+    "closingCash": 10322,
+    "bought": 1,
+    "spent": 2925,
+    "sold": 1,
+    "earned": 7050,
+    "walkouts": 4,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 3180,
+    "stolen": 0
+   },
+   {
+    "day": 31,
+    "openingCash": 10322,
+    "closingCash": 5304,
+    "bought": 2,
+    "spent": 5868,
+    "sold": 1,
+    "earned": 3450,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 2600,
+    "redeemed": 0,
+    "stolen": 1
+   },
+   {
+    "day": 32,
+    "openingCash": 5304,
+    "closingCash": 178,
+    "bought": 4,
+    "spent": 5126,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 4,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 33,
+    "openingCash": 178,
+    "closingCash": 3845,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 3667,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   }
+  ],
+  "crime": {
+   "heat": 0,
+   "pressure": 0,
+   "fenceTrust": 0,
+   "flags": []
+  },
+  "story": {
+   "arcs": {
+    "medals": {
+     "beats": {
+      "medals.roof": {
+       "day": 5,
+       "outcome": "walked"
+      },
+      "medals.second": {
+       "day": 11,
+       "outcome": "passed"
+      },
+      "medals.truth": {
+       "day": 13,
+       "outcome": "talked",
+       "choice": "truth"
+      },
+      "medals.tea": {
+       "day": 19,
+       "outcome": "talked"
+      }
+     },
+     "ended": true
+    }
+   },
+   "pendingEvents": [],
+   "flags": [
+    "medals_conman_known"
+   ]
+  },
+  "reputation": {
+   "general": -72,
+   "byGroup": {
+    "neighbourhood": 0.272,
+    "youth": 0.23,
+    "police": 0,
+    "mob": 0,
+    "specialists": 0.25
+   }
+  },
+  "stats": {
+   "customersSeen": 251,
+   "itemsBought": 26,
+   "itemsSold": 20,
+   "totalSpent": 74394,
+   "totalEarned": 141219,
+   "bestDeal": 47941,
+   "worstDeal": 0,
+   "fakesBought": 0,
+   "itemsStolen": 3
+  },
+  "settings": {
+   "reduceMotion": false,
+   "textScale": 1
+  },
+  "narration": "Someone stops at the window, reads the sign, walks on."
+ },
+ "slot": 2
+}

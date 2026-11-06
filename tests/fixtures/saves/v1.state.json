@@ -1,0 +1,57 @@
+{
+ "meta": {
+  "version": 1,
+  "seed": 31337,
+  "careerId": "career-31337",
+  "rng": 4231057436
+ },
+ "calendar": {
+  "day": 1,
+  "weekday": 0,
+  "season": "spring",
+  "date": "2014-03-03"
+ },
+ "cash": 80000,
+ "shop": {
+  "slots": [],
+  "upgrades": [],
+  "security": 0
+ },
+ "inventory": [],
+ "loans": [],
+ "customers": {},
+ "queue": [],
+ "current": {
+  "customerName": "Walk-in",
+  "line": "You turn it under the lamp. (Inspection arrives in M1.)"
+ },
+ "inspect": null,
+ "haggle": null,
+ "crime": {
+  "heat": 0,
+  "pressure": 0,
+  "fenceTrust": 0,
+  "flags": []
+ },
+ "story": {
+  "arcs": {},
+  "pendingEvents": []
+ },
+ "reputation": {
+  "general": 0,
+  "byGroup": {
+   "neighbourhood": 0,
+   "police": 0,
+   "mob": 0,
+   "specialists": 0
+  }
+ },
+ "stats": {
+  "customersSeen": 7
+ },
+ "settings": {
+  "reduceMotion": false,
+  "textScale": 1.15
+ },
+ "narration": "You shake your head. They pocket it and leave. The bell rings."
+}

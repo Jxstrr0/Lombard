@@ -2,13 +2,14 @@
 import { ItemDefFile, type ItemDef } from '../../game/schema/item'
 import cameras from './cameras.json'
 import coins from './coins.json'
+import electronics from './electronics.json'
 import gold from './gold.json'
 import militaria from './militaria.json'
 import phones from './phones.json'
 import watches from './watches.json'
 
 /** Raw JSON per category file, in spawn-table order (tests validate these directly). */
-export const RAW_ITEM_FILES: Readonly<Record<string, readonly unknown[]>> = { gold, watches, phones, cameras, militaria, coins }
+export const RAW_ITEM_FILES: Readonly<Record<string, readonly unknown[]>> = { gold, watches, phones, cameras, militaria, coins, electronics }
 
 export const ITEM_DEFS: readonly ItemDef[] = Object.values(RAW_ITEM_FILES)
   .flat()

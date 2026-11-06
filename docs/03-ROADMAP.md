@@ -44,28 +44,29 @@ Done when: a tester can play 5 days on a phone, lose money on fakes, and make mo
 
 Done when: the simulator shows a careful policy growing ~15%/month and a careless one busting by day 40.
 
-## M3 — Real art pass (status: in progress. Task 1, the bake pipeline, is done: Kelbo triggered bake #5 from the GitHub app and it deployed as build 6c45ea1. The 30 item models are done (PRs #7–#12). Room layout locked Nov 5 (layout v2: glass counter and cases, back room). Next: dress the shop and the lighting pass)
+## M3 — Real art pass (status: in progress. Task 1, the bake pipeline, is done: Kelbo triggered bake #5 from the GitHub app and it deployed as build 6c45ea1. The 30 item models are done (PRs #7–#12). Room layout locked Nov 5 (layout v2: glass counter and cases, back room). Shop dressed and lit (option B, full bake). Next: the customer A/B test, audio, quality tiers)
 
 - **First task: bake pipeline end to end on a grey box.** `bake/layout.json` with the placeholder room, `bake/bake.py`, and `.github/workflows/bake.yml` (download + cache Blender, preview and full quality, gltf-transform optimize, commit outputs). Wire the lightmap into `scene.ts` on `uv1`. Done when a preview bake triggered from the GitHub mobile app lands in the deployed build. ✅ Done (bake #5 → 6c45ea1).
 - Lock the room layout with Kelbo from preview-bake screenshots before dressing it (layout changes after this mean rebakes). ✅ Locked Nov 5 with Kelbo's changes: glass showcase counter, a low glass case behind it to the player's right, a freestanding glass case on the floor, and a storeroom off the wall to the player's left (see 05).
 - Head look at the counter (Kelbo, Nov 5): drag to turn the head while the eye stays put (full yaw, pitch −55°…+50°); double tap, a new customer, inspect and the portrait offer view recentre it; reduce motion = no inertia and an instant recentre; `?look=<yaw>,<pitch>` for review. Tapping the item on the mat now opens inspect too. ✅ Done.
 - Canal view through the window and door (Kelbo asked for a better river): scripted Cycles render from the eye on a lens-matched plane, moving water, day-clock tint. ✅ Done.
 - Life outside the window (Kelbo: "animated and more alive"): passers-by, traffic on the far road, a boat with a wake, pigeons (one lands on the sill), drifting clouds, lamps and windows at dusk by season, seeded daily weather (rain on the glass, snow, a frozen canal). ✅ Done (Nov 6).
-- Dress the shop: CC0 props, Poly Haven / ambientCG materials, deliberate clutter and slight misalignment (scripted jitter) so it doesn't look procedurally tidy. Surface textures ✅ (ambientCG colour maps on the room's surfaces). Props ✅ first pass (22 Poly Haven models, lighting baked per vertex). Clutter ✅ (a second wave of 29 props replacing the placeholder boxes). Lighting pass next.
-- Lighting pass with Kelbo on preview bakes (warmth, window light, dark corners), then one full bake. Glass cases, shelves, lamp, window with a canal backdrop card.
+- Dress the shop: CC0 props, Poly Haven / ambientCG materials, deliberate clutter and slight misalignment (scripted jitter) so it doesn't look procedurally tidy. Surface textures ✅ (ambientCG colour maps on the room's surfaces). Props ✅ first pass (22 Poly Haven models, lighting baked per vertex). Clutter ✅ (a second wave of 29 props replacing the placeholder boxes).
+- Lighting pass with Kelbo on preview bakes (warmth, window light, dark corners), then one full bake. ✅ Kelbo picked option B (warm evening, lit wall cases) on Nov 5; full bake run. Glass cases, shelves, lamp, window with a canal backdrop card.
 - First 30 items as real models, Draco + KTX2 pipeline. Decided Nov 5: scripted in Blender (`art/items/`), since CC0 sources had almost nothing usable. **Done:** all 30 defs have a scripted glb (coins #7, gold #8, watches #9, militaria #10, phones #11, cameras #12). Review any one on the phone with `?gallery=1&item=<id>`.
 - Customer representation decided (Plan A rigged models vs Plan B portrait cards) after a 1-day test of what CC0 humanoids look like in-scene on phone. ✅ Kelbo picked Plan A with Microsoft Rocketbox (Nov 5); a 25-person cast now plays the walk-ins.
 - Audio: ambience, door, counter, tools. ✅ 13 CC0 sounds from OpenGameArt (Kenney, rubberduck, laleksic, ignasd, randommind, LEGIT Audio) plus two generated tones, ~387 KB, plain WebAudio keyed to state changes, Sound on/off and an ambience level in Settings.
+- Shop life (Kelbo, Nov 6: make the store feel alive): wall clock on shop time, window light that moves with the day (passers-by, cloud), dust, a flickering storeroom tube, steaming tea on the counter. ✅ Done (`src/render/life/`, `?life=0` to compare, `?time=HH:MM` to set the room's time).
 - Quality tiers wired and measured on a real mid-range Android. Tiers ✅ wired (Settings → Graphics, Auto, `?perf=1` readout). Kelbo's phone: a smooth 60 fps (Nov 6), so the tiers were raised (High = native resolution) and customers now walk in and out, with pauses between them.
 
 Done when: screenshots look like a real shop and the phone still holds 30 fps.
 
-## M4 — People and story (status: not started)
+## M4 — People and story (status: in progress. Story engine, regulars and the first arc (the grandmother’s medals) are in, and reputation by group with shoplifting; workers on the title screen, specialists, the laptop and regular-only looks)
 
 - 20 regulars with schedules, memory, and dialogue.
-- Remaining 3 specialists (militaria, antiques, electronics) with their small arcs.
+- Remaining 3 specialists (militaria, antiques, electronics) with their small arcs. Specialists ✅ (Nov 6): Gennady Shurygin (militaria), Stanislav Lyubimov (antiques, icons, instruments), Zhenya Kroshkina (phones, cameras, electronics) are in the Office next to Faina and Ilya. Arcs: all five are written as design notes in GDD § 2b; wiring them onto the story engine is still to do.
 - Story engine and 4 arcs: Grandmother's Medals, Dubai Rolex Guy, The Student's Laptop, Protection (first half).
-- Reputation by group. Shoplifting and security upgrades.
+- Reputation by group. Shoplifting and security upgrades. ✅ Done: five groups (neighbourhood, youth, police, mob, specialists) in `src/game/reputation.ts`, shown in the ledger as vague lines; shoplifting off open shelves from day 8; door chime, convex mirror, lockable wall case and security camera in the Office (see 05).
 - Title screen, career slots, settings (motion, text size), Longlight-branded menu.
 - Add to Kelbo.Website hub.
 

@@ -18,14 +18,16 @@
  * day's weather survives a reload.
  *
  * Review flags: ?street=0 (off), ?street=busy (four times the traffic),
- * ?weather=clear|rain|snow, ?season=winter|spring|summer|autumn,
- * ?time=HH:MM (the street's clock only; the game clock is untouched).
+ * ?weather=clear|rain|snow, ?season=winter|spring|summer|autumn. The shop's
+ * ?time=HH:MM override (render/life/timeOfDay.ts clockForTime) reaches the
+ * street through setClockOverride, like the rest of the room.
  */
 import * as THREE from 'three'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { STREET, type WalkLane } from '../../data/street'
 import type { GameState, Season } from '../../game/state'
 import type { CanalBackdrop } from '../backdrop'
+import { shopHour } from '../life/timeOfDay'
 import type { QualityTier } from '../perf'
 import {
   StreetPlan,
@@ -72,27 +74,17 @@ export interface StreetFlags {
   busy: number
   weather: WeatherKind | null
   season: Season | null
-  /** Street clock hour, or null to follow the shop clock. */
-  hour: number | null
 }
 
 export function streetFlags(params: URLSearchParams): StreetFlags {
   const s = params.get('street')
   const w = params.get('weather')
   const season = params.get('season')
-  const time = params.get('time')
-  let hour: number | null = null
-  if (time) {
-    const [h, m = '0'] = time.split(':')
-    const v = Number(h) + Number(m) / 60
-    if (Number.isFinite(v)) hour = v
-  }
   return {
     enabled: s !== '0',
     busy: s === 'busy' ? 4 : 1,
     weather: w === 'clear' || w === 'rain' || w === 'snow' ? w : null,
     season: season === 'winter' || season === 'spring' || season === 'summer' || season === 'autumn' ? season : null,
-    hour,
   }
 }
 
@@ -123,6 +115,16 @@ export class StreetLife {
   private readonly thingList: SpriteInstance[] = []
   private boatWake: [number, number, number, number] = [0, 0, 1, 0]
   private readonly passers: { x: number; z: number }[] = []
+  /** Walkers already announced to onWindowPasser. */
+  private readonly announced = new WeakSet<WalkerEvent>()
+  private clockOverride: number | null = null
+  /**
+   * Someone on the shop's pavement is about to pass in front of the window:
+   * `dir` +1 walks towards +x (the door side), −1 towards −x; `speed` m/s.
+   * main.ts points this at ShopLife.passerBy so their shadow crosses the sun
+   * patch on the floor. Not called under reduce motion.
+   */
+  onWindowPasser: ((dir: 1 | -1, speed: number) => void) | null = null
 
   private constructor(
     private readonly manifest: StreetManifest,
@@ -168,7 +170,7 @@ export class StreetLife {
     const w = weatherFor(this.seed, day, this.season)
     this.weather = this.flags.weather ? { kind: this.flags.weather, intensity: this.flags.weather === 'clear' ? 0 : 0.85 } : w
     this.ice = (STREET.iceSeasons as readonly Season[]).includes(this.season)
-    const hour = this.flags.hour ?? 10 + state.day.clock / 60
+    const hour = shopHour(this.clockOverride ?? state.day.clock)
     const light = outdoorLight(hour, this.season)
     this.tint = light.tint
     this.dark = light.dark
@@ -183,6 +185,11 @@ export class StreetLife {
       this.plan?.setMood(this.mood())
     }
     this.pushBackdrop()
+  }
+
+  /** ?time=HH:MM: show this shop time (as day.clock seconds) whatever the game's clock says. */
+  setClockOverride(seconds: number | null): void {
+    this.clockOverride = seconds
   }
 
   setTier(tier: QualityTier): void {
@@ -330,7 +337,13 @@ export class StreetLife {
     // fade at the lane's ends (they are out of sight there anyway)
     const edge = Math.min(x - lane.x0, lane.x1 - x)
     this.peopleList.push({ x, y: ground, z: e.z, width: M.metres[0], height: M.metres[1], frame, facingPlusX: e.dir > 0, alpha: clamp01(edge / 1.5), shade: 1 })
-    if (e.lane === 'pavement' && x > WINDOW_SPAN.x0 && x < WINDOW_SPAN.x1) this.passers.push({ x, z: e.z })
+    if (e.lane === 'pavement' && x > WINDOW_SPAN.x0 && x < WINDOW_SPAN.x1) {
+      this.passers.push({ x, z: e.z })
+      if (!this.announced.has(e)) {
+        this.announced.add(e)
+        this.onWindowPasser?.(e.dir > 0 ? 1 : -1, e.speed)
+      }
+    }
   }
 
   private vehicle(e: VehicleEvent, age: number): void {

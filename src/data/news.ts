@@ -185,6 +185,10 @@ export const HINT_NEWS: Readonly<Record<string, { up: readonly NewsTemplate[]; d
     up: [{ id: 'hint_phone_up', headline: 'Second-hand phones fly off the market stalls', body: 'Nobody wants to pay full price for something that will be cracked by spring.' }],
     down: [{ id: 'hint_phone_down', headline: 'Electronics stalls cut prices, nobody notices', body: 'Traders at the ring-road market say the city is full of phones and short of buyers.' }],
   },
+  laptops: {
+    up: [{ id: 'hint_laptop_up', headline: 'Students hunt second-hand laptops', body: 'Notices on the university boards ask for anything with a keyboard that turns on. Price negotiable, the notices add, hopefully.' }],
+    down: [{ id: 'hint_laptop_down', headline: 'Laptops pile up at the ring-road market', body: 'Traders say every student in the city is selling last year’s machine at once. Nobody is buying until September.' }],
+  },
   cameras: {
     up: [{ id: 'hint_camera_up', headline: 'Old cameras wanted by the art school', body: 'Students are asking grandparents to check the top shelf of the wardrobe.' }],
     down: [{ id: 'hint_camera_down', headline: 'Photo club down to its last three members', body: 'They meet on Thursdays and photograph each other. Spare cameras, they say, are everywhere.' }],

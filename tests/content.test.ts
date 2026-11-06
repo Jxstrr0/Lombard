@@ -40,20 +40,20 @@ const militariaTags = getItemDef('medal_for_courage').demandTags
 const goldTags = getItemDef('gold_earrings_583').demandTags
 
 describe('item defs (M2)', () => {
-  it('all 30 raw defs validate against the schema', () => {
+  it('all 31 raw defs validate against the schema', () => {
     const raw = Object.values(RAW_ITEM_FILES).flat()
-    expect(raw).toHaveLength(30)
+    expect(raw).toHaveLength(31)
     for (const r of raw) {
       const res = ItemDef.safeParse(r)
       expect(res.success, `${(r as { id: string }).id}: ${res.success ? '' : res.error.message}`).toBe(true)
     }
   })
 
-  it('covers at least 6 categories with at least 3 defs each', () => {
+  it('covers the six M2 categories with at least 3 defs each', () => {
     const byCat = new Map<string, number>()
     for (const d of ITEM_DEFS) byCat.set(d.category, (byCat.get(d.category) ?? 0) + 1)
     expect(byCat.size).toBeGreaterThanOrEqual(6)
-    for (const [cat, n] of byCat) expect(n, cat).toBeGreaterThanOrEqual(3)
+    // Later categories may start with a single story item (M4: the student's laptop in electronics).
     for (const cat of ['gold', 'watches', 'phones', 'cameras', 'militaria', 'coins']) expect(byCat.get(cat), cat).toBeGreaterThanOrEqual(3)
   })
 

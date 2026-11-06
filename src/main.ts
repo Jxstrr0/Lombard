@@ -7,9 +7,12 @@
  * ?look=<yawDeg>,<pitchDeg> starts the counter view with the head turned from the
  * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
+ * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
+ * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
+ * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
+ * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint, street) for review.
  * Street outside the window (render/street): ?street=0 off, ?street=busy, ?weather=clear|rain|snow,
- * ?season=<season>, ?time=HH:MM (the street's clock only).
- * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line.
+ * ?season=<season> (the street's weather and dusk only).
  */
 import '@fontsource/space-grotesk/400.css'
 import '@fontsource/space-grotesk/500.css'
@@ -28,6 +31,10 @@ import { ITEM_DEFS } from './data/items'
 import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
+import { regularCustomer } from './game/story/plan'
+import type { QueuedVisit } from './game/types'
+import { getRegular } from './data/regulars'
+import { getBeat } from './data/stories'
 import { createInitialState, type GameState } from './game/state'
 import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
@@ -41,6 +48,8 @@ import { ShopScene } from './render/scene'
 import { ItemStage } from './render/stage'
 import { createItemLoader } from './render/loaders'
 import { CustomerCast, castOverride } from './render/customerModel'
+import type { ShopLife } from './render/life'
+import { clockForTime } from './render/life/timeOfDay'
 import { Ui, screenFor, type ScreenId } from './ui/bind'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
@@ -69,6 +78,17 @@ function redeemScenario(s0: GameState): GameState {
   s = reducer({ ...s, loans: [loan] }, { type: 'day/open' })
   const visit = s.queue.find((v) => v.loanId === loan.id)
   return visit ? { ...s, queue: [visit, ...s.queue.filter((v) => v !== visit)] } : s
+}
+
+/** Dev-only (?seed=N&scenario=story): Zinaida Petrovna is first in line with the medals arc's choice scene. */
+function storyScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'day/open' })
+  const who = getRegular('zinaida')
+  const beat = getBeat('medals.truth')
+  if (!who || !beat) return s
+  const visit: QueuedVisit = { visitId: 'v-dev-story', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
+  return { ...s, queue: [visit, ...s.queue] }
 }
 
 /** Screens that show the counter view and leave the 3D area free to drag. */
@@ -152,6 +172,7 @@ async function boot(): Promise<void> {
   if (Number.isFinite(seedParam) && seedParam > 0) {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
+    if (params.get('scenario') === 'story') initial = storyScenario(initial)
   } else {
     try {
       initial = await loadLatestCareer()
@@ -200,10 +221,12 @@ async function boot(): Promise<void> {
   // Quality tier: Auto steps down under 30 fps (see render/perf.ts); ?tier= pins one.
   let graphics: GraphicsChoice = tierStart.choice
   const governor = new TierGovernor(tierStart.tier, graphics === 'auto' && !tierStart.pinned)
+  let life: ShopLife | null = null
   /** Life outside the window, once loaded (see below). */
   let street: import('./render/street').StreetLife | null = null
   const applyTier = (t: QualityTier) => {
     governor.reset(t)
+    life?.setTier(t)
     street?.setTier(t)
     setTextureAnisotropy(TIER_SETTINGS[t].anisotropy)
     // setPixelRatio resizes the drawing buffer itself.
@@ -222,6 +245,8 @@ async function boot(): Promise<void> {
   }
   // ?walk=0: customers appear at the counter instead of walking in from the door (screenshots).
   if (params.get('walk') === '0') shop.setWalking(false)
+  const timeOverride = clockForTime(params.get('time'))
+  shop.setClockOverride(timeOverride)
   const stage = new ItemStage(shop.scene, shop.matPoint, itemLoader?.load)
 
   // --- UI --------------------------------------------------------------------
@@ -279,11 +304,12 @@ async function boot(): Promise<void> {
   const sync = (state: GameState, prev: GameState | null) => {
     // The scene first: it knows whether a new customer is still walking in, which the UI waits for.
     shop.sync(state)
+    life?.sync(state)
     street?.sync(state)
     ui.setCustomerArrivedQuiet(shop.customerState !== 'arriving')
     ui.render(state, prev)
     stage.sync(state)
-    stage.setWaiting(state.current?.phase === 'present' && shop.customerState === 'arriving')
+    stage.setWaiting((state.current?.phase === 'present' || state.current?.phase === 'scene') && shop.customerState === 'arriving')
     rig.reduceMotion = stage.reduceMotion = state.settings.reduceMotion
     // A new customer steps up: face the counter again.
     if (prev && state.current && state.current.visitId !== prev.current?.visitId) rig.recentre()
@@ -372,6 +398,10 @@ async function boot(): Promise<void> {
         if (!ok || !canal) return
         const { StreetLife, streetFlags } = await import('./render/street')
         street = await StreetLife.load(renderer, import.meta.env.BASE_URL, canal, shop.scene, streetFlags(params))
+        street.setClockOverride(timeOverride)
+        // the real passers-by cast the shadows on the sun patch, not the shop life's fake ones
+        street.onWindowPasser = (dir, speed) => life?.passerBy(dir, speed)
+        life?.sunlight.setFakePassers(false)
         street.setTier(governor.current)
         street.sync(store.get())
         document.body.dataset.street = 'ready' // for screenshot scripts
@@ -386,13 +416,14 @@ async function boot(): Promise<void> {
     const dt = Math.min(raw, 0.1)
     perf?.begin()
     shop.update(dt)
+    life?.update(dt, renderer.domElement.height)
     street?.update(dt)
     const customerState = shop.customerState
     if (document.body.dataset.customer !== customerState) {
       document.body.dataset.customer = customerState
       ui.setCustomerArrived(customerState !== 'arriving')
       const c = store.get().current
-      stage.setWaiting(c?.phase === 'present' && customerState === 'arriving')
+      stage.setWaiting((c?.phase === 'present' || c?.phase === 'scene') && customerState === 'arriving')
     }
     stage.update(dt, rig)
     rig.update(dt)
@@ -414,6 +445,17 @@ async function boot(): Promise<void> {
       window.__lombardReady = true
       document.body.classList.add('ready')
       markReady()
+      // Shop life comes after the shop is up, as its own chunk (?life=0 leaves it out).
+      if (params.get('life') !== '0') {
+        void import('./render/life').then(({ ShopLife }) => {
+          life = new ShopLife()
+          life.setClockOverride(timeOverride)
+          if (street) life.sunlight.setFakePassers(false)
+          life.setTier(governor.current)
+          life.sync(store.get())
+          shop.scene.add(life.group)
+        })
+      }
     }
   })
 }

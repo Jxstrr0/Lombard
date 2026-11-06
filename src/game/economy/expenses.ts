@@ -157,5 +157,12 @@ export function upcomingBills(state: GameState): UpcomingBill[] {
   }
   const insurance = protectionFee(state)
   if (insurance) bills.push({ label: 'Insurance', amount: insurance.amount, inDays })
+  // M6: the appraiser's wage for the month (prorated from the day he started; src/game/staff/appraiser.ts).
+  if (state.staff.hired) {
+    const full = daysInMonth(state.calendar.date)
+    const monthStart = state.calendar.day - (Number(state.calendar.date.slice(8, 10)) - 1)
+    const days = Math.min(full, state.calendar.day + inDays - Math.max(monthStart, state.staff.sinceDay) + 1)
+    if (days > 0) bills.push({ label: 'Wages: appraiser', amount: Math.round((tuning.appraiser.salary * days) / full / 100) * 100, inDays })
+  }
   return bills
 }

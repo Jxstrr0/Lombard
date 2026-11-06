@@ -438,6 +438,8 @@ export const tuning = {
       convex_mirror: 2_500,
       wall_case: 14_000,
       camera: 22_000,
+      // M6: room for the appraiser (tuning.appraiser): a month of his wages and a bit.
+      second_counter: 18_000,
     },
     /** Security points (see tuning.theft.perSecurity): chime 0.5 (×0.85 theft), mirror 1 (×0.74), camera 3 (×0.49). */
     security: { door_chime: 0.5, convex_mirror: 1, camera: 3 },
@@ -1021,6 +1023,8 @@ export const tuning = {
     iconReturned: 1,
     /** M5 the Collector: his icon handed to the police. */
     iconHandedIn: 0.5,
+    /** M6 the Appraiser: the crew's tin from under the storeroom floor taken to Volkova. */
+    tinHandedIn: 0.75,
     /** M6 the Flood (heart axis): a pump at fifteen times its price to a neighbour bailing out. */
     floodGouged: -1,
     /** M6 the Flood (heart axis): charging a flooded-out neighbour to keep her things dry. */
@@ -1301,6 +1305,95 @@ export const tuning = {
       elviraTrip: 2000,
       /** The shop's name on twelve Mostovik Under-12 shirts. */
       vityaShirts: 3000,
+    },
+  },
+
+  /**
+   * M6 the Appraiser (GDD § 7 Employee, § 9 The Appraiser; src/game/staff/appraiser.ts, the person
+   * src/data/appraiser.ts, the arc src/data/stories/appraiser.ts). A second counter (an upgrade)
+   * lets you hire one appraiser, Lev Andreyevich Sablin. He serves walk-in sellers off the line while
+   * you serve yours, with his own eye; his deals and his mistakes land in your books.
+   */
+  appraiser: {
+    /** The first day the office offers the second counter (mid-game; its cost is tuning.upgrades.cost.second_counter). */
+    counterDay: 21,
+    /** Salary for a full month, paid at month end with the rent (prorated by days on staff that month; paid up to the day if fired). */
+    salary: 7_000,
+    /**
+     * His eye: the chance he sees a piece for what it is (a fake, a mix of parts, a refinish) before he
+     * buys. Better than a careful player's first month, worse than a specialist on their own line.
+     */
+    accuracy: 0.8,
+    /** His valuation of a sound piece: true value × (1 ± (1 − accuracy) × valueNoise). */
+    valueNoise: 0.6,
+    /** A slip of the tongue: with (1 − accuracy) × this, he opens so low it insults the seller (who walks and tells the street). */
+    lowballChance: 0.35,
+    /** ...at this share of his estimate. */
+    lowballShare: 0.18,
+    /** He aims at this share of his estimate (buy / pawn loan), never more than maxShare. */
+    offerShare: 0.45,
+    maxShare: 0.58,
+    loanShare: 0.34,
+    loanMaxShare: 0.45,
+    /**
+     * He talks a seller down the way you do with a finding on the mat: their walk-away price drops by
+     * this share × his accuracy (he names the wear, the replaced strap, the going rate).
+     */
+    talkDown: 0.15,
+    /** Where the price lands between the seller's floor and his target (0 = their floor, 1 = his target). */
+    haggleKeep: 0.3,
+    /** He never spends the till below this, over the bills due within billsDays. */
+    cashFloor: 15_000,
+    billsDays: 7,
+    /** In-game seconds he spends on one customer [min, max]. */
+    serveSeconds: [110, 170] as [number, number],
+    /** "Next walk-in" rule: he takes someone off the line only while at least this many are waiting. */
+    overflowAt: 3,
+    /** He leaves the first this many people in line for you. */
+    leaveForYou: 1,
+    /** His trust in you (state.customers.appraiser, −1…1): on hiring, a month paid in full, a month short. */
+    trust: { hired: 0.05, paid: 0.08, short: -0.2 },
+    /** The arc (days are days after the beat before). */
+    arc: {
+      /** Zhora sees him at the second counter, this many days on staff. */
+      zhoraAfter: 8,
+      zhoraChance: 0.5,
+      /** He tells you himself if his trust is at least confideTrust, this many days after Zhora. */
+      confideAfter: 3,
+      confideTrust: 0.15,
+      confideChance: 0.6,
+      /** Otherwise, cold, he is gone one morning this many days after Zhora. */
+      vanishAfter: 10,
+      /** ...if his trust is no more than this (between the two, he waits: a paid month may tip it). */
+      vanishTrust: 0.1,
+      vanishChance: 0.35,
+      /** The tin under the storeroom floor: the crew's money his brother skimmed. */
+      tin: 180_000,
+      /** Days from the tin to what follows it. */
+      afterTin: 4,
+      /** Days from his vanishing to Zhora coming for the money. */
+      afterVanish: 2,
+      /** Trust moves. */
+      trust: { welcome: 0.05, ask: -0.03, askLev: 0.05, askZhora: -0.1 },
+      /** Crew: the debt paid off with the tin. */
+      crewPressure: -0.3,
+      crewRep: 0.1,
+      /** Police: the tin handed to Volkova. */
+      policeHeat: -0.1,
+      policePressure: 0.35,
+      policeRep: 0.08,
+      policeTrust: 0.1,
+      /** Split: your half, and what Zhora's visit costs either way. */
+      splitHeat: 0.05,
+      paidBackPressure: -0.1,
+      deniedPressure: 0.35,
+      deniedRep: -0.15,
+      /** He vanished with the tin: the crew think you have it. */
+      vanishPressure: 0.25,
+      /** ...and what Zhora settles for, if you pay something rather than nothing. */
+      vanishPay: 40_000,
+      /** After his brother comes home, his eye sharpens (added to accuracy). */
+      sharper: 0.06,
     },
   },
 

@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { APPRAISER } from '../src/data/appraiser'
 import { COLLECTOR, ROOFER } from '../src/data/collector'
 import { CAST } from '../src/data/customers/cast'
 import { archetypes, femaleFirstNames, firstNames } from '../src/data/customers/walkins'
@@ -213,6 +214,7 @@ describe('M6 looks', () => {
       ['Volkova', VOLKOVA.look],
       ['the Collector', COLLECTOR.look],
       ['Kuzmich (the Flood)', FLOOD_PERSON.look],
+      ['Lev, the appraiser', APPRAISER.look],
     ]
     // One-off strangers, by name (Seryozha the roofer is one, and comes in more than once).
     const strangers = new Map<string, string>([[ROOFER.name, ROOFER.look]])

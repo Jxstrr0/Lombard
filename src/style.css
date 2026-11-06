@@ -2152,6 +2152,23 @@ html {
   display: none;
 }
 
+/* M6 staff: the appraiser's rule and categories */
+.office-rule {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.office-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.office-cats .segment {
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 0.8125rem;
+}
+
 .actions > .btn-office {
   flex: 0 0 auto;
   padding: 0 16px;

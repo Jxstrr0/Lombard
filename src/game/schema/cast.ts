@@ -18,5 +18,12 @@ export const CastEntry = z.object({
    * planted foot stays put; scale the clip's timeScale with any other speed.
    */
   walkSpeed: z.number().positive(),
+  /**
+   * A look kept for an authored regular (M4, src/data/regulars): never given to a random
+   * walk-in, so a regular's face only ever belongs to that regular. Absent = walk-in cast.
+   */
+  regular: z.literal(true).optional(),
+  /** Who this looks like, for casting by description: age band, gender, build, clothes, hair. */
+  note: z.string().min(1),
 })
 export type CastEntry = z.infer<typeof CastEntry>

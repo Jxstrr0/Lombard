@@ -3,7 +3,7 @@ export default {
   id: 'zinaida',
   name: 'Zinaida Petrovna',
   archetype: 'pensioner',
-  look: 'female_adult_14',
+  look: 'business_female_03',
   temperament: 'proud',
   knowledge: 0.2,
   desperation: 0.7,

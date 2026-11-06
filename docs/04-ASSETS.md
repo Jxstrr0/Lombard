@@ -141,6 +141,19 @@ Run locally (Blender 4.5.15 at `~/blender`):
 node scripts/items-pack.mjs
 ```
 
+### M6 wave A: CC0 items and code-drawn kinds (decided Nov 2026)
+
+Wave A adds four categories (instruments, tools, silver & jewellery, household antiques; 44 defs). Here Poly Haven does have usable CC0 models, so the art comes two ways:
+
+- **CC0 models (14 items).** `art/items/cc0.json` lists them, keyed by def id: the Poly Haven asset (`src`), which objects to keep, a rotation into item coordinates, a triangle budget, texture size and the hotspots as pixel picks on a front/back/top/bottom preview. `art/items/cc0.py` (headless Blender) downloads the 1k glTF, joins, re-orients and centres it, drops glass and flame materials, decimates, resizes textures (colour at 512 px, normal and roughness maps at half), resolves each hotspot onto the surface with a ray cast, and writes `art/out/items/<id>.glb` plus `<id>.json` (size, triangles, hotspots). `scripts/items-pack.mjs --only <id>` packs it like any scripted item. In the def, `model.placeholder` is `block` with `model.size` from the json: a plain box shown while the glb loads (the glb is then its own raycast proxy). Each one has an `ATTRIBUTION.md` row. About 3.8 MB for the 14 together, 170–740 KB each (the chess set is the largest at 30k triangles); each loads only when that item is at the counter, so first load doesn't grow.
+  ```
+  ~/blender/blender --background --factory-startup --python art/items/cc0.py -- --only drill_hartwig --preview
+  node scripts/items-pack.mjs --only drill_hartwig
+  ```
+- **Code-drawn kinds (30 items).** Accordions, balalaika, guitars, violin, trumpet, saxophone, power tools, socket set, sewing machine, spoons, tea-glass holder, cups, beads, cameo, amber pendant, samovar, figurine, vase and gramophone are built at runtime in `src/render/itemsWaveA.ts` (same coordinates; half extents listed at the top of the file and in `tests/items.test.ts`). No download at all; they can get scripted glbs later like the M3 items.
+- On the mat, anything longer than 42 cm is scaled down to fit (`MAT_MAX` in `src/render/stage.ts`); inspect shows it at full size.
+- Known texture text: the ukulele's headstock reads KOLO (so the brand is Kolo), the plane's casting reads MADE IN ENGLAND (fits Leman), and the metal detector's box carries the artist's invented marks (ROYAL SYSTEMS, "Gebo Hunter X"), which don't match our Kladez brand; a recolour or a decal over the box is a polish task.
+
 ## Canal backdrop (decided Nov 2026, M3)
 
 What the player sees through the window and the door glass: the pavement, a granite embankment with a cast-iron railing, the canal with a moored boat, a humpbacked granite bridge, and a row of 19th-century plastered houses (with shop fronts, invented Cyrillic signs, a side street, a lime tree and a church dome behind). Overcast northern daylight, like the bake's sky.

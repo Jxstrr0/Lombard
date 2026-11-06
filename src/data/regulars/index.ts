@@ -10,6 +10,7 @@
 import { RegularDef } from '../../game/schema/story'
 import alisa from './alisa'
 import darya from './darya'
+import eduard from './eduard'
 import edik from './edik'
 import fedya from './fedya'
 import gleb from './gleb'
@@ -25,6 +26,7 @@ import ulyana from './ulyana'
 import valentin from './valentin'
 import yana from './yana'
 import yevstafy from './yevstafy'
+import zhora from './zhora'
 import zinaida from './zinaida'
 
 export const REGULARS: readonly RegularDef[] = [
@@ -48,6 +50,9 @@ export const REGULARS: readonly RegularDef[] = [
   // Arc people: Edik (The Dubai Rolex Guy) visits on his own only from day 45; Fedya (The Student's Laptop) comes in only for his arc.
   edik,
   fedya,
+  // Arc-only (Protection): no ordinary visits.
+  eduard,
+  zhora,
 ].map((raw) => RegularDef.parse(raw))
 
 const byId = new Map(REGULARS.map((r) => [r.id, r]))

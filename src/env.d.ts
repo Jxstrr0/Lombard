@@ -4,6 +4,8 @@
 declare const __BUILD_SHA__: string
 /** Build date (YYYY-MM-DD), injected by vite.config.ts. */
 declare const __BUILD_DATE__: string
+/** Game version, Major.Minor.Patch.Build, read from the VERSION file by vite.config.ts. */
+declare const __GAME_VERSION__: string
 
 interface Window {
   /** Set when the first frame with the environment has rendered (used by npm run shots). */

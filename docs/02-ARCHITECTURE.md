@@ -171,6 +171,7 @@ bake/
 - `vite build` with `base: '/Lombard/'` for GitHub Pages.
 - Pre-build script compresses new `.glb` with `gltf-transform` (draco, ktx2) and validates all data files against the zod schemas.
 - Deploys run in GitHub Actions (`deploy.yml`) on every push to `main`, using `actions/configure-pages`, `actions/upload-pages-artifact`, and `actions/deploy-pages`. Pages source is set to GitHub Actions; there is no `gh-pages` branch.
+- Chunks (M6): `vite.config.ts` splits the eager JS into `index` (game, render, UI), `three`, `content` (`src/data`) and `vendor` (zod, fflate, idb) so a deploy re-downloads only what changed; street, shop life, stats.js, the gallery and the dev review careers (`src/dev/scenarios.ts`) are lazy chunks. `scripts/check-bundle.mjs` runs after every build and fails it if the first load (eager files, boot assets, two avatars and an item) passes 15 MiB, the entry chunk 500 kB or any eager chunk 900 kB.
 - Build number (short SHA + build date) is injected at build time via Vite `define` and shown in a screen corner.
 - `npm run shots`: Playwright opens the built site at portrait phone (390×844), landscape, and desktop sizes and saves PNGs to `shots/` (gitignored) for Claude Code to inspect before pushing.
 - Hub link: add the game card to Kelbo.Website once M4 ships.

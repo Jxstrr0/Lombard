@@ -7,7 +7,8 @@
  * ?look=<yawDeg>,<pitchDeg> starts the counter view with the head turned from the
  * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
- * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line.
+ * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
+ * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
  */
 import '@fontsource/space-grotesk/400.css'
 import '@fontsource/space-grotesk/500.css'
@@ -26,12 +27,17 @@ import { ITEM_DEFS } from './data/items'
 import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
+import { regularCustomer } from './game/story/plan'
+import type { QueuedVisit } from './game/types'
+import { getRegular } from './data/regulars'
+import { getBeat } from './data/stories'
 import { createInitialState, type GameState } from './game/state'
 import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
 import { bindKeyboard } from './input/keyboard'
 import { LookGestures } from './input/look'
-import { deleteCareer, loadLatestCareer, saveCareer } from './persist/autosave'
+import { deleteCareer, loadLatestCareer, onCareerSaved, saveCareer } from './persist/autosave'
+import { keepStorage } from './persist/safety'
 import { CameraRig } from './render/camera'
 import { MIN_FPS, PerfOverlay, TIER_SETTINGS, TierGovernor, initialTier, saveAutoTier, saveChoice, setTextureAnisotropy, type GraphicsChoice, type QualityTier } from './render/perf'
 import { ShopScene } from './render/scene'
@@ -66,6 +72,17 @@ function redeemScenario(s0: GameState): GameState {
   s = reducer({ ...s, loans: [loan] }, { type: 'day/open' })
   const visit = s.queue.find((v) => v.loanId === loan.id)
   return visit ? { ...s, queue: [visit, ...s.queue.filter((v) => v !== visit)] } : s
+}
+
+/** Dev-only (?seed=N&scenario=story): Zinaida Petrovna is first in line with the medals arc's choice scene. */
+function storyScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'day/open' })
+  const who = getRegular('zinaida')
+  const beat = getBeat('medals.truth')
+  if (!who || !beat) return s
+  const visit: QueuedVisit = { visitId: 'v-dev-story', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
+  return { ...s, queue: [visit, ...s.queue] }
 }
 
 /** Screens that show the counter view and leave the 3D area free to drag. */
@@ -149,6 +166,7 @@ async function boot(): Promise<void> {
   if (Number.isFinite(seedParam) && seedParam > 0) {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
+    if (params.get('scenario') === 'story') initial = storyScenario(initial)
   } else {
     try {
       initial = await loadLatestCareer()
@@ -161,6 +179,11 @@ async function boot(): Promise<void> {
     }
   }
   const store = new Store(initial)
+  // Once a career with real progress (a finished day) is safely written, ask the
+  // browser to keep the storage. keepStorage asks at most once per page load.
+  onCareerSaved((s) => {
+    if (s.history.length > 0) void keepStorage()
+  })
   window.__lombardState = () => store.get()
 
   const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -209,11 +232,16 @@ async function boot(): Promise<void> {
   if (itemLoader && params.get('nocast') !== '1') {
     shop.setCast(new CustomerCast(itemLoader.gltf, import.meta.env.BASE_URL, __BUILD_SHA__), castOverride(params))
   }
+  // ?walk=0: customers appear at the counter instead of walking in from the door (screenshots).
+  if (params.get('walk') === '0') shop.setWalking(false)
   const stage = new ItemStage(shop.scene, shop.matPoint, itemLoader?.load)
 
   // --- UI --------------------------------------------------------------------
+  // ?lull=0: no waiting between customers; a Next customer button calls each one (review, screenshots).
+  const manualNext = params.get('lull') === '0'
   const ui = new Ui(app, {
     store,
+    manualNext,
     replaceState: (s) => store.replace(s),
     newCareer: () => {
       const old = store.get().meta.careerId
@@ -261,9 +289,12 @@ async function boot(): Promise<void> {
   ui.onScreenChange = () => requestAnimationFrame(resize)
 
   const sync = (state: GameState, prev: GameState | null) => {
-    ui.render(state, prev)
+    // The scene first: it knows whether a new customer is still walking in, which the UI waits for.
     shop.sync(state)
+    ui.setCustomerArrivedQuiet(shop.customerState !== 'arriving')
+    ui.render(state, prev)
     stage.sync(state)
+    stage.setWaiting((state.current?.phase === 'present' || state.current?.phase === 'scene') && shop.customerState === 'arriving')
     rig.reduceMotion = stage.reduceMotion = state.settings.reduceMotion
     // A new customer steps up: face the counter again.
     if (prev && state.current && state.current.visitId !== prev.current?.visitId) rig.recentre()
@@ -312,9 +343,12 @@ async function boot(): Promise<void> {
   window.setInterval(() => {
     if (document.hidden) return
     const s = store.get()
-    if (s.day.phase === 'open' && s.current && s.current.phase !== 'resolved') {
-      store.dispatch({ type: 'time/tick', seconds: 1 })
-    }
+    if (s.day.phase !== 'open') return
+    // At the counter the clock runs until the visit is resolved; with the counter
+    // empty it runs through the lull until the next person walks in.
+    const atCounter = s.current && s.current.phase !== 'resolved'
+    const lull = !s.current && s.queue.length > 0 && !manualNext
+    if (atCounter || lull) store.dispatch({ type: 'time/tick', seconds: 1 })
   }, 1000)
 
   // --- perf ------------------------------------------------------------------
@@ -348,7 +382,12 @@ async function boot(): Promise<void> {
     perf?.begin()
     shop.update(dt)
     const customerState = shop.customerState
-    if (document.body.dataset.customer !== customerState) document.body.dataset.customer = customerState
+    if (document.body.dataset.customer !== customerState) {
+      document.body.dataset.customer = customerState
+      ui.setCustomerArrived(customerState !== 'arriving')
+      const c = store.get().current
+      stage.setWaiting((c?.phase === 'present' || c?.phase === 'scene') && customerState === 'arriving')
+    }
     stage.update(dt, rig)
     rig.update(dt)
     shop.setInspectBlend(rig.inspectBlend)

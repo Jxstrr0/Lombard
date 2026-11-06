@@ -12,12 +12,17 @@
  *   buyer at the counter   → sale (until resolved)
  *   pawner redeeming       → redeem (until resolved)
  *   otherwise              → counter (incl. the resolved outcome + Next)
+ *
+ * Between days (the ledger) a quiet banner may suggest a backup: once per
+ * session, only with a finished day behind you, when there has never been a
+ * backup on this device or the last one is 14+ days old.
  */
 import type { SoundSettings } from '../audio/settings'
 import type { Action } from '../game/actions'
 import type { GameState } from '../game/state'
 import type { Store } from '../game/store'
 import type { KeyName } from '../input/keyboard'
+import { backupAgeText, backupReminderDue, lastBackupAt } from '../persist/safety'
 import { createButton, el } from './components/button'
 import { Hud } from './components/hud'
 import { CounterScreen } from './screens/counter'
@@ -35,11 +40,16 @@ import { WelcomeScreen } from './screens/welcome'
 
 export type ScreenId = 'intro' | 'welcome' | 'news' | 'counter' | 'inspect' | 'offer' | 'sale' | 'redeem' | 'ledger'
 
-export function screenFor(state: GameState): ScreenId {
+/**
+ * `arrived` false: the current customer is still walking in from the door
+ * (render/scene.ts), so the counter shows the empty shop until they reach it.
+ */
+export function screenFor(state: GameState, arrived = true): ScreenId {
   if (state.meta.intro) return 'intro'
   if (state.day.phase === 'closed') return state.history.length > 0 ? 'ledger' : 'welcome'
   if (!state.day.newsRead) return 'news'
   const c = state.current
+  if ((c?.phase === 'present' || c?.phase === 'scene') && !arrived) return 'counter'
   if (c?.phase === 'inspect') return 'inspect'
   if (c?.phase === 'offer') return 'offer'
   if (c?.phase === 'present' && c.kind === 'buyer') return 'sale'
@@ -58,6 +68,8 @@ export interface UiDeps {
   /** Device graphics quality (localStorage, not the career). */
   getGraphics(): GraphicsInfo
   setGraphics(choice: GraphicsChoice): void
+  /** `?lull=0`: a Next customer button instead of the lull between visitors. */
+  manualNext: boolean
 }
 
 export interface UiLayout {
@@ -87,6 +99,12 @@ export class Ui {
   private current: ScreenId | null = null
   private lastLayout: UiLayout | null = null
   private build!: HTMLElement
+  /** False while the current customer is still walking to the counter. */
+  private arrived = true
+  private reminder: HTMLElement
+  private reminderText: HTMLElement
+  /** The backup reminder already had its one showing this session. */
+  private reminderDone = false
   /** Called when the visible screen changes (main re-measures the camera layout). */
   onScreenChange: ((id: ScreenId) => void) | null = null
 
@@ -95,7 +113,8 @@ export class Ui {
     private readonly deps: UiDeps,
   ) {
     const dispatch = (a: Action) => deps.store.dispatch(a)
-    const openSettings = () => this.settings.open()
+    // When Settings closes, the backup reminder gets its chance (it waits while Settings is open).
+    const openSettings = () => this.settings.open(() => this.current && this.updateReminder(deps.store.get(), this.current))
     const gear = (suffix: string) => (onPress: () => void) =>
       createButton({ id: `settings-${suffix}`, label: '', icon: 'gear', ariaLabel: 'Settings', className: 'btn-icon', onPress })
 
@@ -103,7 +122,7 @@ export class Ui {
     const shopButton = (suffix: string) =>
       createButton({ id: `shop-${suffix}`, label: 'Shop', icon: 'tag', ariaLabel: 'Shop floor: display and price tags', className: 'btn-shop', onPress: () => this.shop.open() })
 
-    this.counter = new CounterScreen(dispatch, openSettings, gear('counter'), shopButton('counter'))
+    this.counter = new CounterScreen(dispatch, openSettings, gear('counter'), shopButton('counter'), deps.manualNext)
     this.inspect = new InspectScreen(dispatch)
     this.offer = new OfferScreen(dispatch)
     this.office = new OfficeSheet({ getState: () => deps.store.get(), dispatch })
@@ -144,6 +163,30 @@ export class Ui {
     mount.appendChild(this.settings.root)
     mount.appendChild(this.office.root)
 
+    // --- backup reminder (quiet, dismissible, never over play)
+    const reminder = el('aside', 'backup-reminder menu')
+    reminder.dataset.id = 'backup-reminder'
+    reminder.hidden = true
+    reminder.setAttribute('role', 'status')
+    this.reminderText = el('p', 'backup-reminder-text')
+    const reminderActions = el('div', 'actions')
+    reminderActions.append(
+      createButton({ id: 'backup-later', label: 'Not now', variant: 'ghost', onPress: () => this.hideReminder() }),
+      createButton({
+        id: 'backup-now',
+        label: 'Back up',
+        icon: 'doc',
+        variant: 'primary',
+        onPress: () => {
+          this.hideReminder()
+          openSettings()
+        },
+      }),
+    )
+    reminder.append(this.reminderText, reminderActions)
+    mount.appendChild(reminder)
+    this.reminder = reminder
+
     const build = el('div', 'build-number', `${__BUILD_SHA__} · ${__BUILD_DATE__}`)
     build.dataset.id = 'build'
     mount.appendChild(build)
@@ -155,10 +198,24 @@ export class Ui {
     this.build.textContent = `${__BUILD_SHA__} · ${__BUILD_DATE__} · ${text}`
   }
 
+  /** Same, without rendering (main renders right after). */
+  setCustomerArrivedQuiet(arrived: boolean): void {
+    this.arrived = arrived
+  }
+
+  /** The scene says whether the current customer has reached the counter; re-renders when that changes. */
+  setCustomerArrived(arrived: boolean): void {
+    if (arrived === this.arrived) return
+    this.arrived = arrived
+    const s = this.deps.store.get()
+    this.render(s, s)
+  }
+
   render(state: GameState, prev: GameState | null): void {
     document.documentElement.style.setProperty('--text-scale', String(state.settings.textScale))
     document.documentElement.classList.toggle('reduce-motion', state.settings.reduceMotion)
-    const id = screenFor(state)
+    const id = screenFor(state, this.arrived)
+    const changed = id !== this.current
     if (id !== this.current) {
       if (this.current) this.screens[this.current].root.hidden = true
       this.screens[id].root.hidden = false
@@ -169,7 +226,7 @@ export class Ui {
     this.hud.render(state)
     switch (id) {
       case 'counter':
-        this.counter.render(state)
+        this.counter.render(state, this.arrived)
         break
       case 'inspect':
         this.inspect.render(state, prev)
@@ -202,7 +259,35 @@ export class Ui {
       if (id === 'ledger') this.office.render(state)
       else this.office.close()
     }
-    if (prev === null || screenFor(prev) !== id) this.onScreenChange?.(id)
+    this.updateReminder(state, id)
+    if (changed) this.onScreenChange?.(id)
+  }
+
+  /** Show the backup reminder at a calm moment (the ledger, between days), at most once per session. */
+  private updateReminder(state: GameState, id: ScreenId): void {
+    if (id !== 'ledger') {
+      if (!this.reminder.hidden) this.hideReminder()
+      return
+    }
+    if (this.reminderDone || this.settings.isOpen) return
+    const last = lastBackupAt()
+    const now = Date.now()
+    if (!backupReminderDue(state.history.length > 0, last, now)) {
+      // Backed up from Settings while the banner was up: it has done its job.
+      if (!this.reminder.hidden) this.hideReminder()
+      return
+    }
+    if (!this.reminder.hidden) return
+    this.reminderText.textContent =
+      last === null
+        ? 'No backup of this shop yet. If the phone runs low on space, the browser can clear saves. A backup file keeps it safe.'
+        : `Last backup: ${backupAgeText(last, now)}. Make a fresh one to keep this shop safe.`
+    this.reminder.hidden = false
+  }
+
+  private hideReminder(): void {
+    this.reminder.hidden = true
+    this.reminderDone = true
   }
 
   /** The player dragged to look around (retires the one-time hint). */

@@ -22,6 +22,14 @@ export const tuning = {
     realTimeScale: 1,
     /** In-game seconds each haggle round takes. */
     haggleRoundSeconds: 6,
+    /** Quiet before the first customer walks in after opening, in-game seconds [min, max]. */
+    firstArrivalSeconds: [4, 8] as [number, number],
+    /**
+     * The lull between one customer leaving and the next walking in, in-game
+     * seconds [min, max]. Kelbo (Nov 6): keep 8 sellers a day and add pauses
+     * rather than more customers; this is most of a day's length.
+     */
+    lullSeconds: [15, 35] as [number, number],
   },
 
   customers: {
@@ -29,6 +37,44 @@ export const tuning = {
     temperamentWeights: { stubborn: 1, flexible: 1.4, desperate: 0.8, proud: 0.8 },
     knowledge: [0.1, 0.9] as [number, number],
     desperation: [0.05, 0.95] as [number, number],
+  },
+
+  /** M4: authored regulars (src/data/regulars) and their memory of you. */
+  regulars: {
+    /** At most this many regulars drop in on an ordinary day (story beats come on top). */
+    maxPerDay: 2,
+    /** Extra days, [min, max], added to a regular's first scheduled day so they don't all arrive on schedule.from. */
+    firstVisitJitter: [0, 2] as [number, number],
+    /** A regular this cold waits longer between visits (× every). */
+    coldAt: -0.25,
+    coldEveryScale: 1.6,
+    /** Greets you warmly from this trust up. */
+    warmAt: 0.35,
+    /**
+     * Trust change by how a visit ended. A buy or pawn is judged by price ÷
+     * true value (what's fair, not what you knew): at or over `fair` is a
+     * good deal for them, under `low` stings, under `insult` burns.
+     */
+    trust: {
+      bought: { fair: 0.45, low: 0.3, insult: 0.2, fairDelta: 0.12, okDelta: 0.04, lowDelta: -0.08, insultDelta: -0.2 },
+      pawned: { fair: 0.3, low: 0.15, fairDelta: 0.08, okDelta: 0.02, lowDelta: -0.08 },
+      redeemed: 0.06,
+      walked: -0.1,
+      passed: -0.04,
+    },
+    /** Haggling with a regular: ask × (1 − askPerTrust × trust), floor × (1 − floorPerTrust × trust). */
+    askPerTrust: 0.08,
+    floorPerTrust: 0.05,
+  },
+
+  /** M4: story arcs (src/data/stories). */
+  story: {
+    /** At most this many beats play on one day, and one per arc. */
+    maxBeatsPerDay: 2,
+    /** Story visitors wait as long as it takes (in-game seconds of patience). */
+    patience: 100_000,
+    /** Walk-in sellers never drop below this when regulars and beats take their places. */
+    minWalkIns: 4,
   },
 
   items: {
@@ -371,8 +417,10 @@ export const tuning = {
 
   /**
    * Specialists on retainer (definitions and lines in src/data/specialists.ts).
-   * A call within the allowance costs fee / calls ≈ 1,000–1,500 ₽, so a call is
-   * worth it on items over ~15k ₽ where a mistake costs 10k+.
+   * A call within the allowance costs fee / calls ≈ 450–2,250 ₽ (the electronics
+   * tech is cheap, the antiques dealer dear), so a call is worth it on items over
+   * ~15k ₽ where a mistake costs 10k+. A call takes inspect.toolSeconds.specialist
+   * unless the roster entry sets its own callSeconds.
    */
   specialists: {
     roster: {
@@ -380,7 +428,13 @@ export const tuning = {
       jeweler: { fee: 6_000, calls: 6, perCall: 1_500, accuracy: 0.88, honesty: 0.55 },
       /** Honest to a fault; his eyes are going. */
       watchmaker: { fee: 7_500, calls: 5, perCall: 2_000, accuracy: 0.74, honesty: 0.95 },
-    } as Record<string, { fee: number; calls: number; perCall: number; accuracy: number; honesty: number }>,
+      /** M4. Straight and sure on medals; wants first refusal, but rarely shades a price to get it. */
+      collector: { fee: 5_500, calls: 5, perCall: 1_500, accuracy: 0.85, honesty: 0.9 },
+      /** M4. Almost never wrong, and the least honest of them all: the good pieces "aren't worth much". */
+      antiquary: { fee: 9_000, calls: 4, perCall: 2_500, accuracy: 0.93, honesty: 0.35 },
+      /** M4. Cheap, quick on the phone (callSeconds), and a bit careless. */
+      technician: { fee: 3_500, calls: 8, perCall: 800, accuracy: 0.72, honesty: 0.8, callSeconds: 30 },
+    } as Record<string, { fee: number; calls: number; perCall: number; accuracy: number; honesty: number; callSeconds?: number }>,
     /** Relationship on first retaining; + perMonth at each month-end paid in full (cap 1). */
     relationshipStart: 0.1,
     relationshipPerMonth: 0.15,
@@ -563,6 +617,8 @@ export const tuning = {
     maxCodeChars: 1_000_000,
     /** Largest JSON a save code may inflate to (bytes); guards against decompression bombs. */
     maxInflatedBytes: 8_000_000,
+    /** Days after the last backup (code copied or file saved) before the quiet reminder shows again. */
+    backupReminderDays: 14,
   },
 } as const
 

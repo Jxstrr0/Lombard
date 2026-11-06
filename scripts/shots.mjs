@@ -50,6 +50,13 @@ function helpers(page, name) {
     async click(dataId) {
       await id(dataId).click({ timeout: 10_000 })
       await page.waitForTimeout(120)
+      // The customer's strip and buttons wait until they stand at the counter (model loaded, faded in).
+      if (dataId === 'next-customer') {
+        await page
+          // 'in', not just "not arriving": until the next frame the body still says 'away' from the last visit.
+          .waitForFunction(() => document.body.dataset.customer === 'in', null, { timeout: 30_000 })
+          .catch(() => console.warn('customer never arrived'))
+      }
     },
     async visible(dataId) {
       return (await page.locator(`[data-id="${dataId}"]:visible`).count()) > 0
@@ -409,7 +416,7 @@ async function sendAway(h) {
 
 /**
  * Economy (portrait, ?seed=1): day 1 passed → ledger → Office (buy the acid kit,
- * retain both specialists, buy the door chime and mirror) → word on the street → day 2 → the first gold or watch seller → acid,
+ * retain four of the five specialists, buy the door chime and mirror) → word on the street → day 2 → the first gold or watch seller → acid,
  * reference book and a specialist call.
  */
 async function playEconomy(page, h) {
@@ -424,13 +431,20 @@ async function playEconomy(page, h) {
   await h.screen('ledger')
   await h.click('open-office')
   await page.waitForTimeout(200)
-  for (const id of ['buy-acid_kit', 'retain-jeweler', 'retain-watchmaker']) if (await h.enabled(id)) await h.click(id)
+  // Four of the five specialists: the electronics tech stays unretained to show the Retain button.
+  for (const id of ['buy-acid_kit', 'retain-jeweler', 'retain-watchmaker', 'retain-collector', 'retain-antiquary']) if (await h.enabled(id)) await h.click(id)
   await page.evaluate(() => document.querySelector('[data-id="office"]')?.scrollTo(0, 0))
   await page.waitForTimeout(150)
   await h.shot('office', 'office sheet: bills due, upgrades (acid kit owned), cash')
   await page.evaluate(() => document.querySelector('[data-id="office-specialists"]')?.scrollIntoView({ block: 'start' }))
   await page.waitForTimeout(150)
-  await h.shot('office-specialists', 'office sheet: both specialists retained, calls left, release')
+  await h.shot('office-specialists', 'office sheet: specialists retained, calls left, release')
+  await page.evaluate(() => {
+    const sheet = document.querySelector('[data-id="office"]')
+    sheet?.scrollTo(0, sheet.scrollHeight)
+  })
+  await page.waitForTimeout(150)
+  await h.shot('office-specialists-end', 'office sheet: the last specialists (antiques dealer retained, electronics tech not)')
   for (const id of ['buy-door_chime', 'buy-convex_mirror']) if (await h.enabled(id)) await h.click(id)
   await page.evaluate(() => document.querySelector('[data-id="office-exposure"]')?.scrollIntoView({ block: 'center' }))
   await page.waitForTimeout(150)
@@ -494,8 +508,9 @@ async function main() {
     page.on('console', (m) => {
       if (m.type() === 'error') errors.push(`[${name}] console: ${m.text()}`)
     })
-    // Pin the quality tier: Auto would step down on a slow headless GPU mid-run.
-    const pinned = /[?&]tier=/.test(url) ? url : `${url}${url.includes('?') ? '&' : '?'}tier=mid`
+    // Pin the quality tier (Auto would step down on a slow headless GPU mid-run)
+    // skip the lull between customers (a Next customer button calls each one), and no walk from the door.
+    const pinned = `${url}${url.includes('?') ? '&' : '?'}${/[?&]tier=/.test(url) ? '' : 'tier=mid&'}lull=0&walk=0`
     await page.goto(`${base}${pinned}`, { waitUntil: 'networkidle' })
     await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
     await page.waitForTimeout(400)
@@ -537,6 +552,28 @@ async function main() {
       await h.screen('redeem')
       await page.waitForTimeout(600)
       await h.shot('redeem', 'redeem visit: who, item, pawn ticket (lent + interest = total), Take X, hand it over')
+      out.push(...h.shots)
+      await context.close()
+    }
+    {
+      // Dev scenario: a regular (Zinaida Petrovna) comes in for a story scene with a choice.
+      const { context, page } = await newPage(browser, PORTRAIT, '?seed=1&scenario=story')
+      const h = helpers(page, 'story')
+      await page.waitForFunction(() => ['news', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) === 'news') await h.click('news-done')
+      await h.screen('counter')
+      await h.click('next-customer')
+      await page.waitForTimeout(600)
+      await h.shot('scene', 'story scene: regular badge, first line, Go on')
+      await h.click('scene-next')
+      await page.waitForTimeout(400)
+      await h.shot('choices', 'last line: up to three choices, Go on hidden')
+      await h.click('choice-truth')
+      await page.waitForTimeout(400)
+      await h.shot('reply', 'her reply to the truth; Go on ends the visit')
+      await h.click('scene-next')
+      await page.waitForTimeout(600)
+      await h.shot('talked', 'resolved: Talked, no stamp')
       out.push(...h.shots)
       await context.close()
     }

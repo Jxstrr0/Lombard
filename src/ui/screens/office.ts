@@ -7,6 +7,7 @@
  * Release asks for a second tap (no refund for the month); everything else
  * applies at once. The reducer only accepts these actions while closed.
  */
+import { ITEM_DEFS } from '../../data/items'
 import { getSpecialist, SPECIALISTS } from '../../data/specialists'
 import { tuning } from '../../data/tuning'
 import { UPGRADES } from '../../data/upgrades'
@@ -24,7 +25,21 @@ export interface OfficeDeps {
   dispatch(a: Action): void
 }
 
-const CATEGORY_LABEL: Record<string, string> = { gold: 'gold & jewellery', coins: 'coins', watches: 'watches' }
+const CATEGORY_LABEL: Record<string, string> = {
+  gold: 'gold & jewellery',
+  coins: 'coins',
+  watches: 'watches',
+  militaria: 'medals & militaria',
+  icons: 'icons',
+  antiques: 'antiques & porcelain',
+  instruments: 'instruments',
+  phones: 'phones',
+  cameras: 'cameras',
+  electronics: 'electronics',
+}
+
+/** Categories some item def belongs to (a specialist whose line never walks in yet says so). */
+const STOCKED = new Set<string>(ITEM_DEFS.map((d) => d.category))
 
 function due(inDays: number): string {
   if (inDays <= 0) return 'tonight'
@@ -211,6 +226,7 @@ export class OfficeSheet {
       top.append(el('span', 'office-name', def.name), el('span', 'office-amt', `${rub(roster.fee)}/mo`))
       const covers = def.categories.map((c) => CATEGORY_LABEL[c] ?? c).join(', ')
       li.append(top, el('p', 'office-role', `${def.role} · ${covers}`), el('p', 'office-blurb', def.blurb))
+      if (!def.categories.some((c) => STOCKED.has(c))) li.append(el('p', 'office-quiet', 'Nothing in this line has come through the door yet.'))
       const terms = `${roster.calls} calls a month · extra calls ${rub(roster.perCall)}`
       if (retained) {
         li.append(el('p', 'office-terms', `${terms}. ${callsLeft(state, def.id)} call${callsLeft(state, def.id) === 1 ? '' : 's'} left this month.`))

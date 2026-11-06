@@ -121,14 +121,31 @@ const v2ToV3: Migration = {
 }
 
 /**
- * v3 → v4 (M4 reputation by group, shoplifting): a `youth` reputation group (the
+ * v3 (M3) → v4 (M4 story): regulars' memory and arc progress get real shapes.
+ * Nothing wrote either before, so both start empty; story flags appear.
+ */
+const v3ToV4Story: Migration = {
+  from: 3,
+  to: 4,
+  up(raw) {
+    const story = isRecord(raw.story) ? raw.story : {}
+    return {
+      ...raw,
+      customers: {},
+      story: { arcs: {}, pendingEvents: Array.isArray(story.pendingEvents) ? story.pendingEvents : [], flags: [] },
+    }
+  },
+}
+
+/**
+ * v4 → v5 (M4 reputation by group, shoplifting): a `youth` reputation group (the
  * local kids and students) starting at 0, and a career count of stolen items.
  * Other groups and the day's records are kept as they are; day summaries and
  * the day's rep tally gained optional fields only.
  */
-const v3ToV4: Migration = {
-  from: 3,
-  to: 4,
+const v4ToV5: Migration = {
+  from: 4,
+  to: 5,
   up(raw) {
     const reputation = isRecord(raw.reputation) ? raw.reputation : {}
     const byGroup = isRecord(reputation.byGroup) ? reputation.byGroup : {}
@@ -154,7 +171,7 @@ const v3ToV4: Migration = {
 }
 
 /** Ordered, contiguous chain. Append new steps at the end. */
-export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4]
+export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5]
 
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())

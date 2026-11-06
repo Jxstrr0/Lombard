@@ -1,7 +1,12 @@
 /**
- * M2 specialists on retainer (GDD § 2b), validated at import time. Fictional
- * people. Fees, call allowances, accuracy and honesty live in
- * tuning.specialists.roster[id]; their small arcs arrive in M4.
+ * Specialists on retainer (GDD § 2b), validated at import time. Fictional
+ * people. M2: jeweler, watchmaker. M4: militaria collector, antiques dealer,
+ * electronics tech. Fees, call allowances, accuracy and honesty live in
+ * tuning.specialists.roster[id]; their small arcs are design notes in GDD § 2b
+ * until the story engine carries them.
+ *
+ * Roster order matters: specialistFor() picks the first retained one covering
+ * a category, so keep the categories disjoint.
  *
  * Lines never say a piece is fake outright: they give an opinion and a range.
  */
@@ -63,6 +68,94 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
       ],
       lowball: [
         'Ilya mumbles: “Hard to say with my eyes. {lo}–{hi}? I could take it to my bench, if you like.”',
+      ],
+    },
+  },
+  {
+    id: 'collector',
+    name: 'Gennady Pavlovich Shurygin',
+    short: 'Gennady',
+    role: 'Militaria, Old Bridge flea market',
+    categories: ['militaria'],
+    blurb: 'Retired river-fleet bosun with a folding table under the Old Bridge. Straight as a ruler about medals, and he would like first refusal on the good ones.',
+    hello: '“Five calls. And if a good one comes in, I hear about it first. Agreed?”',
+    lines: {
+      sound: [
+        'Gennady goes quiet a moment: “That one was earned. {lo}–{hi}. If they sell, I’d like first refusal.”',
+        'Gennady, approving: “Right strike, right wear, right weight. {lo}–{hi}. Treat it kindly.”',
+      ],
+      redone: [
+        'Gennady clicks his tongue: “Somebody tidied it up. The number’s been touched, I think. {lo}–{hi} as it stands.”',
+        'Gennady: “Old disc, new tricks. Fresh ribbon, fresh silvering. {lo}–{hi}, and say so on the tag.”',
+      ],
+      mixed: [
+        'Gennady turns it over twice: “These parts were pinned on two different men. {lo}–{hi}.”',
+      ],
+      doubt: [
+        'Gennady sets it down like it’s hot: “Nobody’s grandfather wore this. Souvenir-stall work. {lo}–{hi}.”',
+        'Gennady, flatly: “Wrong metal, wrong hand. Don’t pay a soldier’s price for it. {lo}–{hi}, no more.”',
+      ],
+      lowball: [
+        'Gennady clears his throat: “Common enough, these. {lo}–{hi}. I’d find room for it on my table, mind.”',
+      ],
+    },
+  },
+  {
+    id: 'antiquary',
+    name: 'Stanislav Edgarovich Lyubimov',
+    short: 'Stanislav',
+    role: 'Antiques dealer, Dvoryanskaya embankment',
+    categories: ['icons', 'antiques', 'instruments'],
+    blurb: 'Velvet waistcoat, good cologne, a shop full of other people’s grandmothers. Never wrong about a piece. His friends drive very clean cars.',
+    hello: '“Four calls, my dear. Ring any time; I keep late hours. So do my friends.”',
+    lines: {
+      sound: [
+        'Stanislav purrs: “Oh, that is a lovely, honest thing. {lo}–{hi}, and worth every kopeck.”',
+        'Stanislav, after a pause: “Period, untouched, a pleasure to hold. {lo}–{hi}.”',
+      ],
+      redone: [
+        'Stanislav tuts: “Someone has loved this a little too much. Retouched, regilded. {lo}–{hi}.”',
+        'Stanislav: “The varnish is younger than you are, my dear. {lo}–{hi} as a restored piece.”',
+      ],
+      mixed: [
+        'Stanislav laughs softly: “A marriage of convenience. The base from one, the top from another. {lo}–{hi}.”',
+      ],
+      doubt: [
+        'Stanislav, gently: “It’s pretending, my dear. Very sweetly, but pretending. {lo}–{hi}.”',
+        'Stanislav sets it aside: “Made last year to look like last century. {lo}–{hi}, not a kopeck more.”',
+      ],
+      lowball: [
+        'Stanislav yawns: “Provincial work, nothing special. {lo}–{hi}. I could find it a home, as a favour to you.”',
+        'Stanislav, airily: “Decorative, no more. {lo}–{hi}. Send it round to me and save yourself the bother.”',
+      ],
+    },
+  },
+  {
+    id: 'technician',
+    name: 'Zhenya Kroshkina',
+    short: 'Zhenya',
+    role: 'Repair kiosk, Rechnaya underpass',
+    categories: ['phones', 'cameras', 'electronics'],
+    blurb: 'Twenty-three, fixes phones in a kiosk the size of a wardrobe and answers on the first ring, mouth full. Cheap and fast. Sometimes a little too fast.',
+    hello: '“Eight calls, yeah, fine. Just tell me the model, I’ll know.”',
+    lines: {
+      sound: [
+        'Zhenya, chewing: “Yeah, that’s all original inside. {lo}–{hi}, done.”',
+        'Zhenya, half-listening: “Sounds normal to me. {lo}–{hi}. Next?”',
+      ],
+      redone: [
+        'Zhenya: “Screen’s been swapped, cheap one too. Works, though. {lo}–{hi}.”',
+        'Zhenya snorts: “Refurb. Somebody opened it and closed it nicely. {lo}–{hi}.”',
+      ],
+      mixed: [
+        'Zhenya: “That’s a parts-bin special. Two of them died to make one. {lo}–{hi}.”',
+      ],
+      doubt: [
+        'Zhenya, instantly: “Nope. Wrong font on the menus, wrong weight in the hand. {lo}–{hi}, tops.”',
+        'Zhenya laughs: “Logo’s right, nothing else is. Don’t pay for the name. {lo}–{hi}.”',
+      ],
+      lowball: [
+        'Zhenya: “Last year’s model, nobody wants it. {lo}–{hi}. I’d take it for parts, honestly.”',
       ],
     },
   },

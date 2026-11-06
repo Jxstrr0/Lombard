@@ -55,6 +55,10 @@ export class ItemStage {
   private lift = 0
   private present = false
   private exit: { t: number; dir: number } | null = null
+  /** The customer is still walking in: the item waits off the mat. */
+  private waiting = false
+  /** 0 → 1 as the item slides onto the mat from the customer's side once they arrive. */
+  private enterT = 1
   private inspecting = false
   private yaw = DEFAULT_YAW
   private pitch = DEFAULT_PITCH
@@ -117,7 +121,8 @@ export class ItemStage {
     }
     if (c.visitId !== this.visitId) {
       this.visitId = c.visitId
-      this.setItem(c.item.defId)
+      // A story scene visitor (M4) brings nothing: the mat stays empty.
+      this.setItem(c.item?.defId ?? null)
       this.yaw = DEFAULT_YAW
       this.pitch = DEFAULT_PITCH
       this.zoom = 1
@@ -133,11 +138,17 @@ export class ItemStage {
     }
   }
 
+  /** True while the customer is still on their way to the counter; false slides their item onto the mat. */
+  setWaiting(waiting: boolean): void {
+    if (this.waiting && !waiting) this.enterT = this.reduceMotion ? 1 : 0
+    this.waiting = waiting
+  }
+
   /** Start the cheap visual for a tool use. `magnetic` = does the item pull to the magnet? */
   playTool(tool: ToolId, state: GameState): void {
     const c = state.current
     let magnetic = false
-    if (tool === 'magnet' && c) {
+    if (tool === 'magnet' && c?.item) {
       try {
         const def = getItemDef(c.item.defId)
         magnetic = fakeProfileOf(def, c.item)?.magnetic ?? def.magnetic
@@ -186,7 +197,7 @@ export class ItemStage {
       this.exit.t = this.reduceMotion ? 1 : Math.min(1, this.exit.t + dt / 0.55)
       exitK = this.exit.t
     }
-    const visible = (this.present || (this.exit !== null && this.exit.t < 1)) && exitK < 1
+    const visible = (this.present || (this.exit !== null && this.exit.t < 1)) && exitK < 1 && !(this.waiting && !this.exit)
     this.pivot.visible = visible
     if (!visible) {
       this.shadow.visible = false
@@ -207,6 +218,13 @@ export class ItemStage {
     const counterPos = this.vTmp.copy(this.matPoint)
     counterPos.y += this.lift * this.counterScale + 0.0015
     if (this.exit) counterPos.z += this.exit.dir * 0.35 * this.exit.t
+    else if (this.enterT < 1) {
+      // Arriving: slide in from the customer's side (the reverse of handing it back).
+      this.enterT = Math.min(1, this.enterT + dt / 0.45)
+      const k = 1 - this.enterT
+      exitK = k * k
+      counterPos.z += 0.35 * exitK
+    }
     // Inspect pose: turntable yaw (world Y) then pitch (world X), front facing the camera
     const qYaw = this.qTmp.setFromAxisAngle(Y_AXIS, this.yaw)
     const qPitch = this.qTmp2.setFromAxisAngle(X_AXIS, this.pitch)
@@ -297,10 +315,11 @@ export class ItemStage {
     return out
   }
 
-  private setItem(defId: string): void {
+  private setItem(defId: string | null): void {
     if (this.model) this.pivot.remove(this.model)
     this.model = null
     this.def = null
+    if (defId === null) return
     let def: ItemDef
     try {
       def = getItemDef(defId)

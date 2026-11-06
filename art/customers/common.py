@@ -194,14 +194,20 @@ def paint(arr, op):
     """Paint one rectangle out of a texture, in place. arr: float (h, w, >=3), top row first,
     values 0..1. Coordinates are pixels of the ORIGINAL texture (as in an image editor).
 
-    op = dict(box=(x0, y0, x1, y1), mode='fill' | 'clone' | 'heal', feather=px,
+    op = dict(box=(x0, y0, x1, y1), mode='fill' | 'clone' | 'heal' | 'grey', feather=px,
               sample=(x0, y0, x1, y1)  # fill: median colour of this area (default: a ring round box)
               color=(r, g, b)          # fill: explicit 0..255 colour instead
               dx=, dy=                 # clone: copy from box shifted by (dx, dy); heal: take only the
                                        # fine grain from there, shading from the box's surroundings
               lum=(lo, hi))            # only touch pixels whose 0..255 luminance is in [lo, hi];
                                        # fill colour then defaults to the box's other pixels
-              side=((ax, ay), (bx, by)))  # only touch pixels left of the line a->b
+              side=((ax, ay), (bx, by))  # only touch pixels left of the line a->b
+              level=, gain=, tint=(r, g, b), amount=,  # grey: recolour, not paint out (greying hair,
+                                       # darkening a shirt): level + gain * luminance (0..1) times
+                                       # tint (0..255, 255 = neutral), mixed over the original by
+                                       # amount (1 = all of it)
+              soft=(lo, hi))           # grey: full strength below 0..255 luminance lo, fading to
+                                       # none at hi (hair into skin without a hard edge)
     """
     box = op['box']
     feather = op.get('feather', 3)
@@ -232,6 +238,15 @@ def paint(arr, op):
         assert grain.shape[:2] == (Y1 - Y0 + 2 * r, X1 - X0 + 2 * r), ('heal source out of the texture', op)
         detail = (grain - _blur(grain, r))[r:-r, r:-r]
         src = np.clip(_coons(arr, (X0, Y0, X1, Y1)) + detail, 0, 1)
+    elif mode == 'grey':
+        L = _lum(sub)
+        if op.get('soft'):
+            lo, hi = op['soft']
+            m = m * np.clip((hi / 255 - L) / ((hi - lo) / 255), 0, 1)
+        g = op.get('level', 0.3) + op.get('gain', 1.0) * L
+        tint = np.array(op.get('tint', (255, 255, 255)), np.float32) / 255
+        a = op.get('amount', 1.0)
+        src = np.clip(sub * (1 - a) + g[..., None] * tint * a, 0, 1)
     else:
         if 'color' in op:
             c = np.array(op['color'], np.float32) / 255
@@ -287,7 +302,8 @@ def export_glb(path, objs, draco=False):
               export_apply=False, export_morph=False, export_texcoords=True, export_normals=True,
               export_tangents=False, export_materials='EXPORT', export_cameras=False, export_lights=False,
               export_animation_mode='ACTIONS', export_force_sampling=True, export_frame_step=1,
-              export_optimize_animation_size=True, export_def_bones=True,
+              export_optimize_animation_size=True, export_optimize_animation_keep_anim_armature=False,
+              export_def_bones=True,
               export_anim_slide_to_zero=True)
     if draco:
         kw.update(export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=6)

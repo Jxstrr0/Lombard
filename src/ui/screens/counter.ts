@@ -9,6 +9,7 @@ import type { VisitOutcome } from '../../game/types'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
 import { archetypeLabel, itemNameOf, rub } from '../format'
 import type { IconName } from '../icons'
+import '../story.css'
 
 const LOOK_HINT_KEY = 'lombard.lookHintSeen'
 
@@ -20,7 +21,7 @@ function lookHintSeen(): boolean {
   }
 }
 
-type Primary = 'counter/next' | 'day/close' | 'counter/inspect' | 'counter/dismiss'
+type Primary = 'counter/next' | 'day/close' | 'counter/inspect' | 'counter/dismiss' | 'scene/next'
 
 const OUTCOME: Record<VisitOutcome, string> = {
   bought: 'Bought',
@@ -30,6 +31,7 @@ const OUTCOME: Record<VisitOutcome, string> = {
   passed: 'Passed',
   walked: 'Walked out',
   left: 'Left',
+  talked: 'Talked',
 }
 
 export class CounterScreen {
@@ -39,6 +41,12 @@ export class CounterScreen {
   private name: HTMLElement
   private tag: HTMLElement
   private loanBadge: HTMLElement
+  /** M4: shown for authored regulars (they remember you). */
+  private regularBadge: HTMLElement
+  /** M4: a story scene's choices, on its last line. */
+  private choices: HTMLElement
+  private choiceKey = ''
+  private readonly dispatch: (a: Action) => void
   private itemName: HTMLElement
   private line: HTMLElement
   private stamp: HTMLElement
@@ -56,7 +64,10 @@ export class CounterScreen {
     gear: (onPress: () => void) => HTMLButtonElement,
     /** Opens the shop sheet; shown only while nobody is at the counter. */
     private readonly shopButton?: HTMLButtonElement,
+    /** `?lull=0` (review and screenshots): call each customer with a button instead of waiting out the lull. */
+    private readonly manualNext = false,
   ) {
+    this.dispatch = dispatch
     const root = el('section', 'screen counter-screen')
     root.dataset.screen = 'counter'
     const strip = el('div', 'strip')
@@ -67,7 +78,9 @@ export class CounterScreen {
     this.tag = el('span', 'speaker-tag')
     this.loanBadge = el('span', 'loan-badge', 'wants a loan')
     this.loanBadge.dataset.id = 'loan-badge'
-    this.speaker.append(this.name, this.tag, this.loanBadge)
+    this.regularBadge = el('span', 'regular-badge', 'regular')
+    this.regularBadge.dataset.id = 'regular-badge'
+    this.speaker.append(this.name, this.tag, this.regularBadge, this.loanBadge)
     this.itemName = el('div', 'item-tag')
     this.itemName.dataset.id = 'counter-item'
     this.line = el('p', 'line')
@@ -76,6 +89,9 @@ export class CounterScreen {
     this.stamp.dataset.id = 'outcome'
     dialogue.append(this.speaker, this.itemName, this.line, this.stamp)
 
+    this.choices = el('div', 'scene-choices')
+    this.choices.dataset.id = 'scene-choices'
+    this.choices.hidden = true
     const actions = el('div', 'actions counter-actions')
     this.secondary = createButton({ id: 'pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) })
     this.primary = createButton({
@@ -85,7 +101,7 @@ export class CounterScreen {
       onPress: () => dispatch({ type: this.primaryAction }),
     })
     actions.append(gear(openSettings), ...(shopButton ? [shopButton] : []), this.secondary, this.primary)
-    strip.append(dialogue, actions)
+    strip.append(dialogue, this.choices, actions)
     this.lookHint = el('p', 'look-hint', 'Drag to look around')
     this.lookHint.dataset.id = 'look-hint'
     this.lookHint.hidden = true
@@ -110,8 +126,10 @@ export class CounterScreen {
     }
   }
 
-  render(state: GameState): void {
-    const c = state.current
+  /** `arrived` false: the current customer is still walking in; show the shop as empty until they reach the counter. */
+  render(state: GameState, arrived = true): void {
+    const c = state.current && (arrived || (state.current.phase !== 'present' && state.current.phase !== 'scene')) ? state.current : null
+    const walking = !!state.current && !c
     if (!this.lookHintDone) {
       if (!c && state.day.phase === 'open') {
         this.lookHint.hidden = false
@@ -124,15 +142,17 @@ export class CounterScreen {
     if (c) {
       setText(this.name, c.customer.name)
       setText(this.tag, archetypeLabel(c.customer.archetype))
-      this.loanBadge.hidden = !(c.kind === 'seller' && c.wants === 'pawn' && c.phase !== 'resolved')
-      setText(this.itemName, itemNameOf(c.item.defId, 'Something wrapped in a cloth'))
+      this.regularBadge.hidden = !c.customer.regularId
+      this.loanBadge.hidden = !(c.kind === 'seller' && c.wants === 'pawn' && c.phase !== 'resolved' && c.phase !== 'scene')
+      if (c.item) setText(this.itemName, itemNameOf(c.item.defId, 'Something wrapped in a cloth'))
     }
-    this.itemName.hidden = !c || c.phase === 'resolved'
-    setText(this.line, c ? `“${c.line}”` : state.narration)
+    this.itemName.hidden = !c?.item || c.phase === 'resolved'
+    setText(this.line, c ? `“${c.line}”` : walking ? 'The door opens.' : state.narration)
     this.line.classList.toggle('narration', !c)
 
     const resolved = c?.phase === 'resolved'
-    this.stamp.hidden = !resolved
+    // A story scene that ends in talk gets no stamp.
+    this.stamp.hidden = !resolved || c?.outcome === 'talked'
     if (resolved && c.outcome) {
       const priced = (c.outcome === 'bought' || c.outcome === 'sold' || c.outcome === 'pawned' || c.outcome === 'redeemed') && c.price !== undefined
       const text = priced ? `${OUTCOME[c.outcome]} · ${rub(c.price!)}` : OUTCOME[c.outcome]
@@ -141,15 +161,35 @@ export class CounterScreen {
     }
 
     this.secondary.hidden = !c || c.phase !== 'present'
-    if (this.shopButton) this.shopButton.hidden = !!c
-    if (!c) {
+    if (this.shopButton) this.shopButton.hidden = !!c || walking
+    const scene = c?.phase === 'scene' ? c.scene : undefined
+    const choosing = !!scene && !scene.chosen && scene.step >= scene.lines.length - 1 && scene.choices.length > 0
+    this.renderChoices(choosing ? scene!.choices : [])
+    // Between visitors the next person walks in by themselves (the lull); there is nothing to press.
+    this.primary.hidden = walking || choosing || (!c && state.queue.length > 0 && !this.manualNext)
+    if (scene) {
+      this.setPrimary('scene/next', 'scene-next', 'Go on', undefined)
+    } else if (!c) {
       if (state.queue.length > 0) this.setPrimary('counter/next', 'next-customer', 'Next customer', 'person')
       else this.setPrimary('day/close', 'close-up', 'Close up', 'door')
     } else if (c.phase === 'present') {
       this.setPrimary('counter/inspect', 'inspect', 'Inspect', 'loupe')
     } else {
-      this.setPrimary('counter/dismiss', 'dismiss', state.queue.length > 0 ? 'Next' : 'Done', undefined)
+      this.setPrimary('counter/dismiss', 'dismiss', 'Done', undefined)
     }
+  }
+
+  /** Story choices as buttons (rebuilt only when the set changes). */
+  private renderChoices(choices: { id: string; label: string }[]): void {
+    const key = choices.map((c) => c.id).join('|')
+    this.choices.hidden = choices.length === 0
+    if (key === this.choiceKey) return
+    this.choiceKey = key
+    this.choices.replaceChildren(
+      ...choices.map((ch) =>
+        createButton({ id: `choice-${ch.id}`, label: ch.label, className: 'btn-choice', onPress: () => this.dispatch({ type: 'scene/choose', choiceId: ch.id }) }),
+      ),
+    )
   }
 
   private setPrimary(action: Primary, id: string, label: string, icon: IconName | undefined): void {

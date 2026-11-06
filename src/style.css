@@ -2051,6 +2051,12 @@ html {
   font-style: italic;
 }
 
+.office-quiet {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
 .office-owned {
   display: inline-flex;
   align-items: center;
@@ -2087,6 +2093,59 @@ html {
 
   .btn-office .icon {
     display: none;
+  }
+}
+
+.settings-small {
+  font-size: 0.8125rem;
+}
+
+.actions-stack {
+  flex-direction: column;
+}
+
+.actions-stack > .btn {
+  flex: 0 0 auto;
+}
+
+/* Quiet backup reminder over the ledger (between days); dismissible, never over play. */
+.backup-reminder {
+  position: fixed;
+  left: 50%;
+  top: calc(12px + var(--safe-top));
+  z-index: 15;
+  width: min(460px, calc(100vw - 24px));
+  transform: translateX(-50%);
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(31, 30, 27, 0.97);
+  border: 1px solid rgba(217, 119, 87, 0.45);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  animation: backup-in 0.25s ease-out;
+}
+
+.backup-reminder-text {
+  margin: 0 0 10px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgba(250, 249, 245, 0.88);
+}
+
+.backup-reminder .btn {
+  min-height: 44px;
+}
+
+@keyframes backup-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backup-reminder {
+    animation: none;
   }
 }
 

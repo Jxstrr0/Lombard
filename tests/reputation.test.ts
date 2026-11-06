@@ -22,7 +22,7 @@ import {
 import { Rng } from '../src/game/rng'
 import { migrate } from '../src/game/save/migrations'
 import { sellChance } from '../src/game/sell/buyer'
-import { type GameState } from '../src/game/state'
+import { STATE_VERSION, type GameState } from '../src/game/state'
 import type { ItemInstance, WalkIn } from '../src/game/types'
 import { startedState } from './helpers'
 
@@ -196,18 +196,37 @@ describe('ledger lines', () => {
   })
 })
 
-describe('v3 → v4 save migration', () => {
-  it('adds the youth group and the stolen count, keeping the rest', () => {
+describe('v4 → v5 save migration', () => {
+  /** A played state rewound to an older shape: no youth group, no stolen count. */
+  function old(version: number) {
     const s = startedState(9, 'old')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- deliberately untyped old-shape record
     const raw = JSON.parse(JSON.stringify(s)) as Record<string, any>
-    raw.meta.version = 3
+    raw.meta.version = version
     raw.reputation = { general: -4, byGroup: { neighbourhood: 0.2, police: 0, mob: 0, specialists: 0.1 } }
     delete raw.stats.itemsStolen
-    const m = migrate(raw)
+    if (version < 4) {
+      delete raw.story.flags
+      delete raw.customers
+    }
+    return raw
+  }
+
+  it('adds the youth group and the stolen count, keeping the rest', () => {
+    const m = migrate(old(4))
+    expect(m.meta.version).toBe(STATE_VERSION)
     expect(m.reputation.general).toBe(-4)
     expect(m.reputation.byGroup).toEqual({ neighbourhood: 0.2, youth: 0, police: 0, mob: 0, specialists: 0.1 })
     expect(m.stats.itemsStolen).toBe(0)
     expect(standingLines(m).length).toBeGreaterThan(0)
+  })
+
+  it('a v3 save goes through the story step and this one', () => {
+    const m = migrate(old(3))
+    expect(m.meta.version).toBe(STATE_VERSION)
+    expect(m.story.flags).toEqual([])
+    expect(m.customers).toEqual({})
+    expect(m.reputation.byGroup.youth).toBe(0)
+    expect(m.stats.itemsStolen).toBe(0)
   })
 })

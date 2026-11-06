@@ -25,6 +25,7 @@ const KIND_LABEL: Record<LedgerEntry['kind'], string> = {
   loan: 'LOAN',
   redeem: 'REDEEM',
   forfeit: 'KEPT',
+  story: 'NOTE',
   theft: 'GONE',
   deterred: 'SEEN',
 }

@@ -34,6 +34,7 @@ import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import type { ItemDef } from '../game/schema/item'
 import type { GlbLoader } from './loaders'
+import { buildWaveA } from './itemsWaveA'
 import { textureAnisotropy } from './perf'
 
 export type PlaceholderKind = ItemDef['model']['placeholder']
@@ -50,7 +51,7 @@ export interface ModelSpec {
   ribbon?: readonly string[]
   /** Which relief a medal/coin draws. */
   emblem?: string
-  /** M6: overall size of a box or book, metres. */
+  /** M6: overall size of a box, book or `block`, metres. */
   size?: readonly [number, number, number]
 }
 
@@ -128,6 +129,9 @@ export function buildPlaceholder(spec: ModelSpec): THREE.Group {
     case 'book':
       buildBook(g, color, spec.size ?? [0.15, 0.22, 0.03])
       break
+    default:
+      // M6 wave A kinds (src/render/itemsWaveA.ts)
+      buildWaveA(g, spec)
   }
   const s = spec.scale ?? 1
   g.scale.setScalar(s)
@@ -228,6 +232,17 @@ export class ItemModels {
  * instead of the glb's tens of thousands.
  */
 export function swapInGlb(model: THREE.Group, scene: THREE.Group): void {
+  if (model.name === 'placeholder:block') {
+    // M6: a CC0 model (a few thousand triangles) over a stand-in box: it is its own raycast proxy.
+    for (const c of [...model.children]) {
+      c.removeFromParent()
+      disposeObject(c)
+    }
+    scene.name = 'glb'
+    model.add(scene)
+    model.userData.glb = true
+    return
+  }
   const proxy = new THREE.Group()
   proxy.name = 'proxy'
   proxy.visible = false

@@ -9,9 +9,30 @@ import media from './media.json'
 import militaria from './militaria.json'
 import phones from './phones.json'
 import watches from './watches.json'
+// M6 wave A
+import antiques from './antiques.json'
+import instruments from './instruments.json'
+import silver from './silver.json'
+import tools from './tools.json'
 
 /** Raw JSON per category file, in spawn-table order (tests validate these directly). */
-export const RAW_ITEM_FILES: Readonly<Record<string, readonly unknown[]>> = { gold, watches, phones, cameras, militaria, coins, electronics, icons, media }
+export const RAW_ITEM_FILES: Readonly<Record<string, readonly unknown[]>> = {
+  gold,
+  watches,
+  phones,
+  cameras,
+  militaria,
+  coins,
+  electronics,
+  icons,
+  // M6 wave A
+  instruments,
+  tools,
+  silver,
+  antiques,
+  // M6 wave B
+  media,
+}
 
 export const ITEM_DEFS: readonly ItemDef[] = Object.values(RAW_ITEM_FILES)
   .flat()

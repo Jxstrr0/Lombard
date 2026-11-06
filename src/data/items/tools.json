@@ -1,0 +1,1752 @@
+[
+  {
+    "id": "drill_hartwig",
+    "category": "tools",
+    "name": "Hartwig 18 V cordless drill",
+    "brand": "Hartwig",
+    "era": "2010s",
+    "baseValue": {
+      "min": 5000,
+      "max": 8000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 1600,
+      "tolerance": 64.0
+    },
+    "magnetic": true,
+    "rarity": 1.2,
+    "fakeChance": 0.35,
+    "tells": [
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "Under the trigger, a rating plate: HARTWIG, 18 V, a serial and “Made in Germany” in crisp print.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "trigger"
+      },
+      {
+        "id": "chuck",
+        "tool": "loupe",
+        "finding": "A metal keyless chuck, the maker’s name rolled into the sleeve.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "chuck"
+      },
+      {
+        "id": "vents",
+        "tool": "loupe",
+        "finding": "A little brick dust in the vents. It has drilled some walls.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "vents"
+      },
+      {
+        "id": "battery",
+        "tool": "loupe",
+        "finding": "The battery’s label matches the body, the same serial prefix and date code.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "battery"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "About a kilo and a half with the battery. Solid, balanced.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_motor",
+        "tool": "magnet",
+        "finding": "The magnet clings above the trigger, where the motor sits.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "vents"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "hartvig_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 3,
+        "tells": [
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "The plate says HARTVIG with a V, and “Germany Technology” in small letters.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "trigger"
+          },
+          {
+            "id": "chuck",
+            "tool": "loupe",
+            "finding": "The chuck is plastic, painted silver; the paint is wearing off the jaws.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "chuck"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light. Too light for a proper 18-volt drill.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.78
+      },
+      {
+        "id": "wrong_battery",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "battery",
+            "tool": "loupe",
+            "finding": "The battery is a market copy, a different grey from the body, wobbling slightly in its rail.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "battery"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "Hartwig, German. I only used it to hang the shelves.",
+      "Finished the renovation. I never want to see a drill again.",
+      "It was my brother-in-law’s. He owes me money.",
+      "Comes with the battery, charged this morning."
+    ],
+    "model": {
+      "glb": "drill_hartwig.glb",
+      "placeholder": "block",
+      "color": "#1f5f8b",
+      "scale": 1,
+      "rest": "upright",
+      "size": [
+        0.1829,
+        0.1851,
+        0.0524
+      ],
+      "inspectDistance": 0.41,
+      "hotspots": [
+        {
+          "id": "chuck",
+          "label": "Chuck",
+          "position": [
+            -0.0732,
+            0.069,
+            0.0149
+          ]
+        },
+        {
+          "id": "vents",
+          "label": "Motor vents",
+          "position": [
+            0.064,
+            0.0665,
+            0.0211
+          ]
+        },
+        {
+          "id": "trigger",
+          "label": "Trigger and label",
+          "position": [
+            0.0069,
+            0.0242,
+            0.0058
+          ]
+        },
+        {
+          "id": "battery",
+          "label": "Battery",
+          "position": [
+            0.0515,
+            -0.064,
+            0.0245
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "perforator_hartwig",
+    "category": "tools",
+    "name": "Hartwig rotary hammer",
+    "brand": "Hartwig",
+    "era": "2010s",
+    "baseValue": {
+      "min": 7000,
+      "max": 11000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 2900,
+      "tolerance": 116.0
+    },
+    "magnetic": true,
+    "rarity": 1.0,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "The body is stamped HARTWIG into the plastic itself, with a printed rating plate below.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "label"
+      },
+      {
+        "id": "chuck",
+        "tool": "loupe",
+        "finding": "A proper quick-change chuck, the rubber dust cap cracked from use.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "chuck"
+      },
+      {
+        "id": "trigger",
+        "tool": "loupe",
+        "finding": "The trigger is grey with concrete dust. It has made holes for a living.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "trigger"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Almost three kilos. Heavy where it should be, at the front.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_motor",
+        "tool": "magnet",
+        "finding": "The magnet grabs the gearbox at the front and holds hard.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "chuck"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "hartvig_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "The logo is a sticker, not moulded. Under it, the plastic is smooth and blank.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "label"
+          },
+          {
+            "id": "chuck",
+            "tool": "loupe",
+            "finding": "The chuck rattles, and its sleeve is stamped with a different make.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "chuck"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light. It would bounce off a concrete wall.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.8
+      },
+      {
+        "id": "rewound",
+        "kind": "restored",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "screws",
+            "tool": "loupe",
+            "finding": "The case screws are chewed, and one is not original. It has been opened, maybe rewound.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "handle"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "Hartwig perforator, it goes through concrete like butter.",
+      "The brigade bought a new one. This one still works fine.",
+      "I did my whole flat with it. The neighbours hate me."
+    ],
+    "model": {
+      "placeholder": "perforator",
+      "color": "#1f5f8b",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.85,
+      "hotspots": [
+        {
+          "id": "label",
+          "label": "Body label",
+          "position": [
+            -0.02,
+            0.035,
+            0.038
+          ]
+        },
+        {
+          "id": "chuck",
+          "label": "Chuck",
+          "position": [
+            -0.17,
+            0.03,
+            0.026
+          ]
+        },
+        {
+          "id": "handle",
+          "label": "Handle",
+          "position": [
+            0.15,
+            -0.03,
+            0.02
+          ]
+        },
+        {
+          "id": "trigger",
+          "label": "Trigger",
+          "position": [
+            0.125,
+            0.0,
+            0.01
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "grinder_bulat",
+    "category": "tools",
+    "name": "Bulat angle grinder, 125 mm",
+    "brand": "Bulat",
+    "era": "2000s",
+    "baseValue": {
+      "min": 1800,
+      "max": 3000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 2100,
+      "tolerance": 84.0
+    },
+    "magnetic": true,
+    "rarity": 1.0,
+    "fakeChance": 0.2,
+    "tells": [
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "A BULAT rating plate riveted to the body: 900 W, a serial, a Mostograd works stamp.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "label"
+      },
+      {
+        "id": "head",
+        "tool": "loupe",
+        "finding": "The gear head is scuffed and sparked black. It has cut a lot of metal.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "head"
+      },
+      {
+        "id": "cord",
+        "tool": "loupe",
+        "finding": "The cord has been taped near the plug. The insulation underneath is whole.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "cord"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Two kilos. A cast-aluminium head and a heavy motor.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_motor",
+        "tool": "magnet",
+        "finding": "The magnet sticks to the motor housing and to the disc guard.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "disc"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "burnt_motor",
+        "kind": "restored",
+        "valueMultiplier": 0.4,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "A brown scorch mark around the vents, and the plate is half melted. The motor has burnt once.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "label"
+          }
+        ]
+      },
+      {
+        "id": "no_name_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "No plate, just a printed BULAT sticker, already peeling at the edge.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "label"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light. A plastic gear head, most likely.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.78
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "Bulat, our own make. They don’t break. Well, not often.",
+      "I cut a garage door off with it once. Mine, don’t worry.",
+      "It works, I only need cash for the weekend."
+    ],
+    "model": {
+      "placeholder": "grinder",
+      "color": "#2d6f3a",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.75,
+      "hotspots": [
+        {
+          "id": "label",
+          "label": "Body label",
+          "position": [
+            0.02,
+            0.0,
+            0.0365
+          ]
+        },
+        {
+          "id": "head",
+          "label": "Gear head",
+          "position": [
+            -0.11,
+            0.0,
+            0.03
+          ]
+        },
+        {
+          "id": "disc",
+          "label": "Disc and guard",
+          "position": [
+            -0.11,
+            -0.05,
+            0.04
+          ]
+        },
+        {
+          "id": "cord",
+          "label": "Cord",
+          "position": [
+            0.2,
+            0.0,
+            0.004
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "socket_set_hartwig",
+    "category": "tools",
+    "name": "Hartwig socket set, 94 pieces",
+    "brand": "Hartwig",
+    "era": "2010s",
+    "baseValue": {
+      "min": 4000,
+      "max": 7000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 4800,
+      "tolerance": 192.0
+    },
+    "magnetic": true,
+    "rarity": 0.6,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "stamp",
+        "tool": "loupe",
+        "finding": "Every socket is stamped with its size and “CrV”, crisp and deep.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "sockets"
+      },
+      {
+        "id": "ratchet",
+        "tool": "loupe",
+        "finding": "The ratchet clicks fine and even. Its head carries the Hartwig mark.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "ratchet"
+      },
+      {
+        "id": "count",
+        "tool": "loupe",
+        "finding": "Two gaps in the foam, a 10 and a 13. The two that always go missing.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "sockets"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Nearly five kilos. A full case of hardened steel.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_steel",
+        "tool": "magnet",
+        "finding": "Every piece leaps to the magnet. Steel, of course.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "sockets"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "soft_steel_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "stamp",
+            "tool": "loupe",
+            "finding": "The sizes are printed, not stamped, and two sockets are already rounded inside.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "sockets"
+          },
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "The case sticker spells it HARTWIK. Under the handle, “Professional Tools” in Latin capitals.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "label"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for a set this size. Thin steel, or zinc.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.8
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "The full Hartwig set, ninety-four pieces. Bought it for the car. Then sold the car.",
+      "My husband’s. He won’t notice for a month.",
+      "Everything’s there. Well, nearly everything."
+    ],
+    "model": {
+      "placeholder": "socketset",
+      "color": "#b22222",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.95,
+      "hotspots": [
+        {
+          "id": "ratchet",
+          "label": "Ratchet",
+          "position": [
+            -0.06,
+            0.12,
+            0.026
+          ]
+        },
+        {
+          "id": "sockets",
+          "label": "Sockets",
+          "position": [
+            0.0,
+            0.025,
+            0.0375
+          ]
+        },
+        {
+          "id": "label",
+          "label": "Case label",
+          "position": [
+            0.13,
+            -0.14,
+            0.0135
+          ]
+        },
+        {
+          "id": "case",
+          "label": "Case back",
+          "position": [
+            0.0,
+            0.0,
+            -0.04
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "chainsaw_lesovik",
+    "category": "tools",
+    "name": "Lesovik petrol chainsaw",
+    "brand": "Lesovik",
+    "era": "2010s",
+    "baseValue": {
+      "min": 8000,
+      "max": 13000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 5200,
+      "tolerance": 208.0
+    },
+    "magnetic": true,
+    "rarity": 0.4,
+    "fakeChance": 0.25,
+    "tells": [
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "The LESOVIK cover is moulded, with a serial plate riveted under it.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "label"
+      },
+      {
+        "id": "bar",
+        "tool": "loupe",
+        "finding": "The chain is a little dull and the bar has a groove worn in. A season of dacha firewood.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "bar"
+      },
+      {
+        "id": "starter",
+        "tool": "loupe",
+        "finding": "The starter cord is original, the handle marked with the maker’s fir tree.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "starter"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Over five kilos without fuel. A proper engine in there.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_steel",
+        "tool": "magnet",
+        "finding": "The bar and chain grab the magnet. The cover doesn’t.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "bar"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "china_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "The cover is plain orange plastic with LESOVIK on a sticker, and no serial plate.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "label"
+          },
+          {
+            "id": "starter",
+            "tool": "loupe",
+            "finding": "The starter handle is blank, and the cord is already fraying.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "starter"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for its size. A thin, cheap engine.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.8
+      },
+      {
+        "id": "seized",
+        "kind": "restored",
+        "valueMultiplier": 0.4,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "cap",
+            "tool": "loupe",
+            "finding": "The fuel cap is new, and there’s fresh sealant round the cylinder. It seized once.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "cap"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "For the dacha. We sold the dacha.",
+      "Lesovik, it starts first pull. Well, second.",
+      "My father-in-law cut half a forest with it."
+    ],
+    "model": {
+      "placeholder": "chainsaw",
+      "color": "#e06a1b",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 1.6,
+      "hotspots": [
+        {
+          "id": "bar",
+          "label": "Bar and chain",
+          "position": [
+            -0.25,
+            -0.02,
+            0.006
+          ]
+        },
+        {
+          "id": "starter",
+          "label": "Starter",
+          "position": [
+            0.1,
+            0.03,
+            0.115
+          ]
+        },
+        {
+          "id": "label",
+          "label": "Cover label",
+          "position": [
+            0.09,
+            -0.04,
+            0.1005
+          ]
+        },
+        {
+          "id": "cap",
+          "label": "Fuel cap",
+          "position": [
+            0.17,
+            0.106,
+            0.06
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "sewing_machine_rukodelnitsa",
+    "category": "tools",
+    "name": "Rukodelnitsa hand-crank sewing machine",
+    "brand": "Rukodelnitsa",
+    "era": "1960s",
+    "baseValue": {
+      "min": 3000,
+      "max": 5500
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 11000,
+      "tolerance": 440.0
+    },
+    "magnetic": true,
+    "rarity": 0.4,
+    "fakeChance": 0.2,
+    "tells": [
+      {
+        "id": "decal",
+        "tool": "loupe",
+        "finding": "The gold decals on the arm are worn through in places, but the RUKODELNITSA script is clear.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "badge"
+      },
+      {
+        "id": "plate",
+        "tool": "loupe",
+        "finding": "The bed plate is stamped with a factory mark, a year and a serial.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "bed"
+      },
+      {
+        "id": "needle",
+        "tool": "loupe",
+        "finding": "A thin film of old oil on the needle bar. It turns smoothly by hand.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "needle"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Eleven kilos of cast iron. The scale complains loudly.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_iron",
+        "tool": "magnet",
+        "finding": "The magnet clamps on anywhere. Cast iron all through.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "bed"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "repainted",
+        "kind": "restored",
+        "valueMultiplier": 0.55,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "decal",
+            "tool": "loupe",
+            "finding": "The black is too glossy, and the decals are new transfers sitting on top of it.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "badge"
+          }
+        ]
+      },
+      {
+        "id": "mismatched_head",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "plate",
+            "tool": "loupe",
+            "finding": "The bed plate’s serial doesn’t match the number on the arm.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "bed"
+          },
+          {
+            "id": "wheel",
+            "tool": "loupe",
+            "finding": "The hand wheel is from a different machine: other paint, other bolt.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "wheel"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "My grandmother sewed every curtain in the building on this.",
+      "It works, no electricity needed. If the power goes, you’ll still have trousers.",
+      "Soviet quality. It’ll outlive both of us."
+    ],
+    "model": {
+      "placeholder": "sewing",
+      "color": "#1a1a1a",
+      "scale": 1,
+      "rest": "upright",
+      "inspectDistance": 1.0,
+      "hotspots": [
+        {
+          "id": "badge",
+          "label": "Arm decal",
+          "position": [
+            0.0,
+            0.1,
+            0.0455
+          ]
+        },
+        {
+          "id": "needle",
+          "label": "Needle",
+          "position": [
+            -0.135,
+            -0.03,
+            0.022
+          ]
+        },
+        {
+          "id": "wheel",
+          "label": "Hand wheel",
+          "position": [
+            0.195,
+            0.07,
+            0.0
+          ]
+        },
+        {
+          "id": "bed",
+          "label": "Bed plate",
+          "position": [
+            -0.05,
+            -0.089,
+            0.02
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "plane_leman_no4",
+    "category": "tools",
+    "name": "Leman No. 4 smoothing plane",
+    "brand": "Leman",
+    "era": "1950s, England",
+    "baseValue": {
+      "min": 1500,
+      "max": 3000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 1800,
+      "tolerance": 72.0
+    },
+    "magnetic": true,
+    "rarity": 0.3,
+    "fakeChance": 0.2,
+    "tells": [
+      {
+        "id": "casting",
+        "tool": "loupe",
+        "finding": "The casting reads LEMAN No 4, MADE IN ENGLAND, raised and crisp.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "lever"
+      },
+      {
+        "id": "sole",
+        "tool": "loupe",
+        "finding": "The sole is flat, a little rust in the corners, worn bright along the middle.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "sole"
+      },
+      {
+        "id": "tote",
+        "tool": "loupe",
+        "finding": "A rosewood handle, darkened by hands, with a small old repair at the horn.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "tote"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Nearly two kilos of cast iron.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_iron",
+        "tool": "magnet",
+        "finding": "The magnet clamps to the body and the blade.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "sole"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cracked_cheek",
+        "kind": "restored",
+        "valueMultiplier": 0.35,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "sole",
+            "tool": "loupe",
+            "finding": "A hairline crack in the side, brazed and ground smooth. A cast plane that was dropped.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "sole"
+          }
+        ]
+      },
+      {
+        "id": "mixed_parts",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "lever",
+            "tool": "loupe",
+            "finding": "The lever cap is a different maker’s, a shade greyer than the body.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "lever"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "An English plane, the carpenters swear by them. My father brought it from the dockyard.",
+      "It belonged to my grandfather. He made the windows in our village."
+    ],
+    "model": {
+      "glb": "plane_leman_no4.glb",
+      "placeholder": "block",
+      "color": "#2c3e57",
+      "scale": 0.75,
+      "rest": "upright",
+      "size": [
+        0.3308,
+        0.1978,
+        0.0843
+      ],
+      "inspectDistance": 0.55,
+      "hotspots": [
+        {
+          "id": "knob",
+          "label": "Front knob",
+          "position": [
+            -0.1447,
+            -0.0495,
+            0.0049
+          ]
+        },
+        {
+          "id": "tote",
+          "label": "Handle",
+          "position": [
+            0.1266,
+            0.0146,
+            0.0109
+          ]
+        },
+        {
+          "id": "lever",
+          "label": "Lever cap",
+          "position": [
+            0.042,
+            0.0397,
+            0.026
+          ]
+        },
+        {
+          "id": "sole",
+          "label": "Sole",
+          "position": [
+            0.0,
+            -0.0989,
+            -0.0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "hand_drill_burav",
+    "category": "tools",
+    "name": "Burav hand drill",
+    "brand": "Burav",
+    "era": "1960s",
+    "baseValue": {
+      "min": 1000,
+      "max": 2000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 1300,
+      "tolerance": 52.0
+    },
+    "magnetic": true,
+    "rarity": 0.3,
+    "fakeChance": 0.15,
+    "tells": [
+      {
+        "id": "wheel",
+        "tool": "loupe",
+        "finding": "BURAV is cast into the gear wheel, with a little five-pointed star.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "wheel"
+      },
+      {
+        "id": "chuck",
+        "tool": "loupe",
+        "finding": "The jaws open and close cleanly, a drip of old oil inside.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "chuck"
+      },
+      {
+        "id": "handle",
+        "tool": "loupe",
+        "finding": "The wooden handle is cracked lengthwise but holds.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "handle"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "About a kilo and a quarter. Cast iron and beech.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_iron",
+        "tool": "magnet",
+        "finding": "The magnet clings to the frame and the wheel.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "wheel"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "mixed_parts",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "wheel",
+            "tool": "loupe",
+            "finding": "The gear wheel’s paint is a different red from the frame, and its star is missing.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "wheel"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "Grandad’s. It still drills, no batteries needed.",
+      "A Burav, Soviet steel. Will drill through anything."
+    ],
+    "model": {
+      "glb": "hand_drill_burav.glb",
+      "placeholder": "block",
+      "color": "#7a2a1f",
+      "scale": 0.8,
+      "rest": "flat",
+      "size": [
+        0.1317,
+        0.4857,
+        0.1251
+      ],
+      "inspectDistance": 0.85,
+      "hotspots": [
+        {
+          "id": "handle",
+          "label": "Handle",
+          "position": [
+            -0.0022,
+            0.2007,
+            0.016
+          ]
+        },
+        {
+          "id": "wheel",
+          "label": "Gear wheel",
+          "position": [
+            -0.0022,
+            0.0044,
+            0.023
+          ]
+        },
+        {
+          "id": "crank",
+          "label": "Crank",
+          "position": [
+            0.041,
+            -0.0483,
+            0.0229
+          ]
+        },
+        {
+          "id": "chuck",
+          "label": "Chuck",
+          "position": [
+            -0.0022,
+            -0.1811,
+            0.0014
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "metal_detector_kladez",
+    "category": "tools",
+    "name": "Kladez Hunter metal detector",
+    "brand": "Kladez",
+    "era": "2010s",
+    "baseValue": {
+      "min": 18000,
+      "max": 28000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 1400,
+      "tolerance": 56.0
+    },
+    "magnetic": true,
+    "rarity": 0.3,
+    "fakeChance": 0.4,
+    "tells": [
+      {
+        "id": "box",
+        "tool": "loupe",
+        "finding": "The control box has a proper serial label and a KLADEZ hologram that changes colour.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "box"
+      },
+      {
+        "id": "coil",
+        "tool": "loupe",
+        "finding": "The coil is scuffed and muddy underneath. It has been in a lot of fields.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "coil"
+      },
+      {
+        "id": "shaft",
+        "tool": "loupe",
+        "finding": "The shaft clamps are metal with the maker’s mark, the cable neatly clipped.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "shaft"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Just under a kilo and a half. Balanced at the grip.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_box",
+        "tool": "magnet",
+        "finding": "The magnet pulls at the box, near the speaker, and at the shaft bolts.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "box"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "china_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "box",
+            "tool": "loupe",
+            "finding": "No hologram, and the serial sticker has the same six digits printed twice.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "box"
+          },
+          {
+            "id": "shaft",
+            "tool": "loupe",
+            "finding": "The clamps are plastic and one is already cracked. The cable is held with tape.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "shaft"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light. Thin tube and a hollow box.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.78
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "Kladez Hunter, the good one. You can find coins from Catherine’s time with it.",
+      "I dug up half the region. Found bottle caps and a bayonet.",
+      "Bought it last summer, used it twice. The mosquitoes won."
+    ],
+    "model": {
+      "glb": "metal_detector_kladez.glb",
+      "placeholder": "block",
+      "color": "#2b2b2b",
+      "scale": 1,
+      "rest": "flat",
+      "size": [
+        0.8611,
+        0.9619,
+        0.2379
+      ],
+      "inspectDistance": 1.7,
+      "hotspots": [
+        {
+          "id": "box",
+          "label": "Control box",
+          "position": [
+            0.2463,
+            0.2852,
+            0.0737
+          ]
+        },
+        {
+          "id": "coil",
+          "label": "Search coil",
+          "position": [
+            -0.3055,
+            -0.4597,
+            0.0937
+          ]
+        },
+        {
+          "id": "shaft",
+          "label": "Shaft",
+          "position": [
+            -0.0592,
+            -0.1648,
+            0.0075
+          ]
+        },
+        {
+          "id": "grip",
+          "label": "Grip",
+          "position": [
+            0.0951,
+            0.337,
+            0.0104
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "blowtorch_plamya",
+    "category": "tools",
+    "name": "Plamya brass blowtorch",
+    "brand": "Plamya",
+    "era": "1970s",
+    "baseValue": {
+      "min": 1200,
+      "max": 2200
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 1100,
+      "tolerance": 44.0
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.15,
+    "tells": [
+      {
+        "id": "stamp",
+        "tool": "loupe",
+        "finding": "The tank is stamped PLAMYA with a price, 4 r 50 k, and a factory quality mark.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "tank"
+      },
+      {
+        "id": "valve",
+        "tool": "loupe",
+        "finding": "The valve turns stiffly, but it turns. Soot round the burner.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "valve"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "About a kilo, empty. Thick brass.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_brass",
+        "tool": "magnet",
+        "finding": "The magnet slides off the tank. Only the pump rod inside pulls.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "tank"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "leaky",
+        "kind": "restored",
+        "valueMultiplier": 0.4,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "tank",
+            "tool": "loupe",
+            "finding": "A fresh solder patch on the tank seam, shiny against the old brass.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "tank"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "For the garage. My father thawed the car’s engine with this every winter.",
+      "It still works, if you aren’t afraid of it."
+    ],
+    "model": {
+      "glb": "blowtorch_plamya.glb",
+      "placeholder": "block",
+      "color": "#b98a3e",
+      "scale": 1,
+      "rest": "upright",
+      "size": [
+        0.2593,
+        0.2107,
+        0.1294
+      ],
+      "inspectDistance": 0.57,
+      "hotspots": [
+        {
+          "id": "nozzle",
+          "label": "Burner",
+          "position": [
+            -0.1025,
+            0.1002,
+            0.0099
+          ]
+        },
+        {
+          "id": "valve",
+          "label": "Valve",
+          "position": [
+            0.0047,
+            0.0384,
+            0.043
+          ]
+        },
+        {
+          "id": "tank",
+          "label": "Tank",
+          "position": [
+            0.0023,
+            -0.0373,
+            0.0489
+          ]
+        },
+        {
+          "id": "handle",
+          "label": "Handle",
+          "position": [
+            0.1015,
+            -0.022,
+            0.0011
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "vice_kuznets",
+    "category": "tools",
+    "name": "Kuznets bench vice",
+    "brand": "Kuznets",
+    "era": "1980s",
+    "baseValue": {
+      "min": 3000,
+      "max": 5000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 9000,
+      "tolerance": 360.0
+    },
+    "magnetic": true,
+    "rarity": 0.2,
+    "fakeChance": 0.15,
+    "tells": [
+      {
+        "id": "casting",
+        "tool": "loupe",
+        "finding": "KUZNETS is cast into the side, with the jaw width and a GOST number.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "base"
+      },
+      {
+        "id": "jaws",
+        "tool": "loupe",
+        "finding": "The jaws are chewed by years of work but still meet squarely.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "jaws"
+      },
+      {
+        "id": "screw",
+        "tool": "loupe",
+        "finding": "The screw turns smoothly, thick with old grease.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "screw"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Nine kilos of cast iron. You feel it in your back.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_iron",
+        "tool": "magnet",
+        "finding": "The magnet slams onto the body.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "anvil"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cracked_body",
+        "kind": "restored",
+        "valueMultiplier": 0.35,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "base",
+            "tool": "loupe",
+            "finding": "A welded seam across the base, ground down and painted. Cast iron doesn’t forgive.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "base"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "tools"
+    ],
+    "claims": [
+      "From a factory workshop. The factory’s gone. The vice isn’t.",
+      "Kuznets, real cast iron. Nothing like the Chinese ones."
+    ],
+    "model": {
+      "glb": "vice_kuznets.glb",
+      "placeholder": "block",
+      "color": "#3b5a3a",
+      "scale": 0.8,
+      "rest": "upright",
+      "size": [
+        0.3957,
+        0.2851,
+        0.2005
+      ],
+      "inspectDistance": 0.7,
+      "hotspots": [
+        {
+          "id": "jaws",
+          "label": "Jaws",
+          "position": [
+            -0.1298,
+            0.0764,
+            0.0254
+          ]
+        },
+        {
+          "id": "anvil",
+          "label": "Anvil",
+          "position": [
+            0.128,
+            0.0533,
+            0.0241
+          ]
+        },
+        {
+          "id": "screw",
+          "label": "Screw",
+          "position": [
+            -0.187,
+            -0.0199,
+            -0.001
+          ]
+        },
+        {
+          "id": "base",
+          "label": "Base",
+          "position": [
+            -0.0142,
+            -0.0427,
+            0.0949
+          ]
+        }
+      ]
+    }
+  }
+]

@@ -43,6 +43,7 @@ import {
   ACID_FAKE_FALLBACK,
   ACID_FAKE_REACTIONS,
   ACID_GENUINE,
+  ACID_NO_METAL,
   ACID_PURITY_FALLBACK,
   NOTHING_NEW_M2,
   PURITY_MARKS,
@@ -251,6 +252,31 @@ const CONDITION_TEXT: Record<string, Record<Band, string>> = {
     worn: 'Worn flat on the high points, with a few rim knocks.',
     poor: 'Worn smooth, scratched, the date barely legible.',
   },
+  // M6 wave A
+  instruments: {
+    mint: 'Hardly played or well kept: the finish whole, the fittings bright, nothing loose.',
+    good: 'Honest playing wear where hands and chin go; nothing cracked or missing.',
+    worn: 'Worn finish, a few dings, a fitting that wants tightening; it still plays.',
+    poor: 'A crack, a missing part, a stiff action. It needs a repairer before it needs a player.',
+  },
+  tools: {
+    mint: 'Clean, the housing unmarked, the labels sharp. Barely used.',
+    good: 'Dust in the vents and scuffs on the housing; it has done some honest work.',
+    worn: 'Paint worn off the grip, the casing scratched, a sticky switch.',
+    poor: 'Cracked housing, a frayed cord or a bent part. Building-site tired.',
+  },
+  silver: {
+    mint: 'Bright, with only the faintest hairline scratches; the engraving crisp.',
+    good: 'A soft lustre and light wear on the high points; dark tarnish in the recesses.',
+    worn: 'Worn smooth on the edges, a small dent, black tarnish nobody has touched.',
+    poor: 'Bent, dented and scratched deep, the engraving rubbed nearly away.',
+  },
+  antiques: {
+    mint: 'Kept in a cabinet, by the look: no chips, the finish whole.',
+    good: 'Age wear where hands go, a little dust in the crevices; nothing broken.',
+    worn: 'Rubbed gilding, small chips at the edges, a dent or two.',
+    poor: 'A crack, a chip off the rim, a part that does not sit right any more.',
+  },
   icons: {
     mint: 'The paint is whole and the cover bright; it was looked after.',
     good: 'Soot from candles in the corners, a little flaking at the edge.',
@@ -311,6 +337,29 @@ const WEIGHT_SUBJECT: Record<ItemDef['model']['placeholder'], string> = {
   box: 'One like this usually weighs',
   record: 'A pressing like this, in its sleeve, usually weighs',
   book: 'This edition usually weighs',
+  accordion: 'This model usually weighs',
+  balalaika: 'An instrument like this usually weighs',
+  guitar: 'An instrument like this usually weighs',
+  eguitar: 'This model usually weighs',
+  violin: 'A violin like this usually weighs',
+  trumpet: 'This model usually weighs',
+  saxophone: 'This model usually weighs',
+  grinder: 'This model usually weighs',
+  perforator: 'This model usually weighs',
+  chainsaw: 'This model, dry, usually weighs',
+  socketset: 'A full set like this usually weighs',
+  sewing: 'This model usually weighs',
+  spoons: 'A set like this in solid silver usually weighs',
+  glassholder: 'A solid holder this size usually weighs',
+  cups: 'A set like this in solid silver usually weighs',
+  beads: 'A string like this usually weighs',
+  brooch: 'A brooch like this usually weighs',
+  cabochon: 'A pendant like this usually weighs',
+  samovar: 'A samovar like this usually weighs',
+  figurine: 'A figure this size usually weighs',
+  vase: 'A vase this size usually weighs',
+  gramophone: 'A machine like this usually weighs',
+  block: 'One of these usually weighs',
 }
 
 function scaleReading(def: ItemDef, item: ItemInstance, rng: Rng, first: boolean): Omit<Finding, 'id' | 'tool'> {
@@ -361,6 +410,12 @@ function magnetFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Fin
     text = pulls ? 'The whole piece swings toward the magnet.' : 'The piece itself ignores the magnet.'
   } else if (def.category === 'cameras') {
     text = pulls ? 'The magnet catches on steel somewhere inside the body.' : 'Nothing; brass and aluminium all through.'
+  } else if (def.category === 'silver') {
+    text = pulls ? 'It jumps to the magnet and holds on.' : 'No pull at all from the magnet.'
+  } else if (def.category === 'tools') {
+    text = pulls ? 'The magnet clamps onto steel in it.' : 'Hardly a tug anywhere: alloy, brass and plastic.'
+  } else if (def.category === 'instruments') {
+    text = pulls ? 'The magnet catches on steel somewhere: screws, reeds or strings.' : 'Wood, brass and gut: the magnet finds nothing to hold.'
   } else {
     text = pulls ? 'It pulls toward the magnet.' : 'No pull from the magnet.'
   }
@@ -395,6 +450,8 @@ function acidFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Findi
     if (profile.kind === 'fake') return { ...base, text: ACID_FAKE_FALLBACK, polarity: 'negative' }
   }
   const metal = metalOf(def)
+  // M6: amber, pearls and the like sit in the silver category with no metal to scratch.
+  if (metal === 'base' && def.category !== 'coins') return { ...base, text: ACID_NO_METAL, polarity: 'neutral' }
   const text = fill(ACID_GENUINE[metal], { purity: purityOf(def) ?? ACID_PURITY_FALLBACK[metal] })
   return { ...base, text, polarity: metal === 'base' ? 'neutral' : 'positive' }
 }
@@ -481,7 +538,8 @@ export function specialistOpinion(def: ItemDef, item: ItemInstance, sp: CalledSp
 function specialistFinding(def: ItemDef, item: ItemInstance, sp: CalledSpecialist, rng: Rng): Omit<Finding, 'id' | 'tool'> {
   const op = specialistOpinion(def, item, sp, rng)
   const spec = getSpecialist(sp.id)
-  const line = spec ? rng.pick(spec.lines[op.verdict]) : 'The specialist gives a range: {lo}–{hi}.'
+  // M6: a specialist may have their own lines for a category (Zhenya on power tools).
+  const line = spec ? rng.pick(spec.categoryLines?.[def.category]?.[op.verdict] ?? spec.lines[op.verdict]) : 'The specialist gives a range: {lo}–{hi}.'
   const text = fill(line, { lo: rub(op.lo), hi: rub(op.hi), item: def.name })
   const polarity: Polarity = op.verdict === 'sound' ? 'positive' : 'negative'
   return { tellId: SPECIALIST_TELL, text, reveals: 'authenticity', polarity, verdict: op.verdict }

@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { CAST } from '../src/data/customers/cast'
 import { archetypes, femaleFirstNames, firstNames } from '../src/data/customers/walkins'
+import { REGULARS } from '../src/data/regulars'
 import { castPool, genderOf, lookFor, pickLook, regularCast, walkInCast } from '../src/game/customers/look'
 import { generateDayQueue } from '../src/game/customers/walkins'
 import { Rng } from '../src/game/rng'
@@ -113,6 +114,14 @@ describe('looks', () => {
   it('still shows a regular look when a visit names it', () => {
     const reg = regularCast()[0]!
     expect(lookFor({ id: 'r1', name: 'Boris', archetype: 'pensioner', portraitKey: reg.id })).toBe(reg.id)
+  })
+
+  it('gives every authored regular a regular-only look of their own', () => {
+    // The other side of "walk-ins never get a regular look": a regular never wears a walk-in's face.
+    const regularLooks = new Set(regularCast().map((c) => c.id))
+    expect(REGULARS.length).toBeGreaterThan(0)
+    for (const r of REGULARS) expect(regularLooks.has(r.look), `${r.id} look ${r.look}`).toBe(true)
+    expect(new Set(REGULARS.map((r) => r.look)).size).toBe(REGULARS.length)
   })
 
   it('leaves existing walk-in looks as they were before the regular looks were added', () => {

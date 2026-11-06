@@ -18,9 +18,10 @@
  * updateMarket draws from a fork of the day's rng, so adding stories never reshuffles the queue.
  */
 import { ITEM_DEFS } from '../../data/items'
-import { FIRST_DAY, FLAVOUR_NEWS, HINT_ALIAS, HINT_NEWS, HOLIDAY_NEWS, SHOCK_NEWS, type NewsTemplate } from '../../data/news'
+import { FIRST_DAY, FLAVOUR_NEWS, HINT_ALIAS, HINT_NEWS, HOLIDAY_NEWS, SEASON_HINTS, SHOCK_NEWS, type NewsTemplate } from '../../data/news'
 import { tuning } from '../../data/tuning'
-import type { Rng } from '../rng'
+import { floodFactor, floodNews } from '../city/flood'
+import { Rng } from '../rng'
 import { seasonOf, type GameState, type ISODate, type Season } from '../state'
 import type { MarketState, NewsItem } from '../types'
 
@@ -59,10 +60,11 @@ export function holidayFactor(tag: string, date: ISODate): number {
   return k
 }
 
-/** Season × holiday × drift for one tag on the state's calendar day. */
-export function tagFactor(state: Pick<GameState, 'calendar' | 'market'>, tag: string): number {
+/** Season × holiday × drift (× the M6 flood, while it lasts) for one tag on the state's calendar day. */
+export function tagFactor(state: Pick<GameState, 'calendar' | 'market'> & Partial<Pick<GameState, 'meta'>>, tag: string): number {
   const { date } = state.calendar
-  return seasonFactor(tag, seasonOf(date)) * holidayFactor(tag, date) * (state.market.drift[tag] ?? 1)
+  const flood = state.meta ? floodFactor({ meta: state.meta, calendar: state.calendar }, tag) : 1
+  return seasonFactor(tag, seasonOf(date)) * holidayFactor(tag, date) * (state.market.drift[tag] ?? 1) * flood
 }
 
 export function demandMultiplier(state: GameState, tags: readonly string[]): number {
@@ -93,6 +95,25 @@ function applyShock(drift: Record<string, number>, shock: (typeof T.shocks)[numb
 }
 
 // --- news ---------------------------------------------------------------------------------
+
+/**
+ * M6: city flavour comes off a deck shuffled once per career, year and season (its own stream, no
+ * game draws), dealt in order through the season: up to three cards a day, so a story doesn't come
+ * round again until the deck has been through (about a week and a half for thirty stories), and the
+ * next year deals the same season in a different order.
+ */
+function flavourDeck(state: Pick<GameState, 'meta' | 'calendar'>, pool: readonly NewsTemplate[]): { deck: NewsTemplate[]; at: number } {
+  const { date } = state.calendar
+  const season = seasonOf(date)
+  const month = Number(date.slice(5, 7))
+  // The season's first day (winter starts on 1 December of the year before January and February).
+  const year = Number(date.slice(0, 4)) - (season === 'winter' && month <= 2 ? 1 : 0)
+  const startMonth = { winter: 12, spring: 3, summer: 6, autumn: 9 }[season]
+  const start = Date.UTC(year, startMonth - 1, 1)
+  const day = Math.round((Date.parse(`${date}T00:00:00Z`) - start) / 86_400_000)
+  const deck = new Rng(state.meta.seed).fork(`news:deck:${year}:${season}`).shuffle(pool.slice())
+  return { deck, at: day * T.news.storyCountWeights.length }
+}
 
 function toNews(t: NewsTemplate, shopName: string, tags: string[], direction: NewsItem['direction']): NewsItem {
   const fill = (s: string) => s.replaceAll('{shop}', shopName)
@@ -134,10 +155,16 @@ export function updateMarket(state: GameState, rng0: Rng): MarketState {
   }
 
   if (day === 1) add(FIRST_DAY[0], [], 'flat')
+  // M6 the Flood: its story leads the paper while the water is about (src/game/city/flood.ts).
+  const flood = floodNews(state)
+  // Tags no item carries yet (tools: pumps, boots, generators) are left off the hint.
+  const floodTags = (flood?.tags ?? []).filter((t) => DEMAND_TAGS.includes(t))
+  if (flood) add(flood, floodTags, floodTags.length ? (flood.direction ?? 'flat') : 'flat')
   if (shock) add(pickFresh(rng, SHOCK_NEWS[shock.id] ?? [], yesterday), Object.keys(shock.delta), directionOf(shock.delta))
   for (const h of activeHolidays(date)) {
     const firstDay = monthDay(date) === h.from || day === 1
-    if (firstDay || rng.chance(T.news.holidayChance)) add(pickFresh(rng, HOLIDAY_NEWS[h.id] ?? [], yesterday), Object.keys(h.boost), 'up')
+    const tags = Object.keys(h.boost)
+    if (firstDay || rng.chance(T.news.holidayChance)) add(pickFresh(rng, HOLIDAY_NEWS[h.id] ?? [], yesterday), tags, tags.length ? 'up' : 'flat')
   }
   if (news.length < T.news.storyCountWeights.length) {
     // The tag that has wandered furthest, if far enough, gets a hint.
@@ -152,10 +179,16 @@ export function updateMarket(state: GameState, rng0: Rng): MarketState {
       add(pickFresh(rng, hints ? (up ? hints.up : hints.down) : [], yesterday), [best.tag], up ? 'up' : 'down')
     }
   }
+  // M6: a seasonal market note now and then (SEASON_HINTS agree with tuning.demand.seasons; tests check).
+  if (news.length < target && rng.chance(T.news.seasonHintChance)) {
+    const t = pickFresh(rng, SEASON_HINTS[season].filter((h) => !used.has(h.id)), yesterday)
+    if (t) add(t, [...(t.tags ?? [])], t.direction ?? 'flat')
+  }
   const flavour = FLAVOUR_NEWS.filter((t) => !t.seasons || t.seasons.includes(season))
-  while (news.length < target) {
-    const t = pickFresh(rng, flavour.filter((f) => !used.has(f.id)), yesterday)
-    if (!t) break
+  const { deck, at } = flavourDeck(state, flavour)
+  for (let i = 0; news.length < target && i < deck.length; i++) {
+    const t = deck[(at + i) % deck.length]!
+    if (used.has(t.id) || yesterday.has(t.id)) continue
     add(t, [], 'flat')
   }
   return { drift, news: news.slice(0, T.news.storyCountWeights.length) }

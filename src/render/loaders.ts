@@ -1,5 +1,5 @@
 /**
- * Shared glTF loader for item models: Draco geometry and KTX2 (Basis) textures,
+ * Shared glTF loader for item models (and the customer cast): Draco geometry and KTX2 (Basis) textures,
  * decoders served from `${base}assets/decoders/` (copied there by
  * scripts/copy-decoders.mjs). One loader for the whole session so the decoder
  * workers start once; item models are small and come one at a time.
@@ -14,6 +14,8 @@ export type GlbLoader = (file: string) => Promise<THREE.Group>
 
 export interface ItemLoader {
   load: GlbLoader
+  /** The shared Draco/KTX2-ready loader, for other glbs (the customer cast). */
+  gltf: GLTFLoader
   dispose(): void
 }
 
@@ -23,6 +25,7 @@ export function createItemLoader(renderer: THREE.WebGLRenderer, base: string, ve
   const gltf = new GLTFLoader().setDRACOLoader(draco).setKTX2Loader(ktx2)
   return {
     load: async (file) => (await gltf.loadAsync(`${base}assets/items/${file}?v=${version}`)).scene,
+    gltf,
     dispose: () => {
       draco.dispose()
       ktx2.dispose()

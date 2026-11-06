@@ -20,11 +20,14 @@ import ilya from './ilya'
 import stanislav from './stanislav'
 import zhenya from './zhenya'
 
+// M6: the twenty new regulars' small threads, after everything else (lowest beat priority).
+import { THREADS } from './threads'
+
 const SPECIALIST_ARCS = [faina, ilya, gennady, stanislav, zhenya]
 
 // M6 the Flood: its own beats first (a city event; it gets a beat slot on its few days before the
 // others), what people say about it afterwards last.
-export const ARCS: readonly Arc[] = [flood, medals, rolex, laptop, ...SPECIALIST_ARCS, protection, fence, collector, volkova, floodTalk, appraiser].map((raw) => Arc.parse(raw))
+export const ARCS: readonly Arc[] = [flood, medals, rolex, laptop, ...SPECIALIST_ARCS, protection, fence, collector, volkova, floodTalk, appraiser, ...THREADS].map((raw) => Arc.parse(raw))
 
 const beats = new Map<string, Beat>(ARCS.flatMap((a) => a.beats.map((b) => [b.id, b] as const)))
 

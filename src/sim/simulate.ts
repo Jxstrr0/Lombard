@@ -58,6 +58,8 @@ export interface RunResult {
   flags: readonly string[]
   /** M5 Protection, as it played: bricks through the case, glazier visits, insurance paid (₽), crew deliveries bought. */
   crew: { bricks: number; glaziers: number; insurance: number; deliveries: number }
+  /** M6: the appraiser at the end (hired or gone, his record). */
+  staff: GameState['staff']
   /** M6 the Flood: its day, how ready the shop was, pieces the water damaged, the clean-up bill (₽), hero and vulture choices. */
   flood: { day: number; prep: FloodPrep; damaged: number; bill: number; hero: number; vulture: number }
 }
@@ -159,6 +161,7 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
     heat: s.crime.heat,
     pressure: s.crime.pressure,
     flags: s.story.flags,
+    staff: s.staff,
     crew: {
       ...crew,
       deliveries: Object.entries(s.story.arcs.protection?.beats ?? {}).filter(([id, r]) => id.startsWith('protection.delivery') && r.outcome === 'bought').length,

@@ -25,7 +25,7 @@ import type {
 
 export type { ItemInstance } from './types'
 
-export const STATE_VERSION = 8
+export const STATE_VERSION = 9
 
 export type Season = 'winter' | 'spring' | 'summer' | 'autumn'
 export type ISODate = string
@@ -209,6 +209,46 @@ export interface CareerState {
   end: CareerEnd | null
 }
 
+/**
+ * M6 the Appraiser (v9): the one hire the second counter allows (src/game/staff/appraiser.ts,
+ * GDD § 7 Employee). He serves walk-in sellers off the line while you serve yours.
+ */
+export type StaffMode = 'next' | 'categories'
+
+export interface StaffState {
+  /** On staff now. */
+  hired: boolean
+  /** Career day he started (0 = never hired). */
+  sinceDay: number
+  /** How he left, once he has: let go from the office, let go when he told you, or gone in the night. Final. */
+  gone?: 'fired' | 'left' | 'vanished'
+  goneDay?: number
+  /** next: the next walk-in seller while the line is long; categories: only sellers bringing these. */
+  mode: StaffMode
+  categories: string[]
+  /** Added to tuning.appraiser.accuracy by his arc. */
+  accuracyMod: number
+  /** The seller he is serving at the second counter, until the day clock reaches `until`. */
+  busy: { visit: QueuedVisit; until: number } | null
+  /** Pieces he bought today that weren't what he thought: the ledger names them at closing. */
+  pending: { itemId: string; defId: string; price: number; from: string }[]
+  /** Career totals (the office card, the sim, the epilogue). */
+  record: { served: number; bought: number; lent: number; spent: number; fakes: number; insults: number; wages: number }
+}
+
+export function createStaffState(): StaffState {
+  return {
+    hired: false,
+    sinceDay: 0,
+    mode: 'next',
+    categories: [],
+    accuracyMod: 0,
+    busy: null,
+    pending: [],
+    record: { served: 0, bought: 0, lent: 0, spent: 0, fakes: 0, insults: 0, wages: 0 },
+  }
+}
+
 export interface Settings {
   reduceMotion: boolean
   textScale: number
@@ -244,6 +284,8 @@ export interface GameState {
   crime: CrimeState
   /** M5: the ending axes and, once it is over, how the career ended. */
   career: CareerState
+  /** M6 (v9): the appraiser at the second counter. */
+  staff: StaffState
   /**
    * M4: arc progress and story flags (set by beats, read by their conditions).
    * boosts (v6): specialist warnings running ("plated chains turn up more for two weeks").
@@ -330,6 +372,7 @@ export function createInitialState(seed: number, careerId: string): GameState {
     history: [],
     crime: createCrimeState(),
     career: { axes: { clean: 0, heart: 0 }, end: null },
+    staff: createStaffState(),
     story: { arcs: {}, pendingEvents: [], flags: [], boosts: [] },
     reputation: {
       general: 0,

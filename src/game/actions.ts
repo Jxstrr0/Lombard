@@ -51,6 +51,8 @@ import { planBuyers, saleRound, startSale } from './sell/buyer'
 import { placeItem, setPrice } from './shop/display'
 import { removeSold } from './shop/sold'
 import { rollShoplifting } from './shop/theft'
+import { chargeWages, finishShift, fire as fireStaff, hire as hireStaff, setRule as setStaffRule, staffWork } from './staff/appraiser'
+import type { StaffMode } from './state'
 import { addDays, createInitialState, seasonOf, weekdayOf, type GameState, type Settings } from './state'
 import type { Approach, DaySummary, ItemVisit, LedgerEntry, QueuedVisit, VisitOutcome, VisitState } from './types'
 
@@ -90,6 +92,12 @@ export type Action =
   | { type: 'scene/choose'; choiceId: string }
   /** M5: retire from the ledger (from tuning.endings.retireDay; the UI confirms first). Ends the career. */
   | { type: 'career/retire' }
+  /** M6: hire the appraiser (needs the second counter; office, while closed). */
+  | { type: 'staff/hire' }
+  /** M6: let him go (office, while closed; the UI confirms first). Final. */
+  | { type: 'staff/fire' }
+  /** M6: which walk-ins he takes: the overflow, or only some categories. */
+  | { type: 'staff/rule'; mode: StaffMode; categories?: string[] }
 
 /** Action types after which the career is autosaved. */
 export const AUTOSAVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
@@ -107,6 +115,9 @@ export const AUTOSAVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
   'specialist/retain',
   'specialist/release',
   'career/retire',
+  'staff/hire',
+  'staff/fire',
+  'staff/rule',
 ])
 
 /** M5: the only actions an ended career still takes (it can't be played on; GDD § 12). */
@@ -192,6 +203,12 @@ export function reducer(state: GameState, action: Action): GameState {
       return state.day.phase === 'closed' ? syncSpecialistsRep(releaseSpecialist(state, action.id)) : state
     case 'career/begin':
       return beginCareer(state, action.shopName)
+    case 'staff/hire':
+      return state.day.phase === 'closed' ? hireStaff(state) : state
+    case 'staff/fire':
+      return state.day.phase === 'closed' ? fireStaff(state) : state
+    case 'staff/rule':
+      return setStaffRule(state, action.mode, action.categories)
     case 'counter/dismiss': {
       const c = state.current
       if (!c || c.phase !== 'resolved') return state
@@ -383,10 +400,11 @@ function openDay(state: GameState): GameState {
 
 function closeDay(state0: GameState): GameState {
   if (state0.day.phase !== 'open' || state0.current || state0.queue.length > 0) return state0
-  const theft = rollShoplifting(state0)
+  // M6: the appraiser finishes the seller in front of him; the ledger names his mistakes.
+  const theft = rollShoplifting(finishShift(state0))
   // M5 police: heat fades, old police events go, maybe a raid tomorrow; old bulletin lines come off.
   // M5: rent night after the bills: the landlord's notice, or eviction (src/game/endings/eviction.ts).
-  const eviction = checkEviction(pruneBulletin(rollRaid(heatNight(syncSpecialistsRep(chargeExpenses(theft.state))))))
+  const eviction = checkEviction(pruneBulletin(rollRaid(heatNight(syncSpecialistsRep(chargeWages(chargeExpenses(theft.state)))))))
   const state = eviction.state
   const log = state.day.log
   const sum = (kind: LedgerEntry['kind']) => log.filter((e) => e.kind === kind).reduce((a, e) => a + e.amount, 0)
@@ -431,8 +449,11 @@ function lullRng(state: GameState, label: string): Rng {
  * standing in line (the queue's patience doesn't drain), and the next person
  * walks in once the lull is over. Nothing happens before the paper is read.
  */
-function lullTick(state: GameState, seconds: number): GameState {
-  if (state.queue.length === 0 || !state.day.newsRead) return state
+function lullTick(state0: GameState, seconds: number): GameState {
+  if (!state0.day.newsRead) return state0
+  // M6: the appraiser works through the lull too (and runs the clock while he finishes the last seller).
+  const state = staffWork(state0, seconds)
+  if (state.queue.length === 0) return state.staff.busy || state !== state0 ? { ...state, day: { ...state.day, clock: state.day.clock + seconds } } : state
   const clock = state.day.clock + seconds
   const next: GameState = { ...state, day: { ...state.day, clock } }
   return clock >= (state.day.nextArrival ?? 0) ? nextCustomer(next) : next
@@ -699,8 +720,10 @@ function sceneItemLine(c: ItemVisit): string {
 }
 
 /** Advance in-game time while a customer is at the counter; waiting customers lose patience. */
-function advanceTime(state: GameState, seconds: number): GameState {
-  if (seconds <= 0) return state
+function advanceTime(state0: GameState, seconds: number): GameState {
+  if (seconds <= 0) return state0
+  // M6: the appraiser at the second counter works while time passes (he may take someone off the line).
+  const state = staffWork(state0, seconds)
   const stay: typeof state.queue = []
   const gone: typeof state.queue = []
   for (const v of state.queue) {

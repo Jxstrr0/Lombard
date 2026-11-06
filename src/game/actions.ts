@@ -32,6 +32,7 @@ import { haggleRound, startHaggle, type HaggleContext } from './haggle/machine'
 import { payForTool, toolExtras } from './inspect/available'
 import { SPECIALIST_TELL, useTool } from './inspect/tools'
 import { amountDue, createLoan, forfeitOverdue, pawnClaim, planRedemptions } from './loans/loans'
+import { axesAfterDeal } from './endings/axes'
 import { patienceRepFactor, repAfterDeal, repAfterInsult, repAfterRedeem, repAfterSale, repAfterWalkout, syncSpecialistsRep } from './reputation'
 import { Rng } from './rng'
 import type { ToolId } from './schema/item'
@@ -515,7 +516,7 @@ function buy(state: GameState, price: number, line?: string): GameState {
     },
   }
   // M4 specialist arcs: a missed call, a lowball, or Gennady's first refusal on what you just bought.
-  return resolve(noteBought(repAfterDeal(next, c.customer, c.item, price, 'buy'), c.item), 'bought', line ?? visitLines.thanks[0], {
+  return resolve(noteBought(axesAfterDeal(repAfterDeal(next, c.customer, c.item, price, 'buy'), c.customer, c.item, price, 'buy'), c.item), 'bought', line ?? visitLines.thanks[0], {
     kind: 'buy',
     amount: -price,
     text: `Bought ${def.name} from ${c.customer.name}`,
@@ -538,7 +539,7 @@ function pawn(state: GameState, principal: number, line?: string): GameState {
       cash: s.cash - principal,
       loans: [...s.loans, loan],
     }
-    return resolve(repAfterDeal(next, c.customer, c.item, principal, 'pawn'), 'pawned', line ?? pickLine('pawn.thanks', rng, { name: c.customer.name, item: def.name }), {
+    return resolve(axesAfterDeal(repAfterDeal(next, c.customer, c.item, principal, 'pawn'), c.customer, c.item, principal, 'pawn'), 'pawned', line ?? pickLine('pawn.thanks', rng, { name: c.customer.name, item: def.name }), {
       kind: 'loan',
       amount: -principal,
       text: `Lent ${rub(principal)} on ${def.name} to ${c.customer.name}`,

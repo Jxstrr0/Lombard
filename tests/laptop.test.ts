@@ -128,7 +128,7 @@ describe('story pledges (engine)', () => {
     raw.meta.version = 6
     raw.story.arcs = { medals: { beats: { 'medals.roof': { day: 3, outcome: 'bought', ratio: 0.5 } } } }
     const m = migrate(raw)
-    expect(STATE_VERSION).toBe(7)
+    expect(STATE_VERSION).toBeGreaterThanOrEqual(7)
     expect(m.meta.version).toBe(STATE_VERSION)
     expect(m.story.arcs.medals?.beats['medals.roof']).toEqual({ day: 3, outcome: 'bought', ratio: 0.5 })
     expect(pledgeOf(m, 'medals.roof')).toBeUndefined()

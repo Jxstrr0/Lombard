@@ -6,8 +6,10 @@
  * Used by scripts/sim.mjs (`npm run sim`, a printed report for tuning) and by
  * tests/sim.test.ts (the M2 done criteria).
  */
+import { vandalismLines } from '../data/vandalismLines'
 import { reducer, type Action } from '../game/actions'
 import { createInitialState, type GameState } from '../game/state'
+import { recordBeat } from '../game/story/progress'
 import type { Policy } from './policies'
 
 export interface DayPoint {
@@ -39,6 +41,29 @@ export interface RunResult {
   axes: GameState['career']['axes']
   /** Actions dispatched (sanity: guards against a stuck policy). */
   steps: number
+  /** M5: how the career ended (the run stops that day), or null. */
+  end: GameState['career']['end']
+  /** M5: the crime dials (also in `crime`) and the story flags at the end (who paid, who held out). */
+  heat: number
+  pressure: number
+  flags: readonly string[]
+  /** M5 Protection, as it played: bricks through the case, glazier visits, insurance paid (₽), crew deliveries bought. */
+  crew: { bricks: number; glaziers: number; insurance: number; deliveries: number }
+}
+
+export interface SimOptions {
+  /**
+   * M5: the Protection arc's ladder for refusers (the brick, the landlord, pushed out). On by
+   * default. Off, the career starts with the ladder's first rung (protection.properly) marked
+   * as already past, so no rung after the bakery story ever comes; the game's rules are
+   * unchanged. The M2 trading band (tests/sim.test.ts) measures the trade with it off.
+   */
+  protectionLadder?: boolean
+}
+
+/** The ladder's first rung, recorded as past before day 1 (see SimOptions.protectionLadder). */
+export function holdOffLadder(s: GameState): GameState {
+  return recordBeat(s, 'protection.properly', { day: 0, outcome: 'left', choice: 'sim:held_off' })
 }
 
 const MAX_STEPS_PER_DAY = 2_000
@@ -49,8 +74,10 @@ export function worthOf(s: GameState): number {
   return s.cash + stock + lent
 }
 
-export function simulate(seed: number, policy: Policy, days: number): RunResult {
+export function simulate(seed: number, policy: Policy, days: number, options: SimOptions = {}): RunResult {
   let s = reducer(createInitialState(seed, `sim-${seed}`), { type: 'career/begin', shopName: '' })
+  if (options.protectionLadder === false) s = holdOffLadder(s)
+  const crew = { bricks: 0, glaziers: 0, insurance: 0, deliveries: 0 }
   const ctx = policy.start(s)
   const points: DayPoint[] = []
   let bustDay: number | null = null
@@ -75,12 +102,40 @@ export function simulate(seed: number, policy: Policy, days: number): RunResult 
       policy.after?.(s, action, ctx)
       if (s.calendar.day !== day) break // day/close advanced the calendar
     }
+    // The day's ledger (the brick and the glazier land in the morning's log, insurance at closing).
+    for (const e of s.day.log) {
+      if (e.text === vandalismLines.brick.found) crew.bricks++
+      else if (e.text === vandalismLines.brick.glazier) crew.glaziers++
+      else if (e.kind === 'expense' && e.text.startsWith('Insurance')) crew.insurance -= e.amount
+    }
     const worth = worthOf(s)
     points.push({ day, cash: s.cash, worth })
     if (bustDay === null && worth < 0) bustDay = day
+    if (s.career.end) break // M5: a forced ending (pushed out, say): nothing more to play.
   }
   const minCash = Math.min(...points.map((p) => p.cash))
-  return { seed, policy: policy.name, days: points, bustDay, minCash, finalCash: s.cash, finalWorth: worthOf(s), stats: s.stats, customers: s.customers, crime: s.crime, axes: s.career.axes, steps }
+  return {
+    seed,
+    policy: policy.name,
+    days: points,
+    bustDay,
+    minCash,
+    finalCash: s.cash,
+    finalWorth: worthOf(s),
+    stats: s.stats,
+    customers: s.customers,
+    crime: s.crime,
+    steps,
+    end: s.career.end,
+    axes: s.career.axes,
+    heat: s.crime.heat,
+    pressure: s.crime.pressure,
+    flags: s.story.flags,
+    crew: {
+      ...crew,
+      deliveries: Object.entries(s.story.arcs.protection?.beats ?? {}).filter(([id, r]) => id.startsWith('protection.delivery') && r.outcome === 'bought').length,
+    },
+  }
 }
 
 /** Compound growth per 30 days of `worth`, from the start of the run to its end. */

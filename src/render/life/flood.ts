@@ -4,9 +4,8 @@
  * morning until it dries.
  *
  * Two draws at most, built in code (nothing to download): the sandbags are one InstancedMesh of a
- * squashed low-poly sphere; the water is one floor quad with a procedural soft-edged mask, a
- * glossy standard material so the room's environment map gives it a sheen (no real-time
- * reflections, no extra lights). Hidden entirely outside the flood's days.
+ * squashed low-poly sphere; the water is one floor quad with a procedural soft-edged mask that
+ * darkens the parquet (no real-time reflections, no extra lights). Hidden entirely outside the flood's days.
  */
 import * as THREE from 'three'
 import type { FloodPhase, FloodPrep } from '../../game/city/flood'
@@ -22,8 +21,6 @@ const LOOK = {
     sandbags: { rect: [1.0, 2.5, 2.9, 3.6], opacity: 0.45 },
   } satisfies Record<FloodPrep, { rect: number[]; opacity: number }>,
   colour: 0x050403,
-  /** How much of the room's environment map the water's surface shows (a sheen, not a mirror). */
-  sheen: 0.12,
   /** Opacity × this through the phases after the flood morning (receding, drying); then gone. */
   fade: { flood: 1, receding: 0.75, drying: 0.35 } as Partial<Record<FloodPhase, number>>,
 }
@@ -31,7 +28,7 @@ const LOOK = {
 export class FloodInside {
   readonly group = new THREE.Group()
   private readonly bags: THREE.InstancedMesh
-  private readonly water: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>
+  private readonly water: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>
   private readonly mask: THREE.DataTexture
   private key = ''
 
@@ -67,11 +64,10 @@ export class FloodInside {
     this.mask = puddleMask(64)
     this.water = new THREE.Mesh(
       new THREE.PlaneGeometry(1, 1),
-      new THREE.MeshStandardMaterial({
+      // Wet parquet reads darker; the baked room has no light for a glossy material to catch, so the
+      // water darkens the floor under a soft mask rather than shining (a sheen read as a white sheet).
+      new THREE.MeshBasicMaterial({
         color: LOOK.colour,
-        roughness: 0.25,
-        metalness: 0,
-        envMapIntensity: LOOK.sheen,
         transparent: true,
         alphaMap: this.mask,
         depthWrite: false,

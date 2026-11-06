@@ -13,6 +13,10 @@
  *   pawner redeeming       → redeem (until resolved)
  *   otherwise              → counter (incl. the resolved outcome + Next)
  *
+ * Before any of that, the title screen (M4): Ui starts in 'title' mode with
+ * every game screen hidden; main switches it to 'game' once a slot is picked
+ * and back from Settings → Main menu. body[data-screen] reads 'title' then.
+ *
  * Between days (the ledger) a quiet banner may suggest a backup: once per
  * session, only with a finished day behind you, when there has never been a
  * backup on this device or the last one is 14+ days old.
@@ -35,6 +39,8 @@ import { OfferScreen } from './screens/offer'
 import { RedeemScreen } from './screens/redeem'
 import { SaleScreen } from './screens/sale'
 import { SettingsSheet, type GraphicsInfo, type GraphicsChoice } from './screens/settings'
+import { TitleScreen, type TitleDeps } from './screens/title'
+import type { SlotView } from '../game/save/slots'
 import { ShopSheet } from './screens/shop'
 import { WelcomeScreen } from './screens/welcome'
 
@@ -60,8 +66,14 @@ export function screenFor(state: GameState, arrived = true): ScreenId {
 export interface UiDeps {
   store: Store
   replaceState(state: GameState): void
-  newCareer(): void
+  /** Settings → Main menu: save, then show the title screen. */
+  mainMenu(): void
+  /** "Slot 2", or null for an unsaved review career. */
+  slotLabel(): string | null
   setReduceMotion(on: boolean): void
+  setTextScale(scale: number): void
+  /** Title screen actions (main does the storage work). */
+  title: Omit<TitleDeps, 'openSettings'>
   /** Device sound settings (not part of the career). */
   getSound(): SoundSettings
   setSound(patch: Partial<SoundSettings>): void
@@ -97,6 +109,8 @@ export class Ui {
   private readonly shop: ShopSheet
   private readonly screens: Record<ScreenId, { root: HTMLElement }>
   private current: ScreenId | null = null
+  readonly title: TitleScreen
+  private _mode: 'title' | 'game' = 'title'
   private lastLayout: UiLayout | null = null
   private build!: HTMLElement
   /** False while the current customer is still walking to the counter. */
@@ -136,8 +150,10 @@ export class Ui {
       getState: () => deps.store.get(),
       dispatch,
       replaceState: deps.replaceState,
-      newCareer: deps.newCareer,
+      mainMenu: deps.mainMenu,
+      slotLabel: deps.slotLabel,
       setReduceMotion: deps.setReduceMotion,
+      setTextScale: deps.setTextScale,
       getSound: deps.getSound,
       setSound: deps.setSound,
       getGraphics: deps.getGraphics,
@@ -159,6 +175,8 @@ export class Ui {
       mount.appendChild(s.root)
     }
     mount.appendChild(this.hud.root)
+    this.title = new TitleScreen({ ...deps.title, openSettings: () => this.settings.open(undefined, 'title') })
+    mount.appendChild(this.title.root)
     mount.appendChild(this.shop.root)
     mount.appendChild(this.settings.root)
     mount.appendChild(this.office.root)
@@ -198,6 +216,34 @@ export class Ui {
     this.build.textContent = `${__BUILD_SHA__} · ${__BUILD_DATE__} · ${text}`
   }
 
+  get mode(): 'title' | 'game' {
+    return this._mode
+  }
+
+  /** Title screen over the dimmed shop: hide every game screen and sheet. */
+  showTitle(slots: SlotView[]): void {
+    this._mode = 'title'
+    if (this.current) this.screens[this.current].root.hidden = true
+    this.current = null
+    this.hud.root.hidden = true
+    this.shop.close()
+    this.office.close()
+    this.settings.close()
+    this.reminder.hidden = true
+    this.title.render(slots)
+    this.title.root.hidden = false
+    document.body.dataset.screen = 'title'
+    this.onScreenChange?.('counter')
+  }
+
+  /** Back to the game screens for the store's (newly loaded) career. */
+  showGame(): void {
+    this._mode = 'game'
+    this.title.closeLoad()
+    this.title.root.hidden = true
+    this.render(this.deps.store.get(), null)
+  }
+
   /** Same, without rendering (main renders right after). */
   setCustomerArrivedQuiet(arrived: boolean): void {
     this.arrived = arrived
@@ -214,6 +260,10 @@ export class Ui {
   render(state: GameState, prev: GameState | null): void {
     document.documentElement.style.setProperty('--text-scale', String(state.settings.textScale))
     document.documentElement.classList.toggle('reduce-motion', state.settings.reduceMotion)
+    if (this._mode === 'title') {
+      if (this.settings.isOpen) this.settings.render(state)
+      return
+    }
     const id = screenFor(state, this.arrived)
     const changed = id !== this.current
     if (id !== this.current) {
@@ -334,6 +384,13 @@ export class Ui {
     if (this.settings.isOpen) {
       if (k === 'Escape') {
         this.settings.close()
+        return true
+      }
+      return false
+    }
+    if (this._mode === 'title') {
+      if (k === 'Escape' && this.title.loadOpen) {
+        this.title.closeLoad()
         return true
       }
       return false

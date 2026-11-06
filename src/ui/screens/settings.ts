@@ -1,8 +1,12 @@
 /**
  * Settings sheet (Longlight palette): save code copy/load, backup files,
- * new career, sound and ambience level, graphics quality, reduce motion, text
- * size. Loading a code (pasted or from a file) and starting over both ask for
- * confirmation inline (no browser dialogs).
+ * main menu, sound and ambience level, graphics quality, reduce motion, text
+ * size. Loading a code (pasted or from a file) asks for confirmation inline (no
+ * browser dialogs).
+ *
+ * From the title screen (M4) it opens in 'title' mode: only the device
+ * settings (sound, graphics, comfort); the save code and main menu need a career.
+ * New careers start from a slot on the title screen.
  */
 import type { SoundSettings } from '../../audio/settings'
 import { AMBIENCE_LEVELS } from '../../data/audio'
@@ -16,12 +20,16 @@ import { rub } from '../format'
 export interface SettingsDeps {
   getState(): GameState
   dispatch(a: Action): void
-  /** Swap in a loaded career (main also autosaves it). */
+  /** Swap in a loaded career, replacing the one in this slot (main also autosaves it). */
   replaceState(state: GameState): void
-  /** Start a fresh career (main generates the seed and careerId). */
-  newCareer(): void
+  /** Save, then back to the title screen and the career slots. */
+  mainMenu(): void
+  /** "Slot 2" for a career in a slot, null for an unsaved review career (?seed). */
+  slotLabel(): string | null
   /** Persist and apply the reduce-motion override. */
   setReduceMotion(on: boolean): void
+  /** Persist and apply the text size (a device setting). */
+  setTextScale(scale: number): void
   /** Device sound settings (localStorage, not the career). */
   getSound(): SoundSettings
   setSound(patch: Partial<SoundSettings>): void
@@ -69,8 +77,9 @@ export class SettingsSheet {
   private loadConfirm: HTMLElement
   private loadConfirmText: HTMLElement
   private pending: GameState | null = null
-  private newConfirm: HTMLElement
-  private newConfirmText: HTMLElement
+  private careerSections: HTMLElement[]
+  private menuText: HTMLElement
+  private loadText: HTMLElement
   private motion: HTMLButtonElement
   private sound: HTMLButtonElement
   private ambience: HTMLButtonElement[] = []
@@ -125,7 +134,9 @@ export class SettingsSheet {
     copySec.append(copyActions, this.copyStatus, this.manual, this.backupLine, this.storageLine)
 
     // --- save code: load
-    const loadSec = this.section('Load save code', 'Paste a code from another device. It replaces the career on this one.')
+    const loadSec = this.section('Load save code', '')
+    this.loadText = el('p', 'settings-text')
+    loadSec.append(this.loadText)
     this.loadInput = el('textarea', 'code-box')
     this.loadInput.dataset.id = 'code-input'
     this.loadInput.rows = 3
@@ -156,28 +167,20 @@ export class SettingsSheet {
     this.loadConfirm.append(this.loadConfirmText, loadActions)
     loadSec.append(this.loadInput, this.loadError, loadRow, this.fileInput, this.loadConfirm)
 
-    // --- new career
-    const newSec = this.section('New career', 'Start over on Day 1 with a new shop.')
-    const newBtn = createButton({ id: 'new-career', label: 'New career', onPress: () => this.askNew() })
-    this.newConfirm = el('div', 'confirm')
-    this.newConfirm.hidden = true
-    this.newConfirmText = el('p', '')
-    const newActions = el('div', 'actions')
-    newActions.append(
-      createButton({ id: 'new-cancel', label: 'Cancel', onPress: () => (this.newConfirm.hidden = true) }),
-      createButton({
-        id: 'new-confirm',
-        label: 'Start over',
-        variant: 'danger',
-        onPress: () => {
-          this.newConfirm.hidden = true
-          this.deps.newCareer()
-          this.close()
-        },
-      }),
-    )
-    this.newConfirm.append(this.newConfirmText, newActions)
-    newSec.append(newBtn, this.newConfirm)
+    // --- main menu (M4)
+    const menuSec = this.section('Main menu', '')
+    this.menuText = el('p', 'settings-text')
+    const menuBtn = createButton({
+      id: 'main-menu',
+      label: 'Main menu',
+      icon: 'back',
+      onPress: () => {
+        this.close()
+        this.deps.mainMenu()
+      },
+    })
+    menuSec.append(this.menuText, menuBtn)
+    this.careerSections = [copySec, loadSec, menuSec]
 
     // --- sound
     const soundSec = this.section('Sound', '')
@@ -249,14 +252,14 @@ export class SettingsSheet {
       b.dataset.id = `text-${Math.round(s.value * 100)}`
       b.setAttribute('role', 'radio')
       b.style.fontSize = `${s.value}rem`
-      b.addEventListener('click', () => this.deps.dispatch({ type: 'settings/set', patch: { textScale: s.value } }))
+      b.addEventListener('click', () => this.deps.setTextScale(s.value))
       this.sizes.push(b)
       sizeRow.append(b)
     }
     comfort.append(this.motion, sizeLabel, sizeRow)
 
     const foot = el('p', 'settings-foot', `Lombard · build ${__BUILD_SHA__} · ${__BUILD_DATE__} · A Longlight Interactive game`)
-    sheet.append(head, copySec, loadSec, newSec, soundSec, gfxSec, comfort, foot)
+    sheet.append(head, copySec, loadSec, menuSec, soundSec, gfxSec, comfort, foot)
     root.append(sheet)
     this.root = root
     this.sheet = sheet
@@ -266,13 +269,24 @@ export class SettingsSheet {
     return !this.root.hidden
   }
 
-  open(onClose?: () => void): void {
+  open(onClose?: () => void, mode: 'game' | 'title' = 'game'): void {
     this.onClose = onClose ?? null
+    for (const sec of this.careerSections) sec.hidden = mode === 'title'
+    const slot = this.deps.slotLabel()
+    setText(
+      this.loadText,
+      slot
+        ? `Paste a code from another device. It replaces the career in ${slot}.`
+        : 'Paste a code from another device. It replaces this test career (not saved).',
+    )
+    setText(
+      this.menuText,
+      slot ? `Back to the title screen and your careers. This shop is saved in ${slot}.` : 'Back to the title screen. This test career (?seed) is not saved.',
+    )
     this.copyStatus.textContent = ''
     this.manual.hidden = true
     this.loadError.textContent = ''
     this.cancelLoad()
-    this.newConfirm.hidden = true
     this.render(this.deps.getState())
     this.refreshSafety()
     this.root.hidden = false
@@ -447,11 +461,5 @@ export class SettingsSheet {
     this.deps.replaceState(s)
     void keepStorage()
     this.close()
-  }
-
-  private askNew(): void {
-    const cur = this.deps.getState()
-    this.newConfirmText.textContent = `Start over? Your current shop (Day ${cur.calendar.day}, ${rub(cur.cash)}) will be gone unless you copied its save code.`
-    this.newConfirm.hidden = false
   }
 }

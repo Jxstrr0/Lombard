@@ -13,6 +13,8 @@ import { titleOf, type TitleId } from '../game/endings/title'
 import { isPoliceVisit } from '../game/crime/volkova'
 import { createInitialState, type GameState } from '../game/state'
 import { recordBeat } from '../game/story/progress'
+import { floodDay, floodPrep, floodRecord, type FloodPrep } from '../game/city/flood'
+import { FLOOD_LOG } from '../data/flood'
 import type { Policy } from './policies'
 
 export interface DayPoint {
@@ -56,6 +58,8 @@ export interface RunResult {
   flags: readonly string[]
   /** M5 Protection, as it played: bricks through the case, glazier visits, insurance paid (₽), crew deliveries bought. */
   crew: { bricks: number; glaziers: number; insurance: number; deliveries: number }
+  /** M6 the Flood: its day, how ready the shop was, pieces the water damaged, the clean-up bill (₽), hero and vulture choices. */
+  flood: { day: number; prep: FloodPrep; damaged: number; bill: number; hero: number; vulture: number }
 }
 
 export interface SimOptions {
@@ -85,6 +89,9 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
   let s = reducer(createInitialState(seed, `sim-${seed}`), { type: 'career/begin', shopName: '' })
   if (options.protectionLadder === false) s = holdOffLadder(s)
   const crew = { bricks: 0, glaziers: 0, insurance: 0, deliveries: 0 }
+  const flood = { damaged: 0, bill: 0 }
+  const billHead = FLOOD_LOG.bill.slice(0, FLOOD_LOG.bill.indexOf('{'))
+  const damageHead = FLOOD_LOG.damaged.slice(0, FLOOD_LOG.damaged.indexOf('{'))
   const ctx = policy.start(s)
   const points: DayPoint[] = []
   let bustDay: number | null = null
@@ -119,6 +126,8 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
       if (e.text === vandalismLines.brick.found) crew.bricks++
       else if (e.text === vandalismLines.brick.glazier) crew.glaziers++
       else if (e.kind === 'expense' && e.text.startsWith('Insurance')) crew.insurance -= e.amount
+      else if (e.kind === 'expense' && e.text.startsWith(billHead)) flood.bill -= e.amount
+      else if (e.kind === 'story' && e.text.startsWith(damageHead)) flood.damaged++
     }
     const worth = worthOf(s)
     points.push({ day, cash: s.cash, worth })
@@ -154,6 +163,7 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
       ...crew,
       deliveries: Object.entries(s.story.arcs.protection?.beats ?? {}).filter(([id, r]) => id.startsWith('protection.delivery') && r.outcome === 'bought').length,
     },
+    flood: { day: floodDay(seed), prep: floodPrep(s), ...flood, ...floodRecord(s) },
   }
 }
 

@@ -28,6 +28,10 @@
  * the icon in stock and him first in line with the hatbox (sell / return / police).
  * M5 Volkova's arc: ?scenario=volkova-intro (her courtesy call), and beats first in line (BEAT_SCENARIOS): volkova-father,
  * volkova-source, volkova-stakeout, volkova-short, volkova-personal, volkova-inform, volkova-leak, volkova-icon, stanislav-icon.
+ * M6 the Flood and the seasons of news (src/game/city/review.ts): ?scenario=flood-warning (Kuzmich and his sandbags,
+ * three days before the water), ?scenario=flood[&prep=none|sandbags|lifted] (the flood morning, Arkady and his pump),
+ * ?scenario=flood-after (the water going down, Nina Arkadyevna's things); ?scenario=paper[&on=MM-DD|YYYY-MM-DD] opens
+ * that morning's paper (default the first day of school).
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
@@ -69,6 +73,7 @@ import { getRegular } from './data/regulars'
 import { getBeat } from './data/stories'
 import { createInitialState, type CareerEndKind, type GameState } from './game/state'
 import { endingReview, lateCareer } from './game/endings/review'
+import { floodReview, paperReview } from './game/city/review'
 import type { EndingStep } from './ui/screens/ending'
 import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
@@ -451,6 +456,14 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'item') initial = itemScenario(initial, params.get('item'))
     if (params.get('scenario') === 'collector') initial = collectorScenario(initial)
     if (params.get('scenario') === 'collector-offer') initial = collectorOfferScenario(initial)
+    // M6 the Flood and the seasons of news (src/game/city/review.ts).
+    const floodStep = { 'flood-warning': 'warning', flood: 'flood', 'flood-after': 'after' } as const
+    const floodKey = params.get('scenario') as keyof typeof floodStep | null
+    if (floodKey && floodKey in floodStep) {
+      const prep = params.get('prep')
+      initial = floodReview(seedParam, initial.meta.careerId, floodStep[floodKey], prep === 'sandbags' || prep === 'lifted' ? prep : 'none')
+    }
+    if (params.get('scenario') === 'paper') initial = paperReview(seedParam, initial.meta.careerId, params.get('on'))
     const regular = params.get('regular')
     if (regular) {
       const trust = params.has('trust') ? Number(params.get('trust')) : NaN

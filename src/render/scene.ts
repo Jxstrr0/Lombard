@@ -14,7 +14,8 @@ import * as THREE from 'three'
 import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
 import type { GameState } from '../game/state'
 import { loadCanalBackdrop, type CanalBackdrop } from './backdrop'
-import { loadBakedShop, type BakedShop, type ShopManifest } from './bakedShop'
+import { loadBakedShop, type BakedProgress, type BakedShop, type ShopManifest } from './bakedShop'
+import type { OnBytes } from './loadProgress'
 import { INSPECT_POINT } from './camera'
 import { lookFor } from '../game/customers/look'
 import type { CustomerCast, CustomerModel } from './customerModel'
@@ -36,6 +37,8 @@ interface LightRig {
 
 export interface SceneOptions {
   envUrl: string
+  /** Byte progress of the HDRI download (the loading screen's bar). */
+  onProgress?: OnBytes
 }
 
 /** Customer silhouette opacity behind the item in inspect view (presentation only). */
@@ -115,7 +118,7 @@ export class ShopScene {
 
   /** Load the HDRI and set it as the scene environment (reflections + ambient). */
   async loadEnvironment(renderer: THREE.WebGLRenderer, opts: SceneOptions): Promise<void> {
-    const hdr = await new HDRLoader().loadAsync(opts.envUrl)
+    const hdr = await new HDRLoader().loadAsync(opts.envUrl, opts.onProgress)
     hdr.mapping = THREE.EquirectangularReflectionMapping
     const pmrem = new THREE.PMREMGenerator(renderer)
     const env = pmrem.fromEquirectangular(hdr).texture
@@ -130,9 +133,9 @@ export class ShopScene {
    * Swap the grey box for the baked shop. Resolves to the bake manifest, or
    * null if there is no bake yet (the grey box stays).
    */
-  async loadBaked(renderer: THREE.WebGLRenderer, base: string): Promise<ShopManifest | null> {
+  async loadBaked(renderer: THREE.WebGLRenderer, base: string, progress?: BakedProgress): Promise<ShopManifest | null> {
     try {
-      const baked = await loadBakedShop(renderer, base)
+      const baked = await loadBakedShop(renderer, base, progress)
       this.baked = baked
       this.scene.add(baked.group)
       this.scene.remove(this.room)

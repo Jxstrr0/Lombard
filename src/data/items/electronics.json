@@ -1,0 +1,84 @@
+[
+  {
+    "id": "laptop_tosaki_orbita_c40",
+    "category": "electronics",
+    "name": "Tosaki Orbita C40 laptop",
+    "brand": "Tosaki",
+    "era": "2013",
+    "baseValue": { "min": 11000, "max": 16000 },
+    "valueCurve": "linear",
+    "weightGrams": { "expected": 2100, "tolerance": 60 },
+    "magnetic": true,
+    "rarity": 1.2,
+    "fakeChance": 0.3,
+    "tells": [
+      { "id": "serial", "tool": "loupe", "finding": "The rating sticker underneath is crisp, and its serial matches the one printed in the battery bay.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "serial" },
+      { "id": "keyboard", "tool": "loupe", "finding": "W, A, S, D and the space bar are worn shiny, and the palm rest is worn the same: honest, even use.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "keyboard" },
+      { "id": "hinge", "tool": "loupe", "finding": "The lid stays wherever it's put, no wobble. Light scuffs on the hinge barrel.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.35, "hotspot": "hinge" },
+      { "id": "ports", "tool": "loupe", "finding": "The charging socket grips the plug snugly; the ports beside it are clean and straight.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "ports" },
+      { "id": "screen", "tool": "loupe", "finding": "The screen sits evenly in its bezel, the rubber bumpers all present.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "screen" },
+      { "id": "logo", "tool": "loupe", "finding": "TOSAKI on the lid is inlaid metal, the letters crisp and flush.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "logo" },
+      { "id": "heft", "tool": "scale", "finding": "About right for a 14-inch machine, the weight sitting at the back over the battery.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3 },
+      { "id": "magnet_lid", "tool": "magnet", "finding": "Held to the palm rest, the magnet puts the screen to sleep: the lid sensor works.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.35, "hotspot": "keyboard" }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "swapped_parts",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.6,
+        "weight": 2,
+        "tells": [
+          { "id": "serial", "tool": "loupe", "finding": "The hatch screws beside the sticker are chewed, and the warranty seal over one has been slit.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "serial" },
+          { "id": "spec", "tool": "loupe", "finding": "Through the hatch vent, the drive's label reads 250 GB. The palm-rest sticker promises 500.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "serial" }
+        ]
+      },
+      {
+        "id": "refurb_keyboard_screen",
+        "kind": "restored",
+        "valueMultiplier": 0.6,
+        "weight": 1.5,
+        "tells": [
+          { "id": "keyboard", "tool": "loupe", "finding": "The keys are crisp and matte like new, yet the palm rest beside them is worn pale.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "keyboard" },
+          { "id": "screen", "tool": "loupe", "finding": "One corner of the bezel sits a hair proud, and the screen looks bluer than the lid's age suggests.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "screen" }
+        ]
+      },
+      {
+        "id": "aftermarket_battery",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.7,
+        "weight": 1.2,
+        "weightFactor": 0.88,
+        "tells": [
+          { "id": "heft", "tool": "scale", "finding": "Light at the back, where the battery should give it weight.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3 },
+          { "id": "battery", "tool": "loupe", "finding": "The battery label is blurry, with no maker's name, and claims 2,200 mAh against the 4,400 on the bay.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "battery" },
+          { "id": "charger", "tool": "loupe", "finding": "The charger with it is a no-name brick rated 40 W. The sticker underneath asks for 65.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35 },
+          { "id": "ports", "tool": "loupe", "finding": "The charging socket is loose and scorched brown round the rim.", "reveals": "condition", "polarity": "negative", "difficulty": 0.45, "hotspot": "ports" }
+        ]
+      }
+    ],
+    "demandTags": ["electronics", "laptops"],
+    "claims": [
+      "It's my study laptop. I need it back before the exams, I'm only borrowing against it.",
+      "Bought it last September, before term. It's barely a year old.",
+      "The charger's in the bag. It's the original. I think it's the original.",
+      "All my coursework is on it. No, I'm joking, I deleted it. Mostly."
+    ],
+    "model": {
+      "glb": "laptop_tosaki_orbita_c40.glb",
+      "placeholder": "laptop",
+      "rest": "upright",
+      "color": "#6a2131",
+      "scale": 1,
+      "inspectDistance": 0.95,
+      "hotspots": [
+        { "id": "screen", "label": "Screen", "position": [0, 0.0224, -0.1106] },
+        { "id": "keyboard", "label": "Keyboard", "position": [-0.0601, -0.0909, 0.0309] },
+        { "id": "hinge", "label": "Hinge", "position": [0.12, -0.0897, -0.0673] },
+        { "id": "ports", "label": "Ports (left side)", "position": [-0.168, -0.107, -0.0235] },
+        { "id": "serial", "label": "Rating sticker (underneath)", "position": [-0.075, -0.1176, 0.1] },
+        { "id": "battery", "label": "Battery (underneath)", "position": [0.04, -0.1176, -0.0466] },
+        { "id": "logo", "label": "Lid logo", "position": [0, 0.0216, -0.1185] }
+      ]
+    }
+  }
+]

@@ -1,18 +1,20 @@
 /**
  * Office sheet (Longlight palette, opened from the ledger while closed): bills
- * coming due, upgrades with costs and owned state, acid restock, and the
+ * coming due, upgrades with costs and owned state, acid restock, cases and
+ * security (with how many things sit on open shelves tonight), and the
  * specialists on retainer (retain / release, fees, calls left).
  *
  * Release asks for a second tap (no refund for the month); everything else
  * applies at once. The reducer only accepts these actions while closed.
  */
+import { ITEM_DEFS } from '../../data/items'
 import { getSpecialist, SPECIALISTS } from '../../data/specialists'
 import { tuning } from '../../data/tuning'
 import { UPGRADES } from '../../data/upgrades'
 import type { Action } from '../../game/actions'
 import { monthName, upcomingBills } from '../../game/economy/expenses'
 import { callsLeft, retainCost } from '../../game/economy/specialists'
-import { canRestockAcid, hasUpgrade, upgradeStatus } from '../../game/economy/upgrades'
+import { canRestockAcid, hasUpgrade, protectedAreas, upgradeStatus } from '../../game/economy/upgrades'
 import { addDays, type GameState } from '../../game/state'
 import { createButton, el, setText } from '../components/button'
 import { rub } from '../format'
@@ -23,7 +25,21 @@ export interface OfficeDeps {
   dispatch(a: Action): void
 }
 
-const CATEGORY_LABEL: Record<string, string> = { gold: 'gold & jewellery', coins: 'coins', watches: 'watches' }
+const CATEGORY_LABEL: Record<string, string> = {
+  gold: 'gold & jewellery',
+  coins: 'coins',
+  watches: 'watches',
+  militaria: 'medals & militaria',
+  icons: 'icons',
+  antiques: 'antiques & porcelain',
+  instruments: 'instruments',
+  phones: 'phones',
+  cameras: 'cameras',
+  electronics: 'electronics',
+}
+
+/** Categories some item def belongs to (a specialist whose line never walks in yet says so). */
+const STOCKED = new Set<string>(ITEM_DEFS.map((d) => d.category))
 
 function due(inDays: number): string {
   if (inDays <= 0) return 'tonight'
@@ -37,6 +53,8 @@ export class OfficeSheet {
   private bills: HTMLElement
   private billsDue: HTMLElement
   private upgrades: HTMLElement
+  private security: HTMLElement
+  private exposure: HTMLElement
   private acid: HTMLElement
   private specialists: HTMLElement
   private confirmRelease: string | null = null
@@ -76,12 +94,19 @@ export class OfficeSheet {
     this.acid.dataset.id = 'office-acid'
     upSec.append(this.upgrades, this.acid)
 
+    this.security = el('ul', 'office-list')
+    this.security.dataset.id = 'office-security'
+    const secSec = this.section('Cases and security', '')
+    this.exposure = el('p', 'settings-text')
+    this.exposure.dataset.id = 'office-exposure'
+    secSec.append(this.exposure, this.security)
+
     this.specialists = el('ul', 'office-list')
     this.specialists.dataset.id = 'office-specialists'
     const spSec = this.section('Specialists on retainer', 'A monthly fee buys a few calls; extra calls cost more. Retaining mid-month charges the rest of the month.')
     spSec.append(this.specialists)
 
-    sheet.append(head, this.cash, billsSec, upSec, spSec)
+    sheet.append(head, this.cash, billsSec, upSec, secSec, spSec)
     root.append(sheet)
     this.root = root
     this.sheet = sheet
@@ -105,7 +130,7 @@ export class OfficeSheet {
   }
 
   render(state: GameState): void {
-    const key = JSON.stringify([state.cash, state.shop.upgrades, state.shop.acidCharges, state.specialists, state.calendar.date, this.confirmRelease])
+    const key = JSON.stringify([state.cash, state.shop.upgrades, state.shop.acidCharges, state.shop.slots, state.specialists, state.calendar.date, this.confirmRelease])
     if (key === this.key) return
     this.key = key
     setText(this.cash, `Cash in the till: ${rub(state.cash)}`)
@@ -141,6 +166,15 @@ export class OfficeSheet {
 
   private renderUpgrades(state: GameState): void {
     this.upgrades.replaceChildren()
+    this.security.replaceChildren()
+    const shielded = protectedAreas(state)
+    const open = state.shop.slots.filter((sl) => sl.itemId && sl.area !== 'counter' && !shielded.has(sl.area)).length
+    setText(
+      this.exposure,
+      open === 0
+        ? 'Nothing on the open shelves tonight. The counter case is behind glass.'
+        : `${open} thing${open === 1 ? '' : 's'} on the open shelves tonight, within reach of anyone. The counter case is behind glass.`,
+    )
     for (const u of UPGRADES) {
       const status = upgradeStatus(state, u.id)
       const li = el('li', `office-card is-${status}`)
@@ -160,7 +194,8 @@ export class OfficeSheet {
         b.disabled = status !== 'available'
         li.append(b)
       }
-      this.upgrades.append(li)
+      const list = u.group === 'security' ? this.security : this.upgrades
+      list.append(li)
     }
 
     this.acid.replaceChildren()
@@ -191,6 +226,7 @@ export class OfficeSheet {
       top.append(el('span', 'office-name', def.name), el('span', 'office-amt', `${rub(roster.fee)}/mo`))
       const covers = def.categories.map((c) => CATEGORY_LABEL[c] ?? c).join(', ')
       li.append(top, el('p', 'office-role', `${def.role} · ${covers}`), el('p', 'office-blurb', def.blurb))
+      if (!def.categories.some((c) => STOCKED.has(c))) li.append(el('p', 'office-quiet', 'Nothing in this line has come through the door yet.'))
       const terms = `${roster.calls} calls a month · extra calls ${rub(roster.perCall)}`
       if (retained) {
         li.append(el('p', 'office-terms', `${terms}. ${callsLeft(state, def.id)} call${callsLeft(state, def.id) === 1 ? '' : 's'} left this month.`))

@@ -1,4 +1,4 @@
-import { startedState } from './helpers'
+import { playScene, startedState } from './helpers'
 import { deflateSync, strToU8 } from 'fflate'
 import { describe, expect, it } from 'vitest'
 import { tuning } from '../src/data/tuning'
@@ -31,13 +31,14 @@ function serveCurrent(s0: GameState, wantBuy: boolean, multiple: number, stopAtO
   for (let guard = 0; guard < 60 && s.current; guard++) {
     const c = s.current
     if (c.phase === 'present' && c.kind === 'redeem') s = step(s, { type: 'loan/return' })
+    else if (c.phase === 'scene') s = playScene(s)
     else if (c.phase === 'present') s = step(s, { type: 'counter/inspect' })
     else if (c.phase === 'inspect') {
       for (const tool of TOOLS) s = step(s, { type: 'inspect/useTool', tool })
       s = step(s, { type: 'inspect/done' })
     } else if (c.phase === 'offer') {
       if (stopAtOffer) return s
-      const amount = Math.floor(Math.min(c.item.trueValue * multiple, s.cash))
+      const amount = Math.floor(Math.min(c.item!.trueValue * multiple, s.cash))
       if (!wantBuy || amount <= 0) {
         s = step(s, { type: 'counter/pass' })
       } else if (!s.haggle || s.haggle.status === 'open') {

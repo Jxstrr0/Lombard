@@ -17,6 +17,9 @@
  * - order: five-pointed star r 0.025 in XY, face +Z, screw post and nut behind (to z ≈ −0.0125)
  * - badge: oval wreath plate ≈ 0.036 × 0.04 with a banner on top (to y ≈ 0.021), screw post behind (to z ≈ −0.011)
  * - coin: disc r 0.0125, 2 mm thick, obverse +Z, reverse −Z, edge at x = 0.0125 (size it with model.scale)
+ * - laptop: standing as its owner sees it (model.rest "upright"): base 0.336 × 0.026 × 0.236 in the XZ
+ *   plane (y −0.1175…−0.0915, keyboard up, front edge +Z at z ≈ 0.157), hinge at the back (z ≈ −0.072),
+ *   lid 0.228 × 0.0075 open at 110°, screen facing +Z and a little up, lid top at y ≈ 0.122, z ≈ −0.15
  *
  * `model.scale` multiplies the whole model (kept for parity with glb models).
  * Models are cached by defId; ItemModels.evict disposes geometries, materials and textures.
@@ -100,6 +103,9 @@ export function buildPlaceholder(spec: ModelSpec): THREE.Group {
       break
     case 'coin':
       buildCoin(g, color, spec.emblem)
+      break
+    case 'laptop':
+      buildLaptop(g, color)
       break
   }
   const s = spec.scale ?? 1
@@ -1397,4 +1403,35 @@ function buildCoin(g: THREE.Group, color: THREE.Color, emblem?: string): void {
   const c = disc(0.0125, 0.002, [edge, front, back], 48)
   c.name = 'coin'
   g.add(c)
+}
+
+// --- laptop -----------------------------------------------------------------------------------
+
+/** Same layout as art/items/kinds/laptop.py: base centre, hinge-side lid centre, lid tilt. */
+const LAPTOP = { w: 0.336, d: 0.236, t: 0.026, y0: -0.1175, zc: 0.0394, lidH: 0.228, lidT: 0.0075, lidCentre: [0, 0.0136, -0.1114] as const, lidTilt: -0.349 }
+
+function buildLaptop(g: THREE.Group, color: THREE.Color): void {
+  const { w, d, t, y0, zc, lidH, lidT } = LAPTOP
+  const shell = new THREE.MeshStandardMaterial({ color: '#8e9196', metalness: 0.35, roughness: 0.45 })
+  const dark = new THREE.MeshStandardMaterial({ color: '#141516', roughness: 0.4 })
+  const base = new THREE.Mesh(new RoundedBoxGeometry(w, t, d, 2, 0.004), shell)
+  base.name = 'base'
+  base.position.set(0, y0 + t / 2, zc)
+  g.add(base)
+  const keys = new THREE.Mesh(new THREE.PlaneGeometry(0.28, 0.104), dark)
+  keys.rotation.x = -Math.PI / 2
+  keys.position.set(0, y0 + t + 0.0002, zc - 0.0142)
+  g.add(keys)
+  // Lid: box tilted back 20° from vertical about the hinge, screen on its +Z face.
+  const lid = new THREE.Group()
+  lid.position.set(...LAPTOP.lidCentre)
+  lid.rotation.x = LAPTOP.lidTilt
+  const shellLid = new THREE.Mesh(new RoundedBoxGeometry(w - 0.001, lidH, lidT, 2, 0.003), new THREE.MeshStandardMaterial({ color, metalness: 0.2, roughness: 0.25 }))
+  shellLid.name = 'lid'
+  lid.add(shellLid)
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.31, 0.175), new THREE.MeshStandardMaterial({ color: '#06070a', roughness: 0.06 }))
+  screen.name = 'screen'
+  screen.position.set(0, 0.008, lidT / 2 + 0.0002)
+  lid.add(screen)
+  g.add(lid)
 }

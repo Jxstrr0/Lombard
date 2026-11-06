@@ -4,6 +4,7 @@ import { scheduleVandalism } from '../crime/vandalism'
 import { applyFenceChange } from '../crime/fence'
 import { adjustTrust as adjustVolkovaTrust } from '../crime/volkova'
 import { applyCollectorChange } from '../crime/collector'
+import { applyStaffChange } from '../staff/appraiser'
 import { flagAxis, nudgeAxis } from '../endings/axes'
 import { endCareer } from '../endings/end'
 import { tuning } from '../../data/tuning'
@@ -70,6 +71,9 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
     // --- M5 the Collector ---
     case 'collector':
       return applyCollectorChange(state, e.change)
+    // --- M6 the appraiser ---
+    case 'staff':
+      return applyStaffChange(state, e.change)
   }
 }
 

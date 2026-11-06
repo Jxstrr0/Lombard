@@ -10,6 +10,7 @@ import { SPECIALISTS } from '../src/data/specialists'
 import { FENCE } from '../src/data/fence'
 import { COLLECTOR } from '../src/data/collector'
 import { VOLKOVA } from '../src/data/police'
+import { APPRAISER } from '../src/data/appraiser'
 import { FLOOD_PERSON } from '../src/data/flood'
 import { REGULARS, getRegular } from '../src/data/regulars'
 import { ARCS, getBeat } from '../src/data/stories'
@@ -78,8 +79,8 @@ describe('story content', () => {
       for (const beat of arc.beats) {
         const v = beat.visit
         // M4: a regular, or a specialist (their own arcs); `as` someone they sent.
-        // M5: or the fence, the Collector or Detective Volkova (their own arcs).
-        const person = v.who === FENCE.id ? FENCE : v.who === COLLECTOR.id ? COLLECTOR : v.who === VOLKOVA.id ? VOLKOVA : v.who === FLOOD_PERSON.id ? FLOOD_PERSON : undefined
+        // M5: or the fence, the Collector or Detective Volkova (their own arcs). M6: or the appraiser, or the Flood's person.
+        const person = v.who === FENCE.id ? FENCE : v.who === COLLECTOR.id ? COLLECTOR : v.who === VOLKOVA.id ? VOLKOVA : v.who === APPRAISER.id ? APPRAISER : v.who === FLOOD_PERSON.id ? FLOOD_PERSON : undefined
         expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who) ?? person, `${beat.id} who`).toBeDefined()
         if (v.as) expect(looks.has(v.as.look), `${beat.id} as.look`).toBe(true)
         if (v.item) {
@@ -92,11 +93,11 @@ describe('story content', () => {
         const conds: readonly Condition[] = beat.when
         for (const c of conds) {
           if (c.if === 'beat') expect(beats.has(c.beat), `${beat.id} → ${c.beat}`).toBe(true)
-          if (c.if === 'trust' || c.if === 'visits' || c.if === 'loan') expect(getRegular(c.who), `${beat.id} ${c.who}`).toBeDefined()
+          if (c.if === 'trust' || c.if === 'visits' || c.if === 'loan') expect(getRegular(c.who) ?? (c.who === APPRAISER.id ? APPRAISER : undefined), `${beat.id} ${c.who}`).toBeDefined()
           if (c.if === 'specialist') expect(specialists.has(c.id), `${beat.id} ${c.id}`).toBe(true)
         }
         const effects = [...(v.scene?.choices.flatMap((c) => c.effects) ?? []), ...Object.values(v.after).flatMap((a) => a?.effects ?? [])]
-        for (const e of effects) if (e.do === 'trust') expect(getRegular(e.who), `${beat.id} ${e.who}`).toBeDefined()
+        for (const e of effects) if (e.do === 'trust') expect(getRegular(e.who) ?? (e.who === APPRAISER.id ? APPRAISER : undefined), `${beat.id} ${e.who}`).toBeDefined()
       }
     }
   })
@@ -113,6 +114,32 @@ describe('story content', () => {
         // M6: the Flood is a city event; its days (the `flood` condition) open its beats, met or not.
         const theWater = (c: Condition) => (arc.id === 'flood' || arc.id === 'flood_talk') && c.if === 'flood'
         expect(beat.when.some((c) => ofArc(c) || metHer(c) || theWater(c) || (c.if === 'any' && c.of.every(ofArc))), beat.id).toBe(true)
+      }
+    }
+  })
+
+  // M6: the twenty new regulars each have a small thread of their own, and it comes after every
+  // older arc (lowest claim on a day's beat slots). A choice that hands over cash outside a deal
+  // always comes with a `no_thanks`, which the trade-minded sim policies take (src/sim/policies.ts).
+  it('gives each M6 regular a thread of two to four beats, after the older arcs', () => {
+    const M6 = ['artur', 'bakhtiyor', 'dilnoza', 'jamshid', 'patimat', 'snezhana', 'kira', 'alyona', 'grisha', 'vitya', 'prokhor', 'zakhar', 'ernest', 'styopa', 'klava', 'elvira', 'zhanna', 'nonna', 'zoya', 'lera']
+    const ids = ARCS.map((a) => a.id)
+    const first = Math.min(...M6.map((id) => ids.indexOf(id)))
+    expect(first).toBe(ids.length - M6.length)
+    for (const id of M6) {
+      const arc = ARCS.find((a) => a.id === id)
+      expect(arc, id).toBeDefined()
+      expect(getRegular(id), id).toBeDefined()
+      expect(arc!.beats.length, id).toBeGreaterThanOrEqual(2)
+      // Up to four beats a person sees; an arc may hold two alternative endings (one plays).
+      expect(arc!.beats.filter((b) => !b.final).length, id).toBeLessThanOrEqual(3)
+      expect(arc!.beats.some((b) => b.final), id).toBe(true)
+      for (const b of arc!.beats) {
+        for (const c of b.visit.scene?.choices ?? []) {
+          if (c.effects.some((e) => e.do === 'cash' && e.amount < 0)) {
+            expect(b.visit.scene!.choices.some((x) => x.id === 'no_thanks'), `${b.id}: ${c.id} pays out`).toBe(true)
+          }
+        }
       }
     }
   })

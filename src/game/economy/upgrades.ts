@@ -51,6 +51,8 @@ export function upgradeStatus(state: GameState, id: string): UpgradeStatus {
   if (!def) return 'locked'
   if (hasUpgrade(state, id)) return 'owned'
   if (def.requires.some((r) => !hasUpgrade(state, r))) return 'locked'
+  // M6: a mid-game purchase isn't offered before its day.
+  if (def.fromDay !== undefined && state.calendar.day < def.fromDay) return 'locked'
   if (state.cash < def.cost) return 'short'
   return 'available'
 }

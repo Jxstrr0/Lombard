@@ -28,6 +28,11 @@
  * the icon in stock and him first in line with the hatbox (sell / return / police).
  * M5 Volkova's arc: ?scenario=volkova-intro (her courtesy call), and beats first in line (BEAT_SCENARIOS): volkova-father,
  * volkova-source, volkova-stakeout, volkova-short, volkova-personal, volkova-inform, volkova-leak, volkova-icon, stanislav-icon.
+ * M6 the twenty new regulars' threads: ?scenario=<regular id> (artur, bakhtiyor, … lera; src/data/stories/threads) opens
+ * day 1 with that thread's first beat first in line.
+ * M6 the appraiser: ?scenario=appraiser opens day 1 with Lev on staff, serving a walk-in at the second counter while
+ * you have the line; appraiser-start (his first morning), and one per beat of his arc first in line (APPRAISER_SCENARIOS):
+ * appraiser-zhora, -confide, -tin, -yuri, -zhora-back, -vanish (a voicemail), -zhora-vanished; appraiser-paper (the morning paper).
  * M6 the Flood and the seasons of news (src/game/city/review.ts): ?scenario=flood-warning (Kuzmich and his sandbags,
  * three days before the water), ?scenario=flood[&prep=none|sandbags|lifted] (the flood morning, Arkady and his pump),
  * ?scenario=flood-after (the water going down, Nina Arkadyevna's things); ?scenario=paper[&on=MM-DD|YYYY-MM-DD] opens
@@ -57,12 +62,14 @@ import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
 import { beatVisit, regularCustomer, regularVisit } from './game/story/plan'
+import { THREADS } from './data/stories/threads'
 import { recordBeat, setMemory } from './game/story/progress'
 import { specialistCustomer } from './game/story/specialists'
 import { fenceGoods } from './game/crime/fence'
 import { bulletinPiece, wearOf } from './game/crime/bulletin'
 import { addEvent, BRING, RAID, TRAIL } from './game/crime/events'
 import { volkovaCustomer } from './game/crime/volkova'
+import { applyStaffChange, servable } from './game/staff/appraiser'
 import { BULLETIN } from './data/news'
 import { COLLECTOR_ICON } from './data/collector'
 import { scriptedItem } from './game/story/scripted'
@@ -152,6 +159,8 @@ const BEAT_SCENARIOS: Record<string, string> = {
   'volkova-leak': 'volkova.leak',
   'volkova-icon': 'volkova.icon',
   'stanislav-icon': 'stanislav.icon',
+  // M6: each new regular's thread opens with its first beat (?scenario=grisha, ?scenario=alyona, …).
+  ...Object.fromEntries(THREADS.map((a) => [a.id, a.beats[0]!.id])),
 }
 
 /** Dev-only (?scenario=collector): his wish first, then Seryozha with the icon. */
@@ -181,6 +190,49 @@ function beatScenario(s0: GameState, beatId: string): GameState {
   let n = 0
   const visit = beatVisit(s, beat, (prefix) => `${prefix}-dev-${n++}`)
   return visit ? { ...s, queue: [visit, ...s.queue], day: { ...s.day, total: s.day.total + 1 } } : s
+}
+
+/** Dev-only (M6): the second counter bought and Lev hired before day 1 opens (his first morning already played unless `fresh`). */
+function appraiserHired(s0: GameState, fresh = false): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = { ...s, shop: { ...s.shop, upgrades: [...s.shop.upgrades, 'second_counter'] } }
+  s = reducer(s, { type: 'staff/hire' })
+  return fresh ? s : recordBeat(s, 'appraiser.start', { day: 0, outcome: 'talked', choice: 'welcome' })
+}
+
+/** Dev-only (?scenario=appraiser-<beat>): the beat each scenario puts first in line, Lev on staff. */
+const APPRAISER_SCENARIOS: Record<string, string> = {
+  'appraiser-zhora': 'appraiser.zhora',
+  'appraiser-confide': 'appraiser.confide',
+  'appraiser-tin': 'appraiser.tin',
+  'appraiser-yuri': 'appraiser.yuri',
+  'appraiser-zhora-back': 'appraiser.zhora_back',
+  'appraiser-vanish': 'appraiser.vanish',
+  'appraiser-zhora-vanished': 'appraiser.zhora_vanished',
+}
+
+function appraiserScenario(s0: GameState, key: string): GameState {
+  if (key === 'appraiser-start') return reducer(appraiserHired(s0, true), { type: 'day/open' })
+  if (key === 'appraiser-paper') {
+    // The tin went to Volkova days ago: the paper runs it this morning.
+    const s = recordBeat(appraiserHired(s0), 'appraiser.tin', { day: 1 - tuning.appraiser.arc.afterTin, outcome: 'talked', choice: 'tin_police' })
+    return reducer(s, { type: 'day/open' })
+  }
+  // After the voicemail he's gone (Zhora comes for the tin).
+  const hiredS = appraiserHired(s0)
+  const s = reducer(key === 'appraiser-zhora-vanished' ? applyStaffChange(hiredS, 'vanish') : hiredS, { type: 'day/open' })
+  const beatId = APPRAISER_SCENARIOS[key]
+  const beat = beatId ? getBeat(beatId) : undefined
+  if (beat) {
+    let n = 0
+    const visit = beatVisit(s, beat, (prefix) => `${prefix}-dev-${n++}`)
+    return visit ? { ...s, queue: [visit, ...s.queue], day: { ...s.day, total: s.day.total + 1 } } : s
+  }
+  // ?scenario=appraiser: he's serving a walk-in from the line at the second counter.
+  const i = s.queue.findIndex((v, k) => k >= 1 && servable(v))
+  const visit = s.queue[i]
+  if (!visit) return s
+  return { ...s, queue: s.queue.filter((_, k) => k !== i), staff: { ...s.staff, busy: { visit, until: s.day.clock + 600 } } }
 }
 
 /** Dev-only (?scenario=fence, after the meeting beat): the fence's next drop-in, with something to sell, second in line. */
@@ -456,6 +508,7 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'item') initial = itemScenario(initial, params.get('item'))
     if (params.get('scenario') === 'collector') initial = collectorScenario(initial)
     if (params.get('scenario') === 'collector-offer') initial = collectorOfferScenario(initial)
+    if (params.get('scenario')?.startsWith('appraiser')) initial = appraiserScenario(initial, params.get('scenario')!)
     // M6 the Flood and the seasons of news (src/game/city/review.ts).
     const floodStep = { 'flood-warning': 'warning', flood: 'flood', 'flood-after': 'after' } as const
     const floodKey = params.get('scenario') as keyof typeof floodStep | null
@@ -781,6 +834,9 @@ async function boot(): Promise<void> {
     if (life && street) life.setWeather(street.todaysWeather)
     life?.update(dt, renderer.domElement.height)
     street?.update(dt)
+    // M6: where the appraiser is (hidden / closed / serving / counter / idle / walking), for shots.
+    const staffState = shop.staffState
+    if (document.body.dataset.staff !== staffState) document.body.dataset.staff = staffState
     const customerState = shop.customerState
     if (document.body.dataset.customer !== customerState) {
       document.body.dataset.customer = customerState

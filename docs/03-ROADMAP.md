@@ -90,6 +90,7 @@ Done when: a clean run, a mob-friendly run, and a fence-heavy run all play diffe
 
 - 120 items, 40 regulars, 8 arcs, 3 seasons of news.
   - Items wave B (done, Nov 6): +44 defs in the existing categories plus the new vinyl & media category (32 → 76 with wave B alone), every one with a scripted model. See 05.
+  - 40 regulars: done (Nov 6). Twenty more, each with a schedule, memory, a 2–4 beat thread (`src/data/stories/threads`), their own lines and an epilogue card; looks from the Rocketbox Adults pool (7 new faces, 13 recoloured relatives). See 05.
   - 3 seasons of news: done. Four seasons of city life (13–14 stories each, dealt from a per-season deck), five seasonal market notes per season that match `tuning.demand.seasons`, more Victory Day / school / New Year stories and four news-only city days (`src/data/newsSeasons.ts`).
   - The Flood is the seventh arc (with its follow-ups in `flood_talk`).
 - The Flood event, The Appraiser hire (a visible employee who walks between the back room, the counter and the floor; see 05).

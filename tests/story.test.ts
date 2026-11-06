@@ -117,6 +117,32 @@ describe('story content', () => {
       }
     }
   })
+
+  // M6: the twenty new regulars each have a small thread of their own, and it comes after every
+  // older arc (lowest claim on a day's beat slots). A choice that hands over cash outside a deal
+  // always comes with a `no_thanks`, which the trade-minded sim policies take (src/sim/policies.ts).
+  it('gives each M6 regular a thread of two to four beats, after the older arcs', () => {
+    const M6 = ['artur', 'bakhtiyor', 'dilnoza', 'jamshid', 'patimat', 'snezhana', 'kira', 'alyona', 'grisha', 'vitya', 'prokhor', 'zakhar', 'ernest', 'styopa', 'klava', 'elvira', 'zhanna', 'nonna', 'zoya', 'lera']
+    const ids = ARCS.map((a) => a.id)
+    const first = Math.min(...M6.map((id) => ids.indexOf(id)))
+    expect(first).toBe(ids.length - M6.length)
+    for (const id of M6) {
+      const arc = ARCS.find((a) => a.id === id)
+      expect(arc, id).toBeDefined()
+      expect(getRegular(id), id).toBeDefined()
+      expect(arc!.beats.length, id).toBeGreaterThanOrEqual(2)
+      // Up to four beats a person sees; an arc may hold two alternative endings (one plays).
+      expect(arc!.beats.filter((b) => !b.final).length, id).toBeLessThanOrEqual(3)
+      expect(arc!.beats.some((b) => b.final), id).toBe(true)
+      for (const b of arc!.beats) {
+        for (const c of b.visit.scene?.choices ?? []) {
+          if (c.effects.some((e) => e.do === 'cash' && e.amount < 0)) {
+            expect(b.visit.scene!.choices.some((x) => x.id === 'no_thanks'), `${b.id}: ${c.id} pays out`).toBe(true)
+          }
+        }
+      }
+    }
+  })
 })
 
 describe('conditions and effects', () => {

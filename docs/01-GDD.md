@@ -241,6 +241,7 @@ No real brands. Invented equivalents the player learns:
 - Watches: *Pobeda* and *Vostok* are real Soviet brands and fine to use as historical items (they are not trademarks in the luxury sense); invented luxury brands: *Rolland*, *Omeca*, *Brequet-Fils*.
 - Phones: *Mangosteen* (fruit-logo phone), *Galaxia*.
 - Cameras: *Zenit* (historical, fine), *Kanon*.
+- Laptops: *Tosaki* (the Orbita line).
 - Handbags: *Louis Vieux*, *Guccio*.
 Each fake brand has deliberate tells that mirror real-world counterfeit tells without naming real companies.
 

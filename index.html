@@ -15,8 +15,177 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Lombard" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <style>
+      /* Loading screen: inline so it paints on the first frame, before the bundle. Driven by src/ui/loading.ts. */
+      #loading {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        padding: calc(24px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) calc(16px + env(safe-area-inset-left, 0px));
+        background: radial-gradient(120% 80% at 50% 38%, #24211d 0%, #141413 70%);
+        color: #faf9f5;
+        font-family: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        transition: opacity 0.4s ease;
+      }
+      #loading.ld-out { opacity: 0; pointer-events: none; }
+      .ld-tag {
+        position: relative;
+        width: min(300px, 100%);
+        padding: 22px 22px 18px 44px;
+        background: #efe7d4;
+        color: #2a241c;
+        border-radius: 4px;
+        /* a luggage-tag shape: the left end is cut at both corners */
+        clip-path: polygon(22px 0, 100% 0, 100% 100%, 22px 100%, 0 calc(100% - 22px), 0 22px);
+        transform: rotate(-2.5deg);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      }
+      .ld-hole {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        width: 12px;
+        height: 12px;
+        margin-top: -6px;
+        border-radius: 50%;
+        background: #1c1b19;
+        box-shadow: 0 0 0 3px #d9cdb2;
+      }
+      .ld-mono { font-family: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace; }
+      .ld-ticket {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed rgba(42, 36, 28, 0.35);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        color: #6a5f50;
+      }
+      .ld-name {
+        margin: 0;
+        font-size: 44px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.06em;
+      }
+      .ld-line {
+        margin: 10px 0 18px;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #6a5f50;
+      }
+      .ld-bar {
+        position: relative;
+        height: 8px;
+        overflow: hidden;
+        border-radius: 4px;
+        background: rgba(42, 36, 28, 0.14);
+      }
+      .ld-fill {
+        position: absolute;
+        inset: 0;
+        background: #d97757;
+        transform-origin: left center;
+        transform: scaleX(0);
+        transition: transform 0.25s ease-out;
+      }
+      /* Before the first real number: a sliding shimmer (indeterminate). */
+      #loading:not(.ld-known) .ld-fill {
+        width: 35%;
+        transform: none;
+        animation: ld-slide 1.3s ease-in-out infinite;
+      }
+      @keyframes ld-slide {
+        from { left: -35%; }
+        to { left: 100%; }
+      }
+      .ld-foot {
+        display: flex;
+        justify-content: space-between;
+        margin: 8px 0 0;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6a5f50;
+      }
+      .ld-error { margin-top: 14px; }
+      .ld-error-text { margin: 0 0 12px; font-size: 14px; line-height: 1.4; color: #9e2b1f; }
+      #loading.ld-failed .ld-bar,
+      #loading.ld-failed .ld-foot { display: none; }
+      .ld-reload {
+        min-height: 44px;
+        padding: 0 22px;
+        border: 0;
+        border-radius: 8px;
+        background: #d97757;
+        color: #141413;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .ld-reload:focus-visible { outline: 3px solid #7b3fc4; outline-offset: 3px; }
+      .ld-credit {
+        margin: 0;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #b48ce8;
+      }
+      @media (orientation: landscape) and (max-height: 500px) {
+        #loading { gap: 14px; }
+        .ld-tag { padding-top: 14px; padding-bottom: 12px; }
+        .ld-name { font-size: 34px; }
+        .ld-line { margin: 6px 0 12px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #loading, .ld-fill { transition: none; }
+        #loading:not(.ld-known) .ld-fill { animation: none; left: 0; opacity: 0.35; }
+      }
+    </style>
   </head>
   <body>
+    <div id="loading" role="status" aria-busy="true" aria-label="Loading Lombard">
+      <div class="ld-tag">
+        <span class="ld-hole" aria-hidden="true"></span>
+        <p class="ld-ticket ld-mono" aria-hidden="true"><span>PAWN TICKET</span><span>No. 0001</span></p>
+        <p class="ld-name">LOMBARD</p>
+        <p class="ld-line ld-mono">Mostograd, on the canal. Counting the till and wiping the glass&hellip;</p>
+        <div class="ld-bar" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100"><span class="ld-fill"></span></div>
+        <p class="ld-foot ld-mono" aria-hidden="true"><span>Opening up</span><span class="ld-pct"></span></p>
+        <div class="ld-error" hidden>
+          <p class="ld-error-text">The shop could not open.</p>
+          <button class="ld-reload" type="button">Reload</button>
+        </div>
+      </div>
+      <p class="ld-credit">Longlight Interactive</p>
+    </div>
+    <script>
+      // Before the bundle runs: Reload works, and a script that fails to download shows the error line.
+      ;(function () {
+        var root = document.getElementById('loading')
+        root.querySelector('.ld-reload').addEventListener('click', function () {
+          location.reload()
+        })
+        window.addEventListener(
+          'error',
+          function (e) {
+            var t = e.target
+            if (!t || t.tagName !== 'SCRIPT' || !document.getElementById('loading')) return
+            root.classList.add('ld-failed')
+            root.querySelector('.ld-error-text').textContent = 'Part of the game did not download. Check the connection and reload.'
+            root.querySelector('.ld-error').hidden = false
+          },
+          true,
+        )
+      })()
+    </script>
     <div id="scene" aria-hidden="true"></div>
     <main id="app"></main>
     <script type="module" src="/src/main.ts"></script>

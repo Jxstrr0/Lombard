@@ -23,6 +23,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { textureAnisotropy } from './perf'
+import type { OnBytes } from './loadProgress'
 
 export interface ShopManifest {
   version: number
@@ -44,7 +45,13 @@ export interface BakedShop {
 
 type Kind = 'baked' | 'prop' | 'dynamic' | 'glass' | 'unlit'
 
-export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string): Promise<BakedShop> {
+/** Byte progress callbacks for the two big files (the loading screen's bar). */
+export interface BakedProgress {
+  glb?: OnBytes
+  lightmap?: OnBytes
+}
+
+export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string, progress: BakedProgress = {}): Promise<BakedShop> {
   const dir = `${base}assets/shop/`
   const res = await fetch(`${dir}shop.json`, { cache: 'no-cache' })
   if (!res.ok) throw new Error(`no baked shop (${res.status})`)
@@ -57,7 +64,10 @@ export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string)
   const gltfLoader = new GLTFLoader().setDRACOLoader(draco).setKTX2Loader(ktx2)
   const owned: { dispose(): void }[] = []
   try {
-    const [gltf, lightmap] = await Promise.all([gltfLoader.loadAsync(`${dir}${manifest.files.glb}${v}`), ktx2.loadAsync(`${dir}${manifest.files.lightmap}${v}`)])
+    const [gltf, lightmap] = await Promise.all([
+      gltfLoader.loadAsync(`${dir}${manifest.files.glb}${v}`, progress.glb),
+      ktx2.loadAsync(`${dir}${manifest.files.lightmap}${v}`, progress.lightmap),
+    ])
     lightmap.channel = 1
     lightmap.flipY = false
     lightmap.colorSpace = THREE.SRGBColorSpace

@@ -13,7 +13,9 @@
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
- * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint) for review.
+ * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint, street) for review.
+ * Street outside the window (render/street): ?street=0 off, ?street=busy, ?weather=clear|rain|snow,
+ * ?season=<season> (the street's weather and dusk only).
  */
 import '@fontsource/space-grotesk/400.css'
 import '@fontsource/space-grotesk/500.css'
@@ -258,9 +260,12 @@ async function boot(): Promise<void> {
   let graphics: GraphicsChoice = tierStart.choice
   const governor = new TierGovernor(tierStart.tier, graphics === 'auto' && !tierStart.pinned)
   let life: ShopLife | null = null
+  /** Life outside the window, once loaded (see below). */
+  let street: import('./render/street').StreetLife | null = null
   const applyTier = (t: QualityTier) => {
     governor.reset(t)
     life?.setTier(t)
+    street?.setTier(t)
     setTextureAnisotropy(TIER_SETTINGS[t].anisotropy)
     // setPixelRatio resizes the drawing buffer itself.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, TIER_SETTINGS[t].pixelRatioCap))
@@ -383,6 +388,7 @@ async function boot(): Promise<void> {
     // The scene first: it knows whether a new customer is still walking in, which the UI waits for.
     shop.sync(state)
     life?.sync(state)
+    street?.sync(state)
     ui.setCustomerArrivedQuiet(shop.customerState !== 'arriving')
     ui.render(state, prev)
     stage.sync(state)
@@ -467,6 +473,26 @@ async function boot(): Promise<void> {
   void Promise.all([envLoad, bakeLoad, backdropLoad]).finally(() => {
     envReady = true
   })
+  // Street life outside the window (render/street): loads only once the shop is on screen. ?street=0 turns it off.
+  let markReady = () => {}
+  const shopReady = new Promise<void>((r) => (markReady = r))
+  if (params.get('street') !== '0') {
+    void Promise.all([backdropLoad, shopReady])
+      .then(async ([ok]) => {
+        const canal = shop.canal
+        if (!ok || !canal) return
+        const { StreetLife, streetFlags } = await import('./render/street')
+        street = await StreetLife.load(renderer, import.meta.env.BASE_URL, canal, shop.scene, streetFlags(params))
+        street.setClockOverride(timeOverride)
+        // the real passers-by cast the shadows on the sun patch, not the shop life's fake ones
+        street.onWindowPasser = (dir, speed) => life?.passerBy(dir, speed)
+        life?.sunlight.setFakePassers(false)
+        street.setTier(governor.current)
+        street.sync(store.get())
+        document.body.dataset.street = 'ready' // for screenshot scripts
+      })
+      .catch((err) => console.info('[street] staying quiet:', err instanceof Error ? err.message : err))
+  }
 
   const clock = new THREE.Clock()
   let readyFrames = 0
@@ -476,6 +502,7 @@ async function boot(): Promise<void> {
     perf?.begin()
     shop.update(dt)
     life?.update(dt, renderer.domElement.height)
+    street?.update(dt)
     const customerState = shop.customerState
     if (document.body.dataset.customer !== customerState) {
       document.body.dataset.customer = customerState
@@ -502,11 +529,13 @@ async function boot(): Promise<void> {
     if (envReady && !window.__lombardReady && ++readyFrames > 2) {
       window.__lombardReady = true
       document.body.classList.add('ready')
+      markReady()
       // Shop life comes after the shop is up, as its own chunk (?life=0 leaves it out).
       if (params.get('life') !== '0') {
         void import('./render/life').then(({ ShopLife }) => {
           life = new ShopLife()
           life.setClockOverride(timeOverride)
+          if (street) life.sunlight.setFakePassers(false)
           life.setTier(governor.current)
           life.sync(store.get())
           shop.scene.add(life.group)

@@ -21,6 +21,7 @@ import { lookFor } from '../game/customers/look'
 import type { CustomerCast, CustomerModel } from './customerModel'
 import { StaffFigure, type StaffWhere } from './staff'
 import { APPRAISER } from '../data/appraiser'
+import { absentToday } from '../game/staff/appraiser'
 import { canalBackdropTexture, contactShadowTexture, parquetTexture, plasterTexture } from './textures'
 
 const ROOM = { halfW: 3, halfD: 4, height: 4.2 }
@@ -220,7 +221,7 @@ export class ShopScene {
   /** M6: where the appraiser should be, and his model loaded while he's on staff. */
   private syncStaff(state: GameState, levHere: boolean): void {
     const st = state.staff
-    const where: StaffWhere = levHere ? 'counter' : !st.hired ? 'hidden' : state.day.phase !== 'open' ? 'closed' : st.busy ? 'serving' : 'idle'
+    const where: StaffWhere = levHere ? 'counter' : !st.hired || absentToday(state) ? 'hidden' : state.day.phase !== 'open' ? 'closed' : st.busy ? 'serving' : 'idle'
     this.staffLook = where === 'hidden' ? null : APPRAISER.look
     if (this.staffLook && this.cast && !this.staff.hasModel && !this.staffLoading) {
       this.staffLoading = true

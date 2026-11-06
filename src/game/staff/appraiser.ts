@@ -26,7 +26,7 @@
  * seller: they walk and the street hears (repAfterInsult). Every draw comes from a stream keyed
  * by the visit (never the game Rng), so hiring him never rerolls what anyone else brings.
  */
-import { APPRAISER, APPRAISER_FLAGS, APPRAISER_LOG } from '../../data/appraiser'
+import { APPRAISER, APPRAISER_FLAGS, APPRAISER_LOG, APPRAISER_VANISH_BEAT } from '../../data/appraiser'
 import { getItemDef } from '../../data/items'
 import { tuning } from '../../data/tuning'
 import { claimedValue } from '../appraise/value'
@@ -213,6 +213,11 @@ function staffBudget(state: GameState): number {
   return state.cash - A.cashFloor - bills
 }
 
+/** The morning of his voicemail: he never came in (the render leaves him out, and he takes nobody). */
+export function absentToday(state: GameState): boolean {
+  return state.current?.beatId === APPRAISER_VANISH_BEAT || state.queue.some((v) => v.beatId === APPRAISER_VANISH_BEAT)
+}
+
 /**
  * Shop time passing (the reducer calls this before the line's patience drains): he finishes the
  * seller he's serving once the clock reaches the end of the serve, and takes the next one by your
@@ -220,7 +225,7 @@ function staffBudget(state: GameState): number {
  * open or the paper is unread.
  */
 export function staffWork(state: GameState, seconds: number): GameState {
-  if (!state.staff.hired || state.day.phase !== 'open' || !state.day.newsRead || state.staff.sinceDay > state.calendar.day) return state
+  if (!state.staff.hired || state.day.phase !== 'open' || !state.day.newsRead || state.staff.sinceDay > state.calendar.day || absentToday(state)) return state
   let s = state
   let now = s.day.clock
   const end = s.day.clock + Math.max(0, seconds)

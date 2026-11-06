@@ -439,7 +439,7 @@ export const tuning = {
       wall_case: 14_000,
       camera: 22_000,
       // M6: room for the appraiser (tuning.appraiser): a month of his wages and a bit.
-      second_counter: 24_000,
+      second_counter: 18_000,
     },
     /** Security points (see tuning.theft.perSecurity): chime 0.5 (×0.85 theft), mirror 1 (×0.74), camera 3 (×0.49). */
     security: { door_chime: 0.5, convex_mirror: 1, camera: 3 },

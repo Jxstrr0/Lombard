@@ -14,7 +14,7 @@ import { epilogueCards } from '../src/game/endings/epilogue'
 import { walkInCast } from '../src/game/customers/look'
 import { migrate } from '../src/game/save/migrations'
 import { Rng } from '../src/game/rng'
-import { accuracyOf, chargeWages, hireStatus, nextForStaff, serve, servable, SECOND_COUNTER, wagesDue } from '../src/game/staff/appraiser'
+import { absentToday, accuracyOf, chargeWages, hireStatus, nextForStaff, serve, servable, SECOND_COUNTER, wagesDue } from '../src/game/staff/appraiser'
 import { regularCustomer } from '../src/game/story/plan'
 import { recordBeat } from '../src/game/story/progress'
 import { scriptedItem } from '../src/game/story/scripted'
@@ -184,6 +184,14 @@ describe('his work', () => {
     const closed = run({ ...missed!, queue: [], current: null }, { type: 'day/close' })
     expect(closed.history.at(-1)).toBeDefined()
     expect(closed.staff.pending).toEqual([])
+  })
+
+  it('the morning of his voicemail he never came in: he takes nobody', () => {
+    const s = openWithLine(4)
+    const call: QueuedVisit = { visitId: 'v-call', kind: 'scene', customer: s.queue[0]!.customer, patience: 1e5, beatId: 'appraiser.vanish', via: 'phone' }
+    const away = { ...s, queue: [call, ...s.queue] }
+    expect(absentToday(away)).toBe(true)
+    expect(run(away, { type: 'time/tick', seconds: 30 }).staff.busy).toBeNull()
   })
 
   it('closing finishes the seller in front of him', () => {

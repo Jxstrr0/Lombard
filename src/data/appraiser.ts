@@ -40,6 +40,9 @@ export const APPRAISER_FLAGS = {
   letGo: 'appraiser.let_go',
 } as const
 
+/** The morning he doesn't come in (his voicemail): he's not at work while it waits or plays. */
+export const APPRAISER_VANISH_BEAT = 'appraiser.vanish'
+
 /** The office card: who he is before you hire him, and what he says when you do. */
 export const APPRAISER_TEXT = {
   pitch:

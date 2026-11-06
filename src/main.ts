@@ -61,7 +61,7 @@ import { fenceGoods } from './game/crime/fence'
 import { bulletinPiece, wearOf } from './game/crime/bulletin'
 import { addEvent, BRING, RAID, TRAIL } from './game/crime/events'
 import { volkovaCustomer } from './game/crime/volkova'
-import { servable } from './game/staff/appraiser'
+import { applyStaffChange, servable } from './game/staff/appraiser'
 import { BULLETIN } from './data/news'
 import { COLLECTOR_ICON } from './data/collector'
 import { scriptedItem } from './game/story/scripted'
@@ -207,7 +207,9 @@ function appraiserScenario(s0: GameState, key: string): GameState {
     const s = recordBeat(appraiserHired(s0), 'appraiser.tin', { day: 1 - tuning.appraiser.arc.afterTin, outcome: 'talked', choice: 'tin_police' })
     return reducer(s, { type: 'day/open' })
   }
-  const s = reducer(appraiserHired(s0), { type: 'day/open' })
+  // After the voicemail he's gone (Zhora comes for the tin).
+  const hiredS = appraiserHired(s0)
+  const s = reducer(key === 'appraiser-zhora-vanished' ? applyStaffChange(hiredS, 'vanish') : hiredS, { type: 'day/open' })
   const beatId = APPRAISER_SCENARIOS[key]
   const beat = beatId ? getBeat(beatId) : undefined
   if (beat) {

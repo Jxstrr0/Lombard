@@ -33,7 +33,8 @@ const NODES: Record<Node, { at: THREE.Vector3; yaw?: number }> = {
   cback: { at: new THREE.Vector3(2.25, 0, -2.9) },
   /** Behind the counter, at its left end (the player's left), facing the shop. */
   behind: { at: new THREE.Vector3(1.3, 0, -2.85), yaw: FACE.posZ },
-  cfront: { at: new THREE.Vector3(2.25, 0, -1.45) },
+  /** Round the counter's end, on the floor side (clear of the customer spot). */
+  cfront: { at: new THREE.Vector3(2.3, 0, -0.9) },
   /** The customer spot, facing the player (his scenes). */
   spot: { at: new THREE.Vector3(-0.15, 0, -1.45), yaw: FACE.negZ },
   /** At the right-hand shelves (x 2.8). */
@@ -86,6 +87,8 @@ function route(from: Node, to: Node): Node[] {
     if (n === to) break
     for (const [a, b] of EDGES) {
       const m = a === n ? b : b === n ? a : null
+      // The customer spot is somewhere he goes (his scenes), never a short cut past a customer.
+      if (m === 'spot' && m !== to) continue
       if (m && !seen.has(m)) {
         seen.add(m)
         prev.set(m, n)

@@ -256,6 +256,8 @@ export default {
         who: 'appraiser',
         kind: 'scene',
         via: 'phone',
+        // The first thing you hear when you open: he never came in.
+        first: true,
         scene: {
           lines: [
             'A voicemail, left at four in the morning. Lev’s voice, quiet, a train somewhere behind it.',

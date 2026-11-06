@@ -353,5 +353,316 @@
         { "id": "screw", "label": "Screw post", "position": [0, 0, -0.0095] }
       ]
     }
+  },
+  {
+    "id": "medal_labour_valour",
+    "category": "militaria",
+    "name": "Medal \"For Labour Valour\"",
+    "era": "1960s",
+    "baseValue": {"min": 2500, "max": 4500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 26, "tolerance": 1.4},
+    "magnetic": false,
+    "rarity": 0.36,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "face", "tool": "loupe", "finding": "ЗА ТРУДОВУЮ ДОБЛЕСТЬ in crisp relief, the red enamel СССР below without a chip or bubble.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "reverse", "tool": "loupe", "finding": "A plain back with the award number punched in by hand, digit by digit, slightly uneven.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "reverse"},
+        {"id": "ribbon", "tool": "loupe", "finding": "The grey moiré ribbon is faded along its folds, the blue edge stripes dulled by years in a drawer.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "ribbon"},
+        {"id": "silver", "tool": "loupe", "finding": "The disc has the soft grey tone of old silver, darker in the recesses.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "obverse"},
+        {"id": "heft", "tool": "scale", "finding": "A solid silver medal: heavier than it looks.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_medal", "tool": "magnet", "finding": "Only the pin on the back tugs faintly at the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "pin"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "cast_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 2,
+          "weightFactor": 0.82,
+          "tells": [
+            {"id": "face", "tool": "loupe", "finding": "The letters are rounded and soft, and the red is paint, not enamel: it has a brush mark.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"},
+            {"id": "reverse", "tool": "loupe", "finding": "The number on the back is perfectly even, machine pressed.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "reverse"},
+            {"id": "heft", "tool": "scale", "finding": "Light for silver.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "new_ribbon",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "ribbon", "tool": "loupe", "finding": "The ribbon is new, bright and stiff, on a block that is worn and old.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "ribbon"}
+          ]
+        }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "My grandmother's. Forty years at the textile mill. They gave her this and a kettle.",
+      "Silver, a labour medal. They didn't hand these out for nothing.",
+      "She'd want it to go to someone who cares. Do you care? A little?"
+    ],
+    "model": {
+      "glb": "medal_labour_valour.glb",
+      "placeholder": "medal",
+      "color": "#c8c8c4",
+      "scale": 1,
+      "ribbon": ["#2f4f9a", "#9a9a96", "#9a9a96", "#9a9a96", "#9a9a96", "#9a9a96", "#2f4f9a"],
+      "emblem": "labour",
+      "inspectDistance": 0.2,
+      "hotspots": [
+        {"id": "obverse", "label": "Face", "position": [0, -0.02, 0.0017]},
+        {"id": "reverse", "label": "Back", "position": [0, -0.02, -0.0017]},
+        {"id": "eyelet", "label": "Eyelet", "position": [0, -0.0005, 0]},
+        {"id": "ribbon", "label": "Ribbon", "position": [0, 0.022, 0.0025]},
+        {"id": "pin", "label": "Mount pin", "position": [0, 0.022, -0.0025]}
+      ]
+    }
+  },
+  {
+    "id": "medal_liberation_prague",
+    "category": "militaria",
+    "name": "Medal \"For the Liberation of Prague\"",
+    "era": "1940s",
+    "baseValue": {"min": 2000, "max": 3500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 18, "tolerance": 1},
+    "magnetic": false,
+    "rarity": 0.33,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "face", "tool": "loupe", "finding": "ЗА ОСВОБОЖДЕНИЕ ПРАГИ round a star and a rising sun, the rays sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "reverse", "tool": "loupe", "finding": "On the back, the date 9 МАЯ 1945 under a small star, cleanly struck.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "patina", "tool": "loupe", "finding": "The brass has gone brown and soft, worn bright only on the highest points.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "obverse"},
+        {"id": "ribbon", "tool": "loupe", "finding": "The ribbon is threadbare at the fold, the block's tin rusted at the pin.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "ribbon"},
+        {"id": "heft", "tool": "scale", "finding": "About right for a brass medal of the war years.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_medal", "tool": "magnet", "finding": "The disc ignores the magnet; the pin twitches.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "pin"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "cast_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.05,
+          "weight": 2,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "face", "tool": "loupe", "finding": "The sun's rays run together near the edge, and the field is grainy.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"},
+            {"id": "patina", "tool": "loupe", "finding": "The brown is a chemical stain: it rubs off on a finger, bright yellow underneath.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "obverse"},
+            {"id": "heft", "tool": "scale", "finding": "A shade light.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "rebuilt_block",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.6,
+          "weight": 1,
+          "tells": [
+            {"id": "pin", "tool": "loupe", "finding": "The mount behind the ribbon is a later pattern, its pin bright and new.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "pin"}
+          ]
+        }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "Grandfather went all the way to Prague. He talked about the beer, never the rest.",
+      "A campaign medal, the Prague one. They're rarer than Berlin.",
+      "From the box of his things. Mum said sell it or she'll throw it out."
+    ],
+    "model": {
+      "glb": "medal_liberation_prague.glb",
+      "placeholder": "medal",
+      "color": "#c09a5c",
+      "scale": 1,
+      "ribbon": ["#7fa9d8", "#7fa9d8", "#26407e", "#7fa9d8", "#7fa9d8"],
+      "emblem": "prague",
+      "inspectDistance": 0.2,
+      "hotspots": [
+        {"id": "obverse", "label": "Face", "position": [0, -0.02, 0.0017]},
+        {"id": "reverse", "label": "Back", "position": [0, -0.02, -0.0017]},
+        {"id": "eyelet", "label": "Eyelet", "position": [0, -0.0005, 0]},
+        {"id": "ribbon", "label": "Ribbon", "position": [0, 0.022, 0.0025]},
+        {"id": "pin", "label": "Mount pin", "position": [0, 0.022, -0.0025]}
+      ]
+    }
+  },
+  {
+    "id": "medal_capture_konigsberg",
+    "category": "militaria",
+    "name": "Medal \"For the Capture of Königsberg\"",
+    "era": "1940s",
+    "baseValue": {"min": 3000, "max": 5000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 18, "tolerance": 1},
+    "magnetic": false,
+    "rarity": 0.24,
+    "fakeChance": 0.4,
+    "tells": [
+        {"id": "face", "tool": "loupe", "finding": "ЗА ВЗЯТИЕ КЁНИГСБЕРГА in sharp letters round a star, the dots over the Ё crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "reverse", "tool": "loupe", "finding": "The back reads 10 АПРЕЛЯ 1945 under a star, evenly struck.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "patina", "tool": "loupe", "finding": "Dark, even brass patina with honest bright wear on the rim.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "obverse"},
+        {"id": "ribbon", "tool": "loupe", "finding": "The ribbon's green has faded to olive along the fold.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "ribbon"},
+        {"id": "heft", "tool": "scale", "finding": "A brass medal's weight, no more, no less.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_medal", "tool": "magnet", "finding": "Only the pin answers the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "pin"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "cast_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.05,
+          "weight": 2,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "face", "tool": "loupe", "finding": "The Ё has lost its dots in a blur, and the lettering is soft.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"},
+            {"id": "reverse", "tool": "loupe", "finding": "The date is lumpy, a casting seam across the back.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "reverse"},
+            {"id": "heft", "tool": "scale", "finding": "Light for brass.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "reribboned",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "ribbon", "tool": "loupe", "finding": "A fresh, bright ribbon on an old rusty block.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "ribbon"}
+          ]
+        }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "Königsberg. Grandad stormed it. Now they call it something else.",
+      "The rare one, collectors want it. I read it on the internet.",
+      "He kept it in a matchbox with his ration card. I'll keep the ration card."
+    ],
+    "model": {
+      "glb": "medal_capture_konigsberg.glb",
+      "placeholder": "medal",
+      "color": "#bf995a",
+      "scale": 1,
+      "ribbon": ["#2e6b3a", "#2e6b3a", "#1d3f7a", "#2e6b3a", "#2e6b3a"],
+      "emblem": "konigsberg",
+      "inspectDistance": 0.2,
+      "hotspots": [
+        {"id": "obverse", "label": "Face", "position": [0, -0.02, 0.0017]},
+        {"id": "reverse", "label": "Back", "position": [0, -0.02, -0.0017]},
+        {"id": "eyelet", "label": "Eyelet", "position": [0, -0.0005, 0]},
+        {"id": "ribbon", "label": "Ribbon", "position": [0, 0.022, 0.0025]},
+        {"id": "pin", "label": "Mount pin", "position": [0, 0.022, -0.0025]}
+      ]
+    }
+  },
+  {
+    "id": "medal_forty_years_victory",
+    "category": "militaria",
+    "name": "Jubilee medal \"Forty Years of Victory\"",
+    "era": "1985",
+    "baseValue": {"min": 500, "max": 1000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 21, "tolerance": 1.2},
+    "magnetic": false,
+    "rarity": 0.28,
+    "fakeChance": 0.1,
+    "tells": [
+        {"id": "face", "tool": "loupe", "finding": "A soldier against the eternal flame and 1945–1985, the relief crisp but shallow.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse"},
+        {"id": "reverse", "tool": "loupe", "finding": "On the back, '40 ЛЕТ ПОБЕДЫ' in a wreath, cleanly struck. No number: these weren't numbered.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "ribbon", "tool": "loupe", "finding": "Orange and black stripes on red, faded evenly.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "ribbon"},
+        {"id": "heft", "tool": "scale", "finding": "A tombac medal's ordinary weight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_medal", "tool": "magnet", "finding": "The disc ignores the magnet; only the pin tugs.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "pin"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "reribboned",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "ribbon", "tool": "loupe", "finding": "The ribbon is new and shiny, glued at the back rather than sewn.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "pin"}
+          ]
+        }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "Every veteran got one in 1985. My grandfather got two, he lost the first.",
+      "It's a medal. Victory. That must be worth something.",
+      "For the pension, Grandma says. She's joking. I think."
+    ],
+    "model": {
+      "glb": "medal_forty_years_victory.glb",
+      "placeholder": "medal",
+      "color": "#c7a35e",
+      "scale": 1,
+      "ribbon": ["#b3222a", "#e07a1f", "#1a1a1a", "#e07a1f", "#1a1a1a", "#e07a1f", "#b3222a"],
+      "emblem": "forty",
+      "inspectDistance": 0.2,
+      "hotspots": [
+        {"id": "obverse", "label": "Face", "position": [0, -0.02, 0.0017]},
+        {"id": "reverse", "label": "Back", "position": [0, -0.02, -0.0017]},
+        {"id": "eyelet", "label": "Eyelet", "position": [0, -0.0005, 0]},
+        {"id": "ribbon", "label": "Ribbon", "position": [0, 0.022, 0.0025]},
+        {"id": "pin", "label": "Mount pin", "position": [0, 0.022, -0.0025]}
+      ]
+    }
+  },
+  {
+    "id": "order_patriotic_war",
+    "category": "militaria",
+    "name": "Order of the Patriotic War, 2nd class (1985 issue)",
+    "era": "1985",
+    "baseValue": {"min": 3500, "max": 6000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 31, "tolerance": 1.6},
+    "magnetic": false,
+    "rarity": 0.33,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "center", "tool": "loupe", "finding": "The hammer and sickle in the centre medallion stand crisp, ОТЕЧЕСТВЕННАЯ ВОЙНА on the white band.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "center"},
+        {"id": "enamel", "tool": "loupe", "finding": "Ruby-red enamel on the star's rays, glassy, with fine silver showing at the edges.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "enamel"},
+        {"id": "rays", "tool": "loupe", "finding": "Behind the star, the silver sunburst and the crossed rifle and sabre are sharp to the tips.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "enamel"},
+        {"id": "reverse", "tool": "loupe", "finding": "On the back, the mint mark and a hand-stamped number in the 1985 range.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "reverse"},
+        {"id": "screw", "tool": "loupe", "finding": "A threaded post with a big round nut, the mint's name on the nut.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "nut"},
+        {"id": "heft", "tool": "scale", "finding": "Solid silver weight in the palm.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_order", "tool": "magnet", "finding": "Nothing on it stirs for the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "screw"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "cast_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 2,
+          "weightFactor": 0.82,
+          "tells": [
+            {"id": "enamel", "tool": "loupe", "finding": "The red is cold paint with a brush stroke in it, sunk below the silver.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "enamel"},
+            {"id": "rays", "tool": "loupe", "finding": "The rifle and sabre are lumpy, the sunburst rays blunt.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "enamel"},
+            {"id": "heft", "tool": "scale", "finding": "Light for silver.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "number_ground",
+          "kind": "restored",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "reverse", "tool": "loupe", "finding": "Around the number the back is ground smooth and re-struck: someone changed it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "reverse"}
+          ]
+        }
+    ],
+    "demandTags": ["militaria", "soviet"],
+    "claims": [
+      "In 1985 they gave it to every veteran still living. He'd waited forty years.",
+      "Order of the Patriotic War. Silver, enamel, a proper order.",
+      "He wore it every Victory Day. Then he stopped going. Then he stopped."
+    ],
+    "model": {
+      "glb": "order_patriotic_war.glb",
+      "placeholder": "order",
+      "color": "#b01e28",
+      "scale": 1,
+      "inspectDistance": 0.17,
+      "hotspots": [
+        {"id": "center", "label": "Centre", "position": [0, 0, 0.0032]},
+        {"id": "enamel", "label": "Enamel ray", "position": [0, 0.017, 0.0022]},
+        {"id": "reverse", "label": "Back", "position": [0.009, -0.012, -0.0022]},
+        {"id": "screw", "label": "Screw post", "position": [0, 0, -0.0105]},
+        {"id": "nut", "label": "Nut", "position": [0.0125, 0, -0.0095]}
+      ]
+    }
   }
 ]

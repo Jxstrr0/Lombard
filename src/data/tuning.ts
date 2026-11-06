@@ -609,6 +609,11 @@ export const tuning = {
       cameras: { winter: 0.85, spring: 1.05, summer: 1.2, autumn: 0.9 },
       coins: { winter: 1.05, spring: 1, summer: 0.95, autumn: 1 },
       silver: { winter: 1, spring: 1, summer: 1, autumn: 1 },
+      /** M6 wave B, vinyl & media: records and the winter indoors, encyclopaedias before term, consoles at New Year. */
+      vinyl: { winter: 1.1, spring: 0.95, summer: 0.9, autumn: 1.05 },
+      retro: { winter: 1.05, spring: 1, summer: 0.95, autumn: 1 },
+      games: { winter: 1.15, spring: 0.95, summer: 0.9, autumn: 1 },
+      books: { winter: 1.05, spring: 0.9, summer: 0.85, autumn: 1.15 },
       /** M6 wave A. Music schools start in September; summer is for the dacha, not the bayan. */
       instruments: { winter: 1, spring: 1.05, summer: 0.9, autumn: 1.1 },
       /** Dacha and renovation season. */
@@ -622,12 +627,12 @@ export const tuning = {
      * first week (the career starts 3 March).
      */
     holidays: [
-      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, laptops: 1.1, cameras: 1.1 } },
+      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, laptops: 1.1, cameras: 1.1, games: 1.3, vinyl: 1.1 } },
       { id: 'defender_day', from: '02-16', to: '02-23', boost: { watches: 1.15, militaria: 1.1 } },
       { id: 'womens_day', from: '02-28', to: '03-08', boost: { jewelry: 1.35, gold: 1.2, watches: 1.05 } },
       { id: 'victory_day', from: '04-25', to: '05-10', boost: { militaria: 1.45, soviet: 1.15 } },
       { id: 'white_nights', from: '06-01', to: '07-10', boost: { cameras: 1.2, soviet: 1.1 } },
-      { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25, laptops: 1.35 } },
+      { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25, laptops: 1.35, books: 1.2 } },
       // M6 seasons of news: city days the paper covers that move no demand (empty boost: no hint).
       { id: 'city_day', from: '05-25', to: '05-28', boost: {} },
       { id: 'graduates', from: '06-22', to: '06-26', boost: {} },
@@ -910,7 +915,7 @@ export const tuning = {
       /** Bulletin lines kept (and shown in the ledger) this many days. */
       keepDays: 21,
       /** Categories that get stolen and printed. */
-      categories: ['gold', 'watches', 'phones', 'cameras', 'electronics', 'militaria', 'coins', 'tools', 'silver'] as readonly string[],
+      categories: ['gold', 'watches', 'phones', 'cameras', 'electronics', 'militaria', 'coins', 'tools', 'silver', 'media'] as readonly string[],
       /** Only everyday pieces get printed: an item def whose top value (baseValue.max) is over this never does. */
       maxValue: 30_000,
     },

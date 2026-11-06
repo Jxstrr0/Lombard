@@ -437,5 +437,331 @@
         { "id": "lugs", "label": "Lugs", "position": [0, 0.0205, 0.002] }
       ]
     }
+  },
+  {
+    "id": "watch_vostok_amphibia",
+    "category": "watches",
+    "name": "Vostok Amphibia diver",
+    "brand": "Vostok",
+    "era": "1990s",
+    "baseValue": {"min": 4500, "max": 7500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 66, "tolerance": 4},
+    "magnetic": false,
+    "rarity": 1.3,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "dial", "tool": "loupe", "finding": "The dial print is fine and a little matt; the lume plots have aged to the same even cream as the hands.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "dial"},
+        {"id": "bezel", "tool": "loupe", "finding": "The bezel turns both ways on a stiff friction ring, its numerals worn as much as the case.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "bezel"},
+        {"id": "crown", "tool": "loupe", "finding": "The crown wobbles when unscrewed, as these do: the case pressure seals it, not the thread.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "crown"},
+        {"id": "caseback", "tool": "loupe", "finding": "A screwed back with the diver and 'Amphibia 200 m', worn flat on the high points like the rest.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "caseback"},
+        {"id": "lugs", "tool": "loupe", "finding": "Brushed lugs under honest desk scratches; the edges still sharp.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.45, "hotspot": "lugs"},
+        {"id": "heft", "tool": "scale", "finding": "Light for a diver: thin steel and a thick acrylic crystal.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The case ignores the magnet; only the crown stem stirs.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "crown"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "redial",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 2,
+          "tells": [
+            {"id": "dial", "tool": "loupe", "finding": "The dial print is glossy and razor sharp, the lume fresh white against a case that has seen decades.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "dial"},
+            {"id": "dial_edge", "tool": "loupe", "finding": "At the edge the dial sits off-centre, and the minute track doesn't meet the bezel evenly.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "dial"}
+          ]
+        },
+        {
+          "id": "buffed",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "lugs", "tool": "loupe", "finding": "The lug edges are rounded off and mirror bright: buffed on a wheel.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "lugs"},
+            {"id": "caseback", "tool": "loupe", "finding": "The caseback legend is half polished away; the diver is a smudge.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "caseback"}
+          ]
+        }
+    ],
+    "demandTags": ["watches", "soviet"],
+    "claims": [
+      "Proper diving watch. My uncle wore it on the trawlers, Murmansk to Norway.",
+      "Waterproof to two hundred metres. I tested it in the bath, it's fine.",
+      "Vostok, the Amphibia. Collectors abroad pay dollars for these."
+    ],
+    "model": {
+      "glb": "watch_vostok_amphibia.glb",
+      "placeholder": "watch",
+      "color": "#b8bcc0",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        {"id": "dial", "label": "Dial", "position": [0, 0.007, 0.0065]},
+        {"id": "bezel", "label": "Bezel", "position": [0, 0.019, 0.0068]},
+        {"id": "crown", "label": "Crown", "position": [0.0225, 0, 0]},
+        {"id": "caseback", "label": "Caseback", "position": [0, 0, -0.0065]},
+        {"id": "lugs", "label": "Lugs", "position": [0, 0.0215, 0.002]}
+      ]
+    }
+  },
+  {
+    "id": "watch_poljot_signal",
+    "category": "watches",
+    "name": "Poljot Signal alarm watch",
+    "brand": "Poljot",
+    "era": "1980s",
+    "baseValue": {"min": 7000, "max": 11000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 62, "tolerance": 4},
+    "magnetic": false,
+    "rarity": 0.9,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "dial", "tool": "loupe", "finding": "A small turning disc in the centre of the dial sets the alarm; its triangle and the print are crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "dial"},
+        {"id": "alarm_crown", "tool": "loupe", "finding": "The upper crown winds the alarm spring and turns the disc, each with a firm click.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "alarm_crown"},
+        {"id": "caseback", "tool": "loupe", "finding": "Sound holes round the caseback for the alarm hammer, punched clean, the back engraved with a serial.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "caseback"},
+        {"id": "movement", "tool": "loupe", "finding": "Inside: an alarm calibre with its hammer and gong, factory marks the same era as the dial.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.55, "hotspot": "caseback"},
+        {"id": "lugs", "tool": "loupe", "finding": "Chrome lugs, dulled evenly, with a few pin-prick dents.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.45, "hotspot": "lugs"},
+        {"id": "heft", "tool": "scale", "finding": "Thick and solid for its size; the alarm gear adds weight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The chromed brass case ignores the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "crown"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "no_alarm",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.35,
+          "weight": 2,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "alarm_crown", "tool": "loupe", "finding": "Wound and set, the alarm never goes off: the upper crown turns the disc and nothing else.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "alarm_crown"},
+            {"id": "movement", "tool": "loupe", "finding": "Inside: a plain hand-wound movement packed out with a brass ring. No hammer, no gong.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "caseback"},
+            {"id": "heft", "tool": "scale", "finding": "Light for an alarm watch: there's nothing in it to ring.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35}
+          ]
+        },
+        {
+          "id": "repainted_dial",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "dial", "tool": "loupe", "finding": "The dial print is thick and a hair uneven, the alarm triangle painted by hand.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "dial"}
+          ]
+        }
+    ],
+    "demandTags": ["watches", "soviet"],
+    "claims": [
+      "An alarm watch, Soviet. It buzzes on your wrist like a wasp in a jar.",
+      "My father had it for the night shifts at the shipyard. It never missed one.",
+      "The Signal. They gave them to engineers. You can still set it."
+    ],
+    "model": {
+      "glb": "watch_poljot_signal.glb",
+      "placeholder": "watch",
+      "color": "#c2c4c6",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        {"id": "dial", "label": "Dial", "position": [0, 0.007, 0.0065]},
+        {"id": "caseback", "label": "Caseback", "position": [0, 0, -0.0065]},
+        {"id": "crown", "label": "Crown", "position": [0.0215, 0, 0]},
+        {"id": "alarm_crown", "label": "Alarm crown", "position": [0.0185, 0.0105, 0]},
+        {"id": "lugs", "label": "Lugs", "position": [0, 0.0215, 0.002]}
+      ]
+    }
+  },
+  {
+    "id": "watch_mostochas_lady_583",
+    "category": "watches",
+    "name": "Mostochas ladies' watch, 583 gold case",
+    "brand": "Mostochas",
+    "era": "1970s",
+    "baseValue": {"min": 9000, "max": 14000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 16, "tolerance": 0.6},
+    "magnetic": false,
+    "rarity": 1.1,
+    "fakeChance": 0.4,
+    "tells": [
+        {"id": "dial", "tool": "loupe", "finding": "A tiny champagne dial, MOSTOCHAS and '17 jewels' printed fine and straight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "dial"},
+        {"id": "caseback", "tool": "loupe", "finding": "Inside the back: 583, the assay star and a case number, struck deep and crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "caseback"},
+        {"id": "crown", "tool": "loupe", "finding": "A small gold crown, worn smooth at the edge by forty years of fingernails.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "crown"},
+        {"id": "lugs", "tool": "loupe", "finding": "Soft polished lugs with a few small knocks, the gold the same colour all over.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.45, "hotspot": "lugs"},
+        {"id": "heft", "tool": "scale", "finding": "Surprisingly weighty for something so small.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The case ignores the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "caseback"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_case",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 2,
+          "weightFactor": 0.86,
+          "tells": [
+            {"id": "caseback", "tool": "loupe", "finding": "Inside the back, where the assay stamps should be: 'Au 20 мкм'. Twenty microns of gold plate.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "caseback"},
+            {"id": "lugs", "tool": "loupe", "finding": "Where the strap rubs, the lugs show pinkish brass through the yellow.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "lugs"},
+            {"id": "heft", "tool": "scale", "finding": "A little light for a gold case this size.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35}
+          ]
+        },
+        {
+          "id": "redone_dial",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "dial", "tool": "loupe", "finding": "The dial is suspiciously bright and the lettering thick, repainted by someone with a steady hand but not steady enough.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "dial"}
+          ]
+        }
+    ],
+    "demandTags": ["watches", "gold", "soviet"],
+    "claims": [
+      "My mother's, from her wedding. Gold, five eight three, it says so inside.",
+      "A lady's watch, real gold case. It just needs winding every morning.",
+      "I've no daughter to give it to. Sons don't wear these."
+    ],
+    "model": {
+      "glb": "watch_mostochas_lady_583.glb",
+      "placeholder": "watch",
+      "color": "#d3a957",
+      "scale": 1,
+      "inspectDistance": 0.1,
+      "hotspots": [
+        {"id": "dial", "label": "Dial", "position": [0, 0.004, 0.0042]},
+        {"id": "caseback", "label": "Caseback", "position": [0, 0, -0.0042]},
+        {"id": "crown", "label": "Crown", "position": [0.0128, 0, 0]},
+        {"id": "lugs", "label": "Lugs", "position": [0, 0.0126, 0.0014]}
+      ]
+    }
+  },
+  {
+    "id": "watch_rolland_dateline",
+    "category": "watches",
+    "name": "Rolland Dateline, steel and gold",
+    "brand": "Rolland",
+    "era": "2000s",
+    "baseValue": {"min": 150000, "max": 210000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 110, "tolerance": 6},
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.88,
+    "tells": [
+        {"id": "cyclops", "tool": "loupe", "finding": "The bubble lens over the date blows it up big enough to fill the window.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "dial"},
+        {"id": "dial", "tool": "loupe", "finding": "Applied gold batons, the crown logo crisp, the small print flawless even under the loupe.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "dial"},
+        {"id": "bezel", "tool": "loupe", "finding": "The fluted gold bezel has sharp, even flutes that catch the light all the way round.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "bezel"},
+        {"id": "lugs", "tool": "loupe", "finding": "Between the lugs, an engraved serial, deep and clean, a few grains of dirt in the cuts.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "lugs"},
+        {"id": "crown", "tool": "loupe", "finding": "The crown screws down smoothly; a tiny logo and three dots on it.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "crown"},
+        {"id": "heft", "tool": "scale", "finding": "Dense: a solid bracelet and a lot of steel and gold.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "Nothing on the case or the bracelet stirs for the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "caseback"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "replica",
+          "kind": "fake",
+          "valueMultiplier": 0.02,
+          "weight": 3,
+          "weightFactor": 0.82,
+          "tells": [
+            {"id": "cyclops", "tool": "loupe", "finding": "The date under the bubble lens is barely magnified, small in its window.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3, "hotspot": "dial"},
+            {"id": "lugs", "tool": "loupe", "finding": "Between the lugs, the serial is a shallow frosted etching, not cut.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "lugs"},
+            {"id": "heft", "tool": "scale", "finding": "Light for what it claims: a hollow bracelet.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3},
+            {"id": "seconds", "tool": "loupe", "finding": "The seconds hand stutters round in little steps instead of gliding.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "dial"}
+          ]
+        },
+        {
+          "id": "aftermarket_dial",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "dial", "tool": "loupe", "finding": "A sparkly diamond dial, but the stones sit in glued cups and the print beside them is thick.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "dial"},
+            {"id": "bezel", "tool": "loupe", "finding": "The bezel is set with stones in cheap claws, and the flutes they replaced are gone.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "bezel"}
+          ]
+        }
+    ],
+    "demandTags": ["watches", "luxury", "gold"],
+    "claims": [
+      "A Rolland. Bought it in Geneva on business. Well, in the airport.",
+      "Two tone, steel and gold, the classic. I've got the box at home somewhere.",
+      "My partner gave it to me. We're not partners any more. Don't ask."
+    ],
+    "model": {
+      "glb": "watch_rolland_dateline.glb",
+      "placeholder": "watch",
+      "color": "#c7cacc",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        {"id": "dial", "label": "Dial", "position": [0, 0.007, 0.0062]},
+        {"id": "bezel", "label": "Bezel", "position": [0, 0.0185, 0.0055]},
+        {"id": "crown", "label": "Crown", "position": [0.0215, 0, 0]},
+        {"id": "caseback", "label": "Caseback", "position": [0, 0, -0.0062]},
+        {"id": "lugs", "label": "Between the lugs", "position": [0, 0.0215, 0]}
+      ]
+    }
+  },
+  {
+    "id": "watch_omeca_lunaris",
+    "category": "watches",
+    "name": "Omeca Lunaris chronograph",
+    "brand": "Omeca",
+    "era": "1990s",
+    "baseValue": {"min": 110000, "max": 150000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 100, "tolerance": 6},
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.8,
+    "tells": [
+        {"id": "crystal", "tool": "loupe", "finding": "Tilted to the light, a tiny Omeca logo shows etched in the middle of the domed crystal.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "dial"},
+        {"id": "dial", "tool": "loupe", "finding": "Three sunk subdials, crisp white print on black, the hands' lume aged to a warm cream.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "dial"},
+        {"id": "bezel", "tool": "loupe", "finding": "The tachymeter bezel's dot sits just over the 90, as it should on this reference.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.55, "hotspot": "bezel"},
+        {"id": "pushers", "tool": "loupe", "finding": "Start, stop, reset: the hand flies back to twelve dead on, every time.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "pushers"},
+        {"id": "caseback", "tool": "loupe", "finding": "The caseback carries the Omeca seal and 'Flight qualified', engraved deep.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "caseback"},
+        {"id": "heft", "tool": "scale", "finding": "Solid steel, a hand-wound movement and a heavy bracelet.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The steel case ignores the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "caseback"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "quartz_replica",
+          "kind": "fake",
+          "valueMultiplier": 0.03,
+          "weight": 3,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "dial", "tool": "loupe", "finding": "The small seconds subdial ticks once a second, like a kitchen clock.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3, "hotspot": "dial"},
+            {"id": "pushers", "tool": "loupe", "finding": "Reset sends the hand back short of twelve; the pushers feel hollow.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "pushers"},
+            {"id": "crystal", "tool": "loupe", "finding": "A flat mineral glass with no etching anywhere in it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "dial"},
+            {"id": "heft", "tool": "scale", "finding": "Too light by a long way for steel and a mechanical movement.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "service_case",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.6,
+          "weight": 1,
+          "tells": [
+            {"id": "bezel", "tool": "loupe", "finding": "The dot on the bezel sits beside the 90, not over it: a later replacement insert.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.55, "hotspot": "bezel"},
+            {"id": "caseback", "tool": "loupe", "finding": "The caseback's reference number belongs to a different model.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "caseback"}
+          ]
+        }
+    ],
+    "demandTags": ["watches", "luxury"],
+    "claims": [
+      "The Lunaris. The one they wore in space. Not this one. But the same.",
+      "Hand-wound, you have to wind it. That's how you know it's serious.",
+      "My father bought it in the nineties when he had money. Now I don't."
+    ],
+    "model": {
+      "glb": "watch_omeca_lunaris.glb",
+      "placeholder": "watch",
+      "color": "#c4c7ca",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        {"id": "dial", "label": "Dial", "position": [0, 0.007, 0.0065]},
+        {"id": "bezel", "label": "Bezel", "position": [0, 0.0185, 0.0062]},
+        {"id": "crown", "label": "Crown", "position": [0.0215, 0, 0]},
+        {"id": "pushers", "label": "Pushers", "position": [0.0185, 0.0105, 0]},
+        {"id": "caseback", "label": "Caseback", "position": [0, 0, -0.0065]}
+      ]
+    }
   }
 ]

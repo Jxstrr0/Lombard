@@ -5,6 +5,7 @@ import coins from './coins.json'
 import electronics from './electronics.json'
 import gold from './gold.json'
 import icons from './icons.json'
+import media from './media.json'
 import militaria from './militaria.json'
 import phones from './phones.json'
 import watches from './watches.json'
@@ -29,6 +30,8 @@ export const RAW_ITEM_FILES: Readonly<Record<string, readonly unknown[]>> = {
   tools,
   silver,
   antiques,
+  // M6 wave B
+  media,
 }
 
 export const ITEM_DEFS: readonly ItemDef[] = Object.values(RAW_ITEM_FILES)

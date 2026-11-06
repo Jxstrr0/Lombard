@@ -8,6 +8,9 @@ the shank at the bottom.
 Placeholder convention (src/render/items.ts): ring with the hole axis Z, inner
 radius 0.0086, flat oval face on top at +Y (y ≈ 0.0122, 11.2 × 9.2 mm).
 Hotspots: face (0, 0.0118, 0), inner (0, −0.0085, 0).
+
+M6 wave B: ids containing "ruby" get a bezel-set red stone in place of the
+engraving (stone top y ≈ 0.0128, bezel edge ≈ (0, 0.0106, 0.0036)).
 """
 
 from __future__ import annotations
@@ -174,6 +177,25 @@ def face_scratches(mat, n: int, seed: int) -> None:
         lib.transform(o, lib.at(0, TOP - 0.000002, 0) @ lib.rot("x", -math.pi / 2))
 
 
+def stone_setting(it: lib.Item, gold) -> None:
+    """M6 wave B: a bezel-set oval red stone on the head instead of the engraving.
+    The bezel is a rubbed-over collar round the face; the stone (a faceted-top
+    synthetic ruby, as Soviet jewellers set them) domes up to y ≈ 0.0128."""
+    ruby = lib.material(it, "stone", "#6e0414", metal=0.0, rough=0.02, ao=False)
+    sa, sb = 0.0042, 0.0033  # stone half axes (x, z)
+    k = sb / sa
+    bezel = [(sa - 0.00005, TOP - 0.0002), (sa + 0.00055, TOP - 0.0002), (sa + 0.0006, TOP + 0.00025), (sa + 0.00035, TOP + 0.00055), (sa - 0.00015, TOP + 0.00045), (sa - 0.00005, TOP - 0.0002)]
+    o = lib.lathe("bezel", bezel, gold, segments=72, axis="y", cap=False)
+    o.data.transform(Matrix.Diagonal((1, 1, k, 1)))
+    lib.auto_smooth(o, 45)
+    # stone: girdle hidden in the bezel, a stepped crown rising to a table
+    prof = [(0.0, TOP - 0.0001), (sa - 0.0001, TOP - 0.0001), (sa - 0.0001, TOP + 0.0004), (sa * 0.8, 0.01245), (sa * 0.58, 0.0127), (sa * 0.45, 0.0128), (0.0, 0.0128)]
+    st = lib.lathe("stone", prof, ruby, segments=16, axis="y", smooth=False, cap=False)
+    st.data.transform(Matrix.Diagonal((1, 1, k, 1)))
+    for f in st.data.polygons:
+        f.use_smooth = False  # flat facets catch the light one by one
+
+
 def build(it: lib.Item) -> None:
     it.ao_size = 1024
     gold = G.gold(it, 0.16)
@@ -182,6 +204,12 @@ def build(it: lib.Item) -> None:
     satin = G.satin(it)
 
     shank(gold)
+    if "ruby" in it.id:
+        head(gold)
+        stone_setting(it, gold)
+        hm = G.hallmark("hm", "583", "star", stamp, digit=0.00055)
+        G.wrap_cylinder(hm, lambda z: RI - 0.0001 * (1 - min(abs(z) / 0.0018, 1) ** 2) + 0.000004, -math.pi / 2, inward=True)
+        return
     hd = head(gold)
     cutter = engraving_cutters(it, cut)
     mod = hd.modifiers.new("engrave", "BOOLEAN")

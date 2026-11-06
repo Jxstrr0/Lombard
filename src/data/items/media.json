@@ -1,0 +1,676 @@
+[
+  {
+    "id": "lp_liraphon_estrada",
+    "category": "media",
+    "name": "Liraphon LP, estrada songs of 1979",
+    "brand": "Liraphon",
+    "era": "1979",
+    "baseValue": {"min": 500, "max": 800},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 230, "tolerance": 14},
+    "magnetic": false,
+    "rarity": 0.28,
+    "fakeChance": 0.15,
+    "tells": [
+        {"id": "label", "tool": "loupe", "finding": "A blue Liraphon label with the factory's name, the catalogue number and the side, centred true.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "label"},
+        {"id": "runout", "tool": "loupe", "finding": "In the run-out, a catalogue number scratched by hand, matching the label.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "runout"},
+        {"id": "grooves", "tool": "loupe", "finding": "Fine, even grooves with the usual hairline scuffs. It's been played, not abused.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "grooves"},
+        {"id": "sleeve", "tool": "loupe", "finding": "A smiling singer in a wide collar, the card soft at the corners, price printed: 2 руб. 15 коп.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "sleeve"},
+        {"id": "heft", "tool": "scale", "finding": "A thick Soviet pressing in its card sleeve: about right.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_lp", "tool": "magnet", "finding": "Vinyl and card. The magnet has nothing to say.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "sleeve"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "wrong_disc",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "label", "tool": "loupe", "finding": "The label inside belongs to a different record altogether: a choir, not a crooner.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "label"}
+          ]
+        }
+    ],
+    "demandTags": ["vinyl", "soviet"],
+    "claims": [
+      "My mother danced to this at her wedding. And at her second wedding.",
+      "Liraphon. Every flat in the country had this record. That means it's a classic.",
+      "Played once. Maybe twice. Maybe every New Year since 1979."
+    ],
+    "model": {
+      "glb": "lp_liraphon_estrada.glb",
+      "placeholder": "record",
+      "color": "#d8a03c",
+      "scale": 1,
+      "inspectDistance": 0.75,
+      "hotspots": [
+        {"id": "label", "label": "Label", "position": [0.07, 0.0, 0.0041]},
+        {"id": "runout", "label": "Run-out groove", "position": [0.122, -0.03, 0.0041]},
+        {"id": "grooves", "label": "Grooves", "position": [0.07, -0.13, 0.0042]},
+        {"id": "sleeve", "label": "Sleeve front", "position": [-0.17, 0.14, 0.002]},
+        {"id": "back", "label": "Sleeve back", "position": [-0.05, 0.02, -0.002]}
+      ]
+    }
+  },
+  {
+    "id": "lp_liraphon_rock",
+    "category": "media",
+    "name": "Razvodnye Mosty, first LP (Liraphon, 1987)",
+    "brand": "Liraphon",
+    "era": "1987",
+    "baseValue": {"min": 3000, "max": 5500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 225, "tolerance": 14},
+    "magnetic": false,
+    "rarity": 0.27,
+    "fakeChance": 0.4,
+    "tells": [
+        {"id": "label", "tool": "loupe", "finding": "A white Liraphon label from the Mostograd plant: side A, 1987, the track list in a neat column.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "label"},
+        {"id": "runout", "tool": "loupe", "finding": "In the run-out, the matrix number ends in 1-1: a first stamper.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "runout"},
+        {"id": "sleeve", "tool": "loupe", "finding": "A raised drawbridge in grey on the cover, the band's name in a stencil font, the card a little foxed.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "sleeve"},
+        {"id": "back", "tool": "loupe", "finding": "On the back, the price 2 руб. 50 коп. and a print run figure in tiny type.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "back"},
+        {"id": "grooves", "tool": "loupe", "finding": "The grooves are clean, the first track a little greyer than the rest: someone's favourite.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "grooves"},
+        {"id": "heft", "tool": "scale", "finding": "A thinner late-eighties pressing in its sleeve.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_lp", "tool": "magnet", "finding": "Nothing for the magnet in vinyl and card.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "sleeve"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "repress",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.25,
+          "weight": 2,
+          "tells": [
+            {"id": "runout", "tool": "loupe", "finding": "The matrix number ends in 3-2, and the label is a slightly brighter white: a 1990 repress in the old sleeve.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "runout"}
+          ]
+        },
+        {
+          "id": "bootleg",
+          "kind": "fake",
+          "valueMultiplier": 0.08,
+          "weight": 1,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "sleeve", "tool": "loupe", "finding": "The cover is a colour photocopy glued onto card; the grey drawbridge has gone faintly purple.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "sleeve"},
+            {"id": "label", "tool": "loupe", "finding": "The label is blurry, the letters fattened by copying, and it isn't quite centred.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "label"},
+            {"id": "heft", "tool": "scale", "finding": "Light, thin vinyl.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35}
+          ]
+        }
+    ],
+    "demandTags": ["vinyl", "soviet"],
+    "claims": [
+      "First pressing. You can tell by the smell.",
+      "Razvodnye Mosty, the first album. I queued four hours on Kanatnaya for it.",
+      "The singer's in Berlin now, they say. Making jazz. Disgusting."
+    ],
+    "model": {
+      "glb": "lp_liraphon_rock.glb",
+      "placeholder": "record",
+      "color": "#7c8288",
+      "scale": 1,
+      "inspectDistance": 0.75,
+      "hotspots": [
+        {"id": "label", "label": "Label", "position": [0.07, 0.0, 0.0041]},
+        {"id": "runout", "label": "Run-out groove", "position": [0.122, -0.03, 0.0041]},
+        {"id": "sleeve", "label": "Sleeve front", "position": [-0.17, 0.14, 0.002]},
+        {"id": "back", "label": "Sleeve back", "position": [-0.05, 0.02, -0.002]},
+        {"id": "grooves", "label": "Grooves", "position": [0.07, -0.13, 0.0042]}
+      ]
+    }
+  },
+  {
+    "id": "lp_bone_record",
+    "category": "media",
+    "name": "Bone record: rock and roll on an x-ray, 1950s",
+    "brand": "Kanal",
+    "era": "1950s",
+    "baseValue": {"min": 6000, "max": 12000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 24, "tolerance": 3},
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.6,
+    "tells": [
+        {"id": "film", "tool": "loupe", "finding": "Hold it up: the ribs and spine of a stranger's chest, grey on the thin film, the grooves cut right across them.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "label"},
+        {"id": "hole", "tool": "loupe", "finding": "The centre hole is burned through with a cigarette, scorched brown at the rim.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "label"},
+        {"id": "edge", "tool": "loupe", "finding": "The edge is cut round with scissors, in short uneven snips, the film yellowed and brittle.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "grooves"},
+        {"id": "envelope", "tool": "loupe", "finding": "In a brown paper envelope, a song title pencilled in English and crossed out in Russian.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "sleeve"},
+        {"id": "heft", "tool": "scale", "finding": "Next to nothing: a sheet of old film in paper.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_lp", "tool": "magnet", "finding": "Film and paper. The magnet ignores it.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "sleeve"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "modern_xray",
+          "kind": "fake",
+          "valueMultiplier": 0.05,
+          "weight": 3,
+          "weightFactor": 1.25,
+          "tells": [
+            {"id": "film", "tool": "loupe", "finding": "The film is a modern blue-tinted x-ray, crisp and clean; the date of the scan is still printed in the corner: 2009.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "label"},
+            {"id": "edge", "tool": "loupe", "finding": "The edge is cut perfectly round, by machine.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "grooves"},
+            {"id": "heft", "tool": "scale", "finding": "Heavier than old film: modern stock is thicker.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35}
+          ]
+        },
+        {
+          "id": "uncut_film",
+          "kind": "fake",
+          "valueMultiplier": 0.04,
+          "weight": 1,
+          "tells": [
+            {"id": "film", "tool": "loupe", "finding": "There are no grooves on it at all: just an x-ray cut into a circle.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "label"}
+          ]
+        }
+    ],
+    "demandTags": ["vinyl", "soviet"],
+    "claims": [
+      "Rock on the bones. They cut it on hospital x-rays because records were forbidden.",
+      "Grandfather's. He was a stilyaga. The haircut, the trousers, the whole business.",
+      "American rock and roll on somebody's lungs. Is that not art?",
+      "There's a whole collector in Moscow who wants these. I don't have his number."
+    ],
+    "model": {
+      "glb": "lp_bone_record.glb",
+      "placeholder": "record",
+      "color": "#6f7c82",
+      "scale": 0.58,
+      "inspectDistance": 0.45,
+      "hotspots": [
+        {"id": "label", "label": "Label", "position": [0.07, 0.0, 0.0041]},
+        {"id": "grooves", "label": "Grooves", "position": [0.07, -0.13, 0.0042]},
+        {"id": "sleeve", "label": "Sleeve front", "position": [-0.17, 0.14, 0.002]},
+        {"id": "back", "label": "Sleeve back", "position": [-0.05, 0.02, -0.002]}
+      ]
+    }
+  },
+  {
+    "id": "deck_rubezh_302",
+    "category": "media",
+    "name": "Rubezh M-302 stereo cassette deck",
+    "brand": "Rubezh",
+    "era": "1980s",
+    "baseValue": {"min": 1500, "max": 3000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 6500, "tolerance": 260},
+    "magnetic": true,
+    "rarity": 0.36,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "badge", "tool": "loupe", "finding": "РУБЕЖ М-302 in raised silver letters, the factory quality mark beside it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "front"},
+        {"id": "plate", "tool": "loupe", "finding": "On the back plate, the serial, the year 1986 and the price stamped into the steel: 380 руб.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "back"},
+        {"id": "meters", "tool": "loupe", "finding": "Two needle meters, both swinging together; the lamps behind them still glow.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "meters"},
+        {"id": "door", "tool": "loupe", "finding": "The cassette door rises slowly on its damper, the heads inside clean and unworn.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "door"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy, a steel case and a big transformer.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The steel lid takes the magnet firmly.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "top"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "dead_motor",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.35,
+          "weight": 2,
+          "tells": [
+            {"id": "door", "tool": "loupe", "finding": "Inside, the drive belt is new and the motor screws are scratched: someone's been in, and the tape won't turn.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "door"}
+          ]
+        },
+        {
+          "id": "parts_mixed",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.6,
+          "weight": 1,
+          "tells": [
+            {"id": "plate", "tool": "loupe", "finding": "The back plate is from an M-301, riveted on with mismatched rivets.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "back"}
+          ]
+        }
+    ],
+    "demandTags": ["retro", "soviet"],
+    "claims": [
+      "Rubezh, three-oh-two. Best Soviet deck. Better than the Japanese, my father said.",
+      "Works perfectly. The left side is a bit quiet. You get used to it.",
+      "It cost three months' wages in 1986. So really, it's worth three months' wages."
+    ],
+    "model": {
+      "glb": "deck_rubezh_302.glb",
+      "placeholder": "box",
+      "rest": "upright",
+      "color": "#b9b6ae",
+      "scale": 1,
+      "size": [0.43, 0.115, 0.29],
+      "inspectDistance": 0.85,
+      "hotspots": [
+        {"id": "front", "label": "Front badge", "position": [-0.17, 0.035, 0.145]},
+        {"id": "door", "label": "Cassette door", "position": [-0.08, -0.005, 0.145]},
+        {"id": "meters", "label": "Level meters", "position": [0.1, 0.025, 0.145]},
+        {"id": "top", "label": "Lid", "position": [0.0, 0.0575, 0.0]},
+        {"id": "back", "label": "Back plate", "position": [0.05, 0.0, -0.145]}
+      ]
+    }
+  },
+  {
+    "id": "deck_nakashima_cx7",
+    "category": "media",
+    "name": "Nakashima CX-7 three-head cassette deck",
+    "brand": "Nakashima",
+    "era": "1985",
+    "baseValue": {"min": 5000, "max": 8000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 7800, "tolerance": 300},
+    "magnetic": true,
+    "rarity": 0.6,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "badge", "tool": "loupe", "finding": "NAKASHIMA in a crisp brushed-steel badge; '3 HEAD' and 'MADE IN JAPAN' printed below.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "front"},
+        {"id": "heads", "tool": "loupe", "finding": "Behind the door, three separate heads in a row, polished with use but not worn flat.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "door"},
+        {"id": "plate", "tool": "loupe", "finding": "On the back, a plate with the serial, 220 V and 'Tokyo'.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "back"},
+        {"id": "transport", "tool": "loupe", "finding": "The keys are soft-touch and logic-controlled; the tape changes direction without a clunk.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "keys"},
+        {"id": "heft", "tool": "scale", "finding": "Very heavy for its size: a serious transport inside.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "Steel case; the magnet clings anywhere on the lid.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "top"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "two_head",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 2,
+          "weightFactor": 0.92,
+          "tells": [
+            {"id": "heads", "tool": "loupe", "finding": "Only two heads behind the door: this is the cheaper CX-5 wearing a CX-7 front.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "door"},
+            {"id": "plate", "tool": "loupe", "finding": "The back plate reads CX-5.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "back"}
+          ]
+        },
+        {
+          "id": "worn_heads",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "heads", "tool": "loupe", "finding": "The heads are worn flat and shiny, a dull groove across them; someone polished the case to hide the age.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "door"}
+          ]
+        }
+    ],
+    "demandTags": ["retro"],
+    "claims": [
+      "Japanese, three heads. Brought from Vladivostok by a sailor. Not me. Another sailor.",
+      "A Nakashima, the proper one. Audiophiles go mad for these.",
+      "I've moved on to the digital. It's not the same, but it's smaller."
+    ],
+    "model": {
+      "glb": "deck_nakashima_cx7.glb",
+      "placeholder": "box",
+      "rest": "upright",
+      "color": "#1d1d1f",
+      "scale": 1,
+      "size": [0.43, 0.12, 0.3],
+      "inspectDistance": 0.85,
+      "hotspots": [
+        {"id": "front", "label": "Badge", "position": [-0.17, 0.04, 0.15]},
+        {"id": "door", "label": "Cassette door", "position": [-0.08, -0.005, 0.15]},
+        {"id": "keys", "label": "Transport keys", "position": [0.11, -0.035, 0.15]},
+        {"id": "top", "label": "Lid", "position": [0.0, 0.06, 0.0]},
+        {"id": "back", "label": "Back plate", "position": [0.05, 0.0, -0.15]}
+      ]
+    }
+  },
+  {
+    "id": "vhs_tosaki_vr80",
+    "category": "media",
+    "name": "Tosaki VR-80 video recorder",
+    "brand": "Tosaki",
+    "era": "1993",
+    "baseValue": {"min": 1000, "max": 2000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 4200, "tolerance": 180},
+    "magnetic": true,
+    "rarity": 0.21,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "badge", "tool": "loupe", "finding": "TOSAKI and 'VR-80 HQ' printed crisp and level on the front.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "front"},
+        {"id": "plate", "tool": "loupe", "finding": "On the back, the serial sticker is intact, with PAL/SECAM and a Tosaki hologram.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "back"},
+        {"id": "flap", "tool": "loupe", "finding": "The cassette flap springs shut; inside, the drum is bright and the rollers aren't cracked.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "flap"},
+        {"id": "heft", "tool": "scale", "finding": "About right for a recorder with a metal chassis.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The steel lid takes the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "top"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "grey_clone",
+          "kind": "fake",
+          "valueMultiplier": 0.15,
+          "weight": 2,
+          "weightFactor": 0.75,
+          "tells": [
+            {"id": "badge", "tool": "loupe", "finding": "TOSAKl, the I a lowercase l, and the 'HQ' is a sticker.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "front"},
+            {"id": "plate", "tool": "loupe", "finding": "The back plate is printed on paper, no hologram, made somewhere unnamed.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "back"},
+            {"id": "heft", "tool": "scale", "finding": "Light, a plastic chassis.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "chewing_drum",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.4,
+          "weight": 1,
+          "tells": [
+            {"id": "flap", "tool": "loupe", "finding": "There's a snarl of tape wound round the capstan, and the drum is scratched: it chews.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "flap"}
+          ]
+        }
+    ],
+    "demandTags": ["retro"],
+    "claims": [
+      "We watched every film in the world on this. In translation by one man with a cold.",
+      "Tosaki, Japanese. It still plays. The rewind is faster than the play, as it should be.",
+      "Comes with a tape. Don't ask what's on the tape. A wedding. It's a wedding."
+    ],
+    "model": {
+      "glb": "vhs_tosaki_vr80.glb",
+      "placeholder": "box",
+      "rest": "upright",
+      "color": "#28282a",
+      "scale": 1,
+      "size": [0.36, 0.09, 0.27],
+      "inspectDistance": 0.75,
+      "hotspots": [
+        {"id": "front", "label": "Badge", "position": [-0.13, 0.025, 0.135]},
+        {"id": "flap", "label": "Cassette flap", "position": [-0.02, 0.01, 0.135]},
+        {"id": "top", "label": "Lid", "position": [0.0, 0.045, 0.0]},
+        {"id": "back", "label": "Back plate", "position": [0.06, 0.0, -0.135]}
+      ]
+    }
+  },
+  {
+    "id": "console_nimbus_orbit3",
+    "category": "media",
+    "name": "Nimbus Orbit 3 games console, 320 GB",
+    "brand": "Nimbus",
+    "era": "2012",
+    "baseValue": {"min": 7000, "max": 10500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 2100, "tolerance": 80},
+    "magnetic": true,
+    "rarity": 1.2,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "label", "tool": "loupe", "finding": "Underneath, the sticker gives the model, the serial and '320 GB', with the factory seal over one screw unbroken.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "base"},
+        {"id": "slot", "tool": "loupe", "finding": "The disc slot is clean, its felt lips unfrayed.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "slot"},
+        {"id": "vents", "tool": "loupe", "finding": "The vents at the back have a fur of dust but no scorch marks.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "logo", "tool": "loupe", "finding": "The swirl logo on the lid is moulded in, not printed.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "top"},
+        {"id": "heft", "tool": "scale", "finding": "Dense: a power supply and a fan inside.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The magnet catches at the vents, where the steel frame shows.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "back"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "modded",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.55,
+          "weight": 2,
+          "tells": [
+            {"id": "label", "tool": "loupe", "finding": "The seal over the screw is torn and the screw head is chewed: it's been opened, probably to run copied games.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "base"}
+          ]
+        },
+        {
+          "id": "dead_drive",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "slot", "tool": "loupe", "finding": "The slot is scratched at the lips and something rattles inside when tilted: the drive has had it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "slot"}
+          ]
+        }
+    ],
+    "demandTags": ["games", "electronics"],
+    "claims": [
+      "With two controllers and five games. The games are in the bag. Four games. The fifth is at my cousin's.",
+      "My son's. He's joined the army. He'll get a new one when he's back.",
+      "It just works. You plug it in and it works. Unlike my son."
+    ],
+    "model": {
+      "glb": "console_nimbus_orbit3.glb",
+      "placeholder": "box",
+      "rest": "upright",
+      "color": "#151517",
+      "scale": 1,
+      "size": [0.29, 0.065, 0.29],
+      "inspectDistance": 0.6,
+      "hotspots": [
+        {"id": "slot", "label": "Disc slot", "position": [0.0, 0.008, 0.145]},
+        {"id": "top", "label": "Lid", "position": [0.03, 0.0325, 0.02]},
+        {"id": "back", "label": "Vents", "position": [0.05, 0.0, -0.145]},
+        {"id": "base", "label": "Underside", "position": [0.0, -0.0325, 0.0]}
+      ]
+    }
+  },
+  {
+    "id": "console_kosmo_junior",
+    "category": "media",
+    "name": "Kosmo Junior TV games console",
+    "brand": "Kosmo",
+    "era": "1990s",
+    "baseValue": {"min": 600, "max": 1200},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 640, "tolerance": 40},
+    "magnetic": false,
+    "rarity": 0.26,
+    "fakeChance": 0.2,
+    "tells": [
+        {"id": "badge", "tool": "loupe", "finding": "КОСМО JUNIOR moulded into the lid, a little rocket over the O.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "top"},
+        {"id": "cart", "tool": "loupe", "finding": "In the slot, a yellow cartridge labelled '9999 in 1'. There are, in fact, six games, repeated.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "cart"},
+        {"id": "pads", "tool": "loupe", "finding": "Two pads wired in, the cables taped where a dog has had a go at them.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "front"},
+        {"id": "underside", "tool": "loupe", "finding": "Underneath, a sticker in three languages and a serial, the screws untouched.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "base"},
+        {"id": "heft", "tool": "scale", "finding": "Light plastic, about right.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "All plastic. The magnet slides off.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "top"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "no_power",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.4,
+          "weight": 1,
+          "tells": [
+            {"id": "underside", "tool": "loupe", "finding": "The screws are chewed, the battery hatch lost, and someone's soldered a different power socket on the back.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "base"}
+          ]
+        }
+    ],
+    "demandTags": ["games", "retro"],
+    "claims": [
+      "Nine thousand nine hundred and ninety-nine games! Well. Some are similar.",
+      "Every child in Mostograd had one of these. Now every child has a phone. Progress.",
+      "The duck game works. You need the gun. The gun is lost."
+    ],
+    "model": {
+      "glb": "console_kosmo_junior.glb",
+      "placeholder": "box",
+      "rest": "upright",
+      "color": "#9b9da0",
+      "scale": 1,
+      "size": [0.2, 0.06, 0.15],
+      "inspectDistance": 0.5,
+      "hotspots": [
+        {"id": "top", "label": "Lid", "position": [-0.05, 0.03, 0.03]},
+        {"id": "cart", "label": "Cartridge slot", "position": [0.03, 0.03, -0.025]},
+        {"id": "front", "label": "Pad sockets", "position": [0.0, -0.01, 0.075]},
+        {"id": "base", "label": "Underside", "position": [0.0, -0.03, 0.0]}
+      ]
+    }
+  },
+  {
+    "id": "turntable_rubezh_ep101",
+    "category": "media",
+    "name": "Rubezh EP-101 turntable with lid",
+    "brand": "Rubezh",
+    "era": "1980s",
+    "baseValue": {"min": 2500, "max": 4500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 9500, "tolerance": 380},
+    "magnetic": true,
+    "rarity": 0.27,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "plate", "tool": "loupe", "finding": "On the back, a riveted plate: РУБЕЖ ЭП-101, the serial, 1983 and the price, 260 руб.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "back"},
+        {"id": "arm", "tool": "loupe", "finding": "A straight tonearm with a counterweight that screws smoothly; the cartridge's stylus is present and straight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "arm"},
+        {"id": "lid", "tool": "loupe", "finding": "The smoked lid is scratched with circles from years of being wiped, its hinges firm.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "lid"},
+        {"id": "badge", "tool": "loupe", "finding": "The speed switch reads 33 and 45, the Rubezh badge crisp on the front.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "front"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy: a cast platter and a thick wooden plinth.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_tt", "tool": "magnet", "finding": "The magnet clings to the platter and the motor, not to the wooden plinth.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "lid"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "no_stylus",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.55,
+          "weight": 2,
+          "tells": [
+            {"id": "arm", "tool": "loupe", "finding": "The cartridge is a cheap no-name glued in place, and its stylus is bent sideways.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "arm"}
+          ]
+        },
+        {
+          "id": "warped_platter",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 1,
+          "tells": [
+            {"id": "lid", "tool": "loupe", "finding": "Through the lid, the platter's rim dips and rises as it turns: warped.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "lid"}
+          ]
+        }
+    ],
+    "demandTags": ["vinyl", "retro"],
+    "claims": [
+      "Real Soviet hi-fi. Not like the plastic rubbish now.",
+      "I played Razvodnye Mosty on this every evening for a year. The neighbours complained, then they bought the record.",
+      "The lid is a bit scratched. The sound isn't scratched. Well, a bit."
+    ],
+    "model": {
+      "glb": "turntable_rubezh_ep101.glb",
+      "placeholder": "box",
+      "rest": "upright",
+      "color": "#5b4030",
+      "scale": 1,
+      "size": [0.43, 0.14, 0.36],
+      "inspectDistance": 0.9,
+      "hotspots": [
+        {"id": "lid", "label": "Lid", "position": [-0.04, 0.07, 0.0]},
+        {"id": "arm", "label": "Tonearm", "position": [0.15, 0.07, 0.06]},
+        {"id": "front", "label": "Front panel", "position": [0.12, -0.03, 0.18]},
+        {"id": "back", "label": "Back plate", "position": [-0.1, 0.0, -0.18]}
+      ]
+    }
+  },
+  {
+    "id": "books_mostizdat_encyclopedia",
+    "category": "media",
+    "name": "Mostizdat Great Encyclopedia, 30 volumes",
+    "brand": "Mostizdat",
+    "era": "1970s",
+    "baseValue": {"min": 1000, "max": 2500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 42000, "tolerance": 1600},
+    "magnetic": false,
+    "rarity": 0.17,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "spines", "tool": "loupe", "finding": "Thirty red spines with gilt numbers, volume 1 to volume 30, the gilt rubbed but every number readable.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "spine"},
+        {"id": "imprint", "tool": "loupe", "finding": "On the title page of each, the Mostizdat imprint and a year between 1970 and 1978.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "cover"},
+        {"id": "pages", "tool": "loupe", "finding": "The page edges are clean, not foxed; a few volumes have bookmarks of old tram tickets.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "pages"},
+        {"id": "heft", "tool": "scale", "finding": "Forty kilos and change. Your back agrees.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_books", "tool": "magnet", "finding": "Paper and cloth. Nothing for the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "cover"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "incomplete",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.35,
+          "weight": 2,
+          "weightFactor": 0.9,
+          "tells": [
+            {"id": "spines", "tool": "loupe", "finding": "Volumes 17, 22 and 29 are missing; the gaps are filled with a cookbook in a red cover.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "spine"},
+            {"id": "heft", "tool": "scale", "finding": "Light for thirty volumes. Count them.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35}
+          ]
+        },
+        {
+          "id": "water_damage",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.4,
+          "weight": 1,
+          "tells": [
+            {"id": "pages", "tool": "loupe", "finding": "The bottom edge of the lower volumes is wavy and tide-marked: they've been in a flood.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "pages"}
+          ]
+        }
+    ],
+    "demandTags": ["books"],
+    "claims": [
+      "Everything you need to know is in here. Up to 1978.",
+      "My father subscribed. One volume every few months, for nine years. He read volume one.",
+      "We need the shelf for the television."
+    ],
+    "model": {
+      "glb": "books_mostizdat_encyclopedia.glb",
+      "placeholder": "book",
+      "color": "#8c2a25",
+      "scale": 1,
+      "size": [0.17, 0.25, 0.12],
+      "inspectDistance": 0.6,
+      "hotspots": [
+        {"id": "cover", "label": "Top volume", "position": [0.0, 0.03, 0.06]},
+        {"id": "spine", "label": "Spines", "position": [-0.085, 0.0, 0.0]},
+        {"id": "pages", "label": "Page edges", "position": [0.085, 0.0, 0.0]}
+      ]
+    }
+  },
+  {
+    "id": "book_lunin_drawbridge",
+    "category": "media",
+    "name": "Arkady Lunin, \"The Drawbridge\", first edition, signed",
+    "brand": "Mostizdat",
+    "era": "1962",
+    "baseValue": {"min": 15000, "max": 28000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 420, "tolerance": 24},
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.55,
+    "tells": [
+        {"id": "signature", "tool": "loupe", "finding": "On the flyleaf, 'To Galina, from the other bank. A. Lunin', in brown ink pressed deep into the paper, the pen catching on its upstrokes.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "flyleaf"},
+        {"id": "colophon", "tool": "loupe", "finding": "The colophon at the back: Mostizdat 1962, print run 15,000, signed to press in March.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "colophon"},
+        {"id": "jacket", "tool": "loupe", "finding": "The dust jacket is chipped at the top of the spine, its grey drawbridge faded to blue.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "jacket"},
+        {"id": "spine", "tool": "loupe", "finding": "The cloth spine is stamped in silver, a little dulled; the binding is tight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "spine"},
+        {"id": "heft", "tool": "scale", "finding": "A slim hardback with a jacket: about right.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_book", "tool": "magnet", "finding": "Paper and board. The magnet ignores it.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "jacket"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "forged_signature",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 2,
+          "tells": [
+            {"id": "signature", "tool": "loupe", "finding": "The signature is slow and even, the same pressure everywhere, in a blue ballpoint that didn't exist here in 1962.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "flyleaf"}
+          ]
+        },
+        {
+          "id": "later_printing",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.18,
+          "weight": 1,
+          "weightFactor": 0.95,
+          "tells": [
+            {"id": "colophon", "tool": "loupe", "finding": "The colophon gives 1968, a fourth printing of 100,000. The first edition's jacket has been wrapped around it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "colophon"}
+          ]
+        }
+    ],
+    "demandTags": ["books"],
+    "claims": [
+      "Lunin signed it for my grandmother. They were... friends. That's the family word for it.",
+      "A first edition of The Drawbridge. Before they banned the second book.",
+      "Every schoolchild in Mostograd reads it. Not this copy. This copy is signed.",
+      "I had it valued at the library. Well, the librarian said 'oh!'"
+    ],
+    "model": {
+      "glb": "book_lunin_drawbridge.glb",
+      "placeholder": "book",
+      "color": "#55606a",
+      "scale": 1,
+      "size": [0.135, 0.205, 0.028],
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {"id": "jacket", "label": "Dust jacket", "position": [0.0, 0.02, 0.014]},
+        {"id": "spine", "label": "Spine", "position": [-0.0675, 0.0, 0.0]},
+        {"id": "flyleaf", "label": "Flyleaf (signed)", "position": [0.0675, 0.04, 0.0]},
+        {"id": "colophon", "label": "Last page", "position": [0.0, -0.04, -0.014]}
+      ]
+    }
+  }
+]

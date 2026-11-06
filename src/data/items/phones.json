@@ -325,5 +325,261 @@
         { "id": "bottom", "label": "Bottom edge", "position": [0, -0.0626, 0] }
       ]
     }
+  },
+  {
+    "id": "phone_mangosteen_m4",
+    "category": "phones",
+    "name": "Mangosteen m4",
+    "brand": "Mangosteen",
+    "era": "2010",
+    "baseValue": {"min": 3500, "max": 5500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 137, "tolerance": 5},
+    "magnetic": true,
+    "rarity": 0.42,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "model", "tool": "loupe", "finding": "The small print on the back reads Model MG-1003: the m4, not the S.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.45, "hotspot": "logo"},
+        {"id": "logo", "tool": "loupe", "finding": "Under the glass back, the fruit logo is mirror bright and perfectly sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "logo"},
+        {"id": "simtray", "tool": "loupe", "finding": "The serial on the SIM tray matches the one printed beside the slot.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "simtray"},
+        {"id": "screws", "tool": "loupe", "finding": "Two tiny five-lobed screws at the dock connector, their heads clean.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "bottom"},
+        {"id": "heft", "tool": "scale", "finding": "Dense for its size; glass front and back.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_speaker", "tool": "magnet", "finding": "The magnet tugs near the bottom speaker grille and hardly anywhere else.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "bottom"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.07,
+          "weight": 2,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "logo", "tool": "loupe", "finding": "The fruit logo is printed a touch blurred and the leaf sits too far right.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "logo"},
+            {"id": "screws", "tool": "loupe", "finding": "Cross-head screws at the dock connector.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "bottom"},
+            {"id": "simtray", "tool": "loupe", "finding": "No serial on the SIM tray at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "simtray"},
+            {"id": "heft", "tool": "scale", "finding": "Light, like a toy of itself.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "cracked_back",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "back_glass", "tool": "loupe", "finding": "The back glass is new and too white beside a yellowed front: a cheap replacement panel.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "logo"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics", "phones"],
+    "claims": [
+      "It's the m4. The S is the same, just with a cleverer inside. Same price, surely?",
+      "My daughter got a new one. This one still works fine, mostly.",
+      "Never dropped it. Well. Once. The case took it."
+    ],
+    "model": {
+      "glb": "phone_mangosteen_m4.glb",
+      "placeholder": "phone",
+      "color": "#1d1d1f",
+      "scale": 1,
+      "inspectDistance": 0.3,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0, 0.01, 0.0041]},
+        {"id": "logo", "label": "Logo", "position": [0, 0.01, -0.0041]},
+        {"id": "simtray", "label": "SIM tray", "position": [0.0301, 0.01, 0]},
+        {"id": "bottom", "label": "Bottom edge", "position": [0, -0.0626, 0]}
+      ]
+    }
+  },
+  {
+    "id": "phone_mangosteen_m3g",
+    "category": "phones",
+    "name": "Mangosteen m3G",
+    "brand": "Mangosteen",
+    "era": "2009",
+    "baseValue": {"min": 1500, "max": 2500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 134, "tolerance": 5},
+    "magnetic": true,
+    "rarity": 0.36,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "back", "tool": "loupe", "finding": "The curved plastic back is scuffed glossy; the chrome logo and lettering are sharp under the scratches.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "logo"},
+        {"id": "simtray", "tool": "loupe", "finding": "The SIM tray on the top edge pops out with a pin; its serial matches the phone's.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "simtray"},
+        {"id": "screen", "tool": "loupe", "finding": "The screen lights evenly and the home button clicks with a short travel.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "screen"},
+        {"id": "dock", "tool": "loupe", "finding": "The wide dock connector at the bottom is clean, its pins straight.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "bottom"},
+        {"id": "heft", "tool": "scale", "finding": "Lighter than the glass ones, but solid.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_speaker", "tool": "magnet", "finding": "The magnet pulls faintly at the earpiece and the speaker.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "bottom"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 2,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The back is flat, not curved, and the fruit logo is a sticker under lacquer.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "logo"},
+            {"id": "screen", "tool": "loupe", "finding": "The icons are right but the font under them is wrong, and the home button squeaks.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen"},
+            {"id": "heft", "tool": "scale", "finding": "Light and rattly.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "new_shell",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The back shell is flawless and unscratched, while the screen glass is worn dull.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "logo"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics", "phones"],
+    "claims": [
+      "The first Mangosteen I ever had. Sentimental value. Not much other value, I know.",
+      "Works as a phone. Works as a music player. Doesn't work with anything new.",
+      "Found it in a drawer. It's charged, I charged it."
+    ],
+    "model": {
+      "glb": "phone_mangosteen_m3g.glb",
+      "placeholder": "phone",
+      "color": "#141416",
+      "scale": 1,
+      "inspectDistance": 0.3,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0, 0.01, 0.0041]},
+        {"id": "logo", "label": "Logo", "position": [0, 0.01, -0.0041]},
+        {"id": "simtray", "label": "SIM tray", "position": [0.012, 0.0626, 0]},
+        {"id": "bottom", "label": "Bottom edge", "position": [0, -0.0626, 0]}
+      ]
+    }
+  },
+  {
+    "id": "phone_galaxia_stella3mini",
+    "category": "phones",
+    "name": "Galaxia Stella 3 Mini",
+    "brand": "Galaxia",
+    "era": "2012",
+    "baseValue": {"min": 3000, "max": 4500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 112, "tolerance": 5},
+    "magnetic": true,
+    "rarity": 0.42,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "logo", "tool": "loupe", "finding": "GALAXIA printed sharp and evenly spaced on the glossy back.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "logo"},
+        {"id": "battery", "tool": "loupe", "finding": "Under the back cover, the battery label is crisp, with a hologram sticker.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "battery"},
+        {"id": "screen", "tool": "loupe", "finding": "Deep blacks and bright colours; the glass meets the bezel cleanly.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "screen"},
+        {"id": "port", "tool": "loupe", "finding": "The charging port sits dead centre on the bottom edge, firm and clean.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "bottom"},
+        {"id": "heft", "tool": "scale", "finding": "Light and balanced in the hand.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_speaker", "tool": "magnet", "finding": "The magnet tugs at the earpiece end and nowhere much else.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "screen"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 2,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "logo", "tool": "loupe", "finding": "The logo reads GALAXlA, the I a lowercase l.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "logo"},
+            {"id": "battery", "tool": "loupe", "finding": "A blurry battery label with a huge capacity printed on it and no hologram.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "battery"},
+            {"id": "heft", "tool": "scale", "finding": "Hollow, all the weight at one end.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "aftermarket_screen",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "screen", "tool": "loupe", "finding": "Grey blacks and washed-out colours; a thin glue line along the screen edge.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "screen"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics", "phones"],
+    "claims": [
+      "The small one. Fits a pocket. Women's coats have tiny pockets, did you know?",
+      "Bought it for my mother. She says the buttons on the screen are too clever.",
+      "Galaxia, the Mini. Same as the big one, just mini."
+    ],
+    "model": {
+      "glb": "phone_galaxia_stella3mini.glb",
+      "placeholder": "phone",
+      "color": "#e6e7ea",
+      "scale": 1,
+      "inspectDistance": 0.3,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0, 0.01, 0.0041]},
+        {"id": "logo", "label": "Logo", "position": [0, 0.01, -0.0041]},
+        {"id": "battery", "label": "Battery (under cover)", "position": [0, -0.01, -0.0035]},
+        {"id": "bottom", "label": "Bottom edge", "position": [0, -0.0626, 0]}
+      ]
+    }
+  },
+  {
+    "id": "phone_vertex_signature",
+    "category": "phones",
+    "name": "Vertex Signature luxury phone",
+    "brand": "Vertex",
+    "era": "2010",
+    "baseValue": {"min": 60000, "max": 100000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 180, "tolerance": 7},
+    "magnetic": true,
+    "rarity": 0.3,
+    "fakeChance": 0.9,
+    "tells": [
+        {"id": "keys", "tool": "loupe", "finding": "The keys are polished sapphire on ruby bearings, each letter engraved, not printed.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "keys"},
+        {"id": "screen", "tool": "loupe", "finding": "The screen glass shrugs off the corner of a key: sapphire, not glass.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "screen"},
+        {"id": "logo", "tool": "loupe", "finding": "The V on the leather back is a stamped metal inlay, flush with the stitching.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "logo"},
+        {"id": "plate", "tool": "loupe", "finding": "Under the battery, a steel plate engraved with the serial and 'Handmade in England, No. 0418'.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.5, "hotspot": "battery"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy, like a pebble of steel.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_speaker", "tool": "magnet", "finding": "The magnet tugs at the speaker; the steel frame itself ignores it.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "screen"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "replica",
+          "kind": "fake",
+          "valueMultiplier": 0.02,
+          "weight": 4,
+          "weightFactor": 0.7,
+          "tells": [
+            {"id": "keys", "tool": "loupe", "finding": "The keys are glossy plastic with a wobble, the letters printed on.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "keys"},
+            {"id": "logo", "tool": "loupe", "finding": "The V on the back is a sticker under a thick coat of lacquer.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "logo"},
+            {"id": "plate", "tool": "loupe", "finding": "Under the battery: a plain sticker with a serial in a typeface that doesn't match anything else.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "battery"},
+            {"id": "heft", "tool": "scale", "finding": "Light for steel and sapphire. Most of it is air and plastic.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "guts_swap",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.35,
+          "weight": 1,
+          "tells": [
+            {"id": "plate", "tool": "loupe", "finding": "The engraved plate is there, but the board behind it is a cheap no-name with a hand-soldered aerial.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "battery"},
+            {"id": "screen", "tool": "loupe", "finding": "The menus are a plain phone's, in the wrong font, under the right glass.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "screen"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics", "phones", "luxury"],
+    "claims": [
+      "A Vertex. Handmade. Each one is signed by the man who built it.",
+      "There's a button on the side, it calls a concierge in London. They don't answer any more.",
+      "I got it from a man who had to leave the country quickly. Very quickly.",
+      "This costs more than a car. A small car. A Lada, say."
+    ],
+    "model": {
+      "glb": "phone_vertex_signature.glb",
+      "placeholder": "phone",
+      "color": "#2c241e",
+      "scale": 1,
+      "inspectDistance": 0.3,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0, 0.03, 0.0041]},
+        {"id": "keys", "label": "Keypad", "position": [0, -0.03, 0.0041]},
+        {"id": "logo", "label": "Logo", "position": [0, 0.028, -0.0041]},
+        {"id": "battery", "label": "Battery (under cover)", "position": [0, -0.012, -0.0035]}
+      ]
+    }
   }
 ]

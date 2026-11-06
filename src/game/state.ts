@@ -25,7 +25,7 @@ import type {
 
 export type { ItemInstance } from './types'
 
-export const STATE_VERSION = 6
+export const STATE_VERSION = 7
 
 export type Season = 'winter' | 'spring' | 'summer' | 'autumn'
 export type ISODate = string
@@ -83,6 +83,16 @@ export interface BeatRecord {
   choice?: string
   /** Price ÷ true value, for a beat that ended in a buy or a pawn. */
   ratio?: number
+  /** A beat that ended in a pawn (v7): its loan, and once it's over how it ended and on which day. */
+  loan?: PledgeRecord
+}
+
+/** The loan a story beat made (v7), followed until it ends (story/pledges.ts). */
+export interface PledgeRecord {
+  id: string
+  end?: 'redeemed' | 'forfeited'
+  /** Career day it ended. */
+  day?: number
 }
 
 /** An arc's progress (M4): the beats that have played. */

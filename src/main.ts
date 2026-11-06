@@ -12,6 +12,7 @@
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
+ * ?scenario=rolex / ?scenario=laptop open day 1 with a beat of that arc first in line (BEAT_SCENARIOS);
  * ?scenario=specialist opens day 1 with Gennady's first-refusal phone call, then Ilya at the counter with the widow's watch (M4 specialists' arcs).
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
@@ -37,7 +38,7 @@ import { ITEM_DEFS } from './data/items'
 import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
-import { regularCustomer, regularVisit } from './game/story/plan'
+import { beatVisit, regularCustomer, regularVisit } from './game/story/plan'
 import { setMemory } from './game/story/progress'
 import { specialistCustomer } from './game/story/specialists'
 import type { QueuedVisit } from './game/types'
@@ -100,6 +101,19 @@ function storyScenario(s0: GameState): GameState {
   if (!who || !beat) return s
   const visit: QueuedVisit = { visitId: 'v-dev-story', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
   return { ...s, queue: [visit, ...s.queue] }
+}
+
+/** Dev-only (?scenario=<key>): the beat each arc scenario puts first in line on day 1. */
+const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent' }
+
+function beatScenario(s0: GameState, beatId: string): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'day/open' })
+  const beat = getBeat(beatId)
+  if (!beat) return s
+  let n = 0
+  const visit = beatVisit(s, beat, (prefix) => `${prefix}-dev-${n++}`)
+  return visit ? { ...s, queue: [visit, ...s.queue], day: { ...s.day, total: s.day.total + 1 } } : s
 }
 
 /** Dev-only (?seed=N&scenario=specialist): a specialist's phone call (a choice), then a specialist at the counter (a choice). */
@@ -242,6 +256,8 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
     if (params.get('scenario') === 'story') initial = storyScenario(initial)
     if (params.get('scenario') === 'specialist') initial = specialistScenario(initial)
+    const beatId = BEAT_SCENARIOS[params.get('scenario') ?? '']
+    if (beatId) initial = beatScenario(initial, beatId)
     const regular = params.get('regular')
     if (regular) {
       const trust = params.has('trust') ? Number(params.get('trust')) : NaN

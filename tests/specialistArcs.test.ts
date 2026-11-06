@@ -26,7 +26,7 @@ import { applyEffects } from '../src/game/story/effects'
 import { eligibleBeats } from '../src/game/story/plan'
 import { endArc, recordBeat } from '../src/game/story/progress'
 import { boostSellers, monthsRetained, noteBought, noteCall, specialistCustomer, startBoost } from '../src/game/story/specialists'
-import { addDays, weekdayOf, type GameState } from '../src/game/state'
+import { addDays, STATE_VERSION, weekdayOf, type GameState } from '../src/game/state'
 import type { Condition } from '../src/game/schema/story'
 import type { ItemInstance, QueuedVisit, SpecialistState } from '../src/game/types'
 
@@ -456,7 +456,8 @@ describe('save v6', () => {
       story: story5,
     }
     const out = migrate(JSON.parse(JSON.stringify(v5)))
-    expect(out.meta.version).toBe(6)
+    // Migrates on through the later steps to the current version.
+    expect(out.meta.version).toBe(STATE_VERSION)
     expect(out.specialists.jeweler).toEqual({ retained: true, relationship: 0.25, callsUsed: 2, sinceDay: 1, months: 1, events: {}, mods: {}, lowballed: [] })
     expect(out.specialists.watchmaker!.months).toBe(0)
     expect(out.story.boosts).toEqual([])

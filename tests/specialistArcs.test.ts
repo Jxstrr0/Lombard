@@ -54,6 +54,8 @@ function item(defId: string, authenticity: ItemInstance['authenticity'] = 'genui
 
 /** Who plays whom: Faina and Zhenya are women, Ilya and Stanislav men. */
 const SPECIALIST_GENDER: Record<string, 'f' | 'm'> = { jeweler: 'f', watchmaker: 'm', antiquary: 'm', technician: 'f' }
+/** The last free regular-only looks, kept for arc characters: Edik (Dubai Rolex Guy), Fedya (Student's Laptop), Eduard and Zhora (Protection). */
+const RESERVED_LOOKS = new Set(['business_male_05', 'male_adult_06', 'male_adult_20', 'male_adult_11'])
 
 const eligible = (s: GameState, prefix = '') => new Set(eligibleBeats(s).map((b) => b.id).filter((id) => id.startsWith(prefix)))
 
@@ -97,7 +99,7 @@ describe('specialist arcs: content', () => {
     for (const [id, o] of Object.entries(tuning.specialistArcs.offers)) for (const c of o.categories) expect(cats.has(c), `${id} ${c}`).toBe(true)
   })
 
-  it('specialists who come to the counter wear a look of their gender that no regular or other specialist wears', () => {
+  it('specialists who come to the counter wear a look of their gender that no regular, other specialist or reserved arc character wears', () => {
     const taken = new Map(REGULARS.map((r) => [r.look, r.id]))
     for (const sp of SPECIALISTS) {
       const counter = ARCS.find((a) => a.specialist === sp.id)!.beats.some((b) => b.visit.who === sp.id && b.visit.via === 'counter')
@@ -105,6 +107,7 @@ describe('specialist arcs: content', () => {
       expect(sp.look, sp.id).toBeDefined()
       expect(looks.get(sp.look!), `${sp.id} ${sp.look}`).toBeDefined()
       expect(looks.get(sp.look!)!.gender, `${sp.id} ${sp.look}`).toBe(SPECIALIST_GENDER[sp.id])
+      expect(RESERVED_LOOKS.has(sp.look!), `${sp.id}: ${sp.look} is reserved for an arc character`).toBe(false)
       expect(taken.get(sp.look!), `${sp.id} shares ${sp.look}`).toBeUndefined()
       taken.set(sp.look!, sp.id)
     }

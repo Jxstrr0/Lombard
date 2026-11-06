@@ -5,8 +5,10 @@
  * tuning.specialists.roster[id]; their small arcs are src/data/stories/<first name>.ts
  * (GDD § 2b). `look` is the cast member who plays them at the counter (Gennady only
  * ever phones, so he has none). No regular wears it. The regular-only looks ran out
- * with the fifteen regulars, so only Stanislav has one; the others borrow a walk-in
- * look (marking more looks `regular` would reshuffle every walk-in's derived look).
+ * with the fifteen regulars (the last four are reserved for arc characters:
+ * business_male_05 Edik, male_adult_06 Fedya, male_adult_20 Eduard, male_adult_11
+ * Zhora), so every specialist borrows a walk-in look (marking more looks `regular`
+ * would reshuffle every walk-in's derived look).
  *
  * Roster order matters: specialistFor() picks the first retained one covering
  * a category, so keep the categories disjoint.
@@ -107,7 +109,7 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
   },
   {
     id: 'antiquary',
-    look: 'business_male_05',
+    look: 'business_male_07',
     name: 'Stanislav Edgarovich Lyubimov',
     short: 'Stanislav',
     role: 'Antiques dealer, Dvoryanskaya embankment',

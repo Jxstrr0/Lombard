@@ -13,7 +13,7 @@ import { upcomingBills } from '../game/economy/expenses'
 import { availableTools } from '../game/inspect/available'
 import type { ToolId } from '../game/schema/item'
 import type { GameState } from '../game/state'
-import type { Finding } from '../game/types'
+import type { Finding, ItemVisit } from '../game/types'
 
 export interface PolicyContext {
   /** Policy's own value estimate per item id it bought or holds. */
@@ -102,6 +102,13 @@ export function makePolicy(p: PolicyParams): Policy {
         return state.queue.length > 0 ? { type: 'counter/next' } : { type: 'day/close' }
       }
       if (c.phase === 'resolved') return { type: 'counter/dismiss' }
+      // Story scenes: read on, and take the first choice offered (the sim judges prices, not people).
+      if (c.phase === 'scene') {
+        const sc = c.scene
+        if (sc && !sc.chosen && sc.step >= sc.lines.length - 1 && sc.choices.length > 0) return { type: 'scene/choose', choiceId: sc.choices[0]!.id }
+        return { type: 'scene/next' }
+      }
+      if (c.kind === 'scene') return { type: 'scene/next' }
       if (c.kind === 'redeem') return { type: 'loan/return' }
       if (c.kind === 'buyer') {
         const sale = c.sale
@@ -140,7 +147,7 @@ export function makePolicy(p: PolicyParams): Policy {
 }
 
 function sellerEstimate(state: GameState, p: PolicyParams): number {
-  const c = state.current!
+  const c = state.current as ItemVisit
   return Math.round(claimedValue(getItemDef(c.item.defId), c.item) * (1 - p.skepticism))
 }
 

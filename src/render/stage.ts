@@ -21,11 +21,17 @@ import type { GlbLoader } from './loaders'
 import { contactShadowTexture } from './textures'
 
 const COUNTER_READ_SIZE = 0.09
+/** Items with a largest side over this (m) sit on the counter at true size. */
+const BIG_ITEM = 0.2
+/** Most a hotspot may sit behind the first surface hit and still count as visible, m. */
+const OCCLUDE_SLACK_MAX = 0.006
 const ZOOM_MIN = 0.45
 const ZOOM_MAX = 2.6
 const PITCH_LIMIT = 1.35
 const DEFAULT_YAW = -0.42
 const DEFAULT_PITCH = -0.22
+/** Upright items (a laptop) start tipped further towards the camera, so the keyboard shows too. */
+const UPRIGHT_PITCH = -0.5
 /** Finger-sized margin around the item's footprint for a counter tap, CSS px. */
 const TAP_SLOP_PX = 26
 
@@ -55,6 +61,10 @@ export class ItemStage {
   private lift = 0
   private present = false
   private exit: { t: number; dir: number } | null = null
+  /** The customer is still walking in: the item waits off the mat. */
+  private waiting = false
+  /** 0 → 1 as the item slides onto the mat from the customer's side once they arrive. */
+  private enterT = 1
   private inspecting = false
   private yaw = DEFAULT_YAW
   private pitch = DEFAULT_PITCH
@@ -67,6 +77,7 @@ export class ItemStage {
 
   private readonly shadow: THREE.Mesh
   private readonly qCounter = new THREE.Quaternion()
+  private upright = false
   private readonly qFront = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI)
   private readonly qTmp = new THREE.Quaternion()
   private readonly qTmp2 = new THREE.Quaternion()
@@ -117,9 +128,10 @@ export class ItemStage {
     }
     if (c.visitId !== this.visitId) {
       this.visitId = c.visitId
-      this.setItem(c.item.defId)
+      // A story scene visitor (M4) brings nothing: the mat stays empty.
+      this.setItem(c.item?.defId ?? null)
       this.yaw = DEFAULT_YAW
-      this.pitch = DEFAULT_PITCH
+      this.pitch = this.upright ? UPRIGHT_PITCH : DEFAULT_PITCH
       this.zoom = 1
       this.velYaw = this.velPitch = 0
       this.exit = null
@@ -133,11 +145,17 @@ export class ItemStage {
     }
   }
 
+  /** True while the customer is still on their way to the counter; false slides their item onto the mat. */
+  setWaiting(waiting: boolean): void {
+    if (this.waiting && !waiting) this.enterT = this.reduceMotion ? 1 : 0
+    this.waiting = waiting
+  }
+
   /** Start the cheap visual for a tool use. `magnetic` = does the item pull to the magnet? */
   playTool(tool: ToolId, state: GameState): void {
     const c = state.current
     let magnetic = false
-    if (tool === 'magnet' && c) {
+    if (tool === 'magnet' && c?.item) {
       try {
         const def = getItemDef(c.item.defId)
         magnetic = fakeProfileOf(def, c.item)?.magnetic ?? def.magnetic
@@ -186,7 +204,7 @@ export class ItemStage {
       this.exit.t = this.reduceMotion ? 1 : Math.min(1, this.exit.t + dt / 0.55)
       exitK = this.exit.t
     }
-    const visible = (this.present || (this.exit !== null && this.exit.t < 1)) && exitK < 1
+    const visible = (this.present || (this.exit !== null && this.exit.t < 1)) && exitK < 1 && !(this.waiting && !this.exit)
     this.pivot.visible = visible
     if (!visible) {
       this.shadow.visible = false
@@ -207,13 +225,21 @@ export class ItemStage {
     const counterPos = this.vTmp.copy(this.matPoint)
     counterPos.y += this.lift * this.counterScale + 0.0015
     if (this.exit) counterPos.z += this.exit.dir * 0.35 * this.exit.t
+    else if (this.enterT < 1) {
+      // Arriving: slide in from the customer's side (the reverse of handing it back).
+      this.enterT = Math.min(1, this.enterT + dt / 0.45)
+      const k = 1 - this.enterT
+      exitK = k * k
+      counterPos.z += 0.35 * exitK
+    }
     // Inspect pose: turntable yaw (world Y) then pitch (world X), front facing the camera
     const qYaw = this.qTmp.setFromAxisAngle(Y_AXIS, this.yaw)
     const qPitch = this.qTmp2.setFromAxisAngle(X_AXIS, this.pitch)
     const qInspect = qPitch.multiply(qYaw).multiply(this.qFront)
 
     this.pivot.position.copy(counterPos).lerp(INSPECT_POINT, b)
-    this.pivot.quaternion.copy(this.qCounter).slerp(qInspect, b)
+    // Upright items stand on the mat as modelled, front towards the player: the inspect pose, unturned.
+    this.pivot.quaternion.copy(this.upright ? this.qFront : this.qCounter).slerp(qInspect, b)
     const s = this.counterScale + (1 - this.counterScale) * b
     this.pivot.scale.setScalar(s * (1 - exitK * 0.7))
 
@@ -284,7 +310,8 @@ export class ItemStage {
         this.raycaster.far = dist
         const hits = this.raycaster.intersectObject(proxyOf(model), true)
         const first = hits[0]
-        if (first && first.distance < dist - this.size * 0.06) visible = false
+        // Slack for the proxy's rough shape, capped so a mark behind a thin wall (a laptop lid) is hidden.
+        if (first && first.distance < dist - Math.min(this.size * 0.06, OCCLUDE_SLACK_MAX)) visible = false
       }
       out.push({
         id: h.id,
@@ -297,10 +324,12 @@ export class ItemStage {
     return out
   }
 
-  private setItem(defId: string): void {
+  private setItem(defId: string | null): void {
     if (this.model) this.pivot.remove(this.model)
     this.model = null
     this.def = null
+    this.upright = false
+    if (defId === null) return
     let def: ItemDef
     try {
       def = getItemDef(defId)
@@ -314,6 +343,7 @@ export class ItemStage {
     this.pivot.add(model)
     this.model = model
     this.def = def
+    this.upright = def.model.rest === 'upright'
     this.fit()
   }
 
@@ -329,11 +359,12 @@ export class ItemStage {
     parent?.add(model)
     const size = box.getSize(new THREE.Vector3())
     this.size = Math.max(size.x, size.y, size.z, 0.005)
-    this.counterScale = THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, 1.2, 5)
-    // Lying flat: model −Z points down, so lift by the depth below the origin.
-    this.lift = -box.min.z
-    // Footprint for the contact shadow: model X × Y on the mat.
-    this.shadow.scale.set(size.x * this.counterScale * 1.5, size.y * this.counterScale * 1.5, 1)
+    // Big items (a laptop) already read from the counter: shown at true size, not blown up.
+    this.counterScale = THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, this.size > BIG_ITEM ? 1 : 1.2, 5)
+    // Lying flat: model −Z points down, so lift by the depth below the origin (upright: −Y).
+    this.lift = this.upright ? -box.min.y : -box.min.z
+    // Footprint for the contact shadow: model X × Y on the mat (upright: X × Z).
+    this.shadow.scale.set(size.x * this.counterScale * 1.5, (this.upright ? size.z : size.y) * this.counterScale * 1.5, 1)
   }
 
   dispose(): void {

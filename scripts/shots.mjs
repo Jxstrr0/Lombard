@@ -54,6 +54,13 @@ function helpers(page, name) {
     async click(dataId) {
       await id(dataId).click({ timeout: 10_000 })
       await page.waitForTimeout(120)
+      // The customer's strip and buttons wait until they stand at the counter (model loaded, faded in).
+      if (dataId === 'next-customer') {
+        await page
+          // 'in', not just "not arriving": until the next frame the body still says 'away' from the last visit.
+          .waitForFunction(() => document.body.dataset.customer === 'in', null, { timeout: 30_000 })
+          .catch(() => console.warn('customer never arrived'))
+      }
     },
     async visible(dataId) {
       return (await page.locator(`[data-id="${dataId}"]:visible`).count()) > 0
@@ -413,7 +420,7 @@ async function sendAway(h) {
 
 /**
  * Economy (portrait, ?seed=1): day 1 passed → ledger → Office (buy the acid kit,
- * retain both specialists) → day 2 → the first gold or watch seller → acid,
+ * retain four of the five specialists, buy the door chime and mirror) → word on the street → day 2 → the first gold or watch seller → acid,
  * reference book and a specialist call.
  */
 async function playEconomy(page, h) {
@@ -428,14 +435,28 @@ async function playEconomy(page, h) {
   await h.screen('ledger')
   await h.click('open-office')
   await page.waitForTimeout(200)
-  for (const id of ['buy-acid_kit', 'retain-jeweler', 'retain-watchmaker']) if (await h.enabled(id)) await h.click(id)
+  // Four of the five specialists: the electronics tech stays unretained to show the Retain button.
+  for (const id of ['buy-acid_kit', 'retain-jeweler', 'retain-watchmaker', 'retain-collector', 'retain-antiquary']) if (await h.enabled(id)) await h.click(id)
   await page.evaluate(() => document.querySelector('[data-id="office"]')?.scrollTo(0, 0))
   await page.waitForTimeout(150)
   await h.shot('office', 'office sheet: bills due, upgrades (acid kit owned), cash')
   await page.evaluate(() => document.querySelector('[data-id="office-specialists"]')?.scrollIntoView({ block: 'start' }))
   await page.waitForTimeout(150)
-  await h.shot('office-specialists', 'office sheet: both specialists retained, calls left, release')
+  await h.shot('office-specialists', 'office sheet: specialists retained, calls left, release')
+  await page.evaluate(() => {
+    const sheet = document.querySelector('[data-id="office"]')
+    sheet?.scrollTo(0, sheet.scrollHeight)
+  })
+  await page.waitForTimeout(150)
+  await h.shot('office-specialists-end', 'office sheet: the last specialists (antiques dealer retained, electronics tech not)')
+  for (const id of ['buy-door_chime', 'buy-convex_mirror']) if (await h.enabled(id)) await h.click(id)
+  await page.evaluate(() => document.querySelector('[data-id="office-exposure"]')?.scrollIntoView({ block: 'center' }))
+  await page.waitForTimeout(150)
+  await h.shot('office-security', 'office sheet: cases and security (chime and mirror owned), things on open shelves')
   await h.click('office-close')
+  await page.evaluate(() => document.querySelector('[data-id="ledger-standing"]')?.scrollIntoView({ block: 'center' }))
+  await page.waitForTimeout(150)
+  await h.shot('ledger-standing', 'ledger: word on the street (reputation by group as vague lines)')
   await h.open()
   await h.screen('counter')
   while (await h.visible('next-customer')) {
@@ -532,7 +553,7 @@ async function playTitle(page, h) {
   // GDD §11 reminder: pretend the last backup was 20 days ago, then reload (also proves the slots persist).
   await page.evaluate(() => localStorage.setItem('lombard.lastBackup', String(Date.now() - 20 * 86_400_000)))
   await page.reload({ waitUntil: 'networkidle', timeout: 90_000 })
-  await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
+  await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 90_000 })
   await h.screen('title')
   if (!(await h.visible('title-reminder'))) throw new Error('title: backup reminder did not show')
   await h.shot('title-reminder', 'after a reload: two careers, the backup reminder (last backup 20 days ago)')
@@ -542,6 +563,23 @@ async function playTitle(page, h) {
   await h.click('slot-delete-confirm-2')
   await page.waitForTimeout(300)
   if (await h.visible('slot-play-2')) throw new Error('title: slot 2 was not deleted')
+  // A new career in the freed slot 2: the intro, then the welcome card.
+  await h.click('slot-new-2')
+  await h.screen('intro')
+  await h.shot('title-new-slot2', 'new career in slot 2: straight into the name-the-shop intro')
+  await h.begin()
+  await h.screen('welcome')
+  await h.shot('title-new-slot2-welcome', 'slot 2 career after the intro: day 1 welcome card')
+  await toTitle(page, h, 'settings-welcome')
+  await h.shot('title-three', 'three slots: a career on day 2 (slot 1), a new day-1 career (slot 2), one empty; Continue = slot 2')
+  // Continue a slot from its card: slot 1 is back on its ledger.
+  await h.click('slot-play-1')
+  await h.screen('ledger')
+  await page.waitForTimeout(300)
+  if (await h.visible('backup-later')) await h.click('backup-later')
+  await h.shot('title-continue-slot1', 'slot 1 played from its card: back on its day-1 ledger')
+  // Continue now means slot 1 (the most recent).
+  await toTitle(page, h, 'settings-ledger')
   await h.click('title-continue')
   await h.screen('ledger')
 }
@@ -572,7 +610,7 @@ async function playTitleShort(page, h) {
     })
   })
   await page.reload({ waitUntil: 'networkidle', timeout: 90_000 })
-  await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
+  await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 90_000 })
   await h.screen('title')
   if (!(await h.visible('slot-play-1'))) throw new Error('title: the pre-slot save did not migrate into slot 1')
   await h.shot('title-migrated', 'a pre-M4 autosave (no slot) migrated into slot 1; Continue')
@@ -603,8 +641,9 @@ async function main() {
     page.on('console', (m) => {
       if (m.type() === 'error') errors.push(`[${name}] console: ${m.text()}`)
     })
-    // Pin the quality tier: Auto would step down on a slow headless GPU mid-run.
-    const pinned = /[?&]tier=/.test(url) ? url : `${url}${url.includes('?') ? '&' : '?'}tier=mid`
+    // Pin the quality tier (Auto would step down on a slow headless GPU mid-run)
+    // skip the lull between customers (a Next customer button calls each one), and no walk from the door.
+    const pinned = `${url}${url.includes('?') ? '&' : '?'}${/[?&]tier=/.test(url) ? '' : 'tier=mid&'}lull=0&walk=0`
     await page.goto(`${base}${pinned}`, { waitUntil: 'networkidle', timeout: 90_000 })
     await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
     await page.waitForTimeout(400)
@@ -646,6 +685,28 @@ async function main() {
       await h.screen('redeem')
       await page.waitForTimeout(600)
       await h.shot('redeem', 'redeem visit: who, item, pawn ticket (lent + interest = total), Take X, hand it over')
+      out.push(...h.shots)
+      await context.close()
+    }
+    {
+      // Dev scenario: a regular (Zinaida Petrovna) comes in for a story scene with a choice.
+      const { context, page } = await newPage(browser, PORTRAIT, '?seed=1&scenario=story')
+      const h = helpers(page, 'story')
+      await page.waitForFunction(() => ['news', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) === 'news') await h.click('news-done')
+      await h.screen('counter')
+      await h.click('next-customer')
+      await page.waitForTimeout(600)
+      await h.shot('scene', 'story scene: regular badge, first line, Go on')
+      await h.click('scene-next')
+      await page.waitForTimeout(400)
+      await h.shot('choices', 'last line: up to three choices, Go on hidden')
+      await h.click('choice-truth')
+      await page.waitForTimeout(400)
+      await h.shot('reply', 'her reply to the truth; Go on ends the visit')
+      await h.click('scene-next')
+      await page.waitForTimeout(600)
+      await h.shot('talked', 'resolved: Talked, no stamp')
       out.push(...h.shots)
       await context.close()
     }

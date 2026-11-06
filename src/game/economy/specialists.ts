@@ -1,6 +1,6 @@
 /**
  * Specialist retainers (owner: economy worker). GDD § 2b. M2: jeweler and
- * watchmaker. Definitions (name, categories, lines) live in src/data/specialists.ts;
+ * watchmaker; M4: militaria collector, antiques dealer, electronics tech. Definitions (name, categories, lines) live in src/data/specialists.ts;
  * fee, calls per month, per-call fee, hidden accuracy and honesty in
  * tuning.specialists.roster.
  *

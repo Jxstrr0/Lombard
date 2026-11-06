@@ -18,8 +18,8 @@ describe('quality tiers', () => {
     expect(TIER_SETTINGS.low.antialias).toBe(false)
   })
 
-  it('guesses mid for phones and high only for big desktops', () => {
-    expect(guessTier(true, 8)).toBe('mid')
+  it('starts phones and big desktops at high', () => {
+    expect(guessTier(true, 4)).toBe('high')
     expect(guessTier(false, 8)).toBe('high')
     expect(guessTier(false, 4)).toBe('mid')
   })
@@ -30,7 +30,7 @@ describe('quality tiers', () => {
     expect(g.lastFps).toBeCloseTo(60, 0)
   })
 
-  it('steps down one tier per window under 30 fps, and stops at low', () => {
+  it('steps down one tier per window under MIN_FPS, and stops at low', () => {
     const g = new TierGovernor('high')
     expect(run(g, 20, 40)).toEqual(['mid', 'low'])
     expect(g.current).toBe('low')

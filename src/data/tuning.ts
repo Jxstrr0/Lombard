@@ -22,6 +22,14 @@ export const tuning = {
     realTimeScale: 1,
     /** In-game seconds each haggle round takes. */
     haggleRoundSeconds: 6,
+    /** Quiet before the first customer walks in after opening, in-game seconds [min, max]. */
+    firstArrivalSeconds: [4, 8] as [number, number],
+    /**
+     * The lull between one customer leaving and the next walking in, in-game
+     * seconds [min, max]. Kelbo (Nov 6): keep 8 sellers a day and add pauses
+     * rather than more customers; this is most of a day's length.
+     */
+    lullSeconds: [15, 35] as [number, number],
   },
 
   customers: {
@@ -29,6 +37,44 @@ export const tuning = {
     temperamentWeights: { stubborn: 1, flexible: 1.4, desperate: 0.8, proud: 0.8 },
     knowledge: [0.1, 0.9] as [number, number],
     desperation: [0.05, 0.95] as [number, number],
+  },
+
+  /** M4: authored regulars (src/data/regulars) and their memory of you. */
+  regulars: {
+    /** At most this many regulars drop in on an ordinary day (story beats come on top). */
+    maxPerDay: 2,
+    /** Extra days, [min, max], added to a regular's first scheduled day so they don't all arrive on schedule.from. */
+    firstVisitJitter: [0, 2] as [number, number],
+    /** A regular this cold waits longer between visits (× every). */
+    coldAt: -0.25,
+    coldEveryScale: 1.6,
+    /** Greets you warmly from this trust up. */
+    warmAt: 0.35,
+    /**
+     * Trust change by how a visit ended. A buy or pawn is judged by price ÷
+     * true value (what's fair, not what you knew): at or over `fair` is a
+     * good deal for them, under `low` stings, under `insult` burns.
+     */
+    trust: {
+      bought: { fair: 0.45, low: 0.3, insult: 0.2, fairDelta: 0.12, okDelta: 0.04, lowDelta: -0.08, insultDelta: -0.2 },
+      pawned: { fair: 0.3, low: 0.15, fairDelta: 0.08, okDelta: 0.02, lowDelta: -0.08 },
+      redeemed: 0.06,
+      walked: -0.1,
+      passed: -0.04,
+    },
+    /** Haggling with a regular: ask × (1 − askPerTrust × trust), floor × (1 − floorPerTrust × trust). */
+    askPerTrust: 0.08,
+    floorPerTrust: 0.05,
+  },
+
+  /** M4: story arcs (src/data/stories). */
+  story: {
+    /** At most this many beats play on one day, and one per arc. */
+    maxBeatsPerDay: 2,
+    /** Story visitors wait as long as it takes (in-game seconds of patience). */
+    patience: 100_000,
+    /** Walk-in sellers never drop below this when regulars and beats take their places. */
+    minWalkIns: 4,
   },
 
   items: {
@@ -337,7 +383,17 @@ export const tuning = {
       reference_2: 6_000,
       reference_3: 15_000,
       case_counter: 18_000,
+      // M4 security (theft numbers in tuning.theft): a mirror is a week of small margin,
+      // the wall case and the camera are month-two purchases like the counter case.
+      door_chime: 1_200,
+      convex_mirror: 2_500,
+      wall_case: 14_000,
+      camera: 22_000,
     },
+    /** Security points (see tuning.theft.perSecurity): chime 0.5 (×0.85 theft), mirror 1 (×0.74), camera 3 (×0.49). */
+    security: { door_chime: 0.5, convex_mirror: 1, camera: 3 },
+    /** Lockable wall case: thieves can't reach the wall; buyers have to ask, so wall visibility × this. */
+    wallCaseVisibility: 0.9,
     /** Tests in a new acid kit. */
     acidKitCharges: 10,
     /** Restock: price and tests per bottle; charges never exceed acidMaxCharges. */
@@ -361,8 +417,10 @@ export const tuning = {
 
   /**
    * Specialists on retainer (definitions and lines in src/data/specialists.ts).
-   * A call within the allowance costs fee / calls ≈ 1,000–1,500 ₽, so a call is
-   * worth it on items over ~15k ₽ where a mistake costs 10k+.
+   * A call within the allowance costs fee / calls ≈ 450–2,250 ₽ (the electronics
+   * tech is cheap, the antiques dealer dear), so a call is worth it on items over
+   * ~15k ₽ where a mistake costs 10k+. A call takes inspect.toolSeconds.specialist
+   * unless the roster entry sets its own callSeconds.
    */
   specialists: {
     roster: {
@@ -370,7 +428,13 @@ export const tuning = {
       jeweler: { fee: 6_000, calls: 6, perCall: 1_500, accuracy: 0.88, honesty: 0.55 },
       /** Honest to a fault; his eyes are going. */
       watchmaker: { fee: 7_500, calls: 5, perCall: 2_000, accuracy: 0.74, honesty: 0.95 },
-    } as Record<string, { fee: number; calls: number; perCall: number; accuracy: number; honesty: number }>,
+      /** M4. Straight and sure on medals; wants first refusal, but rarely shades a price to get it. */
+      collector: { fee: 5_500, calls: 5, perCall: 1_500, accuracy: 0.85, honesty: 0.9 },
+      /** M4. Almost never wrong, and the least honest of them all: the good pieces "aren't worth much". */
+      antiquary: { fee: 9_000, calls: 4, perCall: 2_500, accuracy: 0.93, honesty: 0.35 },
+      /** M4. Cheap, quick on the phone (callSeconds), and a bit careless. */
+      technician: { fee: 3_500, calls: 8, perCall: 800, accuracy: 0.72, honesty: 0.8, callSeconds: 30 },
+    } as Record<string, { fee: number; calls: number; perCall: number; accuracy: number; honesty: number; callSeconds?: number }>,
     /** Relationship on first retaining; + perMonth at each month-end paid in full (cap 1). */
     relationshipStart: 0.1,
     relationshipPerMonth: 0.15,
@@ -398,7 +462,7 @@ export const tuning = {
     /**
      * Season multiplier per demandTag (GDD § 7). Missing tag or season = 1.
      * Cameras peak with the tourists and white nights, electronics before the school year,
-     * gold and watches over the New Year gift season.
+     * laptops before term starts, gold and watches over the New Year gift season.
      */
     seasons: {
       gold: { winter: 1.05, spring: 1, summer: 1.05, autumn: 0.95 },
@@ -409,6 +473,8 @@ export const tuning = {
       militaria: { winter: 0.9, spring: 1.1, summer: 1.05, autumn: 0.95 },
       electronics: { winter: 1.05, spring: 0.95, summer: 0.9, autumn: 1.1 },
       phones: { winter: 1.05, spring: 0.95, summer: 0.9, autumn: 1.1 },
+      /** Students: buy before term, sell (or pawn) in the dead summer months. */
+      laptops: { winter: 1, spring: 1, summer: 0.85, autumn: 1.15 },
       cameras: { winter: 0.85, spring: 1.05, summer: 1.2, autumn: 0.9 },
       coins: { winter: 1.05, spring: 1, summer: 0.95, autumn: 1 },
       silver: { winter: 1, spring: 1, summer: 1, autumn: 1 },
@@ -419,12 +485,12 @@ export const tuning = {
      * first week (the career starts 3 March).
      */
     holidays: [
-      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, cameras: 1.1 } },
+      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, laptops: 1.1, cameras: 1.1 } },
       { id: 'defender_day', from: '02-16', to: '02-23', boost: { watches: 1.15, militaria: 1.1 } },
       { id: 'womens_day', from: '02-28', to: '03-08', boost: { jewelry: 1.35, gold: 1.2, watches: 1.05 } },
       { id: 'victory_day', from: '04-25', to: '05-10', boost: { militaria: 1.45, soviet: 1.15 } },
       { id: 'white_nights', from: '06-01', to: '07-10', boost: { cameras: 1.2, soviet: 1.1 } },
-      { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25 } },
+      { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25, laptops: 1.35 } },
     ] as readonly { id: string; from: string; to: string; boost: Readonly<Record<string, number>> }[],
     /** Per-tag random walk, stepped once a day at day open: d += U(−step, step) + revert × (1 − d), clamped. */
     drift: { step: 0.025, revert: 0.05, min: 0.8, max: 1.25 },
@@ -435,7 +501,7 @@ export const tuning = {
     shockChance: 0.12,
     shocks: [
       { id: 'ruble_wobble', weight: 3, delta: { gold: 0.12, coins: 0.1, watches: 0.06, luxury: 0.05, electronics: -0.04 } },
-      { id: 'import_prices', weight: 2, delta: { phones: 0.1, electronics: 0.08 } },
+      { id: 'import_prices', weight: 2, delta: { phones: 0.1, electronics: 0.08, laptops: 0.1 } },
       { id: 'phone_launch', weight: 2, delta: { phones: -0.1 } },
       { id: 'flea_market_raid', weight: 1.5, delta: { militaria: -0.12 } },
       { id: 'collectors_fair', weight: 2, delta: { coins: 0.1, militaria: 0.06, cameras: 0.05 } },
@@ -461,6 +527,89 @@ export const tuning = {
     genuineMinCondition: 60,
     /** Attempts at rolling a forced fake/genuine before taking what came. */
     maxRolls: 30,
+  },
+
+  /**
+   * M4 reputation by group (owner: reputation worker; rules in src/game/reputation.ts).
+   * Every group sits in −1…1 (0 = nobody has an opinion yet). Deltas are small so a
+   * reputation is built over weeks: ~25 fair deals with desperate people take the
+   * neighbourhood from 0 to "warm" (0.5).
+   */
+  reputation: {
+    min: -1,
+    max: 1,
+    /** "Fair" and "lowball" are judged on what the deal paid against the item's real worth (trueValue). */
+    fairBuyShare: 0.5,
+    fairLoanShare: 0.3,
+    /** GDD § 3: under ~25% of value is a lowball. */
+    lowballBuyShare: 0.25,
+    lowballLoanShare: 0.12,
+    /** Who counts as vulnerable: desperation at or above this, or one of these archetypes. */
+    vulnerableDesperation: 0.65,
+    vulnerableArchetypes: ['pensioner'] as readonly string[],
+    /** Archetypes the local kids and students hear about. */
+    youthArchetypes: ['student'] as readonly string[],
+    neighbourhood: {
+      /** A fair buy or loan for a vulnerable seller (genuine or restored items only: a fake's worth says nothing about fairness). */
+      fair: 0.02,
+      /** Lowballing a vulnerable seller. */
+      lowball: -0.03,
+      /** Any offer that insults (haggle mood 'insulted'). */
+      insult: -0.02,
+      /**
+       * Someone gave up waiting in the queue. Small: a slow counter loses two or three people
+       * a day, which alone drifts the street to "cool" (−0.15…−0.5) over a couple of months.
+       */
+      walkout: -0.004,
+      /** A pawner got their thing back. */
+      redeem: 0.01,
+    },
+    youth: {
+      /** A fair buy or loan for a student. */
+      fair: 0.04,
+      /** Lowballing or insulting a student. */
+      lowball: -0.05,
+      /** A student gave up waiting. */
+      walkout: -0.02,
+      /** Sold something to a student. */
+      sale: 0.01,
+    },
+    effects: {
+      /** Buyer chance × (1 + neighbourhood × this). */
+      buyerPerNeighbourhood: 0.15,
+      /** Queue patience × (1 + neighbourhood × this). */
+      patiencePerNeighbourhood: 0.2,
+      /** Shoplifting chance × (1 − youth × this). */
+      theftPerYouth: 0.6,
+    },
+    /** Ledger lines: band edges (cold | cool | neutral | warm | close) and a day's change that reads as a trend. */
+    bands: [-0.5, -0.15, 0.15, 0.5] as readonly number[],
+    trendDelta: 0.03,
+  },
+
+  /**
+   * M4 shoplifting (owner: reputation worker; rules in src/game/shop/theft.ts). Rolled once
+   * per open day at closing, per displayed item:
+   *   chance = base × exposure[area] × cheapness(value) × traffic × youth factor × security factor
+   * Tuned with `npm run sim` and tests/theft.test.ts: a shop with ~8 cheap things on open
+   * shelves and no security loses one every 1–2 weeks; mirror + camera + wall case, rarely.
+   */
+  theft: {
+    /** Nobody has cased a new shop yet: no thefts on days before this (the first week is for learning the counter). */
+    fromDay: 8,
+    base: 0.016,
+    /** How exposed each area is: the counter case is behind glass, the back shelf is out of the way. */
+    exposure: { counter: 0, wall: 1, back: 0.6 },
+    /** Cheapness: 1 at or under cheapFull ₽ of real worth, fading linearly to 0 at cheapMax. */
+    cheapFull: 4_000,
+    cheapMax: 15_000,
+    /** Foot traffic = people through the door today / trafficBaseline, clamped. */
+    trafficBaseline: 10,
+    traffic: [0.5, 1.5] as [number, number],
+    /** Security factor = 1 / (1 + shop.security × perSecurity). */
+    perSecurity: 0.35,
+    /** No item is ever more likely than this to go in one night. */
+    maxChance: 0.25,
   },
 
   save: {

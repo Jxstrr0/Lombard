@@ -34,7 +34,7 @@ export function cuesFor(prev: GameState, next: GameState, action: Action | { typ
 
   if (c && c.visitId !== p?.visitId) {
     cues.push({ sound: 'door_bell' })
-    if (c.phase === 'present') cues.push({ sound: 'set_down', delay: AUDIO_MIX.setDownDelay })
+    if (c.item && (c.phase === 'present' || c.phase === 'scene')) cues.push({ sound: 'set_down', delay: AUDIO_MIX.setDownDelay })
   }
 
   if (action.type === 'inspect/useTool') {

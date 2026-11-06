@@ -49,7 +49,7 @@ export function screenFor(state: GameState, arrived = true): ScreenId {
   if (state.day.phase === 'closed') return state.history.length > 0 ? 'ledger' : 'welcome'
   if (!state.day.newsRead) return 'news'
   const c = state.current
-  if (c?.phase === 'present' && !arrived) return 'counter'
+  if ((c?.phase === 'present' || c?.phase === 'scene') && !arrived) return 'counter'
   if (c?.phase === 'inspect') return 'inspect'
   if (c?.phase === 'offer') return 'offer'
   if (c?.phase === 'present' && c.kind === 'buyer') return 'sale'

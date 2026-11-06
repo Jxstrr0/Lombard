@@ -26,7 +26,7 @@ const ALLOWED_BRANDS = new Set([
   'Tosaki',
 ])
 /** Categories whose items carry no maker's brand (struck by a state mint or a jeweller). */
-const UNBRANDED = new Set(['gold', 'militaria', 'coins'])
+const UNBRANDED = new Set(['gold', 'militaria', 'coins', 'icons'])
 
 function makeItem(def: ItemDef, profile: FakeProfile | undefined, seed: number): ItemInstance {
   const forced: ItemDef = profile ? { ...def, fakeChance: 1, fakeProfiles: [profile] } : { ...def, fakeChance: 0 }
@@ -51,6 +51,7 @@ const HALF_EXTENTS: Record<ItemDef['model']['placeholder'], [number, number, num
   badge: [0.02, 0.025, 0.011],
   coin: [0.013, 0.013, 0.0015],
   laptop: [0.169, 0.123, 0.158],
+  icon: [0.08, 0.1, 0.012],
 }
 
 describe('item definitions', () => {
@@ -61,8 +62,8 @@ describe('item definitions', () => {
     }
   })
 
-  it('ships 31 defs across 7 categories with unique ids', () => {
-    expect(ITEM_DEFS).toHaveLength(31)
+  it('ships 32 defs across 8 categories with unique ids', () => {
+    expect(ITEM_DEFS).toHaveLength(32)
     const count = (c: string) => ITEM_DEFS.filter((d) => d.category === c).length
     expect(count('gold')).toBe(6)
     expect(count('watches')).toBe(6)
@@ -71,7 +72,8 @@ describe('item definitions', () => {
     expect(count('militaria')).toBe(5)
     expect(count('coins')).toBe(4)
     expect(count('electronics')).toBe(1)
-    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(31)
+    expect(count('icons')).toBe(1) // M5: the Collector's, story-only
+    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(32)
     expect(getItemDef('gold_band_583').category).toBe('gold')
   })
 

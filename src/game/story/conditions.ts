@@ -77,6 +77,8 @@ export function holds(c: Condition, state: GameState): boolean {
       return c.from <= c.to ? md >= c.from && md <= c.to : md >= c.from || md <= c.to
     }
     // --- M5 ---
+    case 'holds':
+      return state.inventory.some((i) => i.defId === c.defId) !== Boolean(c.not)
     case 'pressure':
       return within(state.crime.pressure, c)
     // --- M5 the fence ---

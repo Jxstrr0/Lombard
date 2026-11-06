@@ -7,8 +7,10 @@
  * Trust thresholds follow tuning.regulars (warm from 0.35, cold at −0.25). Fictional
  * people; nobody is hurt on the page.
  *
- * Detective Volkova reads crime.volkova (trust, lies caught, bribes) and the police.*
- * flags; her fallback needs nothing but her introduction. Venya Mostovoy (the
+ * Detective Volkova reads crime.volkova (trust, lies caught, bribes), the police.* flags
+ * and her own arc's flags (src/data/stories/volkova.ts: the leak, her evidence bag, the
+ * reprimand, the grudge, Tver, the recital, the crackdown, her father's watch); her
+ * fallback needs nothing but her courtesy call. Venya Mostovoy (the
  * fence, src/data/fence.ts) reads crime.fence (deals vs refusals), fenceTrust and the
  * standing arrangement (dirty.fence_standing).
  */
@@ -363,16 +365,48 @@ export const CARDS: Raw[] = [
         text: 'Volkova still has the envelope you offered her, unopened, in a drawer marked “for special occasions”. She has never said what the occasion would be. She tells the story at retirements, without names. Everyone on the canal knows the name.',
       },
       {
+        when: [{ if: 'flag', flag: 'volkova.leaked' }],
+        text: 'Volkova never put your name anywhere. Somebody in her building did, for a price. She sent the glazier round herself, with a note: “I said twice.” She has been very careful with promises since, and with lunches on Sadovaya.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'dirty.volkova_evidence' }],
+        text: 'Volkova’s bag sat in your back room for a month and nobody ever opened it. She made inspector the year after. You are the one person on the canal she can’t afford to forget, and she sends a card every New Year to make sure you know it.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'volkova.reported' }],
+        text: 'Volkova paid back the three months by Easter and her father sold the motor back at a loss. She still reads your book standing up, and leaves without a word about him. She thinks it was a fair price. She would still rather you hadn’t charged it.',
+      },
+      {
         when: [{ if: 'volkova', met: true, bribes: { gte: 1 } }],
         text: 'Volkova was transferred to the port, where the envelopes are thicker and the questions are the same. She remembers what you gave her and what it was for. She writes everything down.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'volkova.grudge' }],
+        text: 'Volkova’s car still has its lunch outside your old window on Tuesdays, out of habit now more than spite. The fire inspector who came round anonymously is her cousin. Everybody on the canal knows. Nobody says.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'volkova.friend' }],
+        text: 'Tver never came for the bayan. Volkova plays it badly at her father’s birthday every year, and every year there is a chair for you at the back, and a cake with three sugars’ worth of icing.',
       },
       {
         when: [{ if: 'volkova', met: true, caught: { gte: 1 } }],
         text: 'Volkova still drinks her tea standing up and still remembers the day you lied to her, to the item and the hour. She keeps one mistake for special occasions. Yours is the one she mentions, kindly, to every new officer on the canal.',
       },
       {
+        when: [{ if: 'flag', flag: 'volkova.crackdown' }],
+        text: 'The clean cars left the embankment the winter after Volkova’s search. She has never said who told her. She buys her rolls from the baker on your corner and looks at your old window as if it were a witness she could trust.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'heart.volkova_recital' }],
+        text: 'You sat at the back of the House of Culture and clapped in the wrong places. Volkova has played three recitals since, each louder than the last, and saves you a seat at every one. Prosecutor the cactus has flowered, once, which she takes as a review.',
+      },
+      {
         when: [{ if: 'volkova', met: true, trust: { gte: 0.4 } }],
         text: 'Volkova made inspector. She tells the new pawnbrokers on the canal there was one shop where you could ask a question and get an answer, and a passport book that was actually filled in, and that they should try it.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'heart.volkova_father' }],
+        text: 'Sergei Ilyich still fishes under the no-fishing sign on the Seventh Bridge, with the motor your price bought him. He tells everyone about the honest pawnbroker, at length. Volkova has stopped rolling her eyes when he does.',
       },
       {
         when: [{ if: 'flag', flag: 'police.cooperated' }],

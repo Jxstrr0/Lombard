@@ -341,5 +341,6 @@ export const trader = makePolicy({
   dumpAfterDays: 21,
   skepticism: 0.1,
   reserveDays: 10,
-  prefer: ['accept', 'busy', 'refuse', 'market', 'wave', 'liar', 'keep', 'rules'],
+  // Volkova's arc: keeps out of her case against the crew it pays, and isn't her source.
+  prefer: ['accept', 'busy', 'refuse', 'market', 'wave', 'liar', 'keep', 'rules', 'stay_out', 'source_no'],
 })

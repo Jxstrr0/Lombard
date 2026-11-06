@@ -13,11 +13,17 @@
  * glints. Reduce motion stops it (the render's own water stays). A daylight
  * tint follows the shop clock.
  *
+ * With the street layer (src/render/street/) attached, the same draw also
+ * reads art/street's canal layers (depth, night light): clouds drift through
+ * the sky, rain / snow / ice grade the picture, street lamps and windows light
+ * up after the season's sunset, and a passing boat stirs the ripples.
+ *
  * Presentation only: nothing here touches game state.
  */
 import * as THREE from 'three'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { Rng } from '../game/rng'
+import { outdoorLight } from './street/plan'
 
 export interface BackdropManifest {
   version: number
@@ -27,6 +33,20 @@ export interface BackdropManifest {
   waterY: number
   file: string
   inputHash: string
+}
+
+/** What the street layer tells the backdrop every frame. */
+export interface BackdropStreet {
+  /** Daylight multiplier (src/render/street/plan.ts outdoorLight). */
+  tint: [number, number, number]
+  /** 0 day → 1 night: lamps, then windows. */
+  dark: number
+  /** 0..1 each: rainy grading, snowy grading, frozen canal. */
+  wet: number
+  snow: number
+  ice: number
+  /** A boat on the water: x, z, heading (+1 towards +x), strength 0..1. */
+  boat: [number, number, number, number]
 }
 
 /** Ripple look. Offsets are in texels of the render; noise scales in cycles per metre of water. */
@@ -42,20 +62,7 @@ const WATER = {
   glint: 0.06,
 }
 
-/**
- * Daylight over the shop's day: [shop-clock hour, r, g, b] multipliers on the render.
- * Overcast March in a northern city: a cool morning, neutral midday, a warmer
- * afternoon, then the light drains towards the blue hour after 18:00.
- * The hour follows shopClock() in src/ui/format.ts (opens 10:00, one minute per in-game second).
- */
-const DAYLIGHT: [number, number, number, number][] = [
-  [10, 0.94, 0.96, 1.0],
-  [12.5, 1.0, 1.0, 1.0],
-  [15.5, 1.0, 0.97, 0.92],
-  [17.5, 0.9, 0.84, 0.8],
-  [18.5, 0.66, 0.66, 0.76],
-  [19.5, 0.42, 0.45, 0.58],
-]
+/** The hour follows shopClock() in src/ui/format.ts (opens 10:00, one minute per in-game second). */
 const OPENING_HOUR = 10
 const HOURS_PER_CLOCK_SECOND = 1 / 60
 
@@ -82,13 +89,26 @@ uniform vec2 offset;
 uniform vec4 layerScale;
 uniform vec4 layerDrift;
 uniform float glint;
+#ifdef USE_STREET
+uniform sampler2D extraMap;
+uniform vec3 lights;  // lamps and shop fronts, early windows, late windows
+uniform vec4 weather; // wet, snow, ice, cloud drift (s)
+uniform vec4 boat;    // x, z on the water, heading (+-1), strength
+#endif
 varying vec2 vUv;
 varying vec3 vWorld;
 
 void main() {
   vec4 base = texture2D(map, vUv);
   vec3 col = base.rgb;
+#ifdef USE_STREET
+  vec4 ex = texture2D(extraMap, vUv);
+  float sky = smoothstep(0.985, 0.998, ex.r);
+  float ice = weather.z * base.a;
+  float wet = base.a * motion * (1.0 - ice);
+#else
   float wet = base.a * motion;
+#endif
   if (wet > 0.004) {
     // Where the render's eye ray through this texel meets the water, in metres.
     vec3 d = vWorld - eye;
@@ -96,6 +116,15 @@ void main() {
     vec2 n1 = texture2D(noiseMap, p * layerScale.xy + time * layerDrift.xy).rg;
     vec2 n2 = texture2D(noiseMap, p * layerScale.zw + time * layerDrift.zw).rg;
     vec2 n = n1 + n2 - 1.0;
+#ifdef USE_STREET
+    // A passing boat: a V of stirred water trailing behind it, churn at the stern.
+    vec2 bd = p - boat.xy;
+    float along = -bd.x * boat.z;
+    float across = abs(bd.y);
+    float wake = step(0.0, along) * exp(-along / 16.0) * exp(-abs(across - 0.9 - along * 0.3) * 1.1);
+    wake += exp(-length(bd * vec2(0.22, 0.8))) * 0.8;
+    n *= 1.0 + boat.w * wake * 3.5;
+#endif
     vec4 s = texture2D(map, vUv + n * offset);
     // Only take the shifted texel if it is water too, so railings and the far wall don't smear.
     col = mix(col, s.rgb, s.a * wet);
@@ -103,25 +132,53 @@ void main() {
     float g = smoothstep(0.72, 0.98, n1.g * 0.5 + n2.g * 0.5 + n.r * 0.25);
     col += glint * g * wet * (0.2 + 2.0 * dot(col, vec3(0.2126, 0.7152, 0.0722)));
   }
+#ifdef USE_STREET
+  if (ice > 0.004) {
+    // Frozen canal: grey-blue ice with a little grain, a ghost of the reflections left.
+    float grain = texture2D(noiseMap, vUv * vec2(7.0, 26.0)).r;
+    col = mix(col, vec3(0.66, 0.70, 0.73) * (0.86 + 0.2 * grain), ice * 0.82);
+  }
+  // Clouds drifting through the render's own sky.
+  vec2 cp = vec2(vUv.x * 2.4 + weather.w * 0.0036, vUv.y * 1.3);
+  float cl = texture2D(noiseMap, cp).r * 0.62 + texture2D(noiseMap, cp * 2.7 + vec2(weather.w * 0.0023, 0.37)).g * 0.38;
+  col *= 1.0 + sky * (cl - 0.5) * 0.24;
+  // Rain: a darker, flatter street under a lower, greyer sky. Snow: muted and lighter.
+  float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
+  col = mix(col, mix(vec3(l), col, 0.7) * 0.8, weather.x * (1.0 - sky));
+  col = mix(col, vec3(l * 0.85 + 0.06), weather.x * sky * 0.7);
+  col = mix(col, mix(vec3(l), col, 0.65) * 0.94 + 0.05, weather.y * (1.0 - sky) * 0.6);
+  col = mix(col, vec3(0.80, 0.82, 0.84), weather.y * sky * 0.7);
+  col *= tint;
+  // Night: street lamps and shop fronts first, then the windows (art/street canal layers, sqrt-stored).
+  vec3 lit = ex.gba * ex.gba;
+  col += vec3(1.0, 0.70, 0.40) * lit.x * lights.x + vec3(1.0, 0.80, 0.55) * (lit.y * lights.y + lit.z * lights.z);
+  gl_FragColor = vec4(col, 1.0);
+#else
   gl_FragColor = vec4(col * tint, 1.0);
+#endif
   #include <colorspace_fragment>
 }
 `
 
 export class CanalBackdrop {
   readonly mesh: THREE.Mesh
+  /** The plane the render is shown on, the eye it was made from, the water level. */
+  readonly frame: { plane: BackdropManifest['plane']; eye: [number, number, number]; waterY: number }
   private readonly material: THREE.ShaderMaterial
   private readonly noise: THREE.DataTexture
   private readonly map: THREE.Texture
   private time = 0
   private motion = 1
   private reduceMotion = false
+  private hour = OPENING_HOUR
+  private street: BackdropStreet | null = null
   private readonly tint = new THREE.Vector3(1, 1, 1)
   private readonly tintTarget = new THREE.Vector3(1, 1, 1)
   private tintPrimed = false
 
   constructor(manifest: BackdropManifest, map: THREE.Texture) {
     const { plane, size, eye } = manifest
+    this.frame = { plane, eye, waterY: manifest.waterY }
     this.map = map
     this.noise = rippleNoise()
     const l0 = WATER.layers[0]!
@@ -156,14 +213,40 @@ export class CanalBackdrop {
     this.mesh.matrixAutoUpdate = false
   }
 
+  /** The render itself (sRGB colour, alpha = water mask), for layers drawn over it. */
+  get texture(): THREE.Texture {
+    return this.map
+  }
+
   /** Shop clock (in-game seconds since opening) and the reduce-motion setting. */
   setState(clockSeconds: number, reduceMotion: boolean): void {
     this.reduceMotion = reduceMotion
-    daylight(OPENING_HOUR + clockSeconds * HOURS_PER_CLOCK_SECOND, this.tintTarget)
-    if (!this.tintPrimed) {
-      this.tint.copy(this.tintTarget)
-      this.tintPrimed = true
-    }
+    this.hour = OPENING_HOUR + clockSeconds * HOURS_PER_CLOCK_SECOND
+    this.retint()
+  }
+
+  /** The street layer's canal data texture (art/street canal_extra.png): turns on clouds, weather, night lights and the wake. */
+  attachStreet(extra: THREE.Texture): void {
+    const u = this.material.uniforms
+    u.extraMap = { value: extra }
+    u.lights = { value: new THREE.Vector3() }
+    u.weather = { value: new THREE.Vector4() }
+    u.boat = { value: new THREE.Vector4(0, 0, 1, 0) }
+    this.material.defines = { ...this.material.defines, USE_STREET: '' }
+    this.material.needsUpdate = true
+  }
+
+  /** The street's light and weather; null goes back to the plain clock tint. */
+  setStreet(street: BackdropStreet | null): void {
+    this.street = street
+    this.retint()
+    const u = this.material.uniforms
+    if (!street || !u.lights) return
+    const d = street.dark
+    ;(u.lights.value as THREE.Vector3).set(ramp(0.12, 0.32, d), ramp(0.3, 0.62, d), ramp(0.55, 0.92, d))
+    const w = u.weather!.value as THREE.Vector4
+    w.set(street.wet, street.snow, street.ice, w.w)
+    ;(u.boat!.value as THREE.Vector4).fromArray(street.boat)
   }
 
   update(dt: number): void {
@@ -175,6 +258,7 @@ export class CanalBackdrop {
       this.motion = Math.min(1, this.motion + dt)
       this.time += dt
       this.tint.lerp(this.tintTarget, Math.min(1, dt * 0.5))
+      if (u.weather) (u.weather.value as THREE.Vector4).w += dt
     }
     u.motion!.value = this.motion
     u.time!.value = this.time
@@ -186,6 +270,20 @@ export class CanalBackdrop {
     this.map.dispose()
     this.noise.dispose()
   }
+
+  private retint(): void {
+    const t = this.street ? this.street.tint : outdoorLight(this.hour, null).tint
+    this.tintTarget.set(t[0], t[1], t[2])
+    if (!this.tintPrimed) {
+      this.tint.copy(this.tintTarget)
+      this.tintPrimed = true
+    }
+  }
+}
+
+function ramp(a: number, b: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)))
+  return t * t * (3 - 2 * t)
 }
 
 export async function loadCanalBackdrop(renderer: THREE.WebGLRenderer, base: string): Promise<CanalBackdrop> {
@@ -202,23 +300,6 @@ export async function loadCanalBackdrop(renderer: THREE.WebGLRenderer, base: str
     return new CanalBackdrop(manifest, map)
   } finally {
     ktx2.dispose()
-  }
-}
-
-function daylight(hour: number, out: THREE.Vector3): void {
-  const k = DAYLIGHT
-  const first = k[0]!
-  const last = k[k.length - 1]!
-  if (hour <= first[0]) return void out.set(first[1], first[2], first[3])
-  if (hour >= last[0]) return void out.set(last[1], last[2], last[3])
-  for (let i = 1; i < k.length; i++) {
-    const b = k[i]!
-    if (hour <= b[0]) {
-      const a = k[i - 1]!
-      const t = (hour - a[0]) / (b[0] - a[0])
-      out.set(a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, a[3] + (b[3] - a[3]) * t)
-      return
-    }
   }
 }
 

@@ -15,7 +15,8 @@
     "shots": "npm run build && node scripts/shots.mjs",
     "sim": "node scripts/sim.mjs",
     "bake:pack": "node scripts/bake-pack.mjs",
-    "backdrop:pack": "node scripts/backdrop-pack.mjs"
+    "backdrop:pack": "node scripts/backdrop-pack.mjs",
+    "street:pack": "node scripts/street-pack.mjs"
   },
   "engines": {
     "node": ">=20.19"

@@ -7,6 +7,8 @@
  * ?look=<yawDeg>,<pitchDeg> starts the counter view with the head turned from the
  * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
+ * Street outside the window (render/street): ?street=0 off, ?street=busy, ?weather=clear|rain|snow,
+ * ?season=<season>, ?time=HH:MM (the street's clock only).
  * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line.
  */
 import '@fontsource/space-grotesk/400.css'
@@ -198,8 +200,11 @@ async function boot(): Promise<void> {
   // Quality tier: Auto steps down under 30 fps (see render/perf.ts); ?tier= pins one.
   let graphics: GraphicsChoice = tierStart.choice
   const governor = new TierGovernor(tierStart.tier, graphics === 'auto' && !tierStart.pinned)
+  /** Life outside the window, once loaded (see below). */
+  let street: import('./render/street').StreetLife | null = null
   const applyTier = (t: QualityTier) => {
     governor.reset(t)
+    street?.setTier(t)
     setTextureAnisotropy(TIER_SETTINGS[t].anisotropy)
     // setPixelRatio resizes the drawing buffer itself.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, TIER_SETTINGS[t].pixelRatioCap))
@@ -274,6 +279,7 @@ async function boot(): Promise<void> {
   const sync = (state: GameState, prev: GameState | null) => {
     // The scene first: it knows whether a new customer is still walking in, which the UI waits for.
     shop.sync(state)
+    street?.sync(state)
     ui.setCustomerArrivedQuiet(shop.customerState !== 'arriving')
     ui.render(state, prev)
     stage.sync(state)
@@ -356,6 +362,22 @@ async function boot(): Promise<void> {
   void Promise.all([envLoad, bakeLoad, backdropLoad]).finally(() => {
     envReady = true
   })
+  // Street life outside the window (render/street): loads only once the shop is on screen. ?street=0 turns it off.
+  let markReady = () => {}
+  const shopReady = new Promise<void>((r) => (markReady = r))
+  if (params.get('street') !== '0') {
+    void Promise.all([backdropLoad, shopReady])
+      .then(async ([ok]) => {
+        const canal = shop.canal
+        if (!ok || !canal) return
+        const { StreetLife, streetFlags } = await import('./render/street')
+        street = await StreetLife.load(renderer, import.meta.env.BASE_URL, canal, shop.scene, streetFlags(params))
+        street.setTier(governor.current)
+        street.sync(store.get())
+        document.body.dataset.street = 'ready' // for screenshot scripts
+      })
+      .catch((err) => console.info('[street] staying quiet:', err instanceof Error ? err.message : err))
+  }
 
   const clock = new THREE.Clock()
   let readyFrames = 0
@@ -364,6 +386,7 @@ async function boot(): Promise<void> {
     const dt = Math.min(raw, 0.1)
     perf?.begin()
     shop.update(dt)
+    street?.update(dt)
     const customerState = shop.customerState
     if (document.body.dataset.customer !== customerState) {
       document.body.dataset.customer = customerState
@@ -390,6 +413,7 @@ async function boot(): Promise<void> {
     if (envReady && !window.__lombardReady && ++readyFrames > 2) {
       window.__lombardReady = true
       document.body.classList.add('ready')
+      markReady()
     }
   })
 }

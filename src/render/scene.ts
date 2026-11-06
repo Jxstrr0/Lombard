@@ -166,6 +166,11 @@ export class ShopScene {
     }
   }
 
+  /** The rendered canal outside, once loaded (the street layer draws over it). */
+  get canal(): CanalBackdrop | null {
+    return this.backdrop
+  }
+
   /** Sync render-owned objects to game state. Never mutates state. */
   sync(state: GameState): void {
     this.backdropState = { clock: state.day.clock, reduceMotion: state.settings.reduceMotion }

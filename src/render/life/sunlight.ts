@@ -41,6 +41,8 @@ const LIGHT = {
   bars: 0.8,
   /** Cloud: the patch breathes between (1 − depth) and 1 of its strength over tens of seconds. */
   cloudDepth: 0.35,
+  /** Under the heaviest rain or snow the patch keeps this much of its strength (a faint, soft brightening). */
+  overcastFloor: 0.08,
   /** A passer-by's shadow: width (m), top (m, a head on the pavement), how dark. */
   passer: { width: 0.55, top: 1.75, strength: 0.55 },
   /** Seconds between fake passers-by. */
@@ -152,6 +154,9 @@ void main() {
 }
 `
 
+/** Rain or snow of intensity i covers the sky by base + (1 − base)·i (light rain already hides most of the sun). */
+export const LIGHT_OVERCAST = { base: 0.7 } as const
+
 export class Sunlight {
   readonly group = new THREE.Group()
   private readonly patch: THREE.Mesh
@@ -162,6 +167,8 @@ export class Sunlight {
   private readonly cloudPhase: number[]
   private time = 0
   private strength = 0
+  /** 1 on a clear day; less under rain or snow (see `setOvercast`). */
+  private sky = 1
   private readonly tint = new THREE.Color()
   private passer: { u: number; du: number; strength: number } | null = null
   private nextPasser: number
@@ -257,6 +264,14 @@ export class Sunlight {
     this.dust.visible = this.particles && this.patch.visible
   }
 
+  /**
+   * The street's weather: 0 for a clear sky, up to 1 for heavy rain or snow.
+   * The patch fades to LIGHT.overcastFloor of its strength and the dust with it.
+   */
+  setOvercast(amount: number): void {
+    this.sky = 1 - (1 - LIGHT.overcastFloor) * Math.min(1, Math.max(0, amount))
+  }
+
   setReduceMotion(on: boolean): void {
     this.reduceMotion = on
     if (on) this.passer = null
@@ -290,7 +305,7 @@ export class Sunlight {
     const p = this.cloudPhase
     const n = 0.5 + 0.5 * (0.55 * Math.sin(t * 0.029 + p[0]!) + 0.3 * Math.sin(t * 0.061 + p[1]!) + 0.15 * Math.sin(t * 0.13 + p[2]!))
     const cloud = this.reduceMotion ? 1 - LIGHT.cloudDepth * 0.5 : 1 - LIGHT.cloudDepth * (1 - n)
-    const s = this.strength * cloud
+    const s = this.strength * cloud * this.sky
     ;(this.patchMat.uniforms.color!.value as THREE.Color).copy(this.tint).multiplyScalar(s)
     ;(this.dustMat.uniforms.color!.value as THREE.Color).copy(this.tint).multiplyScalar(s * DUST.gain)
     this.dustMat.uniforms.time!.value = t

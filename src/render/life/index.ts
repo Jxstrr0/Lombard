@@ -22,7 +22,7 @@
 import * as THREE from 'three'
 import type { GameState } from '../../game/state'
 import type { QualityTier } from '../perf'
-import { Sunlight } from './sunlight'
+import { LIGHT_OVERCAST, Sunlight } from './sunlight'
 import { TeaGlass } from './teaGlass'
 import { shopHour, sunAt } from './timeOfDay'
 import { TubeLight } from './tubeLight'
@@ -79,6 +79,11 @@ export class ShopLife {
     this.sunlight.update(dt, viewHeightPx)
     this.tube.update(dt)
     this.tea.update(dt, viewHeightPx)
+  }
+
+  /** For the street (render/street/): today's weather; rain and snow hide the sun. */
+  setWeather(weather: { kind: 'clear' | 'rain' | 'snow'; intensity: number }): void {
+    this.sunlight.setOvercast(weather.kind === 'clear' ? 0 : LIGHT_OVERCAST.base + (1 - LIGHT_OVERCAST.base) * weather.intensity)
   }
 
   /** For the street (render/street/): someone walks past the window. */

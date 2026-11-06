@@ -25,6 +25,7 @@ import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import type { ItemDef } from '../game/schema/item'
 import type { GlbLoader } from './loaders'
+import { textureAnisotropy } from './perf'
 
 export type PlaceholderKind = ItemDef['model']['placeholder']
 
@@ -228,7 +229,7 @@ function canvasTexture(w: number, h: number, draw: (ctx: CanvasRenderingContext2
   if (ctx) draw(ctx)
   const t = new THREE.CanvasTexture(c)
   t.colorSpace = THREE.SRGBColorSpace
-  t.anisotropy = 4
+  t.anisotropy = textureAnisotropy()
   return t
 }
 

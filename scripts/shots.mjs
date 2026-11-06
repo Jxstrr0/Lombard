@@ -487,7 +487,9 @@ async function main() {
     page.on('console', (m) => {
       if (m.type() === 'error') errors.push(`[${name}] console: ${m.text()}`)
     })
-    await page.goto(`${base}${url}`, { waitUntil: 'networkidle' })
+    // Pin the quality tier: Auto would step down on a slow headless GPU mid-run.
+    const pinned = /[?&]tier=/.test(url) ? url : `${url}${url.includes('?') ? '&' : '?'}tier=mid`
+    await page.goto(`${base}${pinned}`, { waitUntil: 'networkidle' })
     await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
     await page.waitForTimeout(400)
     return { context, page }

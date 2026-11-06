@@ -12,6 +12,8 @@
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
+ * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
+ * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
  * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint, street) for review.
  * Street outside the window (render/street): ?street=0 off, ?street=busy, ?weather=clear|rain|snow,
@@ -34,7 +36,8 @@ import { ITEM_DEFS } from './data/items'
 import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
-import { regularCustomer } from './game/story/plan'
+import { regularCustomer, regularVisit } from './game/story/plan'
+import { setMemory } from './game/story/progress'
 import type { QueuedVisit } from './game/types'
 import { getRegular } from './data/regulars'
 import { getBeat } from './data/stories'
@@ -95,6 +98,19 @@ function storyScenario(s0: GameState): GameState {
   if (!who || !beat) return s
   const visit: QueuedVisit = { visitId: 'v-dev-story', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
   return { ...s, queue: [visit, ...s.queue] }
+}
+
+/** Dev-only (?regular=<id>[&trust=N]): that regular is first in line on an ordinary visit; with trust, they know you already. */
+function regularScenario(s0: GameState, id: string, trust: number | null): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  const def = getRegular(id)
+  if (!def) return reducer(s, { type: 'day/open' })
+  if (trust !== null) s = setMemory(s, id, { trust: Math.max(-1, Math.min(1, trust)), visits: 3 })
+  s = reducer(s, { type: 'day/open' })
+  let n = 0
+  const visit = regularVisit(s, def, (p) => `${p}-dev-regular-${n++}`)
+  const queue = [visit, ...s.queue.filter((v) => v.customer.regularId !== id)]
+  return { ...s, queue, day: { ...s.day, total: queue.length } }
 }
 
 /** Screens that show the counter view and leave the 3D area free to drag. */
@@ -195,8 +211,8 @@ async function boot(): Promise<void> {
   // title screen, with the last played career's shop dimmed behind it.
   const seedRaw = Number(params.get('seed'))
   const seedGiven = Number.isFinite(seedRaw) && seedRaw > 0
-  // A dev ?scenario= is a review career too (seed 1 unless ?seed= says otherwise).
-  const review = seedGiven || params.has('scenario')
+  // A dev ?scenario= or ?regular= is a review career too (seed 1 unless ?seed= says otherwise).
+  const review = seedGiven || params.has('scenario') || params.has('regular')
   const seedParam = seedGiven ? seedRaw : 1
   /** The slot being played; null on the title screen and for a review career (nothing is saved then). */
   let activeSlot: SlotNo | null = null
@@ -206,6 +222,11 @@ async function boot(): Promise<void> {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
     if (params.get('scenario') === 'story') initial = storyScenario(initial)
+    const regular = params.get('regular')
+    if (regular) {
+      const trust = params.has('trust') ? Number(params.get('trust')) : NaN
+      initial = regularScenario(initial, regular, Number.isFinite(trust) ? trust : null)
+    }
   } else {
     const recent = mostRecentSlot(slots)
     if (recent) initial = await loadSlot(recent.slot)

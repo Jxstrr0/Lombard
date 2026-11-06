@@ -14,16 +14,20 @@ import { careful, careless, mobFriendly } from '../src/sim/policies'
 import { simulate, summarize } from '../src/sim/simulate'
 
 const SEEDS = Array.from({ length: 12 }, (_, i) => 1000 + i)
+/** The trade band's median needs more seeds to stop a reshuffle swinging it (M6). */
+const TRADE_SEEDS = Array.from({ length: 24 }, (_, i) => 1000 + i)
 const DAYS = 60
 
 describe('economy simulator (M2 tuning)', () => {
   it('a careful shop grows roughly 15% a month and never goes under', () => {
     // The trade alone: the Protection ladder is held off (its cost has its own test below).
-    const s = summarize(SEEDS.map((seed) => simulate(seed, careful, DAYS, { protectionLadder: false })), tuning.career.startingCash)
+    const s = summarize(TRADE_SEEDS.map((seed) => simulate(seed, careful, DAYS, { protectionLadder: false })), tuning.career.startingCash)
     expect(s.busted).toBe(0)
     // M5 (Volkova and the Collector merged): every story seller takes a walk-in place and reshuffles the rest
     // of a run, so a 12-seed median swings by several points (5.8% here; 8.9% median, 9.5% mean over 60 seeds,
     // against 7.6% / 8.3% for the Collector branch alone). The floor guards a broken trade, not the tuning. docs/05.
+    // M6 wave A (76 items): any new def reshuffles every draw; the first 12 seeds fell to 4.4% while 24, 36 and
+    // 60 seeds read 10.9%, 10.9% and 9.8% (10.3% over 60 before the new defs). So the band runs on 24 seeds.
     expect(s.medianGrowth).toBeGreaterThan(0.05)
     expect(s.medianGrowth).toBeLessThan(0.3)
   })

@@ -1,0 +1,1871 @@
+[
+  {
+    "id": "samovar_teplov",
+    "category": "antiques",
+    "name": "Teplov brass coal samovar",
+    "brand": "Teplov",
+    "era": "c. 1900",
+    "baseValue": {
+      "min": 25000,
+      "max": 45000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 5200,
+      "tolerance": 208.0
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.45,
+    "tells": [
+      {
+        "id": "medals",
+        "tool": "loupe",
+        "finding": "A row of exhibition medals struck into the body, “TEPLOV BROTHERS” around them, worn but crisp at the rims.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "medals"
+      },
+      {
+        "id": "seams",
+        "tool": "loupe",
+        "finding": "Inside the chimney, a hand-dovetailed seam and a century of soot.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "crown"
+      },
+      {
+        "id": "tap",
+        "tool": "loupe",
+        "finding": "The tap key is original, its handle worn smooth. It drips a little.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "tap"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Over five kilos of thick brass. It thumps onto the counter.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_brass",
+        "tool": "magnet",
+        "finding": "Not a flicker from the magnet. Brass all through.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "medals"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "repro_stamped",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "medals",
+            "tool": "loupe",
+            "finding": "The medals are soft and shallow, every one identical, the lettering slightly blurred.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "medals"
+          },
+          {
+            "id": "seams",
+            "tool": "loupe",
+            "finding": "The chimney seam is a single machine weld. And the soot wipes off clean.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "crown"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for a samovar this size. Thin modern brass.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.8
+      },
+      {
+        "id": "married_parts",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.55,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "crown",
+            "tool": "loupe",
+            "finding": "The crown is a different colour of brass, and the fit is loose. From another samovar.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "crown"
+          },
+          {
+            "id": "foot",
+            "tool": "loupe",
+            "finding": "The foot has its own maker’s mark, not Teplov’s.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "foot"
+          }
+        ]
+      },
+      {
+        "id": "replated",
+        "kind": "restored",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "medals",
+            "tool": "loupe",
+            "finding": "Bright new nickel over everything, the medal rims softened by heavy polishing.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "medals"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques",
+      "soviet"
+    ],
+    "claims": [
+      "A Teplov samovar, before the revolution. Look at the medals, every one a prize.",
+      "My great-grandmother’s dowry. It went through two wars and a communal flat.",
+      "We used it at the dacha with pine cones. Best tea in the world."
+    ],
+    "model": {
+      "placeholder": "samovar",
+      "color": "#c79a3f",
+      "scale": 1,
+      "rest": "upright",
+      "inspectDistance": 0.95,
+      "hotspots": [
+        {
+          "id": "medals",
+          "label": "Medals",
+          "position": [
+            0.0,
+            0.03,
+            0.1545
+          ]
+        },
+        {
+          "id": "tap",
+          "label": "Tap",
+          "position": [
+            0.0,
+            -0.06,
+            0.2
+          ]
+        },
+        {
+          "id": "crown",
+          "label": "Crown and chimney",
+          "position": [
+            0.0,
+            0.215,
+            0.035
+          ]
+        },
+        {
+          "id": "foot",
+          "label": "Foot",
+          "position": [
+            0.0,
+            -0.215,
+            0.1
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "samovar_electric_mostmetall",
+    "category": "antiques",
+    "name": "Mostmetall electric samovar",
+    "brand": "Mostmetall",
+    "era": "1980s",
+    "baseValue": {
+      "min": 2500,
+      "max": 4500
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 2300,
+      "tolerance": 92.0
+    },
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.15,
+    "tells": [
+      {
+        "id": "stamp",
+        "tool": "loupe",
+        "finding": "Under the lid rim: MOSTMETALL, 220 V, 1250 W, a price of 24 roubles.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "lid"
+      },
+      {
+        "id": "body",
+        "tool": "loupe",
+        "finding": "The chrome is clouded and scratched, one small dent near the tap.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "body"
+      },
+      {
+        "id": "plug",
+        "tool": "loupe",
+        "finding": "The socket is original, the cable missing. Everyone loses the cable.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "plug"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Two kilos and a bit. Thin, honest brass under chrome.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_brass",
+        "tool": "magnet",
+        "finding": "The magnet only catches the heating element bolt underneath.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "plug"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "burnt_element",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "plug",
+            "tool": "loupe",
+            "finding": "Scorch marks round the socket and a new element nut. It boiled dry once.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "plug"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques",
+      "soviet"
+    ],
+    "claims": [
+      "A samovar for the city flat. Plug it in, tea in ten minutes.",
+      "From the Mostmetall works. My mother worked there thirty years.",
+      "It still boils. Just don’t touch it while it does."
+    ],
+    "model": {
+      "placeholder": "samovar",
+      "color": "#cfcfc8",
+      "scale": 1,
+      "rest": "upright",
+      "emblem": "electric",
+      "inspectDistance": 0.9,
+      "hotspots": [
+        {
+          "id": "body",
+          "label": "Body",
+          "position": [
+            0.0,
+            0.03,
+            0.152
+          ]
+        },
+        {
+          "id": "plug",
+          "label": "Plug socket",
+          "position": [
+            -0.1,
+            -0.12,
+            0.095
+          ]
+        },
+        {
+          "id": "tap",
+          "label": "Tap",
+          "position": [
+            0.0,
+            -0.06,
+            0.2
+          ]
+        },
+        {
+          "id": "lid",
+          "label": "Lid",
+          "position": [
+            0.0,
+            0.15,
+            0.04
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "figurine_horse_volkhov",
+    "category": "antiques",
+    "name": "Volkhov porcelain horse",
+    "brand": "Volkhov",
+    "era": "1950s–1960s",
+    "baseValue": {
+      "min": 8000,
+      "max": 15000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 900,
+      "tolerance": 36.0
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.4,
+    "tells": [
+      {
+        "id": "mark",
+        "tool": "loupe",
+        "finding": "Under the base: the Volkhov works’ blue mark, under the glaze, slightly blurred as old marks are.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "base"
+      },
+      {
+        "id": "glaze",
+        "tool": "loupe",
+        "finding": "The glaze has a soft shine and tiny wear on the high points: the ears, the knees.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "head"
+      },
+      {
+        "id": "legs",
+        "tool": "loupe",
+        "finding": "No chips on the legs, the thinnest part. Someone kept it well.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "legs"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Just under a kilo. Hard, dense porcelain.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "The magnet slides off the glaze.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "base"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "later_repro",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "mark",
+            "tool": "loupe",
+            "finding": "The mark sits on top of the glaze, sharp and printed. You can feel its edge with a nail.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "base"
+          },
+          {
+            "id": "glaze",
+            "tool": "loupe",
+            "finding": "Not a scratch anywhere, and the paint on the mane is a little thick.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "head"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for porcelain. Thick plaster or soft earthenware.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.78
+      },
+      {
+        "id": "glued_leg",
+        "kind": "restored",
+        "valueMultiplier": 0.4,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "legs",
+            "tool": "loupe",
+            "finding": "One leg has been broken and glued; a hairline and a fleck of yellow glue show at the knee.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "legs"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "Volkhov porcelain, the collectors go mad for it. It stood on our sideboard for fifty years.",
+      "My aunt worked at the porcelain works. This was a gift from the director.",
+      "The cat knocked it off twice. Not a scratch."
+    ],
+    "model": {
+      "glb": "figurine_horse_volkhov.glb",
+      "placeholder": "block",
+      "color": "#efe9dd",
+      "scale": 1,
+      "rest": "upright",
+      "size": [
+        0.1629,
+        0.2199,
+        0.1078
+      ],
+      "inspectDistance": 0.48,
+      "hotspots": [
+        {
+          "id": "head",
+          "label": "Head",
+          "position": [
+            -0.0326,
+            0.0919,
+            0.0265
+          ]
+        },
+        {
+          "id": "legs",
+          "label": "Legs",
+          "position": [
+            -0.0672,
+            0.0277,
+            -0.0084
+          ]
+        },
+        {
+          "id": "tail",
+          "label": "Tail",
+          "position": [
+            0.0581,
+            -0.0406,
+            -0.0034
+          ]
+        },
+        {
+          "id": "base",
+          "label": "Base mark",
+          "position": [
+            -0.001,
+            -0.1095,
+            0.0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "figurine_shepherdess_weissenau",
+    "category": "antiques",
+    "name": "Weissenau porcelain shepherdess",
+    "brand": "Weissenau",
+    "era": "19th century, Saxony",
+    "baseValue": {
+      "min": 35000,
+      "max": 60000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 450,
+      "tolerance": 18.0
+    },
+    "magnetic": false,
+    "rarity": 0.15,
+    "fakeChance": 0.6,
+    "tells": [
+      {
+        "id": "mark",
+        "tool": "loupe",
+        "finding": "Under the base: crossed hammers in blue, under the glaze, and an incised model number.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "base"
+      },
+      {
+        "id": "painting",
+        "tool": "loupe",
+        "finding": "The face is painted with a single-hair brush: lashes, a blush, a tiny highlight in each eye.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "head"
+      },
+      {
+        "id": "lamb",
+        "tool": "loupe",
+        "finding": "The lamb’s ear has a tiny old chip, worn smooth with dust in it.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.45,
+        "hotspot": "lamb"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Light and fine. Thin, translucent porcelain.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Not a flicker.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "base"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "later_repro",
+        "kind": "fake",
+        "valueMultiplier": 0.08,
+        "weight": 3,
+        "tells": [
+          {
+            "id": "mark",
+            "tool": "loupe",
+            "finding": "The hammers are printed over the glaze, too crisp, and there is no incised number.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "base"
+          },
+          {
+            "id": "painting",
+            "tool": "loupe",
+            "finding": "The face is a transfer: the blush is made of tiny dots under the loupe.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "head"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Heavy for her size. Thick-walled.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 1.3
+      },
+      {
+        "id": "restored_hands",
+        "kind": "restored",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "skirt",
+            "tool": "loupe",
+            "finding": "A hand and the crook have been remade in resin, the white a shade too cold.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "skirt"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "German porcelain, very old. My grandfather brought it back from Germany in forty-five.",
+      "She stood in my grandmother’s glass cabinet. Nobody was allowed to touch her.",
+      "A man from Moscow offered a lot for it once. My mother said no. My mother is gone now."
+    ],
+    "model": {
+      "placeholder": "figurine",
+      "color": "#9db8d8",
+      "scale": 1,
+      "rest": "upright",
+      "inspectDistance": 0.45,
+      "hotspots": [
+        {
+          "id": "base",
+          "label": "Base mark",
+          "position": [
+            0.0,
+            -0.11,
+            0.0
+          ]
+        },
+        {
+          "id": "head",
+          "label": "Face and hat",
+          "position": [
+            0.0,
+            0.074,
+            0.014
+          ]
+        },
+        {
+          "id": "skirt",
+          "label": "Skirt",
+          "position": [
+            0.0,
+            -0.06,
+            0.042
+          ]
+        },
+        {
+          "id": "lamb",
+          "label": "Lamb",
+          "position": [
+            -0.03,
+            -0.085,
+            0.044
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "vase_crystal_steklov",
+    "category": "antiques",
+    "name": "Steklov cut crystal vase",
+    "brand": "Steklov",
+    "era": "1970s–1980s",
+    "baseValue": {
+      "min": 2000,
+      "max": 3500
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 1600,
+      "tolerance": 64.0
+    },
+    "magnetic": false,
+    "rarity": 0.5,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "cuts",
+        "tool": "loupe",
+        "finding": "The cuts are sharp-edged and slightly uneven, each one ground by a wheel.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "cuts"
+      },
+      {
+        "id": "ring",
+        "tool": "loupe",
+        "finding": "Flick the rim and it rings, long and clear. Lead crystal.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "rim"
+      },
+      {
+        "id": "foot",
+        "tool": "loupe",
+        "finding": "A paper label under the foot: STEKLOV and a price, half scratched off.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "foot"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Heavy, over a kilo and a half. Lead in the glass.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Nothing pulls.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "foot"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "pressed_glass",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "cuts",
+            "tool": "loupe",
+            "finding": "The cuts are soft and rounded, and a faint mould seam runs up the side.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "cuts"
+          },
+          {
+            "id": "ring",
+            "tool": "loupe",
+            "finding": "Flick the rim and it clunks. Ordinary glass.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "rim"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Lighter than lead crystal of that size.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.82
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "Real crystal, every Soviet family had one. Ours had two.",
+      "A wedding present. The marriage broke, the vase didn’t.",
+      "For flowers. Nobody gives me flowers any more."
+    ],
+    "model": {
+      "placeholder": "vase",
+      "color": "#dde8ee",
+      "scale": 1,
+      "rest": "upright",
+      "inspectDistance": 0.6,
+      "hotspots": [
+        {
+          "id": "cuts",
+          "label": "Cut band",
+          "position": [
+            0.0,
+            -0.01,
+            0.076
+          ]
+        },
+        {
+          "id": "foot",
+          "label": "Foot",
+          "position": [
+            0.0,
+            -0.125,
+            0.0
+          ]
+        },
+        {
+          "id": "rim",
+          "label": "Rim",
+          "position": [
+            0.0,
+            0.124,
+            0.057
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "clock_hollweg",
+    "category": "antiques",
+    "name": "Hollweg mantel clock",
+    "brand": "Hollweg",
+    "era": "c. 1910, Germany",
+    "baseValue": {
+      "min": 15000,
+      "max": 25000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 3800,
+      "tolerance": 152.0
+    },
+    "magnetic": true,
+    "rarity": 0.25,
+    "fakeChance": 0.4,
+    "tells": [
+      {
+        "id": "movement",
+        "tool": "loupe",
+        "finding": "Through the back: a brass movement stamped HOLLWEG, a serial and a little anchor.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "back"
+      },
+      {
+        "id": "dial",
+        "tool": "loupe",
+        "finding": "The dial is enamel, with fine hairline crazing and hand-painted numerals.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "dial"
+      },
+      {
+        "id": "case",
+        "tool": "loupe",
+        "finding": "The case veneer is lifting a little at one foot.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "foot"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Nearly four kilos. Solid wood and a heavy movement.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_movement",
+        "tool": "magnet",
+        "finding": "The magnet catches only the steel spring and pins in the back.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "back"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "married_movement",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "movement",
+            "tool": "loupe",
+            "finding": "The movement carries another maker’s stamp, and there are extra screw holes in the case.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "back"
+          }
+        ]
+      },
+      {
+        "id": "repainted_dial",
+        "kind": "restored",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "dial",
+            "tool": "loupe",
+            "finding": "The dial is repainted: smooth, no crazing, the numerals slightly too thick.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "dial"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "German clock, before the First War. It chimes on the half hour, very politely.",
+      "It stood on my grandfather’s desk in the ministry. Which ministry, he never said.",
+      "It needs winding every week. I keep forgetting, and it keeps reminding me."
+    ],
+    "model": {
+      "glb": "clock_hollweg.glb",
+      "placeholder": "block",
+      "color": "#5a3218",
+      "scale": 1,
+      "rest": "upright",
+      "size": [
+        0.3423,
+        0.1605,
+        0.1261
+      ],
+      "inspectDistance": 0.75,
+      "hotspots": [
+        {
+          "id": "dial",
+          "label": "Dial",
+          "position": [
+            -0.0015,
+            0.0369,
+            0.0482
+          ]
+        },
+        {
+          "id": "top",
+          "label": "Top",
+          "position": [
+            -0.0011,
+            0.0798,
+            0.051
+          ]
+        },
+        {
+          "id": "foot",
+          "label": "Foot",
+          "position": [
+            -0.1046,
+            -0.0677,
+            0.0503
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Back and movement",
+          "position": [
+            -0.0015,
+            0.0,
+            -0.0533
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "gramophone_ehrenfeld",
+    "category": "antiques",
+    "name": "Ehrenfeld horn gramophone",
+    "brand": "Ehrenfeld",
+    "era": "c. 1910",
+    "baseValue": {
+      "min": 40000,
+      "max": 65000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 9000,
+      "tolerance": 360.0
+    },
+    "magnetic": true,
+    "rarity": 0.15,
+    "fakeChance": 0.6,
+    "tells": [
+      {
+        "id": "plate",
+        "tool": "loupe",
+        "finding": "A worn brass plate: EHRENFELD, Berlin, a patent number, and old dirt in the letters.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "plate"
+      },
+      {
+        "id": "soundbox",
+        "tool": "loupe",
+        "finding": "The soundbox has a mica diaphragm, slightly yellowed, with the maker’s name round the rim.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "soundbox"
+      },
+      {
+        "id": "turntable",
+        "tool": "loupe",
+        "finding": "The felt is moth-eaten but the turntable spins true.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "turntable"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Nine kilos. The scale strains under the oak case and the steel motor.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_motor",
+        "tool": "magnet",
+        "finding": "The magnet pulls at the case near the crank, where the spring motor sits.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "plate"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "indian_repro",
+        "kind": "fake",
+        "valueMultiplier": 0.08,
+        "weight": 3,
+        "tells": [
+          {
+            "id": "plate",
+            "tool": "loupe",
+            "finding": "The plate is shiny, the name misspelt EHRENFIELD, and the screws are cross-headed.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "plate"
+          },
+          {
+            "id": "soundbox",
+            "tool": "loupe",
+            "finding": "The diaphragm is aluminium, no name on the rim. It sounds like a tin can.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "soundbox"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for a gramophone. Thin plywood case.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.78
+      },
+      {
+        "id": "wrong_horn",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "horn",
+            "tool": "loupe",
+            "finding": "The horn is a later brass replacement; its fitting doesn’t match the arm.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "horn"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "From before the revolution. It played at a count’s ball. Probably.",
+      "It still works, you wind it up. Records not included, sorry.",
+      "My grandmother danced to it as a girl. She’s ninety-one."
+    ],
+    "model": {
+      "placeholder": "gramophone",
+      "color": "#c9a14a",
+      "scale": 1,
+      "rest": "upright",
+      "inspectDistance": 1.7,
+      "hotspots": [
+        {
+          "id": "plate",
+          "label": "Maker’s plate",
+          "position": [
+            0.0,
+            -0.26,
+            0.166
+          ]
+        },
+        {
+          "id": "turntable",
+          "label": "Turntable",
+          "position": [
+            -0.05,
+            -0.19,
+            0.08
+          ]
+        },
+        {
+          "id": "soundbox",
+          "label": "Sound box",
+          "position": [
+            0.07,
+            -0.175,
+            0.066
+          ]
+        },
+        {
+          "id": "horn",
+          "label": "Horn",
+          "position": [
+            0.165,
+            0.147,
+            0.19
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "teapot_volkhov",
+    "category": "antiques",
+    "name": "Volkhov porcelain teapot",
+    "brand": "Volkhov",
+    "era": "1960s",
+    "baseValue": {
+      "min": 3000,
+      "max": 6000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 650,
+      "tolerance": 26.0
+    },
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.25,
+    "tells": [
+      {
+        "id": "mark",
+        "tool": "loupe",
+        "finding": "Under the base: the Volkhov mark in blue, under the glaze, a little blurred.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "base"
+      },
+      {
+        "id": "lid",
+        "tool": "loupe",
+        "finding": "The lid fits perfectly, a small chip on its inner rim.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "lid"
+      },
+      {
+        "id": "spout",
+        "tool": "loupe",
+        "finding": "Tea stains deep inside the spout. It has been used, often.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "spout"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Light and thin. Fine porcelain.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Nothing pulls.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "base"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "wrong_lid",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "lid",
+            "tool": "loupe",
+            "finding": "The lid is a slightly different white and the pattern does not line up.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "lid"
+          }
+        ]
+      },
+      {
+        "id": "later_repro",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "mark",
+            "tool": "loupe",
+            "finding": "The mark is printed over the glaze, sharp, and slightly crooked.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "base"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Heavy for porcelain. Thick earthenware.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 1.3
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "Volkhov porcelain. My mother only took it out for guests.",
+      "From a tea set. The cups died one by one.",
+      "It makes better tea than a modern one, it really does."
+    ],
+    "model": {
+      "glb": "teapot_volkhov.glb",
+      "placeholder": "block",
+      "color": "#f1ece2",
+      "scale": 1,
+      "rest": "upright",
+      "size": [
+        0.2678,
+        0.1644,
+        0.1647
+      ],
+      "inspectDistance": 0.59,
+      "hotspots": [
+        {
+          "id": "spout",
+          "label": "Spout",
+          "position": [
+            -0.108,
+            0.0046,
+            0.0001
+          ]
+        },
+        {
+          "id": "handle",
+          "label": "Handle",
+          "position": [
+            0.1193,
+            -0.0031,
+            0.0028
+          ]
+        },
+        {
+          "id": "lid",
+          "label": "Lid",
+          "position": [
+            -0.0012,
+            0.0397,
+            0.0574
+          ]
+        },
+        {
+          "id": "base",
+          "label": "Base mark",
+          "position": [
+            -0.0012,
+            -0.0744,
+            -0.0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "lamp_krutov",
+    "category": "antiques",
+    "name": "Krutov brass kerosene lamp",
+    "brand": "Krutov",
+    "era": "c. 1900",
+    "baseValue": {
+      "min": 6000,
+      "max": 10000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 1400,
+      "tolerance": 56.0
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.35,
+    "tells": [
+      {
+        "id": "burner",
+        "tool": "loupe",
+        "finding": "The burner is stamped KRUTOV & SONS with a crown, the wick wheel still turning.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "burner"
+      },
+      {
+        "id": "font",
+        "tool": "loupe",
+        "finding": "A smell of old kerosene, and a brown varnish line where the oil sat for decades.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "font"
+      },
+      {
+        "id": "base",
+        "tool": "loupe",
+        "finding": "A felt pad on the base, mostly gone.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "base"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Nearly a kilo and a half of cast brass.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_brass",
+        "tool": "magnet",
+        "finding": "The magnet slides off.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "stem"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "modern_repro",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "burner",
+            "tool": "loupe",
+            "finding": "The burner is unmarked and the wick wheel is stamped tin.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "burner"
+          },
+          {
+            "id": "font",
+            "tool": "loupe",
+            "finding": "Inside the font: clean, no smell, no stains, never filled.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "font"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light. Thin spun brass, not cast.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.75
+      },
+      {
+        "id": "electrified",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "stem",
+            "tool": "loupe",
+            "finding": "A neat hole drilled through the stem for a cable. Someone made it a table lamp.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "stem"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "From my great-grandfather’s house in the village. Before electricity came.",
+      "Krutov brass, Petersburg made. The burner still works.",
+      "Good for power cuts. We have a lot of power cuts."
+    ],
+    "model": {
+      "glb": "lamp_krutov.glb",
+      "placeholder": "block",
+      "color": "#c49a45",
+      "scale": 1,
+      "rest": "upright",
+      "size": [
+        0.22,
+        0.4711,
+        0.22
+      ],
+      "inspectDistance": 1.04,
+      "hotspots": [
+        {
+          "id": "burner",
+          "label": "Burner",
+          "position": [
+            -0.0021,
+            0.1862,
+            0.0207
+          ]
+        },
+        {
+          "id": "font",
+          "label": "Oil font",
+          "position": [
+            -0.0021,
+            0.0487,
+            0.0987
+          ]
+        },
+        {
+          "id": "stem",
+          "label": "Stem",
+          "position": [
+            -0.0021,
+            -0.0677,
+            0.037
+          ]
+        },
+        {
+          "id": "base",
+          "label": "Base",
+          "position": [
+            -0.0021,
+            -0.1947,
+            0.102
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "candelabrum_vasilyev",
+    "category": "antiques",
+    "name": "Vasilyev bronze candelabrum",
+    "brand": "Vasilyev",
+    "era": "late 19th century",
+    "baseValue": {
+      "min": 15000,
+      "max": 25000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 2600,
+      "tolerance": 104.0
+    },
+    "magnetic": false,
+    "rarity": 0.2,
+    "fakeChance": 0.45,
+    "tells": [
+      {
+        "id": "mark",
+        "tool": "loupe",
+        "finding": "Under the base: a cast founder’s mark, VASILYEV, and a number scratched by hand.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "base"
+      },
+      {
+        "id": "patina",
+        "tool": "loupe",
+        "finding": "A deep brown patina, worn back to golden bronze where hands lifted it.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "stem"
+      },
+      {
+        "id": "sconce",
+        "tool": "loupe",
+        "finding": "Old wax in the candle cups, and a little bend in one arm.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "sconce"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Over two and a half kilos of solid bronze.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "The magnet finds nothing.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "base"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "zinc_spelter",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "patina",
+            "tool": "loupe",
+            "finding": "Where the paint-like patina is worn, the metal underneath is grey, not golden.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "stem"
+          },
+          {
+            "id": "mark",
+            "tool": "loupe",
+            "finding": "No founder’s mark. A rough casting seam runs under the base.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "base"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Lighter than bronze should be.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.82
+      },
+      {
+        "id": "replaced_arm",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "arm",
+            "tool": "loupe",
+            "finding": "One arm is a newer casting: sharper detail, a different colour, a fresh screw.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "arm"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "Bronze, nineteenth century. From a merchant’s house on the embankment.",
+      "It came with the flat. The previous owner left in a hurry.",
+      "Heavy, solid. You could defend the house with it."
+    ],
+    "model": {
+      "glb": "candelabrum_vasilyev.glb",
+      "placeholder": "block",
+      "color": "#8a6a3a",
+      "scale": 1,
+      "rest": "upright",
+      "size": [
+        0.2611,
+        0.3794,
+        0.0974
+      ],
+      "inspectDistance": 0.83,
+      "hotspots": [
+        {
+          "id": "base",
+          "label": "Base",
+          "position": [
+            -0.0017,
+            -0.1773,
+            0.0345
+          ]
+        },
+        {
+          "id": "stem",
+          "label": "Stem",
+          "position": [
+            -0.0017,
+            -0.0886,
+            0.0127
+          ]
+        },
+        {
+          "id": "arm",
+          "label": "Arm",
+          "position": [
+            -0.0581,
+            0.0005,
+            0.0023
+          ]
+        },
+        {
+          "id": "sconce",
+          "label": "Candle cup",
+          "position": [
+            -0.1108,
+            0.0477,
+            0.0152
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "chess_set_gambit",
+    "category": "antiques",
+    "name": "Gambit tournament chess set",
+    "brand": "Gambit",
+    "era": "1960s",
+    "baseValue": {
+      "min": 4000,
+      "max": 8000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 1800,
+      "tolerance": 72.0
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.25,
+    "tells": [
+      {
+        "id": "stamp",
+        "tool": "loupe",
+        "finding": "Under the board: an ink stamp, GAMBIT, a price and a quality inspector’s number.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "back"
+      },
+      {
+        "id": "knight",
+        "tool": "loupe",
+        "finding": "The knights are hand-carved, each slightly different, the manes cut with a knife.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "knight"
+      },
+      {
+        "id": "king",
+        "tool": "loupe",
+        "finding": "The kings are weighted with lead under felt; one felt is missing.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "king"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Nearly two kilos, board and pieces. Weighted, proper pieces.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "The magnet only catches the board’s hinges.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "back"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "mixed_pieces",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.5,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "knight",
+            "tool": "loupe",
+            "finding": "Two of the knights are lathe-turned and painted, not carved. Another set’s pieces.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "knight"
+          }
+        ]
+      },
+      {
+        "id": "plastic_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "stamp",
+            "tool": "loupe",
+            "finding": "No stamp under the board, just a printed barcode sticker torn off.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "back"
+          },
+          {
+            "id": "knight",
+            "tool": "loupe",
+            "finding": "The knights are moulded, a seam down the middle of each.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "knight"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light. Unweighted pieces.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.7
+      }
+    ],
+    "demandTags": [
+      "antiques"
+    ],
+    "claims": [
+      "Tournament set. My father played with a grandmaster on this. He lost, but still.",
+      "All thirty-two pieces. I counted twice.",
+      "We played every evening, my husband and I. He always won. Now nobody plays."
+    ],
+    "model": {
+      "glb": "chess_set_gambit.glb",
+      "placeholder": "block",
+      "color": "#7a5230",
+      "scale": 1,
+      "rest": "flat",
+      "size": [
+        0.5532,
+        0.5532,
+        0.1123
+      ],
+      "inspectDistance": 1.15,
+      "hotspots": [
+        {
+          "id": "king",
+          "label": "King",
+          "position": [
+            -0.0323,
+            0.2262,
+            0.0
+          ]
+        },
+        {
+          "id": "knight",
+          "label": "Knight",
+          "position": [
+            -0.1491,
+            -0.1789,
+            -0.01
+          ]
+        },
+        {
+          "id": "board",
+          "label": "Board",
+          "position": [
+            -0.0025,
+            0.0,
+            -0.0388
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Underside",
+          "position": [
+            -0.0025,
+            0.0,
+            -0.0544
+          ]
+        }
+      ]
+    }
+  }
+]

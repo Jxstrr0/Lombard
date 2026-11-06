@@ -223,6 +223,9 @@ export const Effect = z.discriminatedUnion('do', [
   // --- M5 the fence ---------------------------------------------------------------------
   /** A named change to the fence relationship (tuning.fence.changes): met, trust, a refusal, the next contact. */
   z.object({ do: z.literal('fence'), change: fenceChange }),
+  // --- M5 Volkova's arc -----------------------------------------------------------------
+  /** Detective Volkova's trust in you moves by `trust` (clamped to tuning.police.volkova trustMin…trustMax). */
+  z.object({ do: z.literal('volkova'), trust: z.number() }),
   // --- M5 the Collector (src/game/crime/collector.ts) ----------------------------------
   /** The Collector's icon leaves the shop: sold to him (his price), back to its church, or to the police. */
   z.object({ do: z.literal('collector'), change: z.enum(['sold', 'returned', 'handedIn']) }),

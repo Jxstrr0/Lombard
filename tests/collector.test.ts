@@ -59,6 +59,27 @@ describe('the Collector: content', () => {
     expect(SPECIALISTS.some((s) => s.id === COLLECTOR_ID)).toBe(false)
   })
 
+  it('every arc’s one-off strangers wear walk-in looks no named character wears, one look each', () => {
+    // Named people: regulars, specialists, the fence, Volkova, the Collector, the reserved arc looks.
+    const named = new Set([...RESERVED_LOOKS, FENCE.look, VOLKOVA.look, COLLECTOR.look, ...REGULARS.map((r) => r.look), ...SPECIALISTS.flatMap((s) => (s.look ? [s.look] : []))])
+    const strangers = new Map<string, string>([[ROOFER.look, ROOFER.name]])
+    for (const arc of ARCS) {
+      for (const b of arc.beats) {
+        const as = b.visit.as
+        // Volkova off duty is herself, in her own look.
+        if (!as || (b.visit.who === VOLKOVA.id && as.look === VOLKOVA.look)) continue
+        const look = CAST.find((c) => c.id === as.look)
+        expect(look, `${b.id} ${as.look}`).toBeDefined()
+        expect(look!.regular ?? false, `${b.id} ${as.look}`).toBe(false)
+        expect(named.has(as.look), `${b.id} ${as.name} in ${as.look}`).toBe(false)
+        const other = strangers.get(as.look)
+        expect(other === undefined || other === as.name, `${as.name} and ${other} both wear ${as.look}`).toBe(true)
+        strangers.set(as.look, as.name)
+      }
+    }
+    expect(strangers.size).toBeGreaterThanOrEqual(5)
+  })
+
   it('the icon is story-only: real, but never in the walk-in pool or the bulletin', () => {
     expect(ITEM_DEFS.some((d) => d.id === COLLECTOR_ICON)).toBe(true)
     expect(SPAWN_DEFS.some((d) => d.id === COLLECTOR_ICON)).toBe(false)

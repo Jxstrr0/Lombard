@@ -268,8 +268,9 @@ const CAREFUL: PolicyParams = {
   reserveDays: 10,
   // Runs a clean shop: turns down the crew's "insurance" and every rung after (Protection arc).
   // M5 makes refusing cost (the brick, the glazier); see docs/05 for the sim numbers.
-  // M5: and gives the Collector's icon back to its church.
-  prefer: ['refuse', 'cooperate', 'return'],
+  // M5: gives the Collector's icon back to its church, and stays out of Volkova's case against the crew
+  // (informing is its own policy, below).
+  prefer: ['refuse', 'cooperate', 'return', 'stay_out'],
   // And when Eduard Lvovich says "lock up carefully tonight", it empties the counter case.
   heedsThreats: true,
   // M5 police: keeps a passport book, reads the bulletin, and hands stolen pieces over when Volkova asks.
@@ -287,14 +288,20 @@ export const careful = makePolicy(CAREFUL)
  * their deliveries like any other good deal (the M5 "done when": a mob-friendly run plays differently).
  * The fence is a separate person: it still turns him down. It sells the Collector his icon.
  */
-export const mobFriendly = makePolicy({ ...CAREFUL, name: 'mobFriendly', prefer: ['accept', 'pay', 'keep', 'sell'] })
+export const mobFriendly = makePolicy({ ...CAREFUL, name: 'mobFriendly', prefer: ['accept', 'pay', 'keep', 'sell', 'stay_out', 'source_no'] })
+
+/**
+ * M5 Volkova's arc: the careful refuser, except that when Volkova asks about Eduard Lvovich's crew it
+ * tells her everything (volkova.inform): pressure jumps, and then the crew finds out or she gets them.
+ */
+export const informer = makePolicy({ ...CAREFUL, name: 'informer', prefer: ['refuse', 'cooperate', 'inform'] })
 
 /**
  * M5 "done when": a fence-heavy run. The careful player, except that it keeps the fence's Tuesdays,
  * buys what he brings at his price (unless a check flags it) and sells him its problem pieces.
  * It sells the Collector his icon too.
  */
-export const fenceFriend = makePolicy({ ...CAREFUL, name: 'fence', fence: 'deal', prefer: ['fence_yes', 'refuse', 'sell'] })
+export const fenceFriend = makePolicy({ ...CAREFUL, name: 'fence', fence: 'deal', prefer: ['fence_yes', 'refuse', 'sell', 'stay_out', 'source_no'] })
 
 export const careless = makePolicy({
   name: 'careless',
@@ -336,5 +343,6 @@ export const trader = makePolicy({
   dumpAfterDays: 21,
   skepticism: 0.1,
   reserveDays: 10,
-  prefer: ['accept', 'busy', 'refuse', 'market', 'wave', 'liar', 'keep', 'rules'],
+  // Volkova's arc: keeps out of her case against the crew it pays, and isn't her source.
+  prefer: ['accept', 'busy', 'refuse', 'market', 'wave', 'liar', 'keep', 'rules', 'stay_out', 'source_no'],
 })

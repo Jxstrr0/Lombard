@@ -25,6 +25,8 @@ import type { Arc, Beat, RegularDef } from '../schema/story'
 import type { CustomerState, GameState } from '../state'
 import type { QueuedVisit, WalkIn } from '../types'
 import { FENCE_ID, fenceCustomer } from '../crime/fence'
+import { volkovaCustomer } from '../crime/volkova'
+import { VOLKOVA } from '../../data/police'
 import { COLLECTOR_ID, collectorCustomer } from '../crime/collector'
 import { allHold } from './conditions'
 import { beatRecord, memoryOf, warmthOf } from './progress'
@@ -117,13 +119,14 @@ export function pickBeats(state: GameState): Beat[] {
  */
 export type StoryIds = (prefix: string, who: string) => string
 
-/** Who plays a beat at the counter: a regular, a specialist (M4), the fence or the Collector (M5), or someone `who` sent (M4 `as`). */
+/** Who plays a beat at the counter: a regular, a specialist (M4), the fence, the Collector or Volkova (M5), or someone `who` sent (M4 `as`). */
 function beatCustomer(beat: Beat): WalkIn | null {
   const v = beat.visit
   if (v.as) {
     return { id: `as_${beat.id.replace('.', '_')}`, name: v.as.name, archetype: v.as.archetype, temperament: v.as.temperament, knowledge: v.as.knowledge, desperation: v.as.desperation, portraitKey: v.as.look }
   }
   if (v.who === FENCE_ID) return fenceCustomer()
+  if (v.who === VOLKOVA.id) return volkovaCustomer()
   if (v.who === COLLECTOR_ID) return collectorCustomer()
   const regular = REGULARS.find((r) => r.id === v.who)
   return regular ? regularCustomer(regular) : specialistCustomer(v.who)

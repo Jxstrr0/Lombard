@@ -167,6 +167,11 @@ export class ShopScene {
     }
   }
 
+  /** The rendered canal outside, once loaded (the street layer draws over it). */
+  get canal(): CanalBackdrop | null {
+    return this.backdrop
+  }
+
   /** ?time=HH:MM (review): the room shows this shop time (day.clock seconds) instead of the game's. */
   setClockOverride(seconds: number | null): void {
     this.clockOverride = seconds

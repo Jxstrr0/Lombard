@@ -165,6 +165,65 @@ npm run backdrop:pack
 
 Limits: the water reads as a band seen through the railing. The window sill hides everything nearer than about 20 m, so the canal is drawn 30 m wide with the water at a high spring level. The inspect camera and the idle sway see a few centimetres of parallax, which nobody notices at that distance.
 
+## Street life outside the window (decided Nov 2026, M3)
+
+The canal render is a still photo, so the view gets a thin layer of life drawn over it (Kelbo asked for the outside to be "animated and more alive"). It is presentation only: it reads the career seed, the day, the season and the shop clock, and it never writes game state.
+
+What moves:
+
+- **People** on the shop's pavement (waist up through the window), on the near embankment walk, along the far railing and on the far pavement. They walk both ways at 0.95–1.4 m/s, about one every half minute past the window. One spawn in five is a pair. They carry umbrellas on a rainy day. The street is quieter in rain, in snow and after dark.
+- **Traffic** on the far embankment road: cars, a minibus and a rare bus, keeping to the right.
+- **A tour boat** every five minutes or so. Its wake breaks up the water's ripple behind it, and it has a reflection. There are no boats when the canal is frozen.
+- **Pigeons**: a small flock crosses the sky now and then. Once in a while one lands on the outside windowsill, pecks, looks about and flies off. This only happens on dry days in daylight.
+- **The sky and the season**: clouds drift. Street lamps, shop fronts and then house windows come on in two waves at dusk. Dusk follows the season's sunset (winter mid-afternoon, white nights in summer).
+- **Weather**: each day's weather is seeded from the career seed and the day, so a reload keeps it. A rainy day brings streaks and beads on the window and door glass and a wet, darker street. A snowy day brings flakes and a whiter street. In winter the canal is frozen.
+
+How it is made (all self-generated, no third-party assets beyond the Rocketbox cast already in the game):
+
+- `art/street/build.py` (headless Blender, seeded) renders:
+  - **people sheets**: 8 Rocketbox cast members (4 men, 4 women) walking side-on, 8 frames each of the cast's own walk clip, 128×256 px cells in a 2048×1024 atlas. There is a dry sheet and a rain sheet, which adds an umbrella held by IK in the near hand.
+  - **a props sheet**: three cars, a minibus, a bus, a tour boat and the pigeon frames (stand, two pecks, four wing beats, landing).
+  - **canal extras**: an RGBA data image at half the canal render's size. R is a depth code, so a sprite hides behind the railing, the bridge or the boat per pixel. G is the lamps and shop fronts, B is the early windows and A is the late windows, rendered in the canal scene at night with only those emitters on. It uses the backdrop's own scene and camera (`art/backdrop/scene.py`), so it lines up with the photo pixel for pixel.
+- `scripts/street-pack.mjs` (`npm run street:pack`) encodes the three sheets as KTX2 (ETC1S, mipmaps, sRGB) and the data image as lossless WebP (exact, so the depth codes survive). It writes `public/assets/street/`.
+- At runtime, `src/render/street/` builds its schedule in `plan.ts`, which is pure. It uses its own random streams forked from the career seed and the day, so it never shifts the game's RNG. It draws with:
+  - two instanced sprite layers (people; vehicles, boat and birds);
+  - one weather layer on the glass, made of two quads.
+  The clouds, night lights, weather grading and boat wake are added to the canal backdrop's existing shader (`src/render/backdrop.ts`), at no extra draw. Sprites beyond the backdrop plane are pulled in along the eye ray so they sit inside the camera's far plane and look the same size.
+- Everything loads after the shop is ready (`__lombardReady`). A day downloads one people sheet (dry or rain), not both. If loading fails, the street simply stays still.
+- Reduce motion turns the street still: no people, traffic, boat or birds, still clouds, and on the glass the drops and flakes freeze and the streaks go. The lamps, windows and weather grading stay. The Low tier draws fewer rain and snow layers.
+- Numbers (measured headless at 390×844, `?perf=1`, a busy rainy street at the counter):
+  - 3 draw calls (33 → 36) and about 0.1k triangles;
+  - about 4.0 MB of decoded textures (people sheet 2.7 MB, props 0.5 MB, canal data 0.8 MB);
+  - downloads per day: 621 KB dry or 696 KB in rain (people sheet 361 or 434 KB, props 64 KB, canal data 179 KB), plus an 18 KB script chunk (7 KB gzipped).
+- Each passer-by on the shop's pavement calls `StreetLife.onWindowPasser`. `main.ts` points this at the shop life's `passerBy()`, so their shadow crosses the sun patch on the floor, and turns off the shop life's fake passers while the street runs.
+- `tests/street.test.ts` checks:
+  - the schedule (gaps, pairs, directions, the effect of weather and dark, no boats on ice);
+  - the weather odds and the dusk times;
+  - that the packed sheets match the scripts and the current canal render (input hashes);
+  - that a day's download stays under 1.5 MB.
+
+Review flags:
+- `?street=0` turns it off.
+- `?street=busy` gives four times the traffic.
+- `?weather=clear|rain|snow` and `?season=…` set the conditions.
+- `?time=HH:MM` is the shop's own review clock (shared with the shop life), so the street, window light and wall clock agree.
+
+`node scripts/street-shots.mjs` (after `npm run build`) writes day, dusk, rain and snow shots, plus a second day frame one second later, to `shots/street-*.png`.
+
+Rebuild it (Blender 4.5.15; about 15 minutes for people and props at 32 samples, about 4 minutes for the canal extras at 64; commit the result together with the script change):
+
+```
+~/blender/blender -b --factory-startup --python art/street/build.py -- --samples 32 [--only people,props,canal]
+npm run street:pack
+```
+
+Rerun `--only canal` after every canal backdrop rebuild. The test fails until you do, because the data image must match the photo.
+
+Limits:
+- People are flat side-on sprites, so they only walk along the street, never towards the shop.
+- The near asphalt lane in front of the shop has no traffic: a car there would fill the window at a size the sprites can't hold up to.
+- There is no tram, because the render has no tracks.
+- There is no snow on the railing, and no rain sound yet.
 ## Shop life (decided Nov 2026, M3 art pass)
 
 Kelbo asked for the shop to feel more alive. `src/render/life/` adds small moving things on top of the bake, all dynamic, all presentation (they read state like the rest of `render/`, never change it). None of it touches `bake/`: the bake is the room as it is, and these sit in its light.
@@ -237,6 +296,7 @@ npm run assets:optimize   # gltf-transform: draco + ktx2 + prune + dedup on publ
 npm run assets:check      # verify every file in public/assets has an ATTRIBUTION.md line
 # bake: GitHub Actions 'bake' workflow (see Bake pipeline above)
 # canal backdrop: art/backdrop/build.py in Blender, then npm run backdrop:pack (see Canal backdrop above)
+# street life: art/street/build.py in Blender, then npm run street:pack (see Street life above)
 # surface textures: python3 art/materials/prepare.py, then push (the bake runs; see Surface textures above)
 # props: art/props/prepare.py in Blender, then place them in bake/layout.json and push (see Props above)
 # audio: python3 art/audio/build.py [--only <name>], outputs in public/assets/audio/ (see Audio above)

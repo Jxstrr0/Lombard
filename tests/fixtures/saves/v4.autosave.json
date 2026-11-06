@@ -1,0 +1,1249 @@
+{
+ "careerId": "career-7002",
+ "savedAt": 1793941371000,
+ "version": 4,
+ "state": {
+  "meta": {
+   "version": 4,
+   "seed": 7002,
+   "careerId": "career-7002",
+   "rng": 1937899667,
+   "nextId": 1019,
+   "intro": false
+  },
+  "calendar": {
+   "day": 39,
+   "date": "2014-04-10",
+   "weekday": 3,
+   "season": "spring"
+  },
+  "cash": 1558,
+  "shop": {
+   "name": "Lombard No. 7",
+   "slots": [
+    {
+     "id": "counter-1",
+     "area": "counter",
+     "itemId": null
+    },
+    {
+     "id": "counter-2",
+     "area": "counter",
+     "itemId": "in2"
+    },
+    {
+     "id": "counter-3",
+     "area": "counter",
+     "itemId": "inh"
+    },
+    {
+     "id": "counter-4",
+     "area": "counter",
+     "itemId": null
+    },
+    {
+     "id": "counter-5",
+     "area": "counter",
+     "itemId": "iog"
+    },
+    {
+     "id": "counter-6",
+     "area": "counter",
+     "itemId": "iqi"
+    },
+    {
+     "id": "wall-1",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-2",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-3",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-4",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-5",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-6",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-7",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-8",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-9",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-10",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-11",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-12",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "back-1",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-2",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-3",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-4",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-5",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-6",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-7",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-8",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-9",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-10",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-11",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-12",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-13",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-14",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-15",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-16",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-17",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-18",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-19",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-20",
+     "area": "back",
+     "itemId": null
+    }
+   ],
+   "prices": {
+    "in2": 5339,
+    "inh": 3497,
+    "iog": 888,
+    "iqi": 775
+   },
+   "upgrades": [
+    "acid_kit"
+   ],
+   "acidCharges": 0,
+   "security": 0
+  },
+  "inventory": [
+   {
+    "id": "in2",
+    "defId": "phone_mangosteen_m4s",
+    "condition": 79,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 4600,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "@magnet",
+     "magnet_speaker",
+     "back_glass",
+     "simtray",
+     "@reference"
+    ],
+    "story": "It's old but it works. The battery lasts till lunch.",
+    "weightGrams": 140.84
+   },
+   {
+    "id": "inh",
+    "defId": "camera_zenit_e",
+    "condition": 94,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 4600,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "@magnet",
+     "magnet_body",
+     "serial",
+     "nameplate",
+     "@reference"
+    ],
+    "story": "It works without batteries. Try finding a phone that does that.",
+    "weightGrams": 975.96
+   },
+   {
+    "id": "iog",
+    "defId": "coin_poltinnik_1924",
+    "condition": 97,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 1050,
+    "revealed": [
+     "@weight",
+     "@condition",
+     "@magnet",
+     "magnet_coin",
+     "emblem",
+     "@reference"
+    ],
+    "story": "From my grandfather's collection. He had a whole album of these.",
+    "weightGrams": 9.92
+   },
+   {
+    "id": "iqi",
+    "defId": "coin_olympiad_10r",
+    "condition": 51,
+    "authenticity": "genuine",
+    "provenance": "clean",
+    "trueValue": 840,
+    "revealed": [
+     "@weight",
+     "heft",
+     "@condition",
+     "@magnet",
+     "magnet_coin",
+     "relief",
+     "edge",
+     "@reference"
+    ],
+    "story": "Proof condition. It says so on the plastic. Well, the plastic broke.",
+    "weightGrams": 33.48
+   }
+  ],
+  "paid": {
+   "in2": 2543,
+   "inh": 1830,
+   "iog": 381,
+   "iqi": 369
+  },
+  "loans": [
+   {
+    "id": "l3t",
+    "item": {
+     "id": "i3h",
+     "defId": "gold_rope_chain_585",
+     "condition": 44,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 17400,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "clasp_stamp",
+      "colour",
+      "@magnet",
+      "magnet_clasp",
+      "links",
+      "@acid"
+     ],
+     "story": "My husband's. He won't be needing it where he's gone. The north, I mean. For work.",
+     "weightGrams": 10.13
+    },
+    "customer": {
+     "id": "c3g",
+     "name": "Nadia",
+     "archetype": "student",
+     "temperament": "flexible",
+     "knowledge": 0.53,
+     "desperation": 0.79,
+     "portraitKey": "female_adult_03"
+    },
+    "principal": 4266,
+    "startDay": 5,
+    "dueDay": 35,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "l7k",
+    "item": {
+     "id": "i6u",
+     "defId": "coin_poltinnik_1924",
+     "condition": 76,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 840,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "edge",
+      "@magnet",
+      "magnet_coin",
+      "relief",
+      "@reference"
+     ],
+     "story": "I need the bus fare home. Truly.",
+     "weightGrams": 9.85
+    },
+    "customer": {
+     "id": "c6t",
+     "name": "Nadia",
+     "archetype": "student",
+     "temperament": "flexible",
+     "knowledge": 0.5,
+     "desperation": 0.83,
+     "portraitKey": "female_adult_17"
+    },
+    "principal": 290,
+    "startDay": 10,
+    "dueDay": 40,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "l7m",
+    "item": {
+     "id": "i76",
+     "defId": "gold_band_583",
+     "condition": 46,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 8750,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "colour",
+      "seam",
+      "@magnet",
+      "hallmark",
+      "@reference"
+     ],
+     "story": "It was my mother's wedding ring. I don't wear it anymore.",
+     "weightGrams": 4.67
+    },
+    "customer": {
+     "id": "c75",
+     "name": "Alla",
+     "archetype": "tradesman",
+     "temperament": "flexible",
+     "knowledge": 0.65,
+     "desperation": 0.24,
+     "portraitKey": "female_adult_04"
+    },
+    "principal": 3800,
+    "startDay": 10,
+    "dueDay": 40,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "l9z",
+    "item": {
+     "id": "i9i",
+     "defId": "watch_rolland_abyssal",
+     "condition": 86,
+     "authenticity": "fake",
+     "provenance": "unknown",
+     "trueValue": 3500,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "caseback",
+      "@magnet",
+      "magnet_case",
+      "dial",
+      "@reference"
+     ],
+     "story": "My boss gave it to me instead of a bonus. Now I need the bonus.",
+     "fakeProfileId": "high_grade_copy",
+     "weightGrams": 145.05
+    },
+    "customer": {
+     "id": "c9h",
+     "name": "Stas",
+     "archetype": "student",
+     "temperament": "flexible",
+     "knowledge": 0.31,
+     "desperation": 0.41,
+     "portraitKey": "male_adult_18"
+    },
+    "principal": 52200,
+    "startDay": 13,
+    "dueDay": 43,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "ldt",
+    "item": {
+     "id": "ida",
+     "defId": "watch_vostok_komandirskie",
+     "condition": 84,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 7900,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "magnet_crown",
+      "dial",
+      "caseback",
+      "@reference"
+     ],
+     "story": "Komandirskie, Ministry order. Collectors go mad for these.",
+     "weightGrams": 58.19
+    },
+    "customer": {
+     "id": "cd9",
+     "name": "Stas",
+     "archetype": "student",
+     "temperament": "proud",
+     "knowledge": 0.48,
+     "desperation": 0.64,
+     "portraitKey": "male_adult_16"
+    },
+    "principal": 2808,
+    "startDay": 18,
+    "dueDay": 48,
+    "monthlyRate": 0.1,
+    "redeemDay": 46
+   },
+   {
+    "id": "lq1",
+    "item": {
+     "id": "ipe",
+     "defId": "gold_band_583",
+     "condition": 74,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 10900,
+     "revealed": [
+      "@weight",
+      "@condition",
+      "colour",
+      "@magnet",
+      "magnet_seam",
+      "@reference"
+     ],
+     "story": "It was my mother's wedding ring. I don't wear it anymore.",
+     "weightGrams": 4.64
+    },
+    "customer": {
+     "id": "cpd",
+     "name": "Dmitri",
+     "archetype": "office",
+     "temperament": "desperate",
+     "knowledge": 0.77,
+     "desperation": 0.25,
+     "portraitKey": "business_male_02"
+    },
+    "principal": 4600,
+    "startDay": 35,
+    "dueDay": 65,
+    "monthlyRate": 0.1,
+    "redeemDay": 47
+   },
+   {
+    "id": "lsa",
+    "item": {
+     "id": "is0",
+     "defId": "medal_victory_germany",
+     "condition": 36,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 1100,
+     "revealed": [
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "ribbon",
+      "@reference"
+     ],
+     "story": "Every soldier got one of these. My great-grandfather too.",
+     "weightGrams": 15.52
+    },
+    "customer": {
+     "id": "crz",
+     "name": "Gennady",
+     "archetype": "sailor",
+     "temperament": "flexible",
+     "knowledge": 0.44,
+     "desperation": 0.3,
+     "portraitKey": "pilot_male_03"
+    },
+    "principal": 330,
+    "startDay": 38,
+    "dueDay": 68,
+    "monthlyRate": 0.1,
+    "redeemDay": 42
+   }
+  ],
+  "specialists": {
+   "watchmaker": {
+    "retained": true,
+    "relationship": 0.25,
+    "callsUsed": 0,
+    "sinceDay": 6
+   },
+   "antiquary": {
+    "retained": true,
+    "relationship": 0.1,
+    "callsUsed": 0,
+    "sinceDay": 12
+   }
+  },
+  "market": {
+   "drift": {
+    "cameras": 0.993,
+    "coins": 0.99,
+    "electronics": 1.047,
+    "gold": 1.066,
+    "jewelry": 1.057,
+    "laptops": 1.055,
+    "luxury": 0.998,
+    "militaria": 1.107,
+    "phones": 1.041,
+    "silver": 1.002,
+    "soviet": 0.998,
+    "watches": 1.037
+   },
+   "news": [
+    {
+     "id": "fl_pigeon",
+     "headline": "Pigeon steals a whole pie from a tourist",
+     "body": "Witnesses on the Lion Bridge describe a clean operation. The pigeon remains at large.",
+     "tags": [],
+     "direction": "flat"
+    }
+   ]
+  },
+  "customers": {
+   "zinaida": {
+    "trust": 0.17,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 27,
+    "nextDay": 39,
+    "lastOutcome": "passed"
+   }
+  },
+  "queue": [],
+  "current": null,
+  "inspect": null,
+  "haggle": null,
+  "day": {
+   "phase": "closed",
+   "clock": 388,
+   "served": 9,
+   "total": 9,
+   "openingCash": 650,
+   "log": [
+    {
+     "kind": "sell",
+     "amount": 1238,
+     "text": "Sold the Helios-44-2 58 mm lens to Katya",
+     "itemId": "io1",
+     "defId": "lens_helios_44"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on Vostok Komandirskie, Defence Ministry dial from Kostya",
+     "defId": "watch_vostok_komandirskie"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on 583 gold wedding band from Alla",
+     "defId": "gold_band_583"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on Medal \"For Courage\" from Gennady",
+     "defId": "medal_for_courage"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on Medal \"For Courage\" from Alla",
+     "defId": "medal_for_courage"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on Gold chervonets \"Sower\" from Boris",
+     "defId": "coin_chervonets_sower"
+    },
+    {
+     "kind": "loan",
+     "amount": -330,
+     "text": "Lent 330 ₽ on Medal \"For the Victory over Germany\" to Gennady",
+     "itemId": "is0",
+     "defId": "medal_victory_germany"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on Rolland Abyssal diver from Arkady",
+     "defId": "watch_rolland_abyssal"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on 583 gold drop earrings (pair) from Igor",
+     "defId": "gold_earrings_583"
+    }
+   ],
+   "newsRead": true,
+   "nextArrival": 412.2349772155285
+  },
+  "history": [
+   {
+    "day": 1,
+    "openingCash": 80000,
+    "closingCash": 82146,
+    "bought": 2,
+    "spent": 9754,
+    "sold": 1,
+    "earned": 15400,
+    "walkouts": 1,
+    "expenses": 3500,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 2,
+    "openingCash": 82146,
+    "closingCash": 93034,
+    "bought": 0,
+    "spent": 0,
+    "sold": 2,
+    "earned": 10888,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 3,
+    "openingCash": 93034,
+    "closingCash": 91202,
+    "bought": 1,
+    "spent": 1832,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 4,
+    "openingCash": 91202,
+    "closingCash": 87983,
+    "bought": 1,
+    "spent": 2450,
+    "sold": 1,
+    "earned": 3200,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 3969,
+    "redeemed": 0
+   },
+   {
+    "day": 5,
+    "openingCash": 87983,
+    "closingCash": 70317,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 5800,
+    "loaned": 11866,
+    "redeemed": 0
+   },
+   {
+    "day": 6,
+    "openingCash": 70317,
+    "closingCash": 70317,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 7,
+    "openingCash": 70317,
+    "closingCash": 74528,
+    "bought": 1,
+    "spent": 3699,
+    "sold": 1,
+    "earned": 9900,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 1990,
+    "redeemed": 0
+   },
+   {
+    "day": 8,
+    "openingCash": 74528,
+    "closingCash": 52039,
+    "bought": 3,
+    "spent": 22489,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 9,
+    "openingCash": 52039,
+    "closingCash": 52632,
+    "bought": 2,
+    "spent": 6955,
+    "sold": 1,
+    "earned": 8388,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 4910,
+    "redeemed": 4070
+   },
+   {
+    "day": 10,
+    "openingCash": 52632,
+    "closingCash": 43059,
+    "bought": 1,
+    "spent": 783,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 4,
+    "expenses": 0,
+    "loaned": 8790,
+    "redeemed": 0
+   },
+   {
+    "day": 11,
+    "openingCash": 43059,
+    "closingCash": 62979,
+    "bought": 1,
+    "spent": 5184,
+    "sold": 3,
+    "earned": 30354,
+    "walkouts": 2,
+    "expenses": 5250,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 12,
+    "openingCash": 62979,
+    "closingCash": 54388,
+    "bought": 2,
+    "spent": 10141,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 1550
+   },
+   {
+    "day": 13,
+    "openingCash": 54388,
+    "closingCash": 348,
+    "bought": 1,
+    "spent": 830,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 53210,
+    "redeemed": 0
+   },
+   {
+    "day": 14,
+    "openingCash": 348,
+    "closingCash": 348,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 15,
+    "openingCash": 348,
+    "closingCash": 358,
+    "bought": 1,
+    "spent": 850,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 4100,
+    "redeemed": 4960
+   },
+   {
+    "day": 16,
+    "openingCash": 358,
+    "closingCash": 6839,
+    "bought": 1,
+    "spent": 2228,
+    "sold": 2,
+    "earned": 8709,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 17,
+    "openingCash": 6839,
+    "closingCash": 13699,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 4800,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 2060
+   },
+   {
+    "day": 18,
+    "openingCash": 13699,
+    "closingCash": 10411,
+    "bought": 1,
+    "spent": 480,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 2808,
+    "redeemed": 0
+   },
+   {
+    "day": 19,
+    "openingCash": 10411,
+    "closingCash": 19711,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 9300,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 20,
+    "openingCash": 19711,
+    "closingCash": 19711,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 21,
+    "openingCash": 19711,
+    "closingCash": 22061,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 2350,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 22,
+    "openingCash": 22061,
+    "closingCash": 33300,
+    "bought": 0,
+    "spent": 0,
+    "sold": 2,
+    "earned": 2149,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 9090
+   },
+   {
+    "day": 23,
+    "openingCash": 33300,
+    "closingCash": 33300,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 24,
+    "openingCash": 33300,
+    "closingCash": 42970,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 6100,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 3570
+   },
+   {
+    "day": 25,
+    "openingCash": 42970,
+    "closingCash": 42970,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 26,
+    "openingCash": 42970,
+    "closingCash": 42970,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 27,
+    "openingCash": 42970,
+    "closingCash": 42970,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 28,
+    "openingCash": 42970,
+    "closingCash": 44529,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 1559,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 29,
+    "openingCash": 44529,
+    "closingCash": 6621,
+    "bought": 0,
+    "spent": 0,
+    "sold": 3,
+    "earned": 22092,
+    "walkouts": 2,
+    "expenses": 60000,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 30,
+    "openingCash": 6621,
+    "closingCash": 7321,
+    "bought": 1,
+    "spent": 370,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 1070
+   },
+   {
+    "day": 31,
+    "openingCash": 7321,
+    "closingCash": 4778,
+    "bought": 1,
+    "spent": 2543,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 32,
+    "openingCash": 4778,
+    "closingCash": 2948,
+    "bought": 1,
+    "spent": 1830,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 33,
+    "openingCash": 2948,
+    "closingCash": 1899,
+    "bought": 2,
+    "spent": 1049,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 34,
+    "openingCash": 1899,
+    "closingCash": 4979,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 3080
+   },
+   {
+    "day": 35,
+    "openingCash": 4979,
+    "closingCash": 379,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 4600,
+    "redeemed": 0
+   },
+   {
+    "day": 36,
+    "openingCash": 379,
+    "closingCash": 10,
+    "bought": 1,
+    "spent": 369,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 37,
+    "openingCash": 10,
+    "closingCash": 650,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 640,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0
+   },
+   {
+    "day": 38,
+    "openingCash": 650,
+    "closingCash": 1558,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 1238,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 330,
+    "redeemed": 0
+   }
+  ],
+  "crime": {
+   "heat": 0,
+   "pressure": 0,
+   "fenceTrust": 0,
+   "flags": []
+  },
+  "story": {
+   "arcs": {
+    "medals": {
+     "beats": {
+      "medals.roof": {
+       "day": 4,
+       "outcome": "walked"
+      },
+      "medals.second": {
+       "day": 10,
+       "outcome": "passed"
+      },
+      "medals.truth": {
+       "day": 14,
+       "outcome": "talked",
+       "choice": "truth"
+      },
+      "medals.tea": {
+       "day": 18,
+       "outcome": "talked"
+      }
+     },
+     "ended": true
+    }
+   },
+   "pendingEvents": [],
+   "flags": [
+    "medals_conman_known"
+   ]
+  },
+  "reputation": {
+   "general": -49,
+   "byGroup": {
+    "neighbourhood": 0.1,
+    "police": 0,
+    "mob": 0,
+    "specialists": 0
+   }
+  },
+  "stats": {
+   "customersSeen": 306,
+   "itemsBought": 24,
+   "itemsSold": 23,
+   "totalSpent": 73836,
+   "totalEarned": 137067,
+   "bestDeal": 15400,
+   "worstDeal": 0,
+   "fakesBought": 0
+  },
+  "settings": {
+   "reduceMotion": false,
+   "textScale": 1
+  },
+  "narration": "Closed for the night. Rain on the canal."
+ }
+}

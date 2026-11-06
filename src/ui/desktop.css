@@ -239,6 +239,15 @@
     opacity: 0.65;
   }
 
+  /* on buttons the keycap sits on the top edge, so a wrapped two-line label never runs under it */
+  .btn[data-key-hint]::after {
+    top: -0.45rem;
+    right: 8px;
+    color: #faf9f5;
+    background: #1f1e1b;
+    opacity: 1;
+  }
+
   .tool[data-key-hint]::after {
     right: auto;
     left: 5px;

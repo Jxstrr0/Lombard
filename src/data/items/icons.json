@@ -1,0 +1,135 @@
+[
+  {
+    "id": "icon_embankment_hodegetria",
+    "category": "icons",
+    "name": "Icon \"Our Lady of the Embankment\"",
+    "era": "late 18th century",
+    "storyOnly": true,
+    "baseValue": { "min": 70000, "max": 110000 },
+    "valueCurve": "collector",
+    "weightGrams": { "expected": 1450, "tolerance": 60 },
+    "magnetic": false,
+    "rarity": 1,
+    "fakeChance": 0,
+    "tells": [
+      {
+        "id": "crackle",
+        "tool": "loupe",
+        "finding": "Fine crackle all over the paint, and the gilding of the halo worn through to red clay underneath.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "face"
+      },
+      {
+        "id": "boat",
+        "tool": "loupe",
+        "finding": "At her feet, no bigger than a fingernail: a little canal boat with one oar, painted in the same old hand.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.45,
+        "hotspot": "boat"
+      },
+      {
+        "id": "oklad",
+        "tool": "loupe",
+        "finding": "Hand-chased silver cover, an old dent at the top left corner, and a drip of candle wax on the hem.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "oklad"
+      },
+      {
+        "id": "inventory",
+        "tool": "loupe",
+        "finding": "On the back, in white paint, half scraped away: «…ПОКР… № 47». A parish inventory number.",
+        "reveals": "provenance",
+        "polarity": "negative",
+        "difficulty": 0.25,
+        "hotspot": "back"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Heavy for its size: a thick lime-wood panel under a silver cover.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_cover",
+        "tool": "magnet",
+        "finding": "The cover ignores the magnet; only the little nails along the edge twitch.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "oklad"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "printed_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 1,
+        "weightFactor": 0.55,
+        "magnetic": true,
+        "tells": [
+          {
+            "id": "crackle",
+            "tool": "loupe",
+            "finding": "The crackle is printed: under the loupe the lines break into tiny coloured dots.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3,
+            "hotspot": "face"
+          },
+          {
+            "id": "oklad",
+            "tool": "loupe",
+            "finding": "The cover is thin stamped tin, the same pattern repeated exactly along every edge.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "oklad"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light in the pan: pressed board, not a wooden panel.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          },
+          {
+            "id": "magnet_cover",
+            "tool": "magnet",
+            "finding": "The magnet jumps to the cover and stays there.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.2,
+            "hotspot": "oklad"
+          }
+        ],
+        "removeTells": ["boat", "inventory"]
+      }
+    ],
+    "demandTags": ["silver", "luxury"],
+    "claims": [
+      "My gran's. She kept it on the shelf over the stove. She's gone now, God rest her.",
+      "It was in the family. Nobody prays at home any more."
+    ],
+    "model": {
+      "placeholder": "icon",
+      "color": "#c9ccd1",
+      "rest": "flat",
+      "inspectDistance": 0.42,
+      "hotspots": [
+        { "id": "face", "label": "Her face", "position": [0, 0.035, 0.012] },
+        { "id": "boat", "label": "At her feet", "position": [0, -0.08, 0.012] },
+        { "id": "oklad", "label": "Silver cover", "position": [-0.07, 0.095, 0.012] },
+        { "id": "back", "label": "Back of the panel", "position": [0, 0, -0.012] }
+      ]
+    }
+  }
+]

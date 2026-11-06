@@ -16,7 +16,7 @@
  * Every draw forks from the career seed, the day and a label (story/plan.ts's
  * rule), never the game Rng or the shared id counter.
  */
-import { ITEM_DEFS, getItemDef } from '../../data/items'
+import { SPAWN_DEFS, getItemDef } from '../../data/items'
 import { BULLETIN } from '../../data/news'
 import { bulletinCarriers, WEEKDAY_NAMES } from '../../data/police'
 import { getRegular } from '../../data/regulars'
@@ -67,7 +67,7 @@ export function printBulletin(state: GameState): GameState {
   const rng = storyRng(state, 'police:bulletin')
   if (!rng.chance(B.chance)) return state
   const count = rng.weighted(B.lineWeights.map((w, i) => ({ item: i + 1, weight: w })))
-  const defs = ITEM_DEFS.filter((d) => B.categories.includes(d.category) && d.baseValue.max <= B.maxValue)
+  const defs = SPAWN_DEFS.filter((d) => B.categories.includes(d.category) && d.baseValue.max <= B.maxValue)
   let s = state
   const used = new Set<string>()
   for (let i = 0; i < count && defs.length > 0; i++) {

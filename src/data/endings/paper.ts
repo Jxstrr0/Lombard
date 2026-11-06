@@ -76,6 +76,18 @@ export const PAPER_SECTIONS: Raw[] = [
         body: 'Ask the bakery about {shop} and they will tell you about the glue in the lock, and how the pawnbroker paid the locksmith and still said no. Not everyone on the canal could afford that. Some of them say they will try.',
       },
       {
+        id: 'crime_icon_sold',
+        when: [{ if: 'flag', flag: 'collector.sold' }],
+        headline: 'Parish still asks: where is Our Lady of the Embankment?',
+        body: 'Father Ioann of the Intercession church has written to the police again about the icon taken during the roof repairs. A private museum in the old bathhouse says its own Mother of God, with a little boat at her feet, came “from a private collection”. Asked which collection, the museum offered us a catalogue and a glass of something.',
+      },
+      {
+        id: 'crime_icon_home',
+        when: [{ if: 'any', of: [{ if: 'flag', flag: 'collector.returned' }, { if: 'flag', flag: 'collector.handed_in' }] }],
+        headline: 'A new dome on Kozhevennaya Street',
+        body: 'The Church of the Intercession has its dome back, copper, paid for by a donor who asked not to be named and then told everybody. Our Lady of the Embankment watches the work from her old place by the door. Father Ioann says she came home by way of a pawn shop, and that the Lord has a sense of humour.',
+      },
+      {
         id: 'crime_quiet',
         when: [],
         headline: 'Quiet month for the canal district police',

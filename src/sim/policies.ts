@@ -268,7 +268,8 @@ const CAREFUL: PolicyParams = {
   reserveDays: 10,
   // Runs a clean shop: turns down the crew's "insurance" and every rung after (Protection arc).
   // M5 makes refusing cost (the brick, the glazier); see docs/05 for the sim numbers.
-  prefer: ['refuse', 'cooperate'],
+  // M5: and gives the Collector's icon back to its church.
+  prefer: ['refuse', 'cooperate', 'return'],
   // And when Eduard Lvovich says "lock up carefully tonight", it empties the counter case.
   heedsThreats: true,
   // M5 police: keeps a passport book, reads the bulletin, and hands stolen pieces over when Volkova asks.
@@ -284,15 +285,16 @@ export const careful = makePolicy(CAREFUL)
 /**
  * M5: the same careful trader, mob-friendly. Pays the crew whenever asked, keeps their box, and buys
  * their deliveries like any other good deal (the M5 "done when": a mob-friendly run plays differently).
- * The fence is a separate person: it still turns him down.
+ * The fence is a separate person: it still turns him down. It sells the Collector his icon.
  */
-export const mobFriendly = makePolicy({ ...CAREFUL, name: 'mobFriendly', prefer: ['accept', 'pay', 'keep'] })
+export const mobFriendly = makePolicy({ ...CAREFUL, name: 'mobFriendly', prefer: ['accept', 'pay', 'keep', 'sell'] })
 
 /**
  * M5 "done when": a fence-heavy run. The careful player, except that it keeps the fence's Tuesdays,
  * buys what he brings at his price (unless a check flags it) and sells him its problem pieces.
+ * It sells the Collector his icon too.
  */
-export const fenceFriend = makePolicy({ ...CAREFUL, name: 'fence', fence: 'deal', prefer: ['fence_yes', 'refuse'] })
+export const fenceFriend = makePolicy({ ...CAREFUL, name: 'fence', fence: 'deal', prefer: ['fence_yes', 'refuse', 'sell'] })
 
 export const careless = makePolicy({
   name: 'careless',

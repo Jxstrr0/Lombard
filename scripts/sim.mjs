@@ -73,4 +73,10 @@ for (const [policy, options, label] of lines) {
     `          police: Volkova visits ${mean((r) => r.police.visits)}  seized ${mean((r) => r.police.seized)}  raided ${runs.filter((r) => r.police.raids > 0).length}/${runs.length}` +
       `  shut ${runs.filter((r) => r.police.shut).length}/${runs.length}  bribes ${mean((r) => r.crime.volkova.bribes)}  lies ${mean((r) => r.crime.volkova.lies)}`,
   )
+  // M5 the Collector: how many shops he asked, bought his icon, and what became of her.
+  const flagged = (f) => runs.filter((r) => r.flags.includes(f)).length
+  console.log(
+    `          collector: asked ${flagged('collector.asked')}  bought ${flagged('collector.bought')}  passed ${flagged('collector.passed')}` +
+      `  sold ${flagged('collector.sold')}  returned ${flagged('collector.returned')}  police ${flagged('collector.handed_in')}  missed ${flagged('collector.missed')}`,
+  )
 }

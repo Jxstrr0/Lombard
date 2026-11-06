@@ -1000,6 +1000,39 @@ export const tuning = {
     protectionHeldOut: 1,
     /** Any deal with the fence, either way (src/game/crime/fence.ts); on top of stolenBought for a stolen piece. */
     fenceDeal: -0.3,
+    /** M5 the Collector: his icon taken back to its church (with the heart.* flag on top). */
+    iconReturned: 1,
+    /** M5 the Collector: his icon handed to the police. */
+    iconHandedIn: 0.5,
+  },
+
+  /**
+   * M5 the Collector (src/data/collector.ts, src/game/crime/collector.ts, the arc
+   * src/data/stories/collector.ts; GDD § 9): Leopold Germanovich Bessmertny wants one icon,
+   * stolen from the Intercession church, and pays absurdly for it.
+   */
+  collector: {
+    /** His first visit (collector.wish): from this day, this chance a morning. */
+    wishDay: 18,
+    wishChance: 0.35,
+    /** The roofer brings the icon this many days after the wish, this chance a morning. */
+    iconAfter: 6,
+    iconChance: 0.5,
+    /** The roofer opens at this share of what the icon would fetch (he wants it gone). */
+    anchor: 0.35,
+    /** Bessmertny comes back for it this many days after you bought it. */
+    offerAfter: 4,
+    offerChance: 0.6,
+    /** What he pays, in a hatbox. Absurd on purpose: about four months of a good shop. */
+    price: 350_000,
+    /** The papers after each ending, this many days on; the museum opens later. */
+    paperAfter: 2,
+    museumAfter: 12,
+    /** Passed on: the icon turns up elsewhere this many days later. */
+    elsewhereAfter: 10,
+    /** Heat and standing per ending (story effects). */
+    heat: { sold: 0.25, returned: -0.05, handedIn: -0.15 },
+    rep: { soldPolice: -0.05, returnedNeighbourhood: 0.08, handedInPolice: 0.08 },
   },
 
   /**

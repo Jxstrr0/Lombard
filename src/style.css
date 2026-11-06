@@ -531,6 +531,51 @@ html {
   background: #15130f;
 }
 
+/* M5: the passport book, a worn plastic pill under the claim. */
+.passport-pill {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  min-height: 34px;
+  padding: 4px 12px 4px 9px;
+  border: 1px solid var(--plastic-edge);
+  border-radius: 999px;
+  background: var(--plastic);
+  color: var(--ivory);
+  font: 500 0.8125rem/1 var(--font);
+  cursor: pointer;
+}
+
+.passport-pill svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.passport-secs {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+.passport-pill[aria-disabled='true'] {
+  cursor: default;
+}
+
+.passport-pill.is-noted {
+  background: var(--paper);
+  border-color: var(--paper-shade);
+  color: var(--ink-green);
+}
+
+.passport-pill.is-refused {
+  background: var(--paper);
+  border-color: var(--paper-shade);
+  color: var(--ink-red);
+}
+
 .inspect-claim {
   margin: 0;
   max-width: 34em;
@@ -1622,6 +1667,32 @@ html {
   color: var(--ink-soft);
 }
 
+/* M5: the word on heat, then the bulletin lines still in force. */
+.receipt-police {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.receipt-police .police-word {
+  padding: 4px 0;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.receipt-police .police-line {
+  display: grid;
+  grid-template-columns: 4.2em 1fr;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.police-day {
+  color: var(--ink-soft);
+}
+
 .receipt-empty {
   padding: 4px 0;
   color: var(--ink-soft);
@@ -2704,6 +2775,61 @@ html {
   font-size: 2.6em;
   line-height: 0.8;
   font-weight: 700;
+}
+
+/* M5: the police's stolen-goods notice, boxed in heavy rule like a public notice. */
+.paper-bulletin {
+  margin-top: 14px;
+  padding: 10px 12px 12px;
+  border: 2px solid var(--newsink);
+  outline: 1px solid var(--newsink);
+  outline-offset: 2px;
+}
+
+.paper-bulletin[hidden] {
+  display: none;
+}
+
+.bulletin-cyr {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.bulletin-title {
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(36, 32, 26, 0.55);
+}
+
+.bulletin-intro {
+  margin: 8px 0 6px;
+  font-size: 0.8125rem;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.bulletin-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.bulletin-lines li {
+  padding: 4px 0 4px 14px;
+  text-indent: -14px;
+}
+
+.bulletin-lines li::before {
+  content: '— ';
 }
 
 .news-actions {

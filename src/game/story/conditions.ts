@@ -56,6 +56,14 @@ export function holds(c: Condition, state: GameState): boolean {
       return monthsRetained(state, c.id) >= c.gte
     case 'specialistEvent':
       return (state.specialists[c.id]?.events[c.event] ?? 0) >= c.gte
+    // --- M5 police ---
+    case 'heat':
+      return within(state.crime.heat, c)
+    case 'volkova': {
+      const v = state.crime.volkova
+      if (c.met !== undefined && v.met !== c.met) return false
+      return (!c.trust || within(v.trust, c.trust)) && (!c.lies || within(v.lies, c.lies)) && (!c.caught || within(v.caught, c.caught)) && (!c.bribes || within(v.bribes, c.bribes))
+    }
     case 'arc': {
       const a = state.story.arcs[c.arc]
       const started = !!a && Object.keys(a.beats).length > 0

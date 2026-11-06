@@ -12,6 +12,8 @@ import { claimedValue } from '../game/appraise/value'
 import { BRICK, caseBroken } from '../game/crime/vandalism'
 import { fenceAsk, isFence } from '../game/crime/fence'
 import { upcomingBills } from '../game/economy/expenses'
+import { matchesBulletin } from '../game/crime/bulletin'
+import { NO_PASSPORT_TELL, passportAsked } from '../game/crime/ledger'
 import { availableTools } from '../game/inspect/available'
 import type { ToolId } from '../game/schema/item'
 import type { GameState } from '../game/state'
@@ -66,6 +68,12 @@ export interface PolicyParams {
   reserveDays: number
   /** Story choices (by id) to take when a scene offers one of them; otherwise the first choice. */
   prefer?: readonly string[]
+  /** M5: ask every seller for a passport first (the passport book, crime/ledger.ts). */
+  passport?: boolean
+  /** M5: walk away when the passport answer is a worry (no passport, a long search, the wrong name). */
+  passOnShadySellers?: boolean | 'refusals'
+  /** M5: walk away from anything the stolen-goods bulletin has listed lately (it reads the paper). */
+  readsBulletin?: boolean
   /**
    * M5: takes "lock up carefully tonight" seriously: with a brick coming, the counter case goes
    * into the safe at closing, and nothing goes back in it until the glazier has been.
@@ -92,6 +100,7 @@ function spendable(state: GameState, p: PolicyParams): number {
 }
 
 const isRedFlag = (f: Finding) => f.polarity === 'negative' && f.reveals === 'authenticity'
+const isShady = (f: Finding) => f.polarity === 'negative' && f.reveals === 'provenance'
 
 export function makePolicy(p: PolicyParams): Policy {
   return {
@@ -152,18 +161,23 @@ export function makePolicy(p: PolicyParams): Policy {
         return { type: 'sale/counter', amount: Math.max(sale.offer, Math.round(sale.tag * p.holdAt)) }
       }
       // seller
-      if (c.phase === 'present') return { type: 'counter/inspect' }
+      // A player remembers the last week's bulletin (the pieces turn up within days) and checks the wear it printed.
+      if (c.phase === 'present') return p.readsBulletin && matchesBulletin(state, c.item, 7) ? { type: 'counter/pass' } : { type: 'counter/inspect' }
       if (c.phase === 'inspect') {
+        const asked = state.inspect?.findings ?? []
+        if (p.passport && !passportAsked(asked)) return { type: 'inspect/useTool', tool: 'passport' }
+        if (p.passOnShadySellers === 'refusals' && asked.some((f) => f.tellId === NO_PASSPORT_TELL)) return { type: 'counter/pass' }
         // Walk the tool plan in order, skipping tools that are locked for this item.
         const usable = new Set(availableTools(state, getItemDef(c.item.defId)).filter((t) => t.usable).map((t) => t.tool))
         const plan = p.tools.filter((t) => usable.has(t))
-        const uses = Object.values(state.inspect?.toolUses ?? {}).reduce((a, n) => a + (n ?? 0), 0)
+        const uses = Object.entries(state.inspect?.toolUses ?? {}).reduce((a, [t, n]) => a + (t === 'passport' ? 0 : (n ?? 0)), 0)
         const tool = plan[uses]
         return tool ? { type: 'inspect/useTool', tool } : { type: 'inspect/done' }
       }
       // offer phase
       const findings = state.inspect?.findings ?? []
       if (p.passOnRedFlags && findings.some(isRedFlag)) return { type: 'counter/pass' }
+      if (p.passOnShadySellers === true && findings.some(isShady)) return { type: 'counter/pass' }
       const est = sellerEstimate(state, p)
       const pawn = c.wants === 'pawn'
       const open = pawn ? p.loanOpenAt : p.openAt
@@ -174,7 +188,7 @@ export function makePolicy(p: PolicyParams): Policy {
       const offer = Math.round(est * (open + p.step * ctx.rounds))
       if (offer > est * max || offer > budget || offer <= 0) return { type: 'counter/pass' }
       ctx.rounds++
-      const evidence = findings.find((f) => f.polarity === 'negative')
+      const evidence = findings.find((f) => f.polarity === 'negative' && f.reveals !== 'provenance')
       return { type: 'offer/make', amount: offer, approach: evidence && ctx.rounds === 1 ? 'evidence' : 'straight', evidenceId: evidence?.id }
     },
   }
@@ -254,9 +268,13 @@ const CAREFUL: PolicyParams = {
   reserveDays: 10,
   // Runs a clean shop: turns down the crew's "insurance" and every rung after (Protection arc).
   // M5 makes refusing cost (the brick, the glazier); see docs/05 for the sim numbers.
-  prefer: ['refuse'],
+  prefer: ['refuse', 'cooperate'],
   // And when Eduard Lvovich says "lock up carefully tonight", it empties the counter case.
   heedsThreats: true,
+  // M5 police: keeps a passport book, reads the bulletin, and hands stolen pieces over when Volkova asks.
+  passport: true,
+  passOnShadySellers: 'refusals',
+  readsBulletin: true,
   // A clean shop says no to the fence too (M5).
   fence: 'refuse',
 }

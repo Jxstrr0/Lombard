@@ -226,6 +226,17 @@ export const visitLines = {
     'Forget it, I have a bus to catch.',
     'I’ve been standing here since the news started. Goodbye.',
   ],
+  /** The counter is empty and someone is still to come (the lull between visitors). */
+  lull: [
+    'Quiet. A tram rattles over the bridge.',
+    'Someone stops at the window, reads the sign, walks on.',
+    'The fridge hums. The clock ticks.',
+    'A gull on the railing outside. Nobody else yet.',
+    'Footsteps on the embankment. Not yet.',
+    'The radiator knocks twice and goes quiet.',
+    'A boat goes by under the bridge. The street is empty.',
+    'Somebody’s dog looks in through the glass.',
+  ],
   thanks: [
     'Pleasure doing business.',
     'Thank you. Spasibo.',

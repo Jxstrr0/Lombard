@@ -2,12 +2,14 @@
  * Performance overlay (stats.js, shown with ?perf=1) and quality tiers (M3).
  *
  * Three tiers trade sharpness for frame rate: render resolution (the biggest
- * cost on a phone), MSAA and texture anisotropy. The player picks one in
- * Settings, or leaves it on Auto: Auto starts from a device guess and, once
- * the shop is on screen, steps down a tier whenever the median frame rate over
- * a few seconds stays under 30 fps. It never steps back up on its own (with
- * vsync a phone that has headroom still reads 60 fps, so there is nothing to
- * measure), but it remembers where it ended up for the next visit.
+ * cost on a phone), MSAA and texture anisotropy. High renders at the screen's
+ * own resolution (up to 3× CSS pixels). The player picks one in Settings, or
+ * leaves it on Auto: Auto starts at High and, once the shop is on screen,
+ * steps down a tier whenever the median frame rate over a few seconds is
+ * under MIN_FPS (smoothness first: Kelbo's phone held 60 fps at the old Low,
+ * Nov 6). It never steps back up on its own (with vsync a phone that has
+ * headroom still reads 60 fps, so there is nothing to measure), but it
+ * remembers where it ended up for the next visit.
  *
  * Resolution changes apply at once. MSAA is fixed when the WebGL context is
  * made, so a tier change that turns it on or off applies on the next load.
@@ -30,8 +32,8 @@ export const TIERS: readonly QualityTier[] = ['low', 'mid', 'high']
 
 export const TIER_SETTINGS: Record<QualityTier, TierSettings> = {
   low: { pixelRatioCap: 1.25, antialias: false, anisotropy: 2 },
-  mid: { pixelRatioCap: 1.5, antialias: true, anisotropy: 4 },
-  high: { pixelRatioCap: 2, antialias: true, anisotropy: 8 },
+  mid: { pixelRatioCap: 2, antialias: true, anisotropy: 4 },
+  high: { pixelRatioCap: 3, antialias: true, anisotropy: 8 },
 }
 
 export const TIER_LABELS: Record<GraphicsChoice, string> = {
@@ -41,8 +43,12 @@ export const TIER_LABELS: Record<GraphicsChoice, string> = {
   high: 'High',
 }
 
-/** Auto steps down when the median frame rate over a window is below this. */
-export const MIN_FPS = 30
+/**
+ * Auto steps down when the median frame rate over a window is below this.
+ * Above the 30 fps floor in CLAUDE.md on purpose: under ~45 a 60 Hz phone
+ * visibly judders, and a lower tier is the better trade.
+ */
+export const MIN_FPS = 45
 /** Seconds to wait after the shop appears (shader compiles, first decodes). */
 const WARMUP_S = 2
 /** Length of one measuring window, in seconds. */
@@ -51,7 +57,8 @@ const WINDOW_S = 4
 const STALL_S = 0.5
 
 const CHOICE_KEY = 'lombard.qualityTier'
-const AUTO_KEY = 'lombard.autoTier'
+/** v2: the tiers were raised on Nov 6, so every device gets one try at the new High. */
+const AUTO_KEY = 'lombard.autoTier.v2'
 
 function isTier(v: unknown): v is QualityTier {
   return v === 'low' || v === 'mid' || v === 'high'
@@ -88,9 +95,9 @@ export function setTextureAnisotropy(n: number): void {
   anisotropy = n
 }
 
-/** The device guess Auto starts from: phones mid, big desktops high. */
+/** The device guess Auto starts from: High on phones (Auto steps down if needed) and big desktops. */
 export function guessTier(coarsePointer: boolean, cores: number): QualityTier {
-  if (coarsePointer) return 'mid'
+  if (coarsePointer) return 'high'
   return cores >= 8 ? 'high' : 'mid'
 }
 

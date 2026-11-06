@@ -41,6 +41,26 @@ export interface SceneOptions {
 /** Customer silhouette opacity behind the item in inspect view (presentation only). */
 const INSPECT_CUSTOMER_OPACITY = 0.25
 
+/**
+ * The customer's walk (presentation only): in through the street door, across
+ * the floor to their spot at the counter, a turn to face the player; out the
+ * same way. Positions are world metres (bake/layout.json): the door is at
+ * x 1.7 on the street wall (z 3.97), the spot is in front of the counter glass.
+ * The straight line clears the island case and the chair.
+ */
+const WALK = {
+  door: new THREE.Vector3(1.7, 0, 3.55),
+  spot: new THREE.Vector3(-0.15, 0, -1.45),
+  /** Metres from the door over which they fade in (or out): through the door, not out of thin air. */
+  fadeDistance: 0.7,
+  /** Default ground speed (m/s) when the cast entry has none. */
+  speed: 1.25,
+  /** Radians per second when turning on the spot. */
+  turnRate: 3.2,
+  /** Seconds to crossfade idle and walk. */
+  blend: 0.35,
+}
+
 export class ShopScene {
   readonly scene = new THREE.Scene()
   /** Procedural grey-box room; removed once the baked shop is in. */
@@ -53,6 +73,12 @@ export class ShopScene {
   private customerMats: THREE.Material[] = []
   private customerOpaque = false
   private customerMixer: THREE.AnimationMixer | null = null
+  /** Where the customer is on their way: 0 at the door, 1 at the counter. */
+  private walkT = 0
+  /** 'out' (nobody), 'in' (walking in, then turning to the player), 'here', 'leaving'. */
+  private walkPhase: 'out' | 'entering' | 'here' | 'leaving' = 'out'
+  /** ?walk=0: customers fade in at the counter as before (screenshots). */
+  private walking = true
   /** Stand-in drawn when there's no cast, or a cast model fails to load. */
   private silhouette!: THREE.Group
   private silhouetteMats: THREE.Material[] = []
@@ -158,11 +184,16 @@ export class ShopScene {
     this.cast?.retain([this.shownLook, this.wantLook, this.nextLook])
   }
 
-  /** 'in' once the current customer has faded fully in (screenshots wait for it); 'away' with nobody there. */
+  /** 'in' once the current customer stands at the counter, faded in (the UI and screenshots wait for it); 'away' with nobody there. */
   get customerState(): 'away' | 'arriving' | 'in' {
     if (this.wantLook === null || this.customerTarget === 0) return 'away'
-    const ready = this.shownLook === this.wantLook && Math.abs(this.customerFade - this.customerTarget) < 0.01
+    const ready = this.shownLook === this.wantLook && this.walkPhase === 'here' && Math.abs(this.customerFade - this.customerTarget) < 0.01
     return ready ? 'in' : 'arriving'
+  }
+
+  /** false: customers appear at the counter without walking (?walk=0). */
+  setWalking(on: boolean): void {
+    this.walking = on
   }
 
   /** Play customers with the 3D cast (otherwise the silhouette stands in). `override`: everyone is that cast id. */
@@ -202,6 +233,7 @@ export class ShopScene {
     if (p.model) this.customer.add(p.model.root)
     this.customerMats = p.model ? p.model.materials : this.silhouetteMats
     this.customerMixer = p.model ? p.model.mixer : null
+    p.model?.play('idle', 0)
     for (const m of this.customerMats) {
       m.opacity = this.customerFade
       m.transparent = true
@@ -234,13 +266,7 @@ export class ShopScene {
 
   update(dt: number): void {
     this.backdrop?.update(dt)
-    const speed = 3
-    if (this.pending && this.customerFade < 0.01) this.installLook(this.pending)
-    // Hold the customer back until their own look is in (a first-time model can take a moment).
-    const target = this.wantLook !== null && this.shownLook === this.wantLook ? this.customerTarget : 0
-    this.customerFade += (target - this.customerFade) * Math.min(1, dt * speed)
-    this.customer.visible = this.customerFade > 0.01
-    this.customer.position.z = -1.45 + (1 - this.customerFade) * 0.6
+    this.updateWalk(dt)
     // Fully faded in, draw opaque (a transparent skinned body sorts badly against itself).
     const opaque = this.customerFade > 0.99
     for (const mat of this.customerMats) {
@@ -252,6 +278,78 @@ export class ShopScene {
     }
     this.customerOpaque = opaque
     if (this.customer.visible) this.customerMixer?.update(dt)
+  }
+
+  /**
+   * Move the customer along the door → counter line and set their fade. A new
+   * look only swaps in while nobody is in the shop; whoever is there walks
+   * out first.
+   */
+  private updateWalk(dt: number): void {
+    const wanted = this.wantLook !== null && this.customerTarget > 0
+    const mine = wanted && this.shownLook === this.wantLook
+    if (this.walkPhase === 'out') {
+      if (this.pending) this.installLook(this.pending)
+      if (mine) {
+        this.walkPhase = this.walking ? 'entering' : 'here'
+        this.walkT = this.walking ? 0 : 1
+        this.customer.rotation.y = this.walking ? this.heading(WALK.spot, WALK.door) : 0
+        if (this.walking) this.model?.play('walk', 0)
+      }
+    } else if (!mine && this.walkPhase !== 'leaving') {
+      this.walkPhase = this.walking ? 'leaving' : 'out'
+      if (!this.walking) this.walkT = 0
+    }
+
+    const length = WALK.door.distanceTo(WALK.spot)
+    const speed = this.model?.walkSpeed ?? WALK.speed
+    const step = (speed * dt) / length
+    if (this.walkPhase === 'entering') {
+      this.walkT = Math.min(1, this.walkT + step)
+      if (this.walkT >= 1) {
+        // At the counter: settle into the idle while turning to the player.
+        this.model?.play('idle', WALK.blend)
+        if (this.turnTo(0, dt)) this.walkPhase = 'here'
+      }
+    } else if (this.walkPhase === 'leaving') {
+      // Turn towards the door first, then walk.
+      if (this.walkT <= 0 || this.turnTo(this.heading(WALK.door, this.customer.position), dt)) {
+        this.model?.play('walk', WALK.blend)
+        this.walkT = Math.max(0, this.walkT - step)
+      }
+      if (this.walkT <= 0) {
+        this.walkPhase = 'out'
+        this.model?.play('idle', 0)
+      }
+    }
+    this.customer.position.lerpVectors(WALK.door, WALK.spot, this.walkT)
+
+    // Fade: in and out over the first stretch from the door; dimmed while inspecting.
+    const fromDoor = this.walkT * length
+    const doorFade = this.walkPhase === 'out' ? 0 : Math.min(1, fromDoor / WALK.fadeDistance)
+    const dim = this.walkPhase === 'here' ? this.customerTarget || 1 : 1
+    const target = doorFade * dim
+    this.customerFade += (target - this.customerFade) * Math.min(1, dt * 6)
+    if (Math.abs(target - this.customerFade) < 0.002) this.customerFade = target
+    this.customer.visible = this.customerFade > 0.01
+  }
+
+  /** Yaw that points the customer (whose front is −z) from `from` towards `to`. */
+  private heading(to: THREE.Vector3, from: THREE.Vector3): number {
+    return Math.atan2(-(to.x - from.x), -(to.z - from.z))
+  }
+
+  /** Turn towards `yaw`; true once facing it. */
+  private turnTo(yaw: number, dt: number): boolean {
+    let d = yaw - this.customer.rotation.y
+    d = Math.atan2(Math.sin(d), Math.cos(d))
+    const maxStep = WALK.turnRate * dt
+    if (Math.abs(d) <= maxStep) {
+      this.customer.rotation.y = yaw
+      return true
+    }
+    this.customer.rotation.y += Math.sign(d) * maxStep
+    return false
   }
 
   dispose(): void {

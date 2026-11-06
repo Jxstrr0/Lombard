@@ -26,6 +26,13 @@ describe('cast data', () => {
     }
   })
 
+  it('gives everyone a human walking pace for the walk clip', () => {
+    for (const c of CAST) {
+      expect(c.walkSpeed, c.id).toBeGreaterThan(0.6)
+      expect(c.walkSpeed, c.id).toBeLessThan(1.8)
+    }
+  })
+
   it('only lists women in femaleFirstNames that are real first names', () => {
     for (const n of femaleFirstNames) expect(firstNames).toContain(n)
   })

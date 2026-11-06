@@ -56,6 +56,8 @@ export class CounterScreen {
     gear: (onPress: () => void) => HTMLButtonElement,
     /** Opens the shop sheet; shown only while nobody is at the counter. */
     private readonly shopButton?: HTMLButtonElement,
+    /** `?lull=0` (review and screenshots): call each customer with a button instead of waiting out the lull. */
+    private readonly manualNext = false,
   ) {
     const root = el('section', 'screen counter-screen')
     root.dataset.screen = 'counter'
@@ -110,8 +112,10 @@ export class CounterScreen {
     }
   }
 
-  render(state: GameState): void {
-    const c = state.current
+  /** `arrived` false: the current customer is still walking in; show the shop as empty until they reach the counter. */
+  render(state: GameState, arrived = true): void {
+    const c = state.current && (arrived || state.current.phase !== 'present') ? state.current : null
+    const walking = !!state.current && !c
     if (!this.lookHintDone) {
       if (!c && state.day.phase === 'open') {
         this.lookHint.hidden = false
@@ -128,7 +132,7 @@ export class CounterScreen {
       setText(this.itemName, itemNameOf(c.item.defId, 'Something wrapped in a cloth'))
     }
     this.itemName.hidden = !c || c.phase === 'resolved'
-    setText(this.line, c ? `“${c.line}”` : state.narration)
+    setText(this.line, c ? `“${c.line}”` : walking ? 'The door opens.' : state.narration)
     this.line.classList.toggle('narration', !c)
 
     const resolved = c?.phase === 'resolved'
@@ -141,14 +145,16 @@ export class CounterScreen {
     }
 
     this.secondary.hidden = !c || c.phase !== 'present'
-    if (this.shopButton) this.shopButton.hidden = !!c
+    if (this.shopButton) this.shopButton.hidden = !!c || walking
+    // Between visitors the next person walks in by themselves (the lull); there is nothing to press.
+    this.primary.hidden = walking || (!c && state.queue.length > 0 && !this.manualNext)
     if (!c) {
       if (state.queue.length > 0) this.setPrimary('counter/next', 'next-customer', 'Next customer', 'person')
       else this.setPrimary('day/close', 'close-up', 'Close up', 'door')
     } else if (c.phase === 'present') {
       this.setPrimary('counter/inspect', 'inspect', 'Inspect', 'loupe')
     } else {
-      this.setPrimary('counter/dismiss', 'dismiss', state.queue.length > 0 ? 'Next' : 'Done', undefined)
+      this.setPrimary('counter/dismiss', 'dismiss', 'Done', undefined)
     }
   }
 

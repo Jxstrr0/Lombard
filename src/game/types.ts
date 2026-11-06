@@ -225,6 +225,11 @@ export interface DayState {
   log: LedgerEntry[]
   /** False while today's paper is still unread (the news screen shows first). */
   newsRead: boolean
+  /**
+   * Clock second at which the next person in the queue walks in (the lull
+   * between visitors). Unset in older saves: they walk in on the next tick.
+   */
+  nextArrival?: number
 }
 
 /** Compact record of a finished day (kept in saves; full logs are not). */

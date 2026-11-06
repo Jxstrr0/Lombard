@@ -55,7 +55,7 @@ Done when: the simulator shows a careful policy growing ~15%/month and a careles
 - First 30 items as real models, Draco + KTX2 pipeline. Decided Nov 5: scripted in Blender (`art/items/`), since CC0 sources had almost nothing usable. **Done:** all 30 defs have a scripted glb (coins #7, gold #8, watches #9, militaria #10, phones #11, cameras #12). Review any one on the phone with `?gallery=1&item=<id>`.
 - Customer representation decided (Plan A rigged models vs Plan B portrait cards) after a 1-day test of what CC0 humanoids look like in-scene on phone. ✅ Kelbo picked Plan A with Microsoft Rocketbox (Nov 5); a 25-person cast now plays the walk-ins.
 - Audio: ambience, door, counter, tools. ✅ 13 CC0 sounds from OpenGameArt (Kenney, rubberduck, laleksic, ignasd, randommind, LEGIT Audio) plus two generated tones, ~387 KB, plain WebAudio keyed to state changes, Sound on/off and an ambience level in Settings.
-- Quality tiers wired and measured on a real mid-range Android. Tiers ✅ wired (Settings → Graphics, Auto steps down under 30 fps, `?perf=1` readout). Headless measurement is well inside the budget (below); the phone fps reading is Kelbo's.
+- Quality tiers wired and measured on a real mid-range Android. Tiers ✅ wired (Settings → Graphics, Auto, `?perf=1` readout). Kelbo's phone: a smooth 60 fps (Nov 6), so the tiers were raised (High = native resolution) and customers now walk in and out, with pauses between them.
 
 Done when: screenshots look like a real shop and the phone still holds 30 fps.
 

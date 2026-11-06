@@ -12,16 +12,17 @@
 import { APPRAISER, APPRAISER_TEXT } from '../../data/appraiser'
 import { SPAWN_DEFS } from '../../data/items'
 import { getSpecialist, SPECIALISTS } from '../../data/specialists'
+import { t } from '../../data/strings'
 import { tuning } from '../../data/tuning'
 import { UPGRADES } from '../../data/upgrades'
 import type { Action } from '../../game/actions'
-import { monthName, upcomingBills } from '../../game/economy/expenses'
+import { upcomingBills } from '../../game/economy/expenses'
 import { callsLeft, monthlyCalls, retainCost } from '../../game/economy/specialists'
 import { canRestockAcid, hasUpgrade, protectedAreas, upgradeStatus } from '../../game/economy/upgrades'
 import { accuracyOf, hireStatus, wagesDue } from '../../game/staff/appraiser'
 import { addDays, type GameState } from '../../game/state'
 import { createButton, el, setText } from '../components/button'
-import { rub } from '../format'
+import { dayMonth, rub } from '../format'
 import { icons } from '../icons'
 
 export interface OfficeDeps {
@@ -30,27 +31,27 @@ export interface OfficeDeps {
 }
 
 const CATEGORY_LABEL: Record<string, string> = {
-  gold: 'gold & jewellery',
-  coins: 'coins',
-  watches: 'watches',
-  militaria: 'medals & militaria',
-  icons: 'icons',
-  antiques: 'antiques & porcelain',
-  instruments: 'instruments',
-  phones: 'phones',
-  cameras: 'cameras',
-  electronics: 'electronics',
-  media: 'records & media',
-  silver: 'silver & amber',
-  tools: 'tools',
+  gold: t('category.gold'),
+  coins: t('category.coins'),
+  watches: t('category.watches'),
+  militaria: t('category.militaria'),
+  icons: t('category.icons'),
+  antiques: t('category.antiques'),
+  instruments: t('category.instruments'),
+  phones: t('category.phones'),
+  cameras: t('category.cameras'),
+  electronics: t('category.electronics'),
+  media: t('category.media'),
+  silver: t('category.silver'),
+  tools: t('category.tools'),
 }
 
 /** Categories some item def belongs to (a specialist whose line never walks in yet says so). */
 const STOCKED = new Set<string>(SPAWN_DEFS.map((d) => d.category))
 
 function due(inDays: number): string {
-  if (inDays <= 0) return 'tonight'
-  return inDays === 1 ? 'in 1 day' : `in ${inDays} days`
+  if (inDays <= 0) return t('office.tonight')
+  return t('office.inDays', { count: inDays })
 }
 
 export class OfficeSheet {
@@ -78,45 +79,45 @@ export class OfficeSheet {
     sheet.dataset.id = 'office'
     sheet.setAttribute('role', 'dialog')
     sheet.setAttribute('aria-modal', 'true')
-    sheet.setAttribute('aria-label', 'Office')
+    sheet.setAttribute('aria-label', t('office.title'))
 
     const head = el('div', 'sheet-head')
     head.append(
-      el('h2', '', 'Office'),
-      createButton({ id: 'office-close', label: '', icon: 'close', variant: 'ghost', ariaLabel: 'Close office', onPress: () => this.close() }),
+      el('h2', '', t('office.title')),
+      createButton({ id: 'office-close', label: '', icon: 'close', variant: 'ghost', ariaLabel: t('office.closeAria'), onPress: () => this.close() }),
     )
     this.cash = el('p', 'office-cash')
     this.cash.dataset.id = 'office-cash'
 
     this.bills = el('ul', 'office-list')
     this.bills.dataset.id = 'office-bills'
-    const billsSec = this.section('Bills', '')
+    const billsSec = this.section(t('office.bills'), '')
     this.billsDue = el('p', 'settings-text')
     this.billsDue.dataset.id = 'office-due'
     billsSec.append(this.billsDue, this.bills)
 
     this.upgrades = el('ul', 'office-list')
     this.upgrades.dataset.id = 'office-upgrades'
-    const upSec = this.section('Upgrades', '')
+    const upSec = this.section(t('office.upgrades'), '')
     this.acid = el('div', 'office-acid')
     this.acid.dataset.id = 'office-acid'
     upSec.append(this.upgrades, this.acid)
 
     this.security = el('ul', 'office-list')
     this.security.dataset.id = 'office-security'
-    const secSec = this.section('Cases and security', '')
+    const secSec = this.section(t('office.security'), '')
     this.exposure = el('p', 'settings-text')
     this.exposure.dataset.id = 'office-exposure'
     secSec.append(this.exposure, this.security)
 
     this.specialists = el('ul', 'office-list')
     this.specialists.dataset.id = 'office-specialists'
-    const spSec = this.section('Specialists on retainer', 'A monthly fee buys a few calls; extra calls cost more. Retaining mid-month charges the rest of the month.')
+    const spSec = this.section(t('office.specialists'), t('office.specialistsText'))
     spSec.append(this.specialists)
 
     this.staff = el('ul', 'office-list')
     this.staff.dataset.id = 'office-staff'
-    const staffSec = this.section('Staff', 'A second pair of hands for the line you can’t get to. His deals land in your books, and so do his mistakes.')
+    const staffSec = this.section(t('office.staff'), t('office.staffText'))
     staffSec.append(this.staff)
 
     sheet.append(head, this.cash, billsSec, upSec, secSec, staffSec, spSec)
@@ -146,7 +147,7 @@ export class OfficeSheet {
     const key = JSON.stringify([state.cash, state.shop.upgrades, state.shop.acidCharges, state.shop.slots, state.specialists, state.calendar.date, state.staff, this.confirmRelease])
     if (key === this.key) return
     this.key = key
-    setText(this.cash, `Cash in the till: ${rub(state.cash)}`)
+    setText(this.cash, t('office.cash', { cash: rub(state.cash) }))
     this.renderBills(state)
     this.renderUpgrades(state)
     this.renderSpecialists(state)
@@ -166,7 +167,7 @@ export class OfficeSheet {
     // Every M2 bill falls on the same night: the last day of the month.
     const inDays = bills[0]?.inDays ?? 0
     const end = addDays(state.calendar.date, inDays)
-    setText(this.billsDue, `Due at closing on ${Number(end.slice(8, 10))} ${monthName(end)}, ${due(inDays)}.`)
+    setText(this.billsDue, t('office.billsDue', { date: dayMonth(end), when: due(inDays) }))
     for (const b of bills) {
       const li = el('li', 'office-row office-bill')
       li.append(el('span', 'office-name', b.label), el('span', 'office-amt', rub(b.amount)))
@@ -174,7 +175,7 @@ export class OfficeSheet {
     }
     const total = bills.reduce((a, b) => a + b.amount, 0)
     const li = el('li', 'office-row office-bill office-total')
-    li.append(el('span', 'office-name', 'Total'), el('span', 'office-amt', rub(total)), el('span', 'office-when', state.cash < total ? 'more than you have' : ''))
+    li.append(el('span', 'office-name', t('common.total')), el('span', 'office-amt', rub(total)), el('span', 'office-when', state.cash < total ? t('office.moreThanYouHave') : ''))
     this.bills.append(li)
   }
 
@@ -186,25 +187,30 @@ export class OfficeSheet {
     const open = state.shop.slots.filter((sl) => sl.itemId && sl.area !== 'counter' && !shielded.has(sl.area)).length
     setText(
       this.exposure,
-      open === 0
-        ? 'Nothing on the open shelves tonight. The counter case is behind glass.'
-        : `${open} thing${open === 1 ? '' : 's'} on the open shelves tonight, within reach of anyone. The counter case is behind glass.`,
+      open === 0 ? t('office.noExposure') : t('office.exposure', { count: open }),
     )
     for (const u of UPGRADES) {
       const status = upgradeStatus(state, u.id)
       const li = el('li', `office-card is-${status}`)
       li.dataset.id = `upgrade-${u.id}`
       const top = el('div', 'office-card-top')
-      top.append(el('span', 'office-name', u.name), el('span', 'office-amt', status === 'owned' ? 'owned' : rub(u.cost)))
+      top.append(el('span', 'office-name', u.name), el('span', 'office-amt', status === 'owned' ? t('office.owned') : rub(u.cost)))
       li.append(top, el('p', 'office-blurb', u.blurb))
       if (status === 'owned') {
         const tag = el('span', 'office-owned')
         tag.innerHTML = icons.check
-        tag.append(el('span', '', 'In the shop'))
+        tag.append(el('span', '', t('office.inShop')))
         li.append(tag)
       } else {
         const needs = u.requires.filter((r) => !hasUpgrade(state, r)).map((r) => UPGRADES.find((x) => x.id === r)?.name ?? r)
-        const label = status === 'locked' ? (needs.length ? `Needs ${needs.join(', ')}` : `From day ${u.fromDay ?? ''}`) : status === 'short' ? 'Not enough cash' : `Buy — ${rub(u.cost)}`
+        const label =
+          status === 'locked'
+            ? needs.length
+              ? t('office.needs', { list: needs.join(t('common.listSep')) })
+              : t('office.fromDay', { day: u.fromDay ?? '' })
+            : status === 'short'
+              ? t('office.short')
+              : t('office.buy', { amount: rub(u.cost) })
         const b = createButton({ id: `buy-${u.id}`, label, variant: status === 'available' ? 'primary' : 'secondary', onPress: () => this.deps.dispatch({ type: 'upgrade/buy', id: u.id }) })
         b.disabled = status !== 'available'
         li.append(b)
@@ -217,10 +223,10 @@ export class OfficeSheet {
     if (hasUpgrade(state, 'acid_kit')) {
       const u = tuning.upgrades
       const full = state.shop.acidCharges >= u.acidMaxCharges
-      this.acid.append(el('p', 'settings-text', `Acid kit: ${state.shop.acidCharges} test${state.shop.acidCharges === 1 ? '' : 's'} left${full ? ' (full)' : ''}.`))
+      this.acid.append(el('p', 'settings-text', t(full ? 'office.acidFull' : 'office.acid', { count: state.shop.acidCharges })))
       const b = createButton({
         id: 'acid-restock',
-        label: `Refill +${u.acidRestockCharges} — ${rub(u.acidRestockCost)}`,
+        label: t('office.refill', { n: u.acidRestockCharges, amount: rub(u.acidRestockCost) }),
         onPress: () => this.deps.dispatch({ type: 'acid/restock' }),
       })
       b.disabled = !canRestockAcid(state)
@@ -236,8 +242,8 @@ export class OfficeSheet {
     const li = el('li', `office-card${status === 'hired' ? ' is-owned' : ''}`)
     li.dataset.id = 'staff-appraiser'
     const top = el('div', 'office-card-top')
-    top.append(el('span', 'office-name', APPRAISER.name), el('span', 'office-amt', `${rub(A.salary)}/mo`))
-    li.append(top, el('p', 'office-role', `Appraiser · eye ${Math.round(accuracyOf(state) * 100)}%`))
+    top.append(el('span', 'office-name', APPRAISER.name), el('span', 'office-amt', t('office.perMonth', { amount: rub(A.salary) })))
+    li.append(top, el('p', 'office-role', t('office.appraiserRole', { pct: Math.round(accuracyOf(state) * 100) })))
     if (status === 'gone') {
       li.append(el('p', 'office-quiet', st.gone === 'fired' ? APPRAISER_TEXT.fired : APPRAISER_TEXT.gone))
       this.staff.append(li)
@@ -245,10 +251,10 @@ export class OfficeSheet {
     }
     if (status !== 'hired') {
       li.append(el('p', 'office-blurb', APPRAISER_TEXT.pitch))
-      li.append(el('p', 'office-terms', `Paid at month end with the rent, from the day he starts. He never spends the till below ${rub(A.cashFloor)}.`))
+      li.append(el('p', 'office-terms', t('office.appraiserTerms', { floor: rub(A.cashFloor) })))
       const b = createButton({
         id: 'staff-hire',
-        label: status === 'noCounter' ? 'Needs a second counter' : 'Hire — starts tomorrow',
+        label: status === 'noCounter' ? t('office.needsCounter') : t('office.hire'),
         variant: 'primary',
         onPress: () => this.deps.dispatch({ type: 'staff/hire' }),
       })
@@ -263,17 +269,25 @@ export class OfficeSheet {
       el(
         'p',
         'office-terms',
-        `Served ${r.served} · bought ${r.bought} · lent on ${r.lent} · spent ${rub(r.spent)}${r.fakes ? ` · ${r.fakes} fake${r.fakes === 1 ? '' : 's'}` : ''}${r.insults ? ` · ${r.insults} insulted` : ''}. Owed so far this month: ${rub(wagesDue(state))}.`,
+        t('office.record', {
+          served: r.served,
+          bought: r.bought,
+          lent: r.lent,
+          spent: rub(r.spent),
+          fakes: r.fakes ? t('office.recordFakes', { count: r.fakes }) : '',
+          insults: r.insults ? t('office.recordInsults', { n: r.insults }) : '',
+          owed: rub(wagesDue(state)),
+        }),
       ),
     )
     // Which walk-ins he takes.
-    li.append(el('div', 'settings-label', 'He takes'))
+    li.append(el('div', 'settings-label', t('office.heTakes')))
     const rule = el('div', 'segmented office-rule')
     rule.setAttribute('role', 'radiogroup')
-    rule.setAttribute('aria-label', 'Which walk-ins he takes')
+    rule.setAttribute('aria-label', t('office.ruleAria'))
     const modes = [
-      { mode: 'next' as const, label: 'The overflow' },
-      { mode: 'categories' as const, label: 'Only these' },
+      { mode: 'next' as const, label: t('office.ruleNext') },
+      { mode: 'categories' as const, label: t('office.ruleCategories') },
     ]
     for (const m of modes) {
       const b = el('button', `segment${st.mode === m.mode ? ' is-selected' : ''}`, m.label)
@@ -290,8 +304,8 @@ export class OfficeSheet {
         'p',
         'office-quiet',
         st.mode === 'next'
-          ? `When ${A.overflowAt} or more are waiting, he takes the next seller after the first in line. Never a regular, a story, a buyer or a pawner coming back.`
-          : 'Any seller in line bringing one of these (after the first in line), however short the line.',
+          ? t('office.ruleNextText', { n: A.overflowAt })
+          : t('office.ruleCategoriesText'),
       ),
     )
     if (st.mode === 'categories') {
@@ -313,7 +327,7 @@ export class OfficeSheet {
     const confirming = this.confirmRelease === 'staff'
     const fire = createButton({
       id: 'staff-fire',
-      label: confirming ? 'Tap again to let him go (for good)' : 'Let him go',
+      label: confirming ? t('office.fireConfirm') : t('office.fire'),
       variant: confirming ? 'danger' : 'secondary',
       onPress: () => {
         if (this.confirmRelease === 'staff') {
@@ -340,21 +354,21 @@ export class OfficeSheet {
       const li = el('li', `office-card${retained ? ' is-owned' : ''}`)
       li.dataset.id = `specialist-${def.id}`
       const top = el('div', 'office-card-top')
-      top.append(el('span', 'office-name', def.name), el('span', 'office-amt', `${rub(roster.fee)}/mo`))
-      const covers = def.categories.map((c) => CATEGORY_LABEL[c] ?? c).join(', ')
-      li.append(top, el('p', 'office-role', `${def.role} · ${covers}`), el('p', 'office-blurb', def.blurb))
-      if (!def.categories.some((c) => STOCKED.has(c))) li.append(el('p', 'office-quiet', 'Nothing in this line has come through the door yet.'))
-      const terms = `${monthlyCalls(state, def.id)} calls a month · extra calls ${rub(roster.perCall)}`
+      top.append(el('span', 'office-name', def.name), el('span', 'office-amt', t('office.perMonth', { amount: rub(roster.fee) })))
+      const covers = def.categories.map((c) => CATEGORY_LABEL[c] ?? c).join(t('common.listSep'))
+      li.append(top, el('p', 'office-role', t('office.roleCovers', { role: def.role, covers })), el('p', 'office-blurb', def.blurb))
+      if (!def.categories.some((c) => STOCKED.has(c))) li.append(el('p', 'office-quiet', t('office.nothingYet')))
+      const terms = t('office.calls', { calls: monthlyCalls(state, def.id), perCall: rub(roster.perCall) })
       if (sp?.retired) {
         // M4 arcs: gone for good (Faina gave up her bench, Ilya retired).
-        li.append(el('p', 'office-quiet', 'Retired. No longer taking calls.'))
+        li.append(el('p', 'office-quiet', t('office.retired')))
       } else if (retained) {
-        li.append(el('p', 'office-terms', `${terms}. ${callsLeft(state, def.id)} call${callsLeft(state, def.id) === 1 ? '' : 's'} left this month.`))
+        li.append(el('p', 'office-terms', t('office.callsLeft', { terms, count: callsLeft(state, def.id) })))
         li.append(el('p', 'office-quote', getSpecialist(def.id)?.hello ?? ''))
         const confirming = this.confirmRelease === def.id
         const b = createButton({
           id: `release-${def.id}`,
-          label: confirming ? 'Tap again to release (no refund)' : 'Release',
+          label: confirming ? t('office.releaseConfirm') : t('office.release'),
           variant: confirming ? 'danger' : 'secondary',
           onPress: () => {
             if (this.confirmRelease === def.id) {
@@ -370,10 +384,10 @@ export class OfficeSheet {
         li.append(b)
       } else {
         const cost = retainCost(state, def.id)!
-        li.append(el('p', 'office-terms', `${terms}. This month: ${rub(cost.fee)} for ${cost.calls} call${cost.calls === 1 ? '' : 's'}.`))
+        li.append(el('p', 'office-terms', t('office.thisMonth', { terms, fee: rub(cost.fee), count: cost.calls })))
         const b = createButton({
           id: `retain-${def.id}`,
-          label: state.cash < cost.fee ? 'Not enough cash' : `Retain — ${rub(cost.fee)}`,
+          label: state.cash < cost.fee ? t('office.short') : t('office.retain', { amount: rub(cost.fee) }),
           variant: 'primary',
           onPress: () => this.deps.dispatch({ type: 'specialist/retain', id: def.id }),
         })

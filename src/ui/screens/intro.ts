@@ -6,6 +6,7 @@
  * Longlight palette. Tap the card or Next to go on; Skip jumps straight to Begin.
  * The step is UI state only (like an unsent draft): it resets for every new career.
  */
+import { t } from '../../data/strings'
 import type { Action } from '../../game/actions'
 import { INTRO_CARDS, NAME_STEP } from '../../data/intro'
 import { tuning } from '../../data/tuning'
@@ -42,7 +43,7 @@ export class IntroScreen {
     input.value = tuning.career.defaultShopName
     input.autocomplete = 'off'
     input.spellcheck = false
-    input.setAttribute('aria-label', 'Shop name')
+    input.setAttribute('aria-label', t('intro.shopName'))
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         input.blur()
@@ -54,10 +55,10 @@ export class IntroScreen {
     this.dots.setAttribute('aria-hidden', 'true')
     for (let i = 0; i <= INTRO_CARDS.length; i++) this.dots.append(el('span', 'intro-dot'))
     const actions = el('div', 'actions intro-actions')
-    this.skip = createButton({ id: 'intro-skip', label: 'Skip', variant: 'ghost', onPress: () => this.begin() })
-    this.next = createButton({ id: 'intro-next', label: 'Next', variant: 'primary', onPress: () => this.advance() })
+    this.skip = createButton({ id: 'intro-skip', label: t('common.skip'), variant: 'ghost', onPress: () => this.begin() })
+    this.next = createButton({ id: 'intro-next', label: t('common.next'), variant: 'primary', onPress: () => this.advance() })
     actions.append(this.skip, this.next)
-    card.append(this.kicker, this.title, this.body, input, this.dots, actions, el('p', 'welcome-studio', 'A Longlight Interactive game'))
+    card.append(this.kicker, this.title, this.body, input, this.dots, actions, el('p', 'welcome-studio', t('common.studio')))
     // A tap anywhere on a story card (not its buttons or the name field) turns the page.
     // Use the event path, not target.closest(): a button's label swap can detach the
     // tapped span before the click bubbles here, which would turn two pages at once.
@@ -107,6 +108,6 @@ export class IntroScreen {
     this.skip.hidden = this.last
     // The last card's button is Begin (its own data-id, so scripts can find it).
     this.next.dataset.id = this.last ? 'intro-begin' : 'intro-next'
-    setButtonLabel(this.next, this.last ? 'Begin' : 'Next', this.last ? 'door' : undefined)
+    setButtonLabel(this.next, this.last ? t('intro.begin') : t('common.next'), this.last ? 'door' : undefined)
   }
 }

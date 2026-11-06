@@ -8,6 +8,7 @@
  * Local UI state (pad open, typed digits) lives here; game state only changes
  * through sale/accept, sale/counter and counter/pass.
  */
+import { t } from '../../data/strings'
 import type { Action } from '../../game/actions'
 import type { GameState } from '../../game/state'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
@@ -59,19 +60,19 @@ export class SaleScreen {
     offer.dataset.id = 'sale-offer'
     const yours = el('div', 'sale-offer-col sale-offer-tag')
     this.tagValue = el('span', 'sale-tag-value')
-    yours.append(el('span', 'sale-offer-label', 'Your tag'), this.tagValue)
+    yours.append(el('span', 'sale-offer-label', t('sale.yourTag')), this.tagValue)
     const theirs = el('div', 'sale-offer-col')
     this.offerValue = el('span', 'sale-offer-value')
-    theirs.append(el('span', 'sale-offer-label', 'They offer'), this.offerValue)
+    theirs.append(el('span', 'sale-offer-label', t('sale.theyOffer')), this.offerValue)
     const offerMain = el('div', 'sale-offer-main')
     offerMain.append(yours, theirs)
     this.offerTrail = el('div', 'sale-offer-trail')
     offer.append(offerMain, this.offerTrail)
 
     this.actions = el('div', 'actions counter-actions')
-    const refuse = createButton({ id: 'sale-refuse', label: 'Refuse', onPress: () => dispatch({ type: 'counter/pass' }) })
-    const counter = createButton({ id: 'sale-counter', label: 'Counter', onPress: () => this.openPad() })
-    this.accept = createButton({ id: 'sale-accept', label: 'Accept', variant: 'primary', onPress: () => dispatch({ type: 'sale/accept' }) })
+    const refuse = createButton({ id: 'sale-refuse', label: t('sale.refuse'), onPress: () => dispatch({ type: 'counter/pass' }) })
+    const counter = createButton({ id: 'sale-counter', label: t('sale.counter'), onPress: () => this.openPad() })
+    this.accept = createButton({ id: 'sale-accept', label: t('sale.accept'), variant: 'primary', onPress: () => dispatch({ type: 'sale/accept' }) })
     this.actions.append(refuse, counter, this.accept)
 
     // Counter pad
@@ -81,14 +82,14 @@ export class SaleScreen {
     tag.dataset.id = 'sale-amount'
     this.yourValue = el('span', 'price-tag-value')
     this.yourNote = el('span', 'price-tag-note')
-    tag.append(el('span', 'price-tag-label', 'Your price'), this.yourValue, this.yourNote)
+    tag.append(el('span', 'price-tag-label', t('sale.yourPrice')), this.yourValue, this.yourNote)
     this.pad = new NumPad('sale', (v) => {
       this.amount = v
       this.refresh()
     })
     const padActions = el('div', 'actions')
-    this.submit = createButton({ id: 'sale-ask', label: 'Ask', variant: 'primary', onPress: () => this.onSubmit() })
-    padActions.append(createButton({ id: 'sale-back', label: 'Back', icon: 'back', ariaLabel: 'Back', onPress: () => this.closePad() }), this.submit)
+    this.submit = createButton({ id: 'sale-ask', label: t('sale.ask'), variant: 'primary', onPress: () => this.onSubmit() })
+    padActions.append(createButton({ id: 'sale-back', label: t('common.back'), icon: 'back', ariaLabel: t('common.back'), onPress: () => this.closePad() }), this.submit)
     this.panel.append(tag, this.pad.root, padActions)
 
     strip.append(dialogue, offer, this.actions, this.panel)
@@ -114,14 +115,14 @@ export class SaleScreen {
     }
     setText(this.name, c.customer.name)
     // M4: a specialist's offer on the phone (Gennady's first refusal) says so.
-    setText(this.tag, c.via === 'phone' ? `${archetypeLabel(c.customer.archetype)} · on the phone` : archetypeLabel(c.customer.archetype))
+    setText(this.tag, c.via === 'phone' ? t('sale.onPhone', { who: archetypeLabel(c.customer.archetype) }) : archetypeLabel(c.customer.archetype))
     setText(this.item, itemNameOf(c.item.defId))
     setText(this.tagValue, rub(c.sale.tag))
-    setText(this.line, `“${c.line}”`)
+    setText(this.line, t('common.quote', { text: c.line }))
     setText(this.offerValue, rub(c.sale.offer))
-    const trail = c.sale.history.filter((h) => h.response.kind === 'counter').map((h) => `you ${rub(h.counter)} → ${rub(h.response.price)}`)
-    setText(this.offerTrail, trail.length ? trail.join(' · ') : 'Their opening offer')
-    setButtonLabel(this.accept, `Sell ${rub(c.sale.offer)}`)
+    const trail = c.sale.history.filter((h) => h.response.kind === 'counter').map((h) => t('sale.trailRound', { counter: rub(h.counter), price: rub(h.response.price) }))
+    setText(this.offerTrail, trail.length ? trail.join(t('common.dotSep')) : t('sale.opening'))
+    setButtonLabel(this.accept, t('sale.sell', { amount: rub(c.sale.offer) }))
     this.refresh()
   }
 
@@ -146,20 +147,20 @@ export class SaleScreen {
     this.actions.hidden = this.countering
     this.panel.hidden = !this.countering
     const v = this.amount
-    setText(this.yourValue, v > 0 ? rub(v) : '— ₽')
+    setText(this.yourValue, v > 0 ? rub(v) : t('common.noAmount'))
     const over = v > sale.tag
     this.root.classList.toggle('is-over', over)
-    setText(this.yourNote, over ? `Above your own tag (${rub(sale.tag)})` : `They offer ${rub(sale.offer)} · tag ${rub(sale.tag)}`)
+    setText(this.yourNote, over ? t('sale.overTag', { tag: rub(sale.tag) }) : t('sale.note', { offer: rub(sale.offer), tag: rub(sale.tag) }))
     const mid = Math.round((sale.offer + sale.tag) / 2 / 100) * 100
     this.pad.setSideKeys([
-      { id: 'sale-chip-tag', label: 'Tag', sub: rub(sale.tag), onPress: () => this.pad.set(sale.tag) },
-      { id: 'sale-chip-split', label: 'Split', sub: rub(Math.max(sale.offer, mid)), onPress: () => this.pad.set(Math.max(sale.offer, mid)) },
+      { id: 'sale-chip-tag', label: t('sale.chipTag'), sub: rub(sale.tag), onPress: () => this.pad.set(sale.tag) },
+      { id: 'sale-chip-split', label: t('sale.chipSplit'), sub: rub(Math.max(sale.offer, mid)), onPress: () => this.pad.set(Math.max(sale.offer, mid)) },
       null,
-      { id: 'sale-clear', label: 'Clear', onPress: () => this.pad.set(0) },
+      { id: 'sale-clear', label: t('common.clear'), onPress: () => this.pad.set(0) },
     ])
     this.submit.disabled = v <= 0 || over
-    if (v > 0 && v <= sale.offer) setButtonLabel(this.submit, `Take ${rub(sale.offer)}`)
-    else setButtonLabel(this.submit, v > 0 ? `Ask ${rub(v)}` : 'Ask')
+    if (v > 0 && v <= sale.offer) setButtonLabel(this.submit, t('sale.take', { amount: rub(sale.offer) }))
+    else setButtonLabel(this.submit, v > 0 ? t('sale.askAmount', { amount: rub(v) }) : t('sale.ask'))
   }
 
   private openPad(): void {

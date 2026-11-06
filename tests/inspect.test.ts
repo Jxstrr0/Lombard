@@ -354,7 +354,8 @@ describe('evidence', () => {
         expect(caught / n, `${def.id}/${p.id}`).toBeGreaterThan(0.6)
       }
     }
-  })
+    // 100 seeds for every fake profile of all 120 items: about 3 s alone, over the 5 s default on a busy CI runner
+  }, 30_000)
 
   it('a genuine item never produces negative authenticity evidence', () => {
     for (const def of ITEM_DEFS) {

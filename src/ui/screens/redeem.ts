@@ -4,12 +4,13 @@
  * over" (loan/return). After that the counter screen shows the Redeemed stamp
  * and their thank-you line.
  */
+import { t } from '../../data/strings'
 import { tuning } from '../../data/tuning'
 import type { Action } from '../../game/actions'
 import { amountDue } from '../../game/loans/loans'
 import type { GameState } from '../../game/state'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
-import { archetypeLabel, itemNameOf, rub } from '../format'
+import { archetypeLabel, itemNameOf, plusRub, rub } from '../format'
 import { dayLabel, daysLabel, monthlyRateLabel } from '../loanFormat'
 import '../loans.css'
 
@@ -32,7 +33,7 @@ export class RedeemScreen {
     const speaker = el('div', 'speaker')
     this.name = el('span', 'speaker-name')
     this.tag = el('span', 'speaker-tag')
-    speaker.append(this.name, this.tag, el('span', 'loan-badge', 'back for a loan'))
+    speaker.append(this.name, this.tag, el('span', 'loan-badge', t('redeem.badge')))
     this.item = el('div', 'item-tag')
     this.item.dataset.id = 'redeem-item'
     this.line = el('p', 'line')
@@ -41,7 +42,7 @@ export class RedeemScreen {
     this.ticket.dataset.id = 'redeem-ticket'
     dialogue.append(speaker, this.item, this.line, this.ticket)
     const actions = el('div', 'actions counter-actions')
-    this.give = createButton({ id: 'redeem-return', label: 'Hand it over', variant: 'primary', onPress: () => dispatch({ type: 'loan/return' }) })
+    this.give = createButton({ id: 'redeem-return', label: t('redeem.give'), variant: 'primary', onPress: () => dispatch({ type: 'loan/return' }) })
     actions.append(this.give)
     strip.append(dialogue, actions)
     root.append(strip)
@@ -59,16 +60,22 @@ export class RedeemScreen {
     setText(this.name, c.customer.name)
     setText(this.tag, archetypeLabel(c.customer.archetype))
     setText(this.item, itemNameOf(loan.item.defId))
-    setText(this.line, `“${c.line}”`)
+    setText(this.line, t('common.quote', { text: c.line }))
 
     const late = today > loan.dueDay
     const rows: [string, string, string][] = [
-      [`Lent ${dayLabel(state, loan.startDay)}`, rub(loan.principal), ''],
-      [`Interest · ${daysLabel(held)} at ${monthlyRateLabel(loan.monthlyRate)}${held < tuning.loans.minInterestDays ? `, ${tuning.loans.minInterestDays}-day minimum` : ''}`, `+${rub(due - loan.principal)}`, ''],
-      [late ? `Total · ${daysLabel(today - loan.dueDay)} late` : 'Total', rub(due), 'total'],
+      [t('redeem.lent', { date: dayLabel(state, loan.startDay) }), rub(loan.principal), ''],
+      [
+        held < tuning.loans.minInterestDays
+          ? t('redeem.interestMin', { days: daysLabel(held), rate: monthlyRateLabel(loan.monthlyRate), min: tuning.loans.minInterestDays })
+          : t('redeem.interest', { days: daysLabel(held), rate: monthlyRateLabel(loan.monthlyRate) }),
+        plusRub(due - loan.principal),
+        '',
+      ],
+      [late ? t('redeem.totalLate', { days: daysLabel(today - loan.dueDay) }) : t('common.total'), rub(due), 'total'],
     ]
     this.ticket.replaceChildren()
     for (const [k, v, cls] of rows) this.ticket.append(el('dt', cls, k), el('dd', cls, v))
-    setButtonLabel(this.give, `Take ${rub(due)}, hand it over`)
+    setButtonLabel(this.give, t('redeem.take', { amount: rub(due) }))
   }
 }

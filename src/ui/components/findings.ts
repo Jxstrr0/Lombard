@@ -4,14 +4,20 @@
  * icon and a word ("good sign" / "concern"), never colour alone.
  */
 import type { Finding } from '../../game/types'
-import { TOOL_LABEL } from '../format'
+import { t } from '../../data/strings'
+import { toolLabel } from '../format'
 import { icons } from '../icons'
 import { el } from './button'
 
-const POLARITY: Record<Finding['polarity'], { icon: string; word: string } | null> = {
-  positive: { icon: icons.plus, word: 'good sign' },
-  negative: { icon: icons.alert, word: 'concern' },
+const POLARITY: Record<Finding['polarity'], { icon: string; word: () => string } | null> = {
+  positive: { icon: icons.plus, word: () => t('findings.good') },
+  negative: { icon: icons.alert, word: () => t('findings.concern') },
   neutral: null,
+}
+
+/** A mouse or trackpad (not touch): the stack says "click" instead of "tap". */
+function finePointer(): boolean {
+  return typeof window !== 'undefined' && !!window.matchMedia?.('(hover: hover) and (pointer: fine)').matches
 }
 
 export function findingCard(f: Finding, hotspotLabel?: string): HTMLElement {
@@ -20,13 +26,13 @@ export function findingCard(f: Finding, hotspotLabel?: string): HTMLElement {
   const head = el('div', 'fc-head')
   const tool = el('span', 'fc-tool')
   tool.innerHTML = (icons as Record<string, string>)[f.tool] ?? icons.doc
-  tool.append(el('span', '', TOOL_LABEL[f.tool]))
+  tool.append(el('span', '', toolLabel(f.tool)))
   head.append(tool)
   const pol = POLARITY[f.polarity]
   if (pol) {
     const p = el('span', 'fc-pol')
     p.innerHTML = pol.icon
-    p.append(el('span', '', pol.word))
+    p.append(el('span', '', pol.word()))
     head.append(p)
   }
   card.append(head)
@@ -55,12 +61,12 @@ export class FindingStack {
     this.stack.setAttribute('role', 'button')
     this.stack.tabIndex = 0
     this.stack.dataset.id = 'findings-stack'
-    this.stack.setAttribute('aria-label', 'Show all findings')
+    this.stack.setAttribute('aria-label', t('findings.showAll'))
     this.count = el('span', 'findings-count')
     this.list = el('div', 'findings-list')
     this.list.dataset.id = 'findings-list'
     this.list.setAttribute('role', 'dialog')
-    this.list.setAttribute('aria-label', 'Findings')
+    this.list.setAttribute('aria-label', t('findings.title'))
     this.list.hidden = true
     root.append(this.stack, this.list)
     this.stack.addEventListener('click', () => this.setExpanded(true))
@@ -104,9 +110,10 @@ export class FindingStack {
       if (i === 0 && grew) c.classList.add('is-new')
       this.stack.prepend(c)
     })
-    this.count.textContent = findings.length > 1 ? `${findings.length} findings · tap to read all` : '1 finding · tap to read'
+    const mouse = finePointer()
+    this.count.textContent = t(mouse ? 'findings.countClick' : 'findings.countTap', { count: findings.length })
     this.stack.append(this.count)
-    const title = el('div', 'findings-list-title', `Findings (${findings.length}) · tap to close`)
+    const title = el('div', 'findings-list-title', t(mouse ? 'findings.listClick' : 'findings.listTap', { count: findings.length }))
     this.list.append(title)
     for (const f of newestFirst) this.list.append(findingCard(f, f.hotspot ? hotspotLabels[f.hotspot] : undefined))
     this.setExpanded(this.expanded)

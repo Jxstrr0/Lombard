@@ -6,7 +6,7 @@ Goal: as realistic as free-and-open content allows, on a phone. The strategy is 
 
 - Preferred: CC0 (no attribution required, but we attribute anyway).
 - Acceptable: CC BY 4.0 (attribution required, in `ATTRIBUTION.md` and the in-game credits screen).
-- Accepted for one library: MIT for the Microsoft Rocketbox avatars and animations (Colby, Nov 5, 2026). Like CC BY, it needs attribution plus the licence notice, which `ATTRIBUTION.md` carries in full.
+- Accepted for one library: MIT for the Microsoft Rocketbox avatars and animations (Kelbo, Nov 5, 2026). Like CC BY, it needs attribution plus the licence notice, which `ATTRIBUTION.md` carries in full.
 - Not acceptable: CC BY-NC (we may sell this later), CC BY-SA (viral), anything "free for personal use", Sketchfab "Standard" license, anything scraped from games.
 - Every asset gets a line in `ATTRIBUTION.md`: name, author, source URL, license, what we changed.
 - When unsure of a license, do not use the asset. Ask.
@@ -36,7 +36,7 @@ Built in Blender (free) by script, never by hand, exported to `shop.glb`:
 - Lighting baked in Cycles to a single 2048 lightmap (4096 on desktop high tier) covering the static room. Dynamic items get lit by the env map plus the counter lamp.
 - Export: glTF with Draco; textures to KTX2 via `gltf-transform`. Target under 8 MB total for the shop.
 
-**Fallback only** (if the bake pipeline hits a wall): kitbash from CC0 props plus Poly Haven textures on primitives, lit by a strong HDRI and contact-shadow decals. About 70% as good. Do not switch to this without asking Colby.
+**Fallback only** (if the bake pipeline hits a wall): kitbash from CC0 props plus Poly Haven textures on primitives, lit by a strong HDRI and contact-shadow decals. About 70% as good. Do not switch to this without asking Kelbo.
 
 ## Bake pipeline (decided Nov 2026, built in M3 task 1)
 
@@ -126,7 +126,7 @@ A survey of CC0 / CC BY sources found almost nothing for our items: no Soviet wa
   - Relief that sits on a surface leaves out its base face (`base=False`).
   - Keep an item under 60k triangles (aim for 20–30k) and every hotspot within 1.5 mm of the surface. `--strict` fails the build otherwise.
 - `scripts/items-pack.mjs` writes `public/assets/items/<id>.glb`: Draco geometry, plus textures as KTX2 (ETC1S for the AO/colour, UASTC for any data map). A coin is ~230 KB.
-- A def opts in with `"glb": "<id>.glb"` in its `model`. The game shows the placeholder at once and swaps the glb in when it loads. The hidden placeholder stays as the cheap raycast proxy for hotspot occlusion. `?noglb=1` forces placeholders. `?gallery=1&item=<id>` shows one model large, front and back, which is how Colby reviews a model on the phone.
+- A def opts in with `"glb": "<id>.glb"` in its `model`. The game shows the placeholder at once and swaps the glb in when it loads. The hidden placeholder stays as the cheap raycast proxy for hotspot occlusion. `?noglb=1` forces placeholders. `?gallery=1&item=<id>` shows one model large, front and back, which is how Kelbo reviews a model on the phone.
 - `tests/itemModels.test.ts` checks that defs and packed files agree.
 - The `items` workflow (`.github/workflows/items.yml`) rebuilds and commits the models when a push to `main` changes `art/items/` or the pack script, or on demand from the GitHub app (Actions → items → Run workflow). Normally the models are built and committed together with the builder change.
 
@@ -163,7 +163,7 @@ Limits: the water reads as a band seen through the railing. The window sill hide
 
 ## Customers
 
-**Decided (Nov 5, 2026): Plan A with the Microsoft Rocketbox library (MIT, accepted for this library only).** A 1-day test put a MakeHuman (CC0, via MPFB 2) and a Rocketbox man in the shop; on the phone Colby couldn't tell them apart, and Rocketbox won on practical grounds: a breathing idle comes with it, it's 2.5× lighter, and ~115 ready-made everyday people cover a cast without per-person work. (A survey first found no fetchable CC0 / CC BY realistic everyday adults: Quaternius's free characters are superhero bodies under an unclear licence, OpenGameArt's are fantasy-styled, Mixamo needs an account, Sketchfab CC0 scans aren't rigged.) Portrait cards (Plan B) aren't built.
+**Decided (Nov 5, 2026): Plan A with the Microsoft Rocketbox library (MIT, accepted for this library only).** A 1-day test put a MakeHuman (CC0, via MPFB 2) and a Rocketbox man in the shop; on the phone Kelbo couldn't tell them apart, and Rocketbox won on practical grounds: a breathing idle comes with it, it's 2.5× lighter, and ~115 ready-made everyday people cover a cast without per-person work. (A survey first found no fetchable CC0 / CC BY realistic everyday adults: Quaternius's free characters are superhero bodies under an unclear licence, OpenGameArt's are fantasy-styled, Mixamo needs an account, Sketchfab CC0 scans aren't rigged.) Portrait cards (Plan B) aren't built.
 
 **The cast.** 25 avatars in `src/data/customers/cast.json`, at least one man and one woman per walk-in archetype (pensioner, student, tradesman, office worker, hustler, sailor on leave; the sailors wear the white uniform shirt and cap). `art/customers/build.py` (headless Blender; usage in its header) builds `public/assets/customers/<id>.glb` from a blob-less clone of the Rocketbox repo, pinned to commit 0943055, byte-for-byte reproducibly:
 - the men's or women's breathing idle (`m_/f_idle_breathe_01`, ~2.7 s loop) retargeted bone for bone, first frame made the rest pose; feet on the floor, facing glTF +Z (the game turns it by π);

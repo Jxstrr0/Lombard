@@ -13,7 +13,8 @@
 import { getItemDef } from '../../data/items'
 import { tuning } from '../../data/tuning'
 import type { Action } from '../../game/actions'
-import { availableTools, TOOLBAR, type ToolAvailability } from '../../game/inspect/available'
+import { availableTools, TOOLBAR, toolAvailability, type ToolAvailability } from '../../game/inspect/available'
+import { PASSPORT_TELL } from '../../game/crime/ledger'
 import { fakeProfileOf } from '../../game/items/generate'
 import type { ItemDef, ToolId } from '../../game/schema/item'
 import type { GameState } from '../../game/state'
@@ -41,6 +42,8 @@ export class InspectScreen {
   readonly findings = new FindingStack()
   private itemName: HTMLElement
   private claim: HTMLElement
+  /** M5: the passport book, a pill under the claim (crime/ledger.ts); not on the toolbar. */
+  private passport: HTMLButtonElement
   private hotspotLayer: HTMLElement
   private hotspotEls = new Map<string, HTMLButtonElement>()
   private fx: HTMLElement
@@ -68,7 +71,13 @@ export class InspectScreen {
     this.itemName = el('div', 'item-tag item-tag-lg')
     this.itemName.dataset.id = 'inspect-item'
     this.claim = el('p', 'inspect-claim')
-    this.header.append(this.itemName, this.claim)
+    this.passport = el('button', 'passport-pill')
+    this.passport.type = 'button'
+    this.passport.dataset.id = 'inspect-passport'
+    this.passport.addEventListener('click', () => {
+      if (this.passport.getAttribute('aria-disabled') !== 'true') this.useTool('passport')
+    })
+    this.header.append(this.itemName, this.claim, this.passport)
 
     this.hotspotLayer = el('div', 'hotspots')
     this.fx = el('div', 'tool-fx')
@@ -144,6 +153,7 @@ export class InspectScreen {
     this.examined = new Set(insp.findings.filter((f) => f.hotspot).map((f) => f.hotspot!))
 
     this.renderToolbar(state)
+    this.renderPassport(state)
 
     // Tool feedback for findings that just arrived
     const before = prev?.current?.visitId === c.visitId ? (prev.inspect?.findings.length ?? 0) : insp.findings.length
@@ -211,6 +221,23 @@ export class InspectScreen {
       badge.hidden = uses === 0
       setText(badge, `×${uses}`)
     }
+  }
+
+  /** "Passport? 2 s" until asked, then what the book says: noted, or none shown. */
+  private renderPassport(state: GameState): void {
+    const t = this.def ? toolAvailability(state, 'passport', this.def) : { tool: 'passport' as const, usable: false, note: '' }
+    const asked = state.inspect?.findings.find((f) => f.tool === 'passport')
+    const secs = tuning.inspect.toolSeconds.passport
+    const label = asked ? (asked.tellId === PASSPORT_TELL ? 'Passport noted' : 'No passport') : 'Ask for a passport'
+    const key = `${label}|${t.usable}`
+    if (this.passport.dataset.key === key) return
+    this.passport.dataset.key = key
+    this.passport.innerHTML = `${icons.passport}<span class="passport-label"></span>${asked ? '' : `<span class="passport-secs">${secs} s</span>`}`
+    this.passport.querySelector('.passport-label')!.textContent = label
+    this.passport.classList.toggle('is-noted', asked?.tellId === PASSPORT_TELL)
+    this.passport.classList.toggle('is-refused', !!asked && asked.tellId !== PASSPORT_TELL)
+    this.passport.setAttribute('aria-disabled', String(!t.usable))
+    this.passport.setAttribute('aria-label', asked ? label : `Ask for a passport for the book, ${secs} seconds`)
   }
 
   private useTool(tool: ToolId, hotspot?: string): void {

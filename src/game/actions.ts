@@ -34,8 +34,13 @@ import { payForTool, toolExtras } from './inspect/available'
 import { SPECIALIST_TELL, useTool } from './inspect/tools'
 import { amountDue, createLoan, forfeitOverdue, pawnClaim, planRedemptions } from './loans/loans'
 import { axesAfterDeal } from './endings/axes'
+import { bringBulletin, printBulletin, pruneBulletin } from './crime/bulletin'
+import { heatAfterDeal, heatNight, matureTrails } from './crime/heat'
+import { passportCheck } from './crime/ledger'
+import { isPoliceVisit, planPolice, policeChoose, policeScene, rollRaid } from './crime/volkova'
 import { fenceAsk, fenceHaggle, isFence, planFence } from './crime/fence'
 import { FENCE_LINES } from '../data/fence'
+import { volkovaLines } from '../data/police'
 import { patienceRepFactor, repAfterDeal, repAfterInsult, repAfterRedeem, repAfterSale, repAfterWalkout, syncSpecialistsRep } from './reputation'
 import { Rng } from './rng'
 import type { ToolId } from './schema/item'
@@ -207,7 +212,8 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'scene/next':
       return endOrStepScene(state)
     case 'scene/choose':
-      return sceneChoose(state, action.choiceId)
+      // M5: Volkova's question is a systemic scene (crime/volkova.ts), not an arc beat.
+      return isPoliceVisit(state.current) ? policeChoose(state, action.choiceId) : sceneChoose(state, action.choiceId)
     default: {
       const unknown: never = action
       return unknown
@@ -301,6 +307,8 @@ function openDay(state: GameState): GameState {
     const crimeNight = runCrimeEvents(s)
     s = crimeNight.state
     s = { ...s, market: updateMarket(s, rng) }
+    // M5 police: trails reaching you today land their heat; maybe a stolen-goods bulletin in the paper.
+    s = printBulletin(matureTrails(s))
     const ids = idAllocator(s)
     // Regulars and story beats first: their sellers take walk-in places. Their ids are keyed by
     // day and person (each person comes at most once a day) and their queue places come from a
@@ -320,9 +328,18 @@ function openDay(state: GameState): GameState {
     const referred = referralBuyers(s, ids.next)
     s = playPaperBeats(referred.state, story.paper)
     buyers.push(...referred.visits)
+    // M5 police: a raid ordered last night happens now, or Volkova comes in (ids by day and role, the
+    // story stream's draws); bulletin pieces walk in with a flagged regular or a walk-in of their own.
+    const police = planPolice(s, storyId)
+    const brought = bringBulletin(police.state, story.visits.map((v) => v.visit), storyId)
+    s = brought.state
+    const storyVisits = story.visits.map((v, i) => ({ ...v, visit: brought.story[i]! }))
     const market = s.market
-    const later = story.visits.filter((v) => !v.first).map((v) => v.visit)
-    const first = story.visits.filter((v) => v.first).map((v) => v.visit)
+    const later = storyVisits.filter((v) => !v.first).map((v) => v.visit)
+    const first = storyVisits.filter((v) => v.first).map((v) => v.visit)
+    later.push(...brought.extra)
+    if (police.visit && police.first) first.unshift(police.visit)
+    else if (police.visit) later.push(police.visit)
     // Neighbourhood standing stretches (or shortens) how long people wait. No draws.
     const patience = patienceRepFactor(s)
     const walkIns = mergeQueue(sellers, [...buyers, ...redeemers], rng)
@@ -347,7 +364,8 @@ function openDay(state: GameState): GameState {
 function closeDay(state0: GameState): GameState {
   if (state0.day.phase !== 'open' || state0.current || state0.queue.length > 0) return state0
   const theft = rollShoplifting(state0)
-  const state = syncSpecialistsRep(chargeExpenses(theft.state))
+  // M5 police: heat fades, old police events go, maybe a raid tomorrow; old bulletin lines come off.
+  const state = pruneBulletin(rollRaid(heatNight(syncSpecialistsRep(chargeExpenses(theft.state)))))
   const log = state.day.log
   const sum = (kind: LedgerEntry['kind']) => log.filter((e) => e.kind === kind).reduce((a, e) => a + e.amount, 0)
   const summary: DaySummary = {
@@ -401,7 +419,9 @@ function nextCustomer(state: GameState): GameState {
   if (state.day.phase !== 'open' || state.current || state.queue.length === 0) return state
   const [visit, ...rest] = state.queue
   if (!visit) return state
-  const scene = sceneFor(visit)
+  // M5: Volkova's visits build their scene as she walks in (and what happens on arrival applies).
+  const police = visit.kind === 'scene' && isPoliceVisit(visit) ? policeScene(state, visit.visitId) : null
+  const scene = sceneFor(visit) ?? police?.scene
   const common = {
     visitId: visit.visitId,
     wants: visit.wants,
@@ -419,12 +439,17 @@ function nextCustomer(state: GameState): GameState {
       ? { ...common, kind: 'scene', line: scene?.lines[0] ?? visit.line ?? '' }
       : { ...common, kind: visit.kind, item: visit.item, line: scene?.lines[0] ?? visit.line ?? visit.item.story }
   const base: GameState = {
-    ...state,
+    ...(police?.state ?? state),
     queue: rest,
     current,
     inspect: visit.kind === 'seller' ? { findings: [], toolUses: {}, estimate: null } : null,
     haggle: null,
     stats: { ...state.stats, customersSeen: state.stats.customersSeen + 1 },
+  }
+  // M5 police: the pledge they came for was seized (a raid, or handed to Volkova) after they set out.
+  if (visit.kind === 'redeem' && !base.loans.some((l) => l.id === visit.loanId)) {
+    const line = storyRng(base, `police:pledge:${visit.visitId}`).pick(volkovaLines.pledgeSeized).replaceAll('{item}', getItemDef(visit.item.defId).name)
+    return repAfterWalkout({ ...base, current: { ...base.current!, phase: 'resolved', outcome: 'left', line } as VisitState }, visit.customer)
   }
   if (visit.kind !== 'buyer') return base
   if (visit.offer !== undefined) return offerCall(base, visit.offer)
@@ -464,7 +489,12 @@ function applyTool(state: GameState, tool: ToolId, hotspot?: string): GameState 
   return withRng(paidFor, (s0, rng) => {
     const uses = insp.toolUses[tool] ?? 0
     const extras = toolExtras(s0, def)
-    const result = useTool({ item: c.item, def, tool, hotspot, previous: insp.findings, uses, rng, extras })
+    // M5: the passport book is an inspect step about the seller, not the item (crime/ledger.ts). The
+    // seller's reaction is theirs, drawn from a stream keyed by the piece, so asking never shifts the game Rng.
+    const result =
+      tool === 'passport'
+        ? passportCheck({ item: c.item, customer: c.customer, previous: insp.findings, rng: new Rng(s0.meta.seed).fork(`police:passport:${c.item.id}`) })
+        : useTool({ item: c.item, def, tool, hotspot, previous: insp.findings, uses, rng, extras })
     const revealed = new Set(c.item.revealed)
     for (const f of result.findings) if (f.tellId) revealed.add(f.tellId)
     // M4 specialist arcs: count what the call turned out to be.
@@ -531,7 +561,8 @@ function buy(state: GameState, price: number, line?: string): GameState {
     },
   }
   // M4 specialist arcs: a missed call, a lowball, or Gennady's first refusal on what you just bought.
-  return resolve(noteBought(axesAfterDeal(repAfterDeal(next, c.customer, c.item, price, 'buy'), c.customer, c.item, price, 'buy'), c.item), 'bought', line ?? visitLines.thanks[0], {
+  const judged = heatAfterDeal(axesAfterDeal(repAfterDeal(next, c.customer, c.item, price, 'buy'), c.customer, c.item, price, 'buy'), c.customer, c.item)
+  return resolve(noteBought(judged, c.item), 'bought', line ?? visitLines.thanks[0], {
     kind: 'buy',
     amount: -price,
     text: `Bought ${def.name} from ${c.customer.name}`,
@@ -554,7 +585,8 @@ function pawn(state: GameState, principal: number, line?: string): GameState {
       cash: s.cash - principal,
       loans: [...s.loans, loan],
     }
-    return resolve(axesAfterDeal(repAfterDeal(next, c.customer, c.item, principal, 'pawn'), c.customer, c.item, principal, 'pawn'), 'pawned', line ?? pickLine('pawn.thanks', rng, { name: c.customer.name, item: def.name }), {
+    const judged = heatAfterDeal(axesAfterDeal(repAfterDeal(next, c.customer, c.item, principal, 'pawn'), c.customer, c.item, principal, 'pawn'), c.customer, c.item)
+    return resolve(judged, 'pawned', line ?? pickLine('pawn.thanks', rng, { name: c.customer.name, item: def.name }), {
       kind: 'loan',
       amount: -principal,
       text: `Lent ${rub(principal)} on ${def.name} to ${c.customer.name}`,

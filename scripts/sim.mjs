@@ -59,4 +59,9 @@ for (const [policy, options, label] of lines) {
     `          crew: bricks ${mean((r) => r.crew.bricks)}  glaziers ${mean((r) => r.crew.glaziers)}  insurance ₽${mean((r) => r.crew.insurance)}` +
       `  deliveries ${mean((r) => r.crew.deliveries)}  ended ${ends.length ? ends.join(' ') : '-'}`,
   )
+  // M5 police: Volkova's visits, pieces she or a raid took, raids, shutdowns.
+  console.log(
+    `          police: Volkova visits ${mean((r) => r.police.visits)}  seized ${mean((r) => r.police.seized)}  raided ${runs.filter((r) => r.police.raids > 0).length}/${runs.length}` +
+      `  shut ${runs.filter((r) => r.police.shut).length}/${runs.length}  bribes ${mean((r) => r.crime.volkova.bribes)}  lies ${mean((r) => r.crime.volkova.lies)}`,
+  )
 }

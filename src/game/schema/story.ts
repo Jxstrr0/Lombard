@@ -144,6 +144,18 @@ const BaseCondition = z.discriminatedUnion('if', [
   // --- M5 the fence (src/game/crime/fence.ts) -------------------------------------------
   /** crime.fence: met (or not), deals and refusals on record, and fenceTrust (−1…1). */
   z.object({ if: z.literal('fence'), met: z.boolean().optional(), deals: cmp.optional(), refusals: cmp.optional(), trust: cmp.optional() }),
+  // --- M5 police (src/game/crime/), for the Volkova arc and anything else that reads the police ---
+  /** Police heat (0 = the police don't know you exist; unbounded). */
+  z.object({ if: z.literal('heat'), ...cmp.shape }),
+  /** Detective Volkova: met yet, her trust in you (−1…1), and how many lies, caught lies and bribes. */
+  z.object({
+    if: z.literal('volkova'),
+    met: z.boolean().optional(),
+    trust: cmp.optional(),
+    lies: cmp.optional(),
+    caught: cmp.optional(),
+    bribes: cmp.optional(),
+  }),
 ])
 
 /** M4: at least one of these holds (one level: no `any` inside `any`). */

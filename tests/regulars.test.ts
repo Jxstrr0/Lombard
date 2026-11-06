@@ -21,12 +21,15 @@ interface Played {
   final: GameState
   /** Walk-in sellers in each morning's queue. */
   walkInSellers: number[]
+  /** Regulars who at some point held a pledge they meant to redeem. */
+  pledged: Set<string>
 }
 
 function play(seed: number, policy: Policy, days: number): Played {
   let s = reducer(createInitialState(seed, `regulars-${seed}`), { type: 'career/begin', shopName: '' })
   const ctx = policy.start(s)
   const walkInSellers: number[] = []
+  const pledged = new Set<string>()
   for (let d = 0; d < days; d++) {
     const day = s.calendar.day
     for (let guard = 0; guard < 2_000; guard++) {
@@ -38,11 +41,12 @@ function play(seed: number, policy: Policy, days: number): Played {
         walkInSellers.push(next.queue.filter((v) => v.kind === 'seller' && !v.customer.regularId && !v.loanId).length)
       }
       s = next
+      for (const l of s.loans) if (l.customer.regularId && l.redeemDay !== null) pledged.add(l.customer.regularId)
       policy.after?.(s, action, ctx)
       if (s.calendar.day !== day) break
     }
   }
-  return { final: s, walkInSellers }
+  return { final: s, walkInSellers, pledged }
 }
 
 describe('regulars content', () => {
@@ -95,8 +99,12 @@ describe('regulars over a 30-day career', () => {
   })
 
   it('the weekly ones come about weekly, and nobody comes in every other day', () => {
-    for (const { seed, final } of runs) {
-      for (const id of WEEKLY) expect(final.customers[id]?.visits ?? 0, `${id} seed ${seed}`).toBeGreaterThanOrEqual(3)
+    for (const { seed, final, pledged } of runs) {
+      for (const id of WEEKLY) {
+        // Someone with a pledge they mean to redeem comes back for that, not to sell (story/plan.ts),
+        // so a weekly regular who pawns stays away until the redemption, up to a month.
+        expect(final.customers[id]?.visits ?? 0, `${id} seed ${seed}`).toBeGreaterThanOrEqual(pledged.has(id) ? 1 : 3)
+      }
       for (const r of REGULARS) expect(final.customers[r.id]?.visits ?? 0, `${r.id} seed ${seed}`).toBeLessThanOrEqual(DAYS / 5)
     }
   })

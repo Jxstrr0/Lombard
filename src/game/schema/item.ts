@@ -24,7 +24,7 @@ export const Category = z.enum(CATEGORIES)
 export type Category = z.infer<typeof Category>
 
 /** M1 ships loupe, scale, magnet. The rest are declared so data can reference them later. */
-export const TOOL_IDS = ['loupe', 'scale', 'magnet', 'uv', 'acid', 'reference', 'phone', 'specialist'] as const
+export const TOOL_IDS = ['loupe', 'scale', 'magnet', 'uv', 'acid', 'reference', 'phone', 'specialist', 'passport'] as const
 export const ToolId = z.enum(TOOL_IDS)
 export type ToolId = z.infer<typeof ToolId>
 export const M1_TOOLS: readonly ToolId[] = ['loupe', 'scale', 'magnet']

@@ -142,7 +142,7 @@ export const tuning = {
 
   inspect: {
     /** In-game seconds per tool use (GDD § Inspection). */
-    toolSeconds: { loupe: 10, scale: 8, magnet: 4, uv: 12, acid: 20, reference: 15, phone: 20, specialist: 60 },
+    toolSeconds: { loupe: 10, scale: 8, magnet: 4, uv: 12, acid: 20, reference: 15, phone: 20, specialist: 60, passport: 2 },
     /** Miss chance on a tell = difficulty × this. */
     missFactor: 0.8,
     /** Each repeat use of the same tool lowers the miss chance by this factor. */
@@ -845,6 +845,134 @@ export const tuning = {
   },
 
   /**
+   * M5 police (src/game/crime/): heat sources, the stolen-goods bulletin, the passport
+   * book, Detective Volkova's visits and the raid (GDD § 8). Heat is unbounded, 0 = the
+   * police don't know you exist; all heat moves through addHeat (src/game/crime/dials.ts).
+   */
+  police: {
+    heat: {
+      /** Buying (or lending on) a piece printed on the bulletin: the police are already looking for it (at once). */
+      bulletinBuy: 0.12,
+      /** Any other stolen piece through your books: added when the police trail reaches you (see trailDays). */
+      stolenTrail: 0.08,
+      /** Buying from someone the police have flagged (tuning.police.flagged), whatever it was. */
+      flaggedBuy: 0.03,
+      /** "Failing to keep a ledger": the three above × this when no passport was noted on the deal. */
+      noLedgerFactor: 1.5,
+      /**
+       * Heat fades every night by this share of itself (at least decayMin): a dirty shop stays
+       * warmer than a clean one for weeks, and a one-off slip fades in about a month.
+       */
+      decayShare: 0.02,
+      decayMin: 0.001,
+    },
+    /** Regulars the police know (GDD § 8 "flagged people"): Margarita, whose late husband's things are very new. */
+    flagged: ['margarita'] as readonly string[],
+    /** Days after the deal before the police trail on a stolen piece reaches you: [min, max]; bulletin pieces are quick. */
+    trailDays: { bulletin: [1, 3], other: [7, 21] } as { bulletin: readonly [number, number]; other: readonly [number, number] },
+    /** A trail Volkova hasn't asked about is dropped this many days after it reached you. */
+    trailKeepDays: 45,
+    /** The passport book (src/game/crime/ledger.ts): how a seller reacts when asked, by the piece's hidden provenance. */
+    passport: {
+      react: {
+        stolen: { calm: 0.2, nervous: 0.35, refuse: 0.45 },
+        unknown: { calm: 0.88, nervous: 0.08, refuse: 0.04 },
+        clean: { calm: 0.96, nervous: 0.03, refuse: 0.01 },
+        heirloom: { calm: 0.96, nervous: 0.03, refuse: 0.01 },
+      } as Readonly<Record<string, { calm: number; nervous: number; refuse: number }>>,
+    },
+    bulletin: {
+      /** Chance the morning paper prints a bulletin, and how many lines it has (weights for 1, 2). */
+      chance: 0.3,
+      lineWeights: [3, 1] as readonly number[],
+      /** Chance a printed piece is brought to your counter, and how many days later [min, max]. */
+      bringChance: 0.6,
+      bringDays: [1, 6] as readonly [number, number],
+      /** It comes with a regular who brings that sort of thing (Margarita) if she's in that day, with this chance. */
+      regularChance: 0.6,
+      /** Bulletin lines kept (and shown in the ledger) this many days. */
+      keepDays: 21,
+      /** Categories that get stolen and printed. */
+      categories: ['gold', 'watches', 'phones', 'cameras', 'electronics', 'militaria', 'coins'] as readonly string[],
+      /** Only everyday pieces get printed: an item def whose top value (baseValue.max) is over this never does. */
+      maxValue: 30_000,
+    },
+    volkova: {
+      /** She takes an interest at this much heat, or once a police trail has reached you. */
+      interestHeat: 0.12,
+      /** Days from taking an interest to her first visit, and between visits after that ("about weekly"). */
+      firstVisitDays: [0, 2] as readonly [number, number],
+      everyDays: [6, 8] as readonly [number, number],
+      /** Cooperate: you hand over the piece (or tell what you know when it's gone). */
+      cooperate: { trust: 0.15, heat: -0.2, rep: 0.06, goneTrust: 0.08, goneHeat: -0.1 },
+      /** Cooperating with a passport noted or the camera's tape: she gets the seller too. */
+      evidence: { trust: 0.1, heat: -0.08, rep: 0.03 },
+      /** Lying: chance she catches you, from what she can check. */
+      lie: {
+        base: 0.1,
+        bulletin: 0.4,
+        tape: 0.2,
+        passport: 0.15,
+        /** Her trust in you lowers the chance by trust × this (only when she trusts you). */
+        trustEase: 0.25,
+        max: 0.9,
+        /** Not caught: she keeps her doubts. */
+        heat: 0.03,
+        trust: -0.05,
+        /** Caught. */
+        caughtHeat: 0.3,
+        caughtTrust: -0.35,
+        caughtRep: -0.1,
+        /** Not caught: chance she comes back to check in [min, max] days, and that she has it by then. */
+        recheckChance: 0.5,
+        recheckDays: [5, 10] as readonly [number, number],
+        recheckCatch: 0.5,
+      },
+      /** Bribe: an envelope of base + perHeat × heat, rounded to 500 ₽. Fails with base + perBribe × earlier bribes. */
+      bribe: {
+        base: 5_000,
+        perHeat: 10_000,
+        failBase: 0.05,
+        failPerBribe: 0.12,
+        failMax: 0.85,
+        heat: -0.25,
+        trust: -0.05,
+        rep: 0.02,
+        failHeat: 0.35,
+        failTrust: -0.4,
+        failRep: -0.15,
+      },
+      /** A routine visit with nothing to ask about: she glances at your passport book. */
+      routine: { goodTrust: 0.05, goodHeat: -0.03, thinTrust: -0.03, thinHeat: 0.03, thinShare: 0.5 },
+      /** Her trust on meeting you if you went to the police about the glue in your lock (Protection's protection.told_police). */
+      reportedTrust: 0.05,
+      /** Her trust in you: −1…1. */
+      trustMin: -1,
+      trustMax: 1,
+    },
+    raid: {
+      /** At closing, with heat at least this, a raid may be ordered for the next morning. */
+      at: 0.9,
+      chance: 0.15,
+      chancePerHeat: 0.5,
+      /** Her trust at or over this halves the chance (she vouches for you). */
+      vouchTrust: 0.5,
+      /** Fine: base + perItem × pieces seized. */
+      fine: { base: 10_000, perItem: 3_000 },
+      /** Heat left afterwards (× this), her trust and the precinct's view. */
+      heatKeep: 0.4,
+      trust: -0.2,
+      rep: -0.2,
+      /** Shut down (endCareer 'raided') at this much heat, or on a second raid. */
+      shutdownHeat: 1.6,
+    },
+    /** Volkova waits as long as it takes. */
+    patience: 100_000,
+    /** The ledger's vague word on heat (src/data/police.ts heatWords): the line for the highest band reached. */
+    heatBands: [0, 0.05, 0.12, 0.4, 0.9] as readonly number[],
+  },
+
+  /**
    * M5 ending axes (src/game/endings/axes.ts, GDD § 12). Signed weights; the unit is one
    * story choice. Clean ↔ dirty: stolen goods, bribes, the fence, protection. Heart ↔
    * hustle: fair offers to people who needed them, loans, regulars helped or burned.
@@ -860,6 +988,10 @@ export const tuning = {
     lowball: -0.35,
     /** Buying, or lending on, a piece that turns out to be stolen, known or not. */
     stolenBought: -0.5,
+    /** M5 police: an envelope for Detective Volkova, taken or not (the clean axis). */
+    bribe: -0.75,
+    /** M5 police: lying to Volkova about a piece, caught or not (the clean axis). */
+    lie: -0.25,
     /** M5 Protection: each month's insurance paid. */
     protectionPaid: -0.5,
     /** M5 Protection: each time you tell the crew no. */

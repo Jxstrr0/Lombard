@@ -53,7 +53,8 @@ describe('economy simulator (M2 tuning)', () => {
       expect(r.crew.insurance, `seed ${r.seed}`).toBeGreaterThan(0)
       expect(r.crew.bricks, `seed ${r.seed}`).toBe(0)
       expect(r.axes.clean, `seed ${r.seed}`).toBeLessThan(0)
-      expect(r.heat, `seed ${r.seed}`).toBeGreaterThan(0)
+      // Noticed: still warm, or Volkova has been round (talking to her cools a shop down; M5 police).
+      expect(r.heat > 0 || r.police.visits > 0, `seed ${r.seed}`).toBe(true)
     }
     expect(runs.filter((r) => r.crew.deliveries > 0).length).toBeGreaterThan(SEEDS.length / 2)
   })

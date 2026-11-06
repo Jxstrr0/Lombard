@@ -8,6 +8,7 @@
  */
 import { vandalismLines } from '../data/vandalismLines'
 import { reducer, type Action } from '../game/actions'
+import { isPoliceVisit } from '../game/crime/volkova'
 import { createInitialState, type GameState } from '../game/state'
 import { recordBeat } from '../game/story/progress'
 import type { Policy } from './policies'
@@ -41,6 +42,8 @@ export interface RunResult {
   axes: GameState['career']['axes']
   /** Actions dispatched (sanity: guards against a stuck policy). */
   steps: number
+  /** M5 police: heat at the end, Volkova's visits, pieces the police took, raids, and whether it was shut down. */
+  police: { heat: number; visits: number; seized: number; raids: number; shut: boolean }
   /** M5: how the career ended (the run stops that day), or null. */
   end: GameState['career']['end']
   /** M5: the crime dials (also in `crime`) and the story flags at the end (who paid, who held out). */
@@ -82,6 +85,7 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
   const points: DayPoint[] = []
   let bustDay: number | null = null
   let steps = 0
+  const police = { heat: 0, visits: 0, seized: 0, raids: 0, shut: false }
   for (let d = 0; d < days; d++) {
     const day = s.calendar.day
     let guard = 0
@@ -98,6 +102,8 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
         s = reducer(s, fallback)
         continue
       }
+      if (action.type === 'counter/next' && isPoliceVisit(next.current)) police.visits++
+      if (action.type === 'day/close') police.seized += s.day.log.filter((e) => e.kind === 'story' && e.itemId && (e.text.startsWith('Volkova took') || e.text.startsWith('Seized'))).length
       s = next
       policy.after?.(s, action, ctx)
       if (s.calendar.day !== day) break // day/close advanced the calendar
@@ -114,6 +120,9 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
     if (s.career.end) break // M5: a forced ending (pushed out, say): nothing more to play.
   }
   const minCash = Math.min(...points.map((p) => p.cash))
+  police.heat = s.crime.heat
+  police.raids = s.crime.flags.includes('police.raided') ? 1 + (s.career.end?.kind === 'raided' ? 1 : 0) : 0
+  police.shut = s.career.end?.kind === 'raided'
   return {
     seed,
     policy: policy.name,
@@ -126,6 +135,7 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
     customers: s.customers,
     crime: s.crime,
     steps,
+    police,
     end: s.career.end,
     axes: s.career.axes,
     heat: s.crime.heat,

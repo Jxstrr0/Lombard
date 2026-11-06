@@ -305,3 +305,38 @@ export const FLAVOUR_NEWS: readonly NewsTemplate[] = [
     seasons: ['autumn'],
   },
 ]
+
+/**
+ * M5 police: the stolen-goods bulletin, a box at the foot of the paper (src/game/crime/bulletin.ts).
+ * One line per piece: what it is, how worn, where and when it went. Some of these pieces turn up at
+ * your counter a few days later; buying one brings Detective Volkova round. No digits in the
+ * templates (the item's own name may have some).
+ */
+export const BULLETIN = {
+  cyr: 'РОЗЫСК',
+  title: 'Police bulletin',
+  intro: 'The Kanal district police ask pawn shops and dealers to look out for:',
+  /** {item}, {wear}, {place}, {when}. */
+  line: '{item}, {wear}. Taken from {place} {when}.',
+  /** By condition, best first: [at least, words]. */
+  wear: [
+    [90, 'as new'],
+    [70, 'light wear'],
+    [45, 'well worn'],
+    [0, 'badly worn'],
+  ] as readonly (readonly [number, string])[],
+  places: [
+    'a flat on Kanatnaya Street',
+    'a dacha past the Ring',
+    'a parked car by the Seventh Bridge',
+    'a student hostel on Tkachey Lane',
+    'a changing room at the Volna pool',
+    'a stall at the Zatonny market',
+    'a widow’s flat on the Fourth Line',
+    'a hotel room on Bolshaya Mostovaya',
+    'a repair kiosk in the Lodochny underpass',
+    'a courtyard workshop off Kirpichny Lane',
+  ] as readonly string[],
+  /** {day} = a weekday. */
+  when: ['on {day} night', 'on {day} afternoon', 'late on {day}', 'early on {day}'] as readonly string[],
+}

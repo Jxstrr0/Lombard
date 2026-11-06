@@ -52,6 +52,7 @@ export const TOOL_LABEL: Record<ToolId, string> = {
   reference: 'Reference',
   phone: 'Phone',
   specialist: 'Specialist',
+  passport: 'Passport',
 }
 
 /** "14 March 2014" style date from an ISO date. */

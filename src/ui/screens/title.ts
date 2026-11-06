@@ -9,11 +9,15 @@
  *
  * The screen holds no career state of its own: main passes the slot list in
  * and does the storage work behind the callbacks.
+ *
+ * M5: a slot whose career has ended shows its ending title; tapping it opens the
+ * summary (main loads it; the ending screen takes over). It offers New career
+ * (confirm, then the slot is overwritten) as well as Delete. Continue skips it.
  */
 import { decodeSaveCode, SaveCodeError } from '../../game/save/code'
 import type { SlotNo, SlotView } from '../../game/save/slots'
 import { mostRecentSlot } from '../../game/save/slots'
-import type { GameState } from '../../game/state'
+import type { CareerEndKind, GameState } from '../../game/state'
 import { backupAgeText, backupReminderDue, lastBackupAt, readBackupFile } from '../../persist/safety'
 import { createButton, el, setText } from '../components/button'
 import { icons } from '../icons'
@@ -39,6 +43,8 @@ export function lastPlayedText(savedAt: number, now = Date.now()): string {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+const END_LABEL: Record<CareerEndKind, string> = { retired: 'retired', evicted: 'evicted', raided: 'shut down', pushedOut: 'pushed out' }
+
 function shopLabel(c: NonNullable<SlotView['career']>): string {
   return c.intro ? 'New shop (not named yet)' : c.shopName
 }
@@ -51,8 +57,8 @@ export class TitleScreen {
   private readonly reminder: HTMLElement
   private readonly list: HTMLElement
   private readonly busy = new Set<SlotNo>()
-  /** Slot whose delete confirm is open. */
-  private confirmDelete: SlotNo | null = null
+  /** Slot whose delete (or, for an ended career, new career) confirm is open. */
+  private confirm: { slot: SlotNo; what: 'delete' | 'new' } | null = null
   // load sheet
   private readonly loadRoot: HTMLElement
   private readonly loadSheet: HTMLElement
@@ -90,7 +96,7 @@ export class TitleScreen {
     this.continueSub = el('span', 'title-continue-sub')
     cont.append(contLabel, this.continueSub)
     cont.addEventListener('click', () => {
-      const s = mostRecentSlot(this.slots)
+      const s = mostRecentSlot(this.slots, true)
       if (s) this.deps.play(s.slot)
     })
     this.continueBtn = cont
@@ -193,7 +199,7 @@ export class TitleScreen {
   render(slots: SlotView[], now = Date.now()): void {
     this.slots = slots
     this.busy.clear()
-    const recent = mostRecentSlot(slots)
+    const recent = mostRecentSlot(slots, true)
     this.continueBtn.hidden = !recent
     if (recent?.career) setText(this.continueSub, `Slot ${recent.slot} · ${shopLabel(recent.career)} · Day ${recent.career.day}`)
 
@@ -218,7 +224,18 @@ export class TitleScreen {
     const main = el('button', 'slot-main')
     main.type = 'button'
     const no = el('span', 'slot-no', `Slot ${slot}`)
-    if (career) {
+    if (career?.end) {
+      li.classList.add('is-ended')
+      main.dataset.id = `slot-ending-${slot}`
+      main.setAttribute('aria-label', `Slot ${slot}: ${shopLabel(career)}, ended: ${career.end.title}. View the summary`)
+      main.append(
+        no,
+        el('span', 'slot-shop', shopLabel(career)),
+        el('span', 'slot-title', career.end.title),
+        el('span', 'slot-when', `Ended after ${career.end.daysRun} day${career.end.daysRun === 1 ? '' : 's'} · ${END_LABEL[career.end.kind]}`),
+      )
+      main.addEventListener('click', () => this.once(slot, () => this.deps.play(slot)))
+    } else if (career) {
       main.dataset.id = `slot-play-${slot}`
       main.setAttribute('aria-label', `Play slot ${slot}: ${shopLabel(career)}, day ${career.day}`)
       main.append(
@@ -242,48 +259,51 @@ export class TitleScreen {
       main.addEventListener('click', () => this.once(slot, () => this.deps.newCareer(slot)))
     }
     li.append(main)
+    const redraw = () => this.list.replaceChildren(...this.slots.map((s) => this.card(s, now)))
+    const ask = (what: 'delete' | 'new') => {
+      this.confirm = { slot, what }
+      redraw()
+      this.list.querySelector<HTMLButtonElement>(`[data-id="slot-confirm-cancel-${slot}"]`)?.focus()
+    }
     if (career || view.damaged) {
-      const del = createButton({
-        id: `slot-delete-${slot}`,
-        label: 'Delete',
-        variant: 'ghost',
-        className: 'slot-delete',
-        ariaLabel: `Delete the career in slot ${slot}`,
-        onPress: () => {
-          this.confirmDelete = slot
-          this.list.replaceChildren(...this.slots.map((s) => this.card(s, now)))
-          this.list.querySelector<HTMLButtonElement>(`[data-id="slot-delete-cancel-${slot}"]`)?.focus()
-        },
-      })
-      li.append(del)
-      if (this.confirmDelete === slot) {
-        const confirm = el('div', 'confirm slot-confirm')
-        confirm.append(
-          el(
-            'p',
-            '',
-            career
-              ? `Delete ${shopLabel(career)} (Day ${career.day}, ${rub(career.cash)})? It can’t be undone unless you kept its save code.`
-              : 'Delete this unreadable save?',
-          ),
+      const side = el('div', 'slot-side')
+      if (career?.end) {
+        side.append(
+          createButton({ id: `slot-renew-${slot}`, label: 'New career', variant: 'ghost', className: 'slot-delete slot-renew', ariaLabel: `Start a new career in slot ${slot}`, onPress: () => ask('new') }),
         )
+      }
+      side.append(
+        createButton({ id: `slot-delete-${slot}`, label: 'Delete', variant: 'ghost', className: 'slot-delete', ariaLabel: `Delete the career in slot ${slot}`, onPress: () => ask('delete') }),
+      )
+      li.append(side)
+      if (this.confirm?.slot === slot) {
+        const what = this.confirm.what
+        const confirm = el('div', 'confirm slot-confirm')
+        const text = !career
+          ? 'Delete this unreadable save?'
+          : what === 'new'
+            ? `Start a new career in slot ${slot}? ${shopLabel(career)}’s ending and summary will be gone unless you kept its save code.`
+            : career.end
+              ? `Delete ${shopLabel(career)} (${career.end.title})? It can’t be undone unless you kept its save code.`
+              : `Delete ${shopLabel(career)} (Day ${career.day}, ${rub(career.cash)})? It can’t be undone unless you kept its save code.`
+        confirm.append(el('p', '', text))
         const acts = el('div', 'actions')
         acts.append(
           createButton({
-            id: `slot-delete-cancel-${slot}`,
+            id: `slot-confirm-cancel-${slot}`,
             label: 'Cancel',
             onPress: () => {
-              this.confirmDelete = null
-              this.list.replaceChildren(...this.slots.map((s) => this.card(s, now)))
+              this.confirm = null
+              redraw()
             },
           }),
           createButton({
-            id: `slot-delete-confirm-${slot}`,
-            label: 'Delete',
+            id: what === 'new' ? `slot-renew-confirm-${slot}` : `slot-delete-confirm-${slot}`,
+            label: what === 'new' ? 'New career' : 'Delete',
             variant: 'danger',
             onPress: () => {
-              this.confirmDelete = null
-              this.once(slot, () => this.deps.deleteSlot(slot))
+              this.confirm = null
+              this.once(slot, () => (what === 'new' ? this.deps.newCareer(slot) : this.deps.deleteSlot(slot)))
             },
           }),
         )

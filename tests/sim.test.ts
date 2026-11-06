@@ -34,6 +34,25 @@ describe('economy simulator (M2 tuning)', () => {
     expect(days[Math.floor(days.length / 2)]).toBeLessThanOrEqual(40)
   })
 
+  // M5 eviction (two rent nights under water): the careful shop is never evicted; the careless one always is,
+  // on its second rent night after going broke. With the Protection ladder held off, careful runs retire at the
+  // end and get a title; with it on, a refuser either retires or is pushed out (with the pushed-out titles).
+  it('a careful shop is never evicted and retires with a title; a careless one is evicted', () => {
+    const seeds = SEEDS.slice(0, 6)
+    for (const r of seeds.map((seed) => simulate(seed, careful, tuning.endings.retireDay + 10, { protectionLadder: false }))) {
+      expect(r.end?.kind, `careful seed ${r.seed}`).toBe('retired')
+      expect(r.title).not.toBeNull()
+    }
+    for (const r of seeds.map((seed) => simulate(seed, careful, tuning.endings.retireDay + 10))) {
+      expect(['retired', 'pushedOut'], `careful seed ${r.seed}`).toContain(r.end?.kind)
+      if (r.end?.kind === 'pushedOut') expect(['pushedOutStood', 'pushedOut']).toContain(r.title)
+    }
+    for (const r of seeds.map((seed) => simulate(seed, careless, 75))) {
+      expect(r.end?.kind, `careless seed ${r.seed}`).toBe('evicted')
+      expect(r.title === 'evicted' || r.title === 'evictedKind').toBe(true)
+    }
+  })
+
   it('a careful shop that refuses the crew takes the brick, pays the glazier, and still grows', () => {
     const runs = SEEDS.map((seed) => simulate(seed, careful, DAYS))
     const s = summarize(runs, tuning.career.startingCash)

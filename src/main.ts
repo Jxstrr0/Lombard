@@ -20,6 +20,9 @@
  * M5 police: ?scenario=volkova opens day 1 with Detective Volkova first in line, asking about a bulletin watch you bought
  * two days ago and still hold (her three answers); ?scenario=bulletin prints a stolen-goods bulletin in today's paper
  * and puts the piece first in line with a walk-in seller (the passport pill); ?scenario=raid opens on a police raid.
+ * M5 the Collector: ?scenario=collector opens day 1 with Leopold Germanovich asking after his icon, then Seryozha the
+ * roofer bringing her in (stolen; the loupe finds the parish number on the back); ?scenario=collector-offer opens with
+ * the icon in stock and him first in line with the hatbox (sell / return / police).
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
@@ -52,6 +55,8 @@ import { bulletinPiece, wearOf } from './game/crime/bulletin'
 import { addEvent, BRING, RAID, TRAIL } from './game/crime/events'
 import { volkovaCustomer } from './game/crime/volkova'
 import { BULLETIN } from './data/news'
+import { COLLECTOR_ICON } from './data/collector'
+import { scriptedItem } from './game/story/scripted'
 import { BRICK } from './game/crime/vandalism'
 import { placeItem } from './game/shop/display'
 import type { QueuedVisit } from './game/types'
@@ -125,6 +130,25 @@ const BEAT_SCENARIOS: Record<string, string> = {
   protection: 'protection.offer',
   fence: 'fence.meet',
   delivery: 'protection.delivery_phones',
+}
+
+/** Dev-only (?scenario=collector): his wish first, then Seryozha with the icon. */
+function collectorScenario(s0: GameState): GameState {
+  const s = beatScenario(s0, 'collector.icon')
+  const wish = getBeat('collector.wish')
+  const visit = wish && beatVisit(s, wish, (prefix) => `${prefix}-dev-wish`)
+  return visit ? { ...s, queue: [visit, ...s.queue], day: { ...s.day, total: s.day.total + 1 } } : s
+}
+
+/** Dev-only (?scenario=collector-offer): the icon bought from Seryozha and in stock; he is first in line with the hatbox. */
+function collectorOfferScenario(s0: GameState): GameState {
+  let s = s0
+  const def = ITEM_DEFS.find((d) => d.id === COLLECTOR_ICON)
+  if (!def) return s
+  const icon = scriptedItem(def, { authenticity: 'genuine', provenance: 'stolen', condition: [70, 70], story: 'My gran’s.' }, new Rng(7), 'i-dev-icon')
+  s = { ...s, cash: s.cash - 12_000, inventory: [...s.inventory, icon], paid: { ...s.paid, [icon.id]: 12_000 } }
+  s = recordBeat(s, 'collector.icon', { day: s.calendar.day, outcome: 'bought' })
+  return beatScenario(s, 'collector.offer')
 }
 
 function beatScenario(s0: GameState, beatId: string): GameState {
@@ -372,6 +396,8 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'volkova') initial = volkovaScenario(initial)
     if (params.get('scenario') === 'bulletin') initial = bulletinScenario(initial)
     if (params.get('scenario') === 'raid') initial = raidScenario(initial)
+    if (params.get('scenario') === 'collector') initial = collectorScenario(initial)
+    if (params.get('scenario') === 'collector-offer') initial = collectorOfferScenario(initial)
     const regular = params.get('regular')
     if (regular) {
       const trust = params.has('trust') ? Number(params.get('trust')) : NaN

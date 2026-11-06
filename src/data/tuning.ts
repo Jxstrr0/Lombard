@@ -26,7 +26,7 @@ export const tuning = {
     firstArrivalSeconds: [4, 8] as [number, number],
     /**
      * The lull between one customer leaving and the next walking in, in-game
-     * seconds [min, max]. Colby (Nov 6): keep 8 sellers a day and add pauses
+     * seconds [min, max]. Kelbo (Nov 6): keep 8 sellers a day and add pauses
      * rather than more customers; this is most of a day's length.
      */
     lullSeconds: [15, 35] as [number, number],
@@ -478,6 +478,8 @@ export const tuning = {
     maxCodeChars: 1_000_000,
     /** Largest JSON a save code may inflate to (bytes); guards against decompression bombs. */
     maxInflatedBytes: 8_000_000,
+    /** Days after the last backup (code copied or file saved) before the quiet reminder shows again. */
+    backupReminderDays: 14,
   },
 } as const
 

@@ -90,6 +90,7 @@ function warn(what: string, err: unknown): void {
 // --- save (coalesced) ---------------------------------------------------------
 
 let lastSavedAt = 0
+let afterSave: ((state: GameState) => void) | null = null
 let writer: Promise<void> | null = null
 let queued: GameState | null = null
 
@@ -102,7 +103,18 @@ async function writeOne(state: GameState): Promise<void> {
     await db.put(STORE, { careerId: state.meta.careerId, savedAt, version: state.meta.version, state })
   } catch (err) {
     warn('save', err)
+    return
   }
+  try {
+    afterSave?.(state)
+  } catch (err) {
+    console.warn('Lombard: after-save hook failed', err)
+  }
+}
+
+/** Run `fn` after each successful write (main uses it to ask the browser to keep the storage). */
+export function onCareerSaved(fn: ((state: GameState) => void) | null): void {
+  afterSave = fn
 }
 
 async function drain(): Promise<void> {

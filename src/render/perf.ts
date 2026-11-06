@@ -6,7 +6,7 @@
  * own resolution (up to 3× CSS pixels). The player picks one in Settings, or
  * leaves it on Auto: Auto starts at High and, once the shop is on screen,
  * steps down a tier whenever the median frame rate over a few seconds is
- * under MIN_FPS (smoothness first: Colby's phone held 60 fps at the old Low,
+ * under MIN_FPS (smoothness first: Kelbo's phone held 60 fps at the old Low,
  * Nov 6). It never steps back up on its own (with vsync a phone that has
  * headroom still reads 60 fps, so there is nothing to measure), but it
  * remembers where it ended up for the next visit.

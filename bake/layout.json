@@ -7,18 +7,20 @@
       { "name": "back_room", "min": [3.0, 0, -4.0], "max": [6.0, 3.2, -1.6], "$comment": "extra volume outside the main shell whose faces survive culling (x from the right wall's inner face so the doorway reveals stay)" }
     ]
   },
-  "world": { "color": "#a9b8c6", "strength": 0.35, "$comment": "overcast canal-side daylight; reaches the room only through the window and door portals" },
+  "world": { "color": "#9fb3c8", "strength": 0.6, "$comment": "overcast canal-side daylight; reaches the room only through the window and door portals" },
   "lights": [
-    { "name": "pendant_back", "type": "point", "position": [0, 2.8, -1.6], "radius": 0.05, "kelvin": 2700, "power": 12 },
-    { "name": "pendant_front", "type": "point", "position": [0, 2.8, 1.4], "radius": 0.05, "kelvin": 2700, "power": 12 },
-    { "name": "counter_lamp", "type": "spot", "position": [1.02, 1.27, -2.38], "target": [0.35, 0.94, -2.15], "radius": 0.03, "kelvin": 3000, "power": 22, "spotSize": 110, "spotBlend": 0.6 },
+    { "name": "pendant_back", "type": "point", "position": [0, 2.8, -1.6], "radius": 0.05, "kelvin": 2400, "power": 16 },
+    { "name": "pendant_front", "type": "point", "position": [0, 2.8, 1.4], "radius": 0.05, "kelvin": 2400, "power": 14 },
+    { "name": "counter_lamp", "type": "spot", "position": [1.02, 1.27, -2.38], "target": [0.35, 0.94, -2.15], "radius": 0.03, "kelvin": 2700, "power": 26, "spotSize": 110, "spotBlend": 0.6 },
     { "name": "window_portal", "type": "portal", "position": [-1, 2.05, 3.98], "size": [3.0, 2.4] },
     { "name": "door_portal", "type": "portal", "position": [1.7, 1.475, 3.98], "size": [0.9, 1.15] },
-    { "name": "back_room_bulb", "type": "point", "position": [4.4, 2.68, -2.8], "radius": 0.04, "kelvin": 3300, "power": 30 },
+    { "name": "back_room_bulb", "type": "point", "position": [4.4, 2.68, -2.8], "radius": 0.04, "kelvin": 2900, "power": 14 },
     { "name": "counter_case_0", "type": "point", "position": [-0.8, 0.86, -2.2], "radius": 0.02, "kelvin": 3600, "power": 1.2 },
     { "name": "counter_case_1", "type": "point", "position": [0.8, 0.86, -2.2], "radius": 0.02, "kelvin": 3600, "power": 1.2 },
     { "name": "wing_case_light", "type": "point", "position": [-2.7, 0.86, -3.05], "radius": 0.02, "kelvin": 3600, "power": 0.8 },
-    { "name": "island_case_light", "type": "point", "position": [-1.15, 1.12, 0.75], "radius": 0.02, "kelvin": 3600, "power": 1.0 }
+    { "name": "island_case_light", "type": "point", "position": [-1.15, 1.12, 0.75], "radius": 0.02, "kelvin": 3600, "power": 1.0 },
+    { "name": "case_a_light", "type": "point", "position": [-2.76, 1.94, 0.2], "radius": 0.02, "kelvin": 2900, "power": 2.5 },
+    { "name": "case_b_light", "type": "point", "position": [-2.76, 1.94, 2.0], "radius": 0.02, "kelvin": 2900, "power": 2.5 }
   ],
   "cameras": [
     { "name": "preview", "position": [0, 1.62, -3.2], "target": [0, 0.62, -0.9], "verticalFov": 62, "width": 720, "height": 1280 },

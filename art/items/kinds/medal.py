@@ -8,7 +8,8 @@ Placeholder convention (src/render/items.ts): pentagonal ribbon block on top
 centred at y = −0.02, face +Z, about 3 mm thick; eyelet at the top of the disc
 (y ≈ −0.0005), pin across the back of the block at y ≈ 0.022.
 
-`model.emblem` picks the design (courage | merit | victory) and `model.ribbon`
+`model.emblem` picks the design (courage | merit | victory; M6 wave B: labour | prague |
+konigsberg | forty) and `model.ribbon`
 lists the stripe colours left to right. Disc designs are drawn on the placeholder's
 256 px canvas (centre 128, radius 128 = the disc radius); see _award.Face.
 """
@@ -255,6 +256,87 @@ def victory_back(f: aw.Face) -> None:
     f.arc("В ВЕЛИКОЙ ОТЕЧЕСТВЕННОЙ ВОЙНЕ 1941—1945 гг.", f.S(104), f.S(11), start=-math.pi / 2, inward=True, spacing=0.66)
 
 
+# ---------------------------------------------------------------------------
+# M6 wave B designs
+
+
+def labour(f: aw.Face, enamel) -> None:
+    """For Labour Valour: a star with rays over ЗА ТРУДОВУЮ ДОБЛЕСТЬ, СССР in red enamel."""
+    cx, cy = f.C(128, 62)
+    for i in range(16):
+        a = math.pi / 2 + 2 * math.pi * i / 16
+        r0, r1 = f.S(20), f.S(36 if i % 2 == 0 else 30)
+        w = f.S(2.6)
+        f.poly([(cx + math.cos(a) * r0 - math.sin(a) * w, cy + math.sin(a) * r0 + math.cos(a) * w), (cx + math.cos(a) * r1, cy + math.sin(a) * r1), (cx + math.cos(a) * r0 + math.sin(a) * w, cy + math.sin(a) * r0 - math.cos(a) * w)], h=RELIEF * 0.6, bevel=0)
+    f.poly(lib.star_points(5, f.S(19), f.S(7.6), (cx, cy)), h=RELIEF * 1.3, bevel=0.00005)
+    for txt, y, s in (("ЗА", 110, 20), ("ТРУДОВУЮ", 138, 19), ("ДОБЛЕСТЬ", 166, 19)):
+        f.text(txt, f.S(s), *f.C(128, y), h=RELIEF * 1.1, bold=1.2, spacing=1.04)
+    f.text("СССР", f.S(22), *f.C(128, 206), h=RELIEF * 1.3, mat=enamel, bold=1.3)
+
+
+def rising_sun(f: aw.Face, cx: float, cy: float, r: float, n: int = 13) -> None:
+    for i in range(n):
+        a = math.pi * (i + 0.5) / n
+        f.line([(cx + math.cos(a) * r * 1.15, cy + math.sin(a) * r * 1.15), (cx + math.cos(a) * r * 1.75, cy + math.sin(a) * r * 1.75)], f.S(2.4), h=RELIEF * 0.55)
+    f.line([(cx + math.cos(math.pi * i / 16) * r, cy + math.sin(math.pi * i / 16) * r) for i in range(17)], f.S(3), h=RELIEF * 0.8)
+
+
+def campaign_face(f: aw.Face, legend: str) -> None:
+    """The campaign-medal face: a star over a rising sun, the legend round the rim, a laurel sprig below."""
+    cx, cy = f.C(128, 150)
+    rising_sun(f, cx, cy, f.S(34))
+    f.poly(lib.star_points(5, f.S(30), f.S(12), f.C(128, 104)), h=RELIEF * 1.3, bevel=0.00006)
+    f.line([f.C(70, 150), f.C(186, 150)], f.S(2.2), h=RELIEF * 0.7)
+    for s in (-1, 1):
+        stem = [f.C(128 + s * (8 + 9 * k), 206 - 6 * k + 0.6 * k * k) for k in range(6)]
+        f.line(stem, f.S(2), h=RELIEF * 0.7)
+        for k in range(1, 6):
+            x, y = stem[k]
+            a = math.atan2(stem[k][1] - stem[k - 1][1], stem[k][0] - stem[k - 1][0]) + 0.7
+            f.poly(aw.ellipse(x + math.cos(a) * f.S(4.5), y + math.sin(a) * f.S(4.5), f.S(5), f.S(2.2), 10, rot=a), h=RELIEF * 0.9)
+    f.arc(legend, f.S(102), f.S(17), start=math.pi / 2, spacing=0.66)
+
+
+def campaign_back(f: aw.Face, day: str, month: str, year: str = "1945") -> None:
+    f.poly(lib.star_points(5, f.S(16), f.S(6.4), f.C(128, 58)), h=RELIEF * 1.1)
+    f.text(day, f.S(56), *f.C(128, 110), h=RELIEF * 1.1, bold=1.3)
+    f.text(month, f.S(30), *f.C(128, 158), h=RELIEF * 1.0, bold=1.3, spacing=1.06)
+    f.text(year, f.S(30), *f.C(128, 196), h=RELIEF * 1.0, bold=1.3)
+
+
+def forty(f: aw.Face) -> None:
+    """Forty Years of Victory: a soldier before the eternal flame, the dates below."""
+    # the flame: three tongues rising from a five-pointed star base
+    f.poly(lib.star_points(5, f.S(22), f.S(9), f.C(150, 166)), h=RELIEF * 0.9)
+    for dx, hgt, w in ((-8, 52, 7), (0, 70, 9), (8, 48, 7)):
+        bx, by = f.C(150 + dx, 156)
+        tx, ty = f.C(150 + dx * 0.4, 156 - hgt)
+        f.poly([(bx - f.S(w), by), (bx + f.S(w), by), (tx, ty)], h=RELIEF * 1.0)
+    # the soldier in a rain cape, helmeted, a rifle slung, standing to the left
+    f.poly(aw.ellipse(*f.C(92, 64), f.S(9), f.S(10), 16), h=RELIEF * 1.35)  # head
+    f.poly([f.C(80, 60), f.C(84, 50), f.C(92, 46), f.C(100, 50), f.C(104, 60), f.C(106, 63), f.C(78, 63)], h=RELIEF * 1.5)  # helmet
+    f.poly([f.C(86, 74), f.C(98, 74), f.C(100, 80), f.C(84, 80)], h=RELIEF * 1.3)  # neck
+    f.poly([f.C(72, 82), f.C(112, 82), f.C(118, 96), f.C(114, 150), f.C(70, 150), f.C(66, 96)], h=RELIEF * 1.25)  # cape over the shoulders
+    for x0, x1 in ((76, 74), (98, 102)):
+        f.line([f.C(x0 + 6, 148), f.C(x1 + 4, 200)], f.S(11), h=RELIEF * 1.2)  # legs
+    f.line([f.C(110, 86), f.C(116, 74), f.C(122, 40)], f.S(3.2), h=RELIEF * 1.4)  # rifle barrel over the shoulder
+    for y in (100, 124):
+        f.line([f.C(72, y), f.C(112, y + 2)], f.S(1.6), h=RELIEF * 1.32)  # cape folds
+    f.text("1945–1985", f.S(19), *f.C(128, 224), h=RELIEF * 1.0, bold=1.3)
+
+
+def forty_back(f: aw.Face) -> None:
+    f.poly(lib.star_points(5, f.S(12), f.S(4.8), f.C(128, 58)), h=RELIEF * 1.1)
+    f.text("40", f.S(56), *f.C(128, 106), h=RELIEF * 1.1, bold=1.4)
+    f.text("ЛЕТ ПОБЕДЫ", f.S(22), *f.C(128, 152), h=RELIEF * 1.0, bold=1.3)
+    for s in (-1, 1):
+        for i in range(9):
+            a = -math.pi / 2 + s * (0.5 + i * 0.22)
+            r = f.S(88)
+            x, y = f.C(128 + math.cos(a) * 88, 128 - math.sin(a) * 88)
+            f.poly(aw.ellipse(x, y, f.S(4), f.S(8.5), 10, rot=-a), h=RELIEF * 0.9)
+
+
 def serial(it: lib.Item) -> str:
     r = aw.rng(it, "serial")
     return f"№{r.randint(120000, 3900000)}"
@@ -264,7 +346,7 @@ def build(it: lib.Item) -> None:
     it.ao_size = 1024
     emblem = it.model.get("emblem", "courage")
     color = it.color
-    brass = emblem == "victory"
+    brass = emblem in ("victory", "prague", "konigsberg", "forty")
     field = lib.material(it, "field", lib.shade(color, 0.92), metal=1.0, rough=0.42 if not brass else 0.38)
     relief = lib.material(it, "relief", lib.shade(color, 1.04), metal=1.0, rough=0.3)
     steel = lib.material(it, "steel", "#8d8c88", metal=1.0, rough=0.45)
@@ -287,6 +369,17 @@ def build(it: lib.Item) -> None:
     elif emblem == "victory":
         victory_face(obv)
         victory_back(rev)
-    if emblem in ("courage", "merit"):
+    elif emblem == "labour":
+        labour(obv, lib.material(it, "enamel", "#a3161c", metal=0.0, rough=0.2))
+    elif emblem == "prague":
+        campaign_face(obv, "ЗА ОСВОБОЖДЕНИЕ ПРАГИ")
+        campaign_back(rev, "9", "МАЯ")
+    elif emblem == "konigsberg":
+        campaign_face(obv, "ЗА ВЗЯТИЕ КЁНИГСБЕРГА")
+        campaign_back(rev, "10", "АПРЕЛЯ")
+    elif emblem == "forty":
+        forty(obv)
+        forty_back(rev)
+    if emblem in ("courage", "merit", "labour"):
         # the award number, hand-punched digit by digit into the plain back
         aw.stamp(d, it, serial(it), size=0.0026, x=0, y=CY - 0.0006, z=-FIELD, facing=-1, depth=0.00013, uneven=1.0, spacing=0.62)

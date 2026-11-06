@@ -80,5 +80,270 @@
         { "id": "logo", "label": "Lid logo", "position": [0, 0.0216, -0.1185] }
       ]
     }
+  },
+  {
+    "id": "tablet_mangosteen_pad2",
+    "category": "electronics",
+    "name": "Mangosteen Pad 2 tablet, 16 GB",
+    "brand": "Mangosteen",
+    "era": "2011",
+    "baseValue": {"min": 7000, "max": 10000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 605, "tolerance": 20},
+    "magnetic": true,
+    "rarity": 1.2,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "back", "tool": "loupe", "finding": "The aluminium back is engraved: fruit logo, '16 GB', and a serial that matches the one in Settings.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "screen", "tool": "loupe", "finding": "The glass sits flush in its black bezel; no lifting at the corners.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "screen"},
+        {"id": "port", "tool": "loupe", "finding": "The wide dock connector at the bottom is clean, the speaker grille beside it free of fluff.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "port"},
+        {"id": "buttons", "tool": "loupe", "finding": "Volume rocker and side switch click crisply; the aluminium round them is unchipped.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "buttons"},
+        {"id": "heft", "tool": "scale", "finding": "About right: a big battery behind the glass.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_cover", "tool": "magnet", "finding": "The magnet snaps to the left edge, where the cover's magnets sit, and the screen wakes.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "buttons"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 2,
+          "weightFactor": 0.75,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The back is painted plastic, the logo printed, and there is no serial anywhere on it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "back"},
+            {"id": "port", "tool": "loupe", "finding": "A small round charging socket and a mini-USB port where the dock connector should be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "port"},
+            {"id": "heft", "tool": "scale", "finding": "Light, a thin tray of plastic.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "cheap_glass",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "screen", "tool": "loupe", "finding": "The front glass is lifting at one corner, a line of glue squeezed out under it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen"}
+          ]
+        },
+        {
+          "id": "swapped_back",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.65,
+          "weight": 1,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The back is engraved 64 GB, but the box and the settings both say 16.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "back"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics"],
+    "claims": [
+      "The children used it for cartoons. It's been wiped. With a cloth, and with the reset.",
+      "Mangosteen Pad. From the proper shop on Kanatnaya Street, not the market.",
+      "I got a new one for my birthday, so this one is surplus."
+    ],
+    "model": {
+      "glb": "tablet_mangosteen_pad2.glb",
+      "placeholder": "box",
+      "color": "#b9bcc0",
+      "scale": 1,
+      "size": [0.186, 0.242, 0.0088],
+      "inspectDistance": 0.5,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0, 0.01, 0.0044]},
+        {"id": "back", "label": "Back", "position": [0, 0.01, -0.0044]},
+        {"id": "port", "label": "Dock connector", "position": [0, -0.121, 0]},
+        {"id": "buttons", "label": "Side buttons", "position": [0.093, 0.075, 0]}
+      ]
+    }
+  },
+  {
+    "id": "player_mangosteen_tune",
+    "category": "electronics",
+    "name": "Mangosteen Tune Classic, 160 GB",
+    "brand": "Mangosteen",
+    "era": "2009",
+    "baseValue": {"min": 3000, "max": 5000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 140, "tolerance": 6},
+    "magnetic": true,
+    "rarity": 0.3,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "wheel", "tool": "loupe", "finding": "The click wheel spins smooth and silent; the centre button clicks with a soft, even press.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "wheel"},
+        {"id": "back", "tool": "loupe", "finding": "Mirror steel back, scratched to a haze, engraved with the logo, '160 GB' and a serial.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "screen", "tool": "loupe", "finding": "The little screen is bright and sharp; the anodised front has a few dents at the corners.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "screen"},
+        {"id": "port", "tool": "loupe", "finding": "The dock connector and the headphone socket are clean and tight.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "port"},
+        {"id": "heft", "tool": "scale", "finding": "Solid, with a hard disk's weight inside.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_disk", "tool": "magnet", "finding": "The magnet pulls at the middle, where the hard disk sits.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "back"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.05,
+          "weight": 2,
+          "weightFactor": 0.55,
+          "magnetic": false,
+          "tells": [
+            {"id": "wheel", "tool": "loupe", "finding": "The wheel is a ring of printed buttons that don't spin at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3, "hotspot": "wheel"},
+            {"id": "back", "tool": "loupe", "finding": "The back is chromed plastic, and it says 160 GB in a font that's slightly too round.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "back"},
+            {"id": "heft", "tool": "scale", "finding": "Far too light for something with a disk in it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25}
+          ]
+        },
+        {
+          "id": "smaller_disk",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.65,
+          "weight": 1,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The back says 160 GB; the case screws are scratched and the menu says 80 GB.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "back"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics"],
+    "claims": [
+      "Forty thousand songs on it. Mostly my brother's. Mostly Mostograd punk.",
+      "It's the Classic, the one with the wheel. They don't make it any more, it'll be worth money.",
+      "Battery lasts a whole night shift. That's how I know."
+    ],
+    "model": {
+      "glb": "player_mangosteen_tune.glb",
+      "placeholder": "box",
+      "color": "#2a2a2c",
+      "scale": 1,
+      "size": [0.062, 0.104, 0.0135],
+      "inspectDistance": 0.26,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0, 0.026, 0.00675]},
+        {"id": "wheel", "label": "Click wheel", "position": [0, -0.024, 0.00675]},
+        {"id": "back", "label": "Back", "position": [0, 0.0, -0.00675]},
+        {"id": "port", "label": "Bottom edge", "position": [0, -0.052, 0]}
+      ]
+    }
+  },
+  {
+    "id": "carstereo_severin_cdx",
+    "category": "electronics",
+    "name": "Severin CDX-410 car stereo, detachable panel",
+    "brand": "Severin",
+    "era": "2008",
+    "baseValue": {"min": 1200, "max": 2200},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 1250, "tolerance": 45},
+    "magnetic": true,
+    "rarity": 0.2,
+    "fakeChance": 0.2,
+    "tells": [
+        {"id": "panel", "tool": "loupe", "finding": "The detachable panel clicks off and back on firmly; its pins and the chassis contacts are clean.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "panel"},
+        {"id": "harness", "tool": "loupe", "finding": "At the back, the plastic ISO block is clipped in whole, the wires ending in it neatly.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "sticker", "tool": "loupe", "finding": "The sticker on top carries the model and a serial that matches the one on the panel.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "top"},
+        {"id": "disc", "tool": "loupe", "finding": "The disc slot takes a CD and gives it back without a grind.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "panel"},
+        {"id": "heft", "tool": "scale", "finding": "Solid steel box, about what these weigh.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The steel chassis grabs the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "top"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "wrong_panel",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 2,
+          "tells": [
+            {"id": "sticker", "tool": "loupe", "finding": "The model number on the chassis sticker isn't the one printed on the panel.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "top"},
+            {"id": "panel", "tool": "loupe", "finding": "The panel rocks on its catch; half its pins don't meet anything.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "panel"}
+          ]
+        },
+        {
+          "id": "knockoff",
+          "kind": "fake",
+          "valueMultiplier": 0.15,
+          "weight": 1,
+          "weightFactor": 0.7,
+          "tells": [
+            {"id": "panel", "tool": "loupe", "finding": "SEVRIN in silver paint, already rubbing off at the corners.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "panel"},
+            {"id": "heft", "tool": "scale", "finding": "Light: a thin tin box.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        }
+    ],
+    "demandTags": ["electronics"],
+    "claims": [
+      "Out of my car. I'm selling the car, it doesn't need music.",
+      "Severin, with the panel that comes off. So nobody nicks it, you see.",
+      "It plays CDs and the radio. And the radio plays the same eight songs."
+    ],
+    "model": {
+      "glb": "carstereo_severin_cdx.glb",
+      "placeholder": "box",
+      "rest": "upright",
+      "color": "#2b2c2e",
+      "scale": 1,
+      "size": [0.182, 0.053, 0.16],
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {"id": "panel", "label": "Front panel", "position": [0.02, 0.006, 0.08]},
+        {"id": "top", "label": "Top sticker", "position": [0.03, 0.0265, -0.03]},
+        {"id": "back", "label": "Back", "position": [0, 0, -0.08]}
+      ]
+    }
+  },
+  {
+    "id": "dashcam_severin_dozor",
+    "category": "electronics",
+    "name": "Severin Dozor HD dashcam",
+    "brand": "Severin",
+    "era": "2013",
+    "baseValue": {"min": 1000, "max": 1800},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 86, "tolerance": 3},
+    "magnetic": true,
+    "rarity": 0.2,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "lens", "tool": "loupe", "finding": "The lens is glass, wide and clean, ringed with 'Severin DOZOR HD 1080'.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "lens"},
+        {"id": "screen", "tool": "loupe", "finding": "The little screen at the back shows today's date when it powers on, ticking over properly.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "screen"},
+        {"id": "slot", "tool": "loupe", "finding": "The memory card slot springs the card out cleanly.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "slot"},
+        {"id": "mount", "tool": "loupe", "finding": "The windscreen mount clicks into its rail on top, the rubber sucker still soft.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.4, "hotspot": "mount"},
+        {"id": "heft", "tool": "scale", "finding": "Light, but dense for its size.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_cam", "tool": "magnet", "finding": "The magnet catches faintly at the speaker grille.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "screen"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.1,
+          "weight": 2,
+          "weightFactor": 0.75,
+          "tells": [
+            {"id": "lens", "tool": "loupe", "finding": "The lens is plastic, and the ring round it says 'FULL HD 1080P' four times in different fonts.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "lens"},
+            {"id": "heft", "tool": "scale", "finding": "Light, mostly air.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "swollen_battery",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "screen", "tool": "loupe", "finding": "The screen bulges at one corner: the battery behind it has swollen, and someone swapped in another.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "screen"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics"],
+    "claims": [
+      "Every car has one. You need proof. Otherwise the other man says it was you.",
+      "It recorded a meteorite once. No it didn't. But it could.",
+      "Comes with the card. I deleted everything on it. Everything."
+    ],
+    "model": {
+      "glb": "dashcam_severin_dozor.glb",
+      "placeholder": "box",
+      "color": "#1c1c1d",
+      "scale": 1,
+      "size": [0.066, 0.048, 0.034],
+      "inspectDistance": 0.24,
+      "hotspots": [
+        {"id": "lens", "label": "Lens", "position": [0.012, 0.004, 0.017]},
+        {"id": "screen", "label": "Screen", "position": [0, 0, -0.017]},
+        {"id": "slot", "label": "Card slot", "position": [0.033, -0.006, 0]},
+        {"id": "mount", "label": "Mount rail", "position": [0, 0.024, 0]}
+      ]
+    }
   }
 ]

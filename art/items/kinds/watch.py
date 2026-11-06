@@ -106,7 +106,7 @@ def shear_obj(obj, k: float, pivot=(0.0, 0.0)) -> None:
 def case_dims(it: lib.Item) -> tuple[float, float]:
     crown = it.hotspot("crown")
     back = it.hotspot("caseback")
-    R = min(max(crown.x - 0.0016, 0.016), 0.022) if crown else 0.019
+    R = min(max(crown.x - 0.0016, 0.010), 0.022) if crown else 0.019  # 10 mm for a ladies' watch (M6)
     depth = min(max(abs(back.z) * 2 - 0.0006, 0.007), 0.014) if back else 0.009
     return R, depth / 2
 
@@ -1011,6 +1011,308 @@ def brequet(it: lib.Item) -> None:
         strap(f"strap.{sign}", path, 0.03, W - 0.0004, W - 0.0019, 0.0028, leather, stitch_mat=leather, flat=0.0072)
 
 
+# ---------------------------------------------------------------------------
+# M6 wave B watches
+
+
+def _names() -> set:
+    return {o.name for o in lib.mesh_objects()}
+
+
+def _since(before: set) -> list:
+    return [o for o in lib.mesh_objects() if o.name not in before]
+
+
+def pushers(R: float, degs, mat, *, pr: float = 0.0011, reach: float = 0.0028) -> None:
+    """Chronograph pushers at clock angles, along the case radius (as on the Strela)."""
+    for deg in degs:
+        p_end = R + reach
+        objs = [
+            lib.cylinder(f"pusher.stem.{deg}", 0.0007, 0.0024, mat, axis="x", center=(R - 0.0004 + 0.0012, 0, 0), segments=20),
+            lib.lathe(f"pusher.cap.{deg}", [(0, p_end), (pr * 0.85, p_end), (pr, p_end - 0.0002), (pr, p_end - 0.0011), (0.0007, p_end - 0.0013), (0, p_end - 0.0013)], mat, segments=28, axis="x", cap=False),
+        ]
+        lib.transform(objs, lib.rot("z", math.radians(90 - deg)))
+
+
+def amphibia(it: lib.Item) -> None:
+    """1990s Vostok Amphibia: thin steel case, friction bezel, blue dial with a diver, acrylic dome, screw-down crown."""
+    R, h = case_dims(it)
+    steel = lib.material(it, "steel", it.color, metal=1.0, rough=0.3)
+    brushed = lib.material(it, "brushed", lib.shade(it.color, 0.9), metal=1.0, rough=0.45)
+    blue = lib.material(it, "dial", "#1d3a6e", rough=0.5)
+    white = lib.material(it, "print", "#ece6d2", rough=0.45)
+    lume = lib.material(it, "lume", "#d9cfa8", rough=0.5)
+    red = lib.material(it, "red", "#b8261c", rough=0.4)
+    glass = glass_mat(it)
+    rubber = lib.material(it, "strap", "#1b1c1e", rough=0.75)
+
+    zd = h - 0.0024
+    diver_case(R, h, zd, brushed, blue)
+    # friction bezel: a plain steel ring with a 60-minute scale
+    n = 90
+    inner = circle(0.77 * R, 2 * n)
+    outer = [((R * (1.002 if i % 2 == 0 else 0.99)) * math.cos(math.pi * i / n), (R * (1.002 if i % 2 == 0 else 0.99)) * math.sin(math.pi * i / n)) for i in range(2 * n)]
+    annulus("bezel", inner, outer, h - 0.0019, h + 0.0004, steel)
+    zi = h + 0.0004
+    for k in range(1, 6):
+        x, y = clock(0.88 * R, k * 60)
+        lib.text(f"bezel.{k}", str(k * 10), 0.0018, PRINT * 3, brushed, pos=(x, y, zi), rot_z=-math.radians(k * 60), bold=1.2)
+    prisms("bezel.ticks", [radial_bar(0.83 * R, 0.93 * R, 0.0005, dg) for dg in range(30, 360, 60)], zi, PRINT * 3, brushed)
+    lib.polygon("bezel.tri", [clock(0.82 * R, 0), clock(0.94 * R, 6), clock(0.94 * R, -6)], PRINT * 3, red, z=zi, base=False)
+    rd = 0.74 * R
+    d = Dial(zd, rd)
+    d.disc(blue)
+    d.ticks(60, rd * 0.9, rd * 0.97, 0.00012, white, skip=lambda i: i % 5 == 0)
+    d.plots([clock(rd * 0.82, i * 30) for i in range(12) if i % 3], 0.0008, lume, h=0.00012)
+    for deg in (0, 90, 180, 270):
+        d.poly(radial_bar(rd * 0.7, rd * 0.92, 0.0015, deg), lume, h=0.00012)
+    # the diver: helmet and body, a simple silhouette
+    dv = (0, rd * 0.42)
+    d.poly(circle(0.0011, 20, dv), white)
+    d.poly([(dv[0] - 0.0006, dv[1] - 0.0009), (dv[0] + 0.0006, dv[1] - 0.0009), (dv[0] + 0.0004, dv[1] - 0.0032), (dv[0] - 0.0004, dv[1] - 0.0032)], white)
+    d.text("ВОСТОК", 0.0012, 0, -rd * 0.22, white, bold=1.1)
+    d.text("АМФИБИЯ", 0.00085, 0, -rd * 0.36, white, bold=0.8, spacing=1.1)
+    d.text("200 м", 0.0007, 0, -rd * 0.5, white, bold=0.5)
+    hz = zd + 0.00025
+    hand("hand.hour", sword(rd * 0.55, 0.0016, 0.001), 304.5, hz, white)
+    hand("hand.min", sword(rd * 0.86, 0.0013, 0.0012), 54, hz + 0.00016, white)
+    hand("hand.sec", baton(rd * 0.92, 0.0002, 0.0001, 0.003), 198, hz + 0.00032, red, t=0.00007)
+    pivot(zd, hz + 0.00044, 0.0006, red)
+    dome_crystal(0.77 * R, h - 0.0001, h + 0.0012, glass)
+    fr = caseback(R, h, steel, field=0.66, screw_notches=8)
+    b = Back(-h, steel)
+    # a diver in a helmet, raised and worn flat on top
+    b.poly(circle(0.0026, 28, (0, 0.0014)), h=0.00014, bevel=0.00004)
+    b.poly(circle(0.0014, 20, (0, 0.0014)), h=0.00019)
+    b.poly([(-0.0024, -0.0012), (0.0024, -0.0012), (0.0018, -0.0034), (-0.0018, -0.0034)], h=0.00013)
+    b.arc("АМФИБИЯ  200 м", fr * 0.84, 0.0015, start=math.pi / 2, spacing=0.68)
+    b.arc("НЕРЖ. СТАЛЬ", fr * 0.84, 0.0015, start=-math.pi / 2, inward=True, spacing=0.68)
+    x_end = it.hotspot("crown").x + 0.0006
+    crown(R, x_end, 0.0026, steel, teeth=24, tooth=0.00018, soft=0.00005)
+    W = 0.018
+    lug_set(R, h, W, 0.0022, 0.0056, brushed, top0=h - 0.0024, top1=0.0012, bot0=-h + 0.0027, bot1=-0.0018, bevel=0.00015)
+    leather_straps(R, W, rubber, rubber, zc=0.0002, t=0.0034)
+
+
+def signal(it: lib.Item) -> None:
+    """1980s Poljot Signal alarm: chromed case, a second crown at 2 for the alarm, a turning centre disc, sound-hole caseback."""
+    R, h = case_dims(it)
+    chrome = lib.material(it, "chrome", it.color, metal=1.0, rough=0.26)
+    dial_m = lib.material(it, "dial", "#c9ccd0", metal=0.4, rough=0.4)
+    disc_m = lib.material(it, "disc", "#9fa6ad", metal=0.4, rough=0.42)
+    ink = lib.material(it, "ink", "#141518", rough=0.45)
+    red = lib.material(it, "red", "#b82a1f", rough=0.4)
+    dark = lib.material(it, "dark", "#0e0f10", rough=0.6)
+    glass = glass_mat(it)
+    leather = lib.material(it, "leather", "#3a2416", rough=0.7)
+
+    zd = h - 0.0018
+    vintage_case(R, h, zd, chrome, bezel_w=0.06)
+    rd = 0.86 * R
+    d = Dial(zd, rd)
+    d.disc(dial_m)
+    d.ticks(60, rd * 0.92, rd * 0.98, 0.00012, ink, skip=lambda i: i % 5 == 0)
+    for i in range(12):
+        d.poly(radial_bar(rd * 0.76, rd * 0.94, 0.0006, i * 30), ink, h=APPLIED, z=zd + 0.00005)
+    # the alarm-setting disc in the middle, with its triangle
+    d.poly(circle(rd * 0.42, 48), disc_m, h=0.00004)
+    d.ring(rd * 0.42, 0.0001, ink)
+    d.poly([clock(rd * 0.4, 130), clock(rd * 0.3, 124), clock(rd * 0.3, 136)], red, h=0.00008)
+    d.text("ПОЛЁТ", 0.0015, 0, rd * 0.58, ink, bold=1.3)
+    d.text("СИГНАЛ", 0.0009, 0, -rd * 0.55, ink, bold=0.8, spacing=1.12)
+    d.text("18 КАМНЕЙ", 0.0006, 0, -rd * 0.66, ink, bold=0.3)
+    hz = zd + 0.00025
+    hand("hand.hour", baton(rd * 0.52, 0.0012, 0.0008, 0.001), 304.5, hz, ink)
+    hand("hand.min", baton(rd * 0.84, 0.0009, 0.0006, 0.0012), 54, hz + 0.00015, ink)
+    hand("hand.sec", baton(rd * 0.9, 0.0002, 0.0001, 0.0028), 198, hz + 0.0003, red, t=0.00007)
+    pivot(zd, hz + 0.0004, 0.0006, chrome)
+    dome_crystal(0.88 * R, h - 0.0002, h + 0.0011, glass)
+    fr = caseback(R, h, chrome, field=0.64)
+    b = Back(-h, chrome)
+    b.text("№ 418362", 0.0019, 0, 0.0006, h=0.0001, font="DejaVuSansMono.woff2", bold=0.3)
+    b.text("ХРОМИР.", 0.0014, 0, -0.0026, h=0.00009, bold=0.3)
+    # the ring of sound holes for the alarm hammer, just outside the engraving field
+    prisms("back.holes", [circle(0.00055, 12, clock(fr * 1.1, 360 * k / 18)) for k in range(18)], -h + 0.00027, 0.00004, dark, facing=-1)
+    x_end = it.hotspot("crown").x + 0.0006
+    crown(R, x_end, 0.0021, chrome, teeth=22, tooth=0.00012, soft=0.00008)
+    # the alarm crown at 2: a second knurled crown, turned up the case
+    ac = it.hotspot("alarm_crown")
+    a_end = (math.hypot(ac.x, ac.y) if ac else R + 0.0019) + 0.0006
+    before = _names()
+    crown(R, a_end, 0.0019, chrome, teeth=20, tooth=0.00012, soft=0.00008)
+    lib.transform(_since(before), lib.rot("z", math.atan2(ac.y, ac.x) if ac else math.radians(30)))
+    W = 0.018
+    lug_set(R, h, W, 0.0022, 0.0055, chrome, top0=h - 0.0021, top1=0.0011, bot0=-h + 0.0027, bot1=-0.0017, bevel=0.0003)
+    leather_straps(R, W, leather, dial_m, zc=0.0002, t=0.0033)
+
+
+def mostochas(it: lib.Item) -> None:
+    """1970s Mostochas ladies' watch: a tiny 583 gold case, champagne dial, gold batons, thin strap."""
+    R, h = case_dims(it)
+    gold = lib.material(it, "gold", it.color, metal=1.0, rough=0.22)
+    dial_m = lib.material(it, "dial", "#e3cf9e", metal=0.5, rough=0.36)
+    ink = lib.material(it, "ink", "#3a2c18", rough=0.4)
+    glass = glass_mat(it)
+    leather = lib.material(it, "leather", "#2a1a14", rough=0.6)
+
+    zd = h - 0.0012
+    vintage_case(R, h, zd, gold, bezel_w=0.07)
+    rd = 0.84 * R
+    d = Dial(zd, rd)
+    d.disc(dial_m)
+    for i in range(12):
+        w = 0.0005 if i % 3 == 0 else 0.0003
+        d.poly(radial_bar(rd * 0.72, rd * 0.93, w, i * 30), gold, h=APPLIED * 0.7, z=zd + 0.00004)
+    d.text("МОСТОЧАС", 0.00075, 0, rd * 0.4, ink, bold=0.7, spacing=1.08)
+    d.text("17 КАМНЕЙ", 0.00042, 0, -rd * 0.42, ink, bold=0.2)
+    hz = zd + 0.0002
+    hand("hand.hour", leaf(rd * 0.5, 0.0009, 0.0006), 304.5, hz, gold)
+    hand("hand.min", leaf(rd * 0.82, 0.0007, 0.0007), 54, hz + 0.00012, gold)
+    pivot(zd, hz + 0.00026, 0.00035, gold)
+    dome_crystal(0.86 * R, h - 0.0002, h + 0.0007, glass)
+    caseback(R, h, gold, field=0.62)
+    b = Back(-h, gold)
+    b.poly(lib.star_points(5, 0.0016, 0.0007, (-0.0026, 0.0009)), h=0.0001)
+    b.text("583", 0.0026, 0.001, 0.0009, h=0.00011, bold=0.8)
+    b.text("№ 51907", 0.0011, 0, -0.0022, h=0.00007, font="DejaVuSansMono.woff2", bold=0.3)
+    crown(R, it.hotspot("crown").x + 0.0006, 0.0013, gold, teeth=16, tooth=0.0001, tube_r=0.0007, soft=0.00008)
+    W = 0.0095
+    lug_set(R, h, W, 0.0015, 0.0038, gold, top0=h - 0.0013, top1=0.0008, bot0=-h + 0.0018, bot1=-0.0012, bevel=0.0003)
+    leather_straps(R, W, leather, leather, zc=0.0001, t=0.0024, length=0.022, flat=0.006, k=48.0, taper=0.001)
+
+
+def dateline(it: lib.Item) -> None:
+    """2000s Rolland Dateline: steel case, fluted gold bezel, champagne dial with applied gold batons, date with cyclops, two-tone bracelet."""
+    R, h = case_dims(it)
+    steel = lib.material(it, "steel", it.color, metal=1.0, rough=0.16)
+    brushed = lib.material(it, "brushed", lib.shade(it.color, 0.93), metal=1.0, rough=0.4)
+    gold = lib.material(it, "gold", "#d9b45c", metal=1.0, rough=0.16)
+    dial_m = lib.material(it, "dial", "#d8c18c", metal=0.55, rough=0.3)
+    ink = lib.material(it, "ink", "#1c1a16", rough=0.4)
+    white = lib.material(it, "white", "#f2efe6", rough=0.4)
+    glass = glass_mat(it)
+
+    zd = h - 0.002
+    diver_case(R, h, zd, steel, dial_m)
+    # fluted bezel: deep, even flutes all round
+    n = 60
+    inner = circle(0.77 * R, 4 * n)
+    outer = []
+    for i in range(4 * n):
+        a = 2 * math.pi * i / (4 * n)
+        rr = R * (0.965 + 0.035 * abs(math.cos(a * n / 2)))
+        outer.append((rr * math.cos(a), rr * math.sin(a)))
+    annulus("bezel", inner, outer, h - 0.0019, h - 0.0003, gold, smooth_angle=70)
+    lib.lathe("bezel.top", [(0.77 * R, h - 0.0003), (0.96 * R, h - 0.0003), (0.9 * R, h + 0.0001), (0.78 * R, h + 0.0001), (0.77 * R, h - 0.0003)], gold, segments=96, axis="z", cap=False)
+    rd = 0.745 * R
+    d = Dial(zd, rd)
+    d.disc(dial_m)
+    d.ticks(60, rd * 0.93, rd * 0.99, 0.0001, ink, skip=lambda i: i % 5 == 0)
+    for i in range(12):
+        if i == 3:
+            continue
+        if i == 0:
+            for sgn in (-1, 1):
+                d.poly(rect(0.0007, 0.0024, sgn * 0.0006, rd * 0.8), gold, h=APPLIED, z=zd + 0.0001)
+        else:
+            d.poly(radial_bar(rd * 0.68, rd * 0.9, 0.0009, i * 30), gold, h=APPLIED, z=zd + 0.0001)
+    # the crown logo: five points on a band
+    cy = rd * 0.55
+    d.poly(rect(0.0026, 0.0005, 0, cy - 0.0005), gold, h=APPLIED * 0.6, z=zd + 0.00005)
+    for k in range(5):
+        x = -0.0012 + 0.0006 * k
+        d.poly([(x - 0.0002, cy - 0.0002), (x + 0.0002, cy - 0.0002), (x, cy + 0.0007 + 0.0002 * (k == 2))], gold, h=APPLIED * 0.6, z=zd + 0.00005)
+    d.text("ROLLAND", 0.0012, 0, rd * 0.36, ink, bold=1.2, spacing=1.1)
+    d.text("DATELINE", 0.00085, 0, -rd * 0.3, ink, bold=0.9, spacing=1.12)
+    d.text("SUPERLATIVE CHRONOMETER", 0.00048, 0, -rd * 0.42, ink, bold=0.4)
+    dc = (rd * 0.74, 0)
+    d.poly(rect(0.0031, 0.0024, *dc), gold, h=0.00012)
+    d.poly(rect(0.0026, 0.0019, *dc), white, h=0.00016)
+    d.text("24", 0.0015, dc[0], dc[1], ink, h=PRINT, bold=0.6, z=zd + 0.00019)
+    hz = zd + 0.00028
+    hand("hand.hour", baton(rd * 0.55, 0.0011, 0.0009, 0.001), 304.5, hz, gold)
+    hand("hand.min", baton(rd * 0.88, 0.0009, 0.0007, 0.0013), 54, hz + 0.00018, gold)
+    hand("hand.sec", baton(rd * 0.94, 0.0002, 0.00012, 0.0032), 198, hz + 0.00036, gold, t=0.00007)
+    pivot(zd, hz + 0.00048, 0.00065, gold)
+    flat_crystal(0.77 * R, h + 0.0002, glass)
+    cyc = [(dc[0] + 0.0024 * math.copysign(abs(math.cos(a)) ** 0.5, math.cos(a)), 0.002 * math.copysign(abs(math.sin(a)) ** 0.5, math.sin(a))) for a in [2 * math.pi * i / 28 for i in range(28)]]
+    lib.polygon("cyclops", cyc, 0.0007, glass, z=h + 0.00019, bevel=0.0002)
+    caseback(R, h, steel, field=0.7, flutes=48)
+    x_end = it.hotspot("crown").x + 0.0006
+    crown(R, x_end, 0.0026, gold, teeth=28, tooth=0.0002, tube_r=0.0014, soft=0.00004)
+    W = 0.020
+    lug_set(R, h, W, 0.0026, 0.006, steel, top0=h - 0.0024, top1=0.0006, bot0=-h + 0.0027, bot1=-0.0024, bevel=0.0005)
+    flank_text("Z 4 1 8 2 7 3 9", 0.0011, R, 0.0012, 0.00006, brushed)
+    # two-tone: steel outer links, polished gold centre links
+    bracelets(R, W, [(0.28, brushed, 0.0), (0.14, gold, 0.00015), (0.16, steel, 0.0001), (0.14, gold, 0.00015), (0.28, brushed, 0.0)], brushed, zc=-0.0015, pitch=0.0038, round_=0.5)
+
+
+def lunaris(it: lib.Item) -> None:
+    """1990s Omeca Lunaris: black chronograph dial with three sunk subdials, tachymeter bezel, pushers at 2 and 4, domed crystal."""
+    R, h = case_dims(it)
+    steel = lib.material(it, "steel", it.color, metal=1.0, rough=0.2)
+    brushed = lib.material(it, "brushed", lib.shade(it.color, 0.92), metal=1.0, rough=0.42)
+    black = lib.material(it, "black", "#0d0e10", rough=0.35)
+    sub = lib.material(it, "sub", "#1a1b1f", rough=0.4)
+    white = lib.material(it, "print", "#ecebe4", rough=0.4)
+    lume = lib.material(it, "lume", "#e2d6b0", rough=0.5)
+    glass = glass_mat(it)
+
+    zd = h - 0.0022
+    diver_case(R, h, zd, steel, black)
+    annulus("bezel", circle(0.77 * R, 192), circle(R * 0.995, 192), h - 0.0019, h - 0.0001, steel)
+    zi = h - 0.0001
+    lib.lathe("insert", [(0.775 * R, zi - 0.0002), (0.965 * R, zi - 0.0002), (0.965 * R, zi), (0.775 * R, zi), (0.775 * R, zi - 0.0002)], black, segments=96, axis="z", cap=False)
+    for v in (500, 300, 200, 150, 120, 100, 90, 80, 70, 60):
+        deg = 3600 / v * 6
+        x, y = clock(0.87 * R, deg)
+        lib.text(f"tachy.{v}", str(v), 0.0011, PRINT * 2, white, pos=(x, y, zi), rot_z=-math.radians(deg), bold=0.8)
+    prisms("tachy.dot", [circle(0.0003, 10, clock(0.94 * R, 3600 / 90 * 6))], zi, PRINT * 2, white)
+    tx, ty = clock(0.87 * R, 300)
+    lib.text("tachy.word", "TACHYMETRE", 0.0009, PRINT * 2, white, pos=(tx, ty, zi), rot_z=-math.radians(300) + math.pi, bold=0.6)
+    rd = 0.745 * R
+    d = Dial(zd, rd)
+    d.disc(black)
+    d.ticks(60, rd * 0.92, rd * 0.99, 0.0001, white, skip=lambda i: i % 5 == 0)
+    for i in range(12):
+        if i in (3, 6, 9):
+            continue
+        d.poly(radial_bar(rd * 0.7, rd * 0.9, 0.0008, i * 30), steel, h=APPLIED, z=zd + 0.0001)
+        d.poly(radial_bar(rd * 0.72, rd * 0.88, 0.0004, i * 30), lume, h=APPLIED + 0.00003, z=zd + 0.0001)
+    rs = 0.0036
+    for deg, n_ticks, ang in ((270, 60, 200), (90, 30, 0), (180, 12, 0)):
+        c = clock(rd * 0.47, deg)
+        d.poly(circle(rs, 40, c), sub, h=0.00002)
+        d.ring(rs * 0.98, 0.00008, white, c=c, n=48)
+        d.ticks(n_ticks, rs * 0.76, rs * 0.95, 0.00007, white, c=c)
+        hand(f"hand.sub.{deg}", baton(rs * 0.85, 0.00024, 0.0001, 0.0006), ang, zd + 0.00008, white, c=c, t=0.00006)
+        pivot(zd, zd + 0.0002, 0.0003, white, c=c)
+    d.poly(lib.star_points(5, 0.0009, 0.00037, (0, rd * 0.62)), steel, h=APPLIED, z=zd + 0.00005, bevel=0.00004)
+    d.text("OMECA", 0.0011, 0, rd * 0.47, white, bold=1.2, spacing=1.12)
+    d.text("Lunaris", 0.0009, 0, rd * 0.31, white, italic=0.22, bold=0.6)
+    d.text("PROFESSIONAL", 0.00052, 0, rd * 0.21, white, bold=0.6)
+    hz = zd + 0.0003
+    hand("hand.hour", sword(rd * 0.55, 0.0015, 0.001), 304.5, hz, steel)
+    hand("hand.hour.lume", sword(rd * 0.47, 0.0008, -0.001), 304.5, hz + HAND_T, lume, t=0.00004)
+    hand("hand.min", sword(rd * 0.88, 0.0012, 0.0012), 54, hz + 0.00016, steel)
+    hand("hand.min.lume", sword(rd * 0.78, 0.0006, -0.0014), 54, hz + 0.00016 + HAND_T, lume, t=0.00004)
+    hand("hand.chrono", baton(rd * 0.97, 0.00018, 0.0001, 0.0028), 0, hz + 0.00032, white, t=0.00007)
+    pivot(zd, hz + 0.00044, 0.0006, steel)
+    dome_crystal(0.77 * R, h - 0.0001, h + 0.0013, glass)
+    fr = caseback(R, h, steel, field=0.68, screw_notches=6)
+    b = Back(-h, steel)
+    b.poly(circle(0.0034, 32, (0, 0.0012)), h=0.0001, bevel=0.00004)
+    b.poly(lib.star_points(5, 0.0022, 0.0009, (0, 0.0012)), h=0.00016)
+    b.text("FLIGHT QUALIFIED", 0.0011, 0, -0.0033, h=0.00009, bold=0.5)
+    b.arc("OMECA • LUNARIS • PROFESSIONAL", fr * 0.86, 0.0012, start=math.pi / 2, spacing=0.66)
+    x_end = it.hotspot("crown").x + 0.0006
+    crown(R, x_end, 0.0026, steel, teeth=26, tooth=0.00018, soft=0.00005)
+    pushers(R, (60, 120), steel, pr=0.0012, reach=0.003)
+    W = 0.020
+    lug_set(R, h, W, 0.0026, 0.0062, steel, top0=h - 0.0026, top1=0.0006, bot0=-h + 0.0027, bot1=-0.0024, bevel=0.0003)
+    bracelets(R, W, [(0.3, brushed, 0.0), (0.14, steel, 0.00015), (0.12, brushed, 0.0), (0.14, steel, 0.00015), (0.3, brushed, 0.0)], brushed, zc=-0.0015, pitch=0.0048, round_=0.5)
+
+
 BUILDERS = {
     "watch_pobeda_gold": pobeda,
     "watch_vostok_komandirskie": vostok,
@@ -1018,6 +1320,12 @@ BUILDERS = {
     "watch_poljot_strela": poljot,
     "watch_omeca_aquastar": omeca,
     "watch_brequet_classique": brequet,
+    # M6 wave B
+    "watch_vostok_amphibia": amphibia,
+    "watch_poljot_signal": signal,
+    "watch_mostochas_lady_583": mostochas,
+    "watch_rolland_dateline": dateline,
+    "watch_omeca_lunaris": lunaris,
 }
 
 

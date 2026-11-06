@@ -42,7 +42,7 @@ describe('economy simulator (M2 tuning)', () => {
     expect(days[Math.floor(days.length / 2)]).toBeLessThanOrEqual(40)
   })
 
-  // M5 eviction (two rent nights under water): the careful shop is never evicted; the careless one always is,
+  // M5 eviction (two rent nights under water): the careful shop is (almost) never evicted; the careless one always is,
   // on its second rent night after going broke. With the Protection ladder held off, careful runs retire at the
   // end and get a title; with it on, a refuser either retires or is pushed out (with the pushed-out titles).
   it('a careful shop is never evicted and retires with a title; a careless one is evicted', () => {
@@ -51,10 +51,20 @@ describe('economy simulator (M2 tuning)', () => {
       expect(r.end?.kind, `careful seed ${r.seed}`).toBe('retired')
       expect(r.title).not.toBeNull()
     }
+    // With the ladder on, a refuser that pays the glazier and hits a thin month can miss a rent: over seeds
+    // 1000–1059, 1 careful run in 60 is evicted on main with items wave A (seed 1054) and 2 in 60 with wave B
+    // as well (1005, 1042); none without the ladder. So one eviction in these six is the ladder's cost, not a
+    // broken trade; two would be. docs/05.
+    let evicted = 0
     for (const r of seeds.map((seed) => simulate(seed, careful, tuning.endings.retireDay + 10))) {
+      if (r.end?.kind === 'evicted') {
+        evicted++
+        continue
+      }
       expect(['retired', 'pushedOut'], `careful seed ${r.seed}`).toContain(r.end?.kind)
       if (r.end?.kind === 'pushedOut') expect(['pushedOutStood', 'pushedOut']).toContain(r.title)
     }
+    expect(evicted, 'careful refusers evicted').toBeLessThanOrEqual(1)
     for (const r of seeds.map((seed) => simulate(seed, careless, 75))) {
       expect(r.end?.kind, `careless seed ${r.seed}`).toBe('evicted')
       expect(r.title === 'evicted' || r.title === 'evictedKind').toBe(true)

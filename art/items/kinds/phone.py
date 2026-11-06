@@ -1,6 +1,8 @@
 """
 Phones: Mangosteen m5 / m4S (fruit-logo phones), Galaxia Stella 4 / Nota 3
-(removable back cover; the Nota has a stylus), Severin K1 push-button phone.
+(removable back cover; the Nota has a stylus), Severin K1 push-button phone. M6 wave B: Mangosteen m4 (the m4S body, own
+model number) and m3G (glossy plastic back), Galaxia Stella 3 Mini (the Stella
+body), Vertex Signature (steel, sapphire keys, leather back).
 
 Placeholder convention (src/render/items.ts): a 0.06 × 0.125 × 0.008 slab centred
 on the origin, screen +Z, back −Z (logo, camera at +X / top), bottom edge −Y
@@ -259,7 +261,8 @@ def mangosteen_logo(m: Matrix, mat, scale: float = 1.0):
 # Mangosteen m5 and m4S
 
 
-def mangosteen(it: lib.Item, m4s: bool) -> None:
+def mangosteen(it: lib.Item, m4s: bool, m4: bool = False) -> None:
+    """`m4` (with m4s=True): the earlier glass-and-steel m4, same body, its own model number."""
     color = it.color
     if m4s:
         shell = lib.material(it, "steel", "#b9bcc0", metal=1.0, rough=0.22)
@@ -323,8 +326,8 @@ def mangosteen(it: lib.Item, m4s: bool) -> None:
         disc(F("back", (0.0155, 0.0535, bz)), 0.00035, -0.00002, 0.00003, dark, n=12)  # microphone
     tm = F("back", (0, 0, bz))
     text_on(tm, "Mangosteen", 0.0036, ink, y=-0.022, bold=0.5)
-    model = "MG-1104" if m4s else "MG-1205"
-    imei = "01 291 400 618 223" if m4s else "01 384 200 517 936"
+    model = "MG-1003" if m4 else "MG-1104" if m4s else "MG-1205"
+    imei = "01 172 300 845 019" if m4 else "01 291 400 618 223" if m4s else "01 384 200 517 936"
     text_on(tm, "Designed by Mangosteen in Mostograd. Assembled in Mostograd", 0.00105, ink, y=-0.037)
     text_on(tm, f"Model {model}   IMEI {imei}", 0.00105, ink, y=-0.0393)
 
@@ -342,7 +345,7 @@ def mangosteen(it: lib.Item, m4s: bool) -> None:
     sy = it.hotspot("simtray").y if it.hotspot("simtray") else 0.010
     tray_m = F("px", (HW, sy, sz))
     side_cuts.append(pocket(lambda i: pill(0.0150, 0.0030, 8), 0.0006, dark, tray_m))
-    serial = "C39H 7RKQ DTC1" if m4s else "F2LJ 9X4M DTTP"
+    serial = "DN8K 2PLM A4S9" if m4 else "C39H 7RKQ DTC1" if m4s else "F2LJ 9X4M DTTP"
     slab(lambda i: pill(0.0148 - 2 * i, 0.0028 - 2 * i, 8), [(0, -0.0006, shell), (0, -0.00002, shell)], cap_lo=shell, cap_hi=shell, m=tray_m)
     disc(tray_m @ lib.at(0.0052, 0, 0), 0.0004, -0.00002, 0.0, dark, n=12)
     text_on(tray_m, serial, 0.00052, ink, x=-0.0012, y=-0.00002, depth=0.000012)
@@ -381,7 +384,7 @@ def mangosteen(it: lib.Item, m4s: bool) -> None:
 # Galaxia Stella 4 and Nota 3
 
 
-def galaxia(it: lib.Item, nota: bool) -> None:
+def galaxia(it: lib.Item, nota: bool, mini: bool = False) -> None:
     color = it.color
     if nota:
         cover = lib.material(it, "leather", color, rough=0.78)
@@ -445,7 +448,7 @@ def galaxia(it: lib.Item, nota: bool) -> None:
     bmx = F("back", (0, 0, bz))
     text_on(bmx, "GALAXIA", 0.0042, ink, y=0.010, spacing=1.3, bold=0.6)
     text_on(bmx, "Galaxia Electronics, Mostograd", 0.0011, ink, y=-0.050)
-    text_on(bmx, "GX-N9005" if nota else "GX-I9505", 0.0011, ink, y=-0.0525)
+    text_on(bmx, "GX-N9005" if nota else "GX-I8190" if mini else "GX-I9505", 0.0011, ink, y=-0.0525)
     back_cuts = holes(F("back", (-0.019, -0.056, bz)), [(i * 0.0011, k * 0.0011) for i in range(-2, 3) for k in range(-1, 2)], 0.00032, 0.0006, dark, 8)
     if nota:
         stitch = rr(W - 0.0052, H - 0.0052, r - 0.0026, 10)
@@ -663,14 +666,162 @@ def severin(it: lib.Item) -> None:
     slab(lambda i: pill(0.0120 - 2 * i, 0.0024 - 2 * i, 8), [(0, -0.0004, keys_m), (0, 0.0002, keys_m), (0.0003, 0.0004, keys_m)], cap_lo=keys_m, cap_hi=keys_m, m=F("nx", (-HW, 0.026, 0)))
 
 
+# ---------------------------------------------------------------------------
+# M6 wave B: Mangosteen m3G (curved plastic back) and the Vertex Signature
+
+
+def m3g(it: lib.Item) -> None:
+    """The plastic Mangosteen: a glossy soap-bar back, a chrome bezel round the glass,
+    the SIM tray and the headphone jack on the top edge, the wide dock connector below."""
+    color = it.color
+    plastic = lib.material(it, "plastic", color, rough=0.12)
+    chrome = lib.material(it, "chrome", "#d4d6da", metal=1.0, rough=0.08)
+    glass = lib.material(it, "glass", "#050607", rough=0.04, ao=False)
+    dark = lib.material(it, "dark", "#121314", metal=0.3, rough=0.55)
+    ink = lib.material(it, "ink", "#b9bbbf", metal=0.6, rough=0.3, ao=False)
+    r = 0.0095
+    shape = rr_shape(W, H, r, 10)
+    rings = [(0.0058, -0.004, plastic), (0.0034, -0.0037, plastic), (0.0018, -0.0031, plastic), (0.0008, -0.0022, plastic), (0.0002, -0.0010, plastic),
+             (0, 0.0002, plastic), (0, 0.0024, plastic), (0.00005, 0.0025, chrome), (0, 0.0028, chrome), (0.0002, 0.0034, chrome), (0.0006, 0.0036, chrome)]
+    body = slab(shape, rings, cap_lo=plastic, cap_hi=chrome, smooth=40)
+    front = slab(shape, [(0.0008, 0.0033, glass), (0.0008, 0.0037, glass), (0.0011, 0.004, glass)], cap_lo=glass, cap_hi=glass)
+    fz = 0.004
+    fm = F("front", (0, 0, fz))
+    cut(front, [pocket(lambda i: pill(0.0098, 0.0013, 8), 0.0004, dark, fm @ lib.at(0, 0.0525, 0)), pocket(circle_shape(0.0056, 40), 0.0004, dark, fm @ lib.at(0, -0.0528, 0))])
+    btn = F("front", (0, -0.0528, fz))
+    slab(circle_shape(0.0051, 40), [(0, -0.0004, glass), (0, -0.00012, glass), (0.0003, -0.00005, glass)], cap_lo=glass, cap_hi=glass, m=btn)
+    line_on(btn, rr(0.0029, 0.0029, 0.0007, 4), 0.00016, 0.00001, ink, z=-0.00005, closed=True)
+
+    # back: chrome logo and lettering on the gloss, a small lens at the top left
+    bz = -0.004
+    mangosteen_logo(F("back", (0, 0.010, bz)), chrome)
+    cam = F("back", (0.022, 0.0545, bz + 0.0006))
+    disc(cam, 0.0024, -0.0002, 0.0002, chrome, n=32)
+    disc(cam, 0.0018, 0.0002, 0.00022, dark, n=32)
+    disc(cam, 0.0009, 0.00022, 0.00026, glass, n=24)
+    tm = F("back", (0, 0, bz))
+    text_on(tm, "Mangosteen", 0.0036, ink, y=-0.020, bold=0.5)
+    text_on(tm, "16GB", 0.0016, ink, y=-0.0265, spacing=1.2)
+    text_on(tm, "Designed by Mangosteen in Mostograd", 0.00105, ink, y=-0.037)
+    text_on(tm, "Model MG-1241   FCC 0018-MG", 0.00105, ink, y=-0.0393)
+
+    # sides
+    sz = 0.0008
+    side_cuts = [pocket(lambda i: rr(0.0055 - 2 * i, 0.0021 - 2 * i, 0.0006), 0.0006, dark, F("nx", (-HW, 0.046, sz)))]
+    for y in (0.034, 0.025):
+        slab(lambda i: pill(0.0062 - 2 * i, 0.0026 - 2 * i, 8), [(0, -0.0003, chrome), (0, 0.0003, chrome), (0.0003, 0.00045, chrome)], cap_lo=chrome, cap_hi=chrome, m=F("nx", (-HW, y, sz)))
+    # top: SIM tray (from the hotspot), headphone jack, sleep button
+    sim = it.hotspot("simtray")
+    sx = sim.x if sim else 0.012
+    tray = F("top", (sx, HH, sz))
+    side_cuts.append(pocket(lambda i: pill(0.0150, 0.0030, 8), 0.0006, dark, tray))
+    side_cuts += holes(F("top", (-0.018, HH, sz)), [(0, 0)], 0.0018, 0.004, dark, 24)
+    slab(lambda i: pill(0.0095 - 2 * i, 0.0024 - 2 * i, 8), [(0, -0.0003, plastic), (0, 0.0003, plastic), (0.0003, 0.00045, plastic)], cap_lo=plastic, cap_hi=plastic, m=F("top", (0.0215, HH, sz)) @ lib.rot("z", 0) @ lib.at(0, 0, 0))
+    # bottom: wide dock connector between two speaker grilles
+    bm = F("bottom", (0, -HH, sz))
+    side_cuts.append(pocket(lambda i: rr(0.0212, 0.0024, 0.0005, 4), 0.003, dark, bm))
+    side_cuts += holes(bm, [(0.0162 + i * 0.0018, k) for i in range(5) for k in (-0.0004, 0.0004)], 0.0005, 0.0012, dark, 10)
+    side_cuts += holes(bm, [(-0.0162 - i * 0.0018, k) for i in range(5) for k in (-0.0004, 0.0004)], 0.0005, 0.0012, dark, 10)
+    cut(body, side_cuts)
+    slab(lambda i: pill(0.0148 - 2 * i, 0.0028 - 2 * i, 8), [(0, -0.0006, chrome), (0, -0.00002, chrome)], cap_lo=chrome, cap_hi=chrome, m=tray)
+    disc(tray @ lib.at(0.0052, 0, 0), 0.0004, -0.00002, 0.0, dark, n=12)
+    text_on(tray, "88 0417 ZXB 21", 0.00052, dark, x=-0.0012, depth=0.000012)
+    slab(rr_shape(0.0172, 0.0006, 0.0002, 2), [(0, -0.003, dark), (0, -0.0007, dark)], cap_lo=dark, cap_hi=dark, m=bm)
+
+
+VERTEX_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"]
+
+
+def vertex(it: lib.Item) -> None:
+    """A hand-built luxury candybar: a polished steel frame, a sapphire screen in a
+    steel surround, sapphire keys on the lower half, and a stitched leather back
+    with a metal V and a screwed steel battery plate."""
+    color = it.color
+    steel = lib.material(it, "steel", "#c7c8ca", metal=1.0, rough=0.12)
+    brushed = lib.material(it, "brushed", "#a9aaac", metal=1.0, rough=0.32)
+    leather = lib.material(it, "leather", color, rough=0.82)
+    stitch = lib.material(it, "stitch", lib.shade(color, 1.5), rough=0.7, ao=False)
+    glass = lib.material(it, "sapphire", "#050607", rough=0.03, ao=False)
+    keyglass = lib.material(it, "keys", "#1b1c20", metal=0.2, rough=0.05)
+    ink = lib.material(it, "ink", "#d9dadc", metal=0.8, rough=0.25, ao=False)
+    dark = lib.material(it, "dark", "#101112", metal=0.3, rough=0.55)
+    W2, H2 = 0.050, 0.124
+    r = 0.012
+    shape = lambda inset: rr(W2 - 2 * inset, H2 - 2 * inset, max(r - inset, 0.0005), 12)
+    rings = [(0.0022, -0.004, leather), (0.0008, -0.0037, leather), (0.0003, -0.0031, leather), (0.0003, -0.0029, dark), (0.0002, -0.0028, steel), (0, -0.0022, steel),
+             (0, 0.0024, steel), (0.0004, 0.0031, steel), (0.0012, 0.0036, steel), (0.0016, 0.0038, brushed)]
+    body = slab(shape, rings, cap_lo=leather, cap_hi=brushed, smooth=38)
+    fz = 0.0038
+    # screen: a sapphire window in a raised polished surround (top half)
+    sm = F("front", (0, 0.030, fz))
+    slab(lambda i: rr(0.0400 - 2 * i, 0.0440 - 2 * i, 0.004, 8), [(0, -0.0002, steel), (0, 0.0002, steel), (0.0006, 0.00032, steel)], cap_lo=steel, cap_hi=steel, m=sm)
+    poly_on(sm, rr(0.0330, 0.0360, 0.0012, 6), 0.00002, glass, z=0.00032)
+    cut(body, [pocket(lambda i: pill(0.0110, 0.0016, 8), 0.0005, dark, F("front", (0, 0.0565, fz)))])
+    text_on(F("front", (0, 0.0537, fz)), "VERTEX", 0.0018, ink, spacing=1.6, bold=0.4)
+    # keys: soft keys, a nav ring, then a 4 × 3 keypad of domed sapphire jewels
+    ky = it.hotspot("keys").y if it.hotspot("keys") else -0.03
+    for sx in (-1, 1):
+        km = F("front", (sx * 0.0155, ky + 0.0215, fz))
+        slab(lambda i: pill(0.0100 - 2 * i, 0.0046 - 2 * i, 8), [(0, -0.0002, keyglass), (0, 0.0003, keyglass), (0.0004, 0.00045, keyglass)], cap_lo=keyglass, cap_hi=keyglass, m=km)
+    nm = F("front", (0, ky + 0.0215, fz))
+    slab(circle_shape(0.0045, 32), [(0, -0.0002, steel), (0, 0.0003, steel), (0.0004, 0.00045, steel)], cap_lo=steel, cap_hi=steel, m=nm)
+    disc(nm, 0.0022, 0.00045, 0.0006, keyglass, n=24, round_top=0.0001)
+    for k, ch in enumerate(VERTEX_KEYS):
+        col, row = k % 3, k // 3
+        km = F("front", ((col - 1) * 0.0128, ky + 0.0118 - row * 0.0078, fz))
+        slab(lambda i: pill(0.0100 - 2 * i, 0.0056 - 2 * i, 10), [(0, -0.0002, steel), (0, 0.0002, steel)], cap_lo=steel, cap_hi=steel, m=km)
+        slab(lambda i: pill(0.0086 - 2 * i, 0.0044 - 2 * i, 10), [(0, 0.0002, keyglass), (0, 0.0004, keyglass), (0.0006, 0.00058, keyglass)], cap_lo=keyglass, cap_hi=keyglass, m=km)
+        text_on(km @ lib.at(0, 0, 0.0006), ch, 0.0026, ink, depth=0.00001)
+    # sides: steel buttons
+    for y in (0.034, 0.024):
+        slab(lambda i: pill(0.0070 - 2 * i, 0.0022 - 2 * i, 8), [(0, -0.0003, steel), (0, 0.0003, steel), (0.0003, 0.00045, steel)], cap_lo=steel, cap_hi=steel, m=F("nx", (-W2 / 2, y, 0.0002)))
+    # back: stitching round the leather, the V inlay, the steel battery plate with screws
+    bz = -0.004
+    bmx = F("back", (0, 0, bz))
+    path = rr(W2 - 0.0060, H2 - 0.0060, r - 0.003, 10)
+    per = [(a, b, math.dist(a, b)) for a, b in zip(path, path[1:] + path[:1])]
+    total = sum(p[2] for p in per)
+    n = int(total / 0.0016)
+    acc, k = 0.0, 0
+    for a, b, ln in per:
+        while k < n and k * total / n <= acc + ln:
+            t = (k * total / n - acc) / ln if ln else 0
+            x, y = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
+            dx, dy = (b[0] - a[0]) / (ln or 1), (b[1] - a[1]) / (ln or 1)
+            line_on(bmx, [(-(x - dx * 0.0005), y - dy * 0.0005), (-(x + dx * 0.0005), y + dy * 0.0005)], 0.00026, 0.00004, stitch)
+            k += 1
+        acc += ln
+    lg = it.hotspot("logo")
+    vm = F("back", (0, lg.y if lg else 0.028, bz))
+    poly_on(vm, [(-0.0042, 0.0045), (-0.0026, 0.0045), (0, -0.0022), (0.0026, 0.0045), (0.0042, 0.0045), (0.0008, -0.0048), (-0.0008, -0.0048)], 0.00008, steel, bevel=0.00003)
+    bt = it.hotspot("battery")
+    by = bt.y if bt else -0.012
+    pm = F("back", (0, by - 0.012, bz))
+    slab(lambda i: rr(0.0300 - 2 * i, 0.0400 - 2 * i, 0.004, 8), [(0, -0.0004, brushed), (0, 0.00015, brushed), (0.0003, 0.00025, brushed)], cap_lo=brushed, cap_hi=brushed, m=pm)
+    for sx, sy in ((-0.0115, 0.0165), (0.0115, 0.0165), (-0.0115, -0.0165), (0.0115, -0.0165)):
+        crosshead(pm @ lib.at(sx, sy, 0.00025), steel, dark, r=0.0008)
+    text_on(pm @ lib.at(0, 0, 0.00025), "HANDMADE", 0.0019, dark, y=0.007, depth=0.00001, spacing=1.4)
+    text_on(pm @ lib.at(0, 0, 0.00025), "No. 0418", 0.0016, dark, y=0.002, depth=0.00001, spacing=1.2)
+    text_on(pm @ lib.at(0, 0, 0.00025), "VX-SIG 0418 5521 70", 0.0010, dark, y=-0.006, depth=0.00001)
+    # bottom: charging socket and lanyard loop
+    ends = holes(F("bottom", (0, -H2 / 2, 0)), [(0, 0)], 0.0011, 0.003, dark, 24)
+    cut(body, ends)
+
+
 def build(it: lib.Item) -> None:
     it.ao_size = 1024
     _n[0] = 0
     pid = it.id
-    if "mangosteen" in pid:
+    if "m3g" in pid:
+        m3g(it)
+    elif "vertex" in pid:
+        vertex(it)
+    elif pid.endswith("mangosteen_m4"):
+        mangosteen(it, m4s=True, m4=True)
+    elif "mangosteen" in pid:
         mangosteen(it, m4s="m4s" in pid)
     elif "galaxia" in pid:
-        galaxia(it, nota="nota" in pid)
+        galaxia(it, nota="nota" in pid, mini="mini" in pid)
     elif "severin" in pid:
         severin(it)
     else:

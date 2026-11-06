@@ -15,8 +15,10 @@ export const UpgradeDef = z.object({
   cost: z.number().int().positive(),
   /** Upgrade ids that must be owned first. */
   requires: z.array(z.string()).default([]),
-  /** Office section: tools and books, or cases and security (M4). */
-  group: z.enum(['tools', 'security']).default('tools'),
+  /** Office section: tools and books, cases and security (M4), or staff (M6: the second counter). */
+  group: z.enum(['tools', 'security', 'staff']).default('tools'),
+  /** M6: not offered before this career day (a mid-game purchase). */
+  fromDay: z.number().int().positive().optional(),
   effects: z
     .object({
       /** Unlocks this tool (for the categories below, if given). */

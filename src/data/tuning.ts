@@ -438,6 +438,8 @@ export const tuning = {
       convex_mirror: 2_500,
       wall_case: 14_000,
       camera: 22_000,
+      // M6: room for the appraiser (tuning.appraiser): a month of his wages and a bit.
+      second_counter: 18_000,
     },
     /** Security points (see tuning.theft.perSecurity): chime 0.5 (×0.85 theft), mirror 1 (×0.74), camera 3 (×0.49). */
     security: { door_chime: 0.5, convex_mirror: 1, camera: 3 },
@@ -625,6 +627,11 @@ export const tuning = {
       { id: 'victory_day', from: '04-25', to: '05-10', boost: { militaria: 1.45, soviet: 1.15 } },
       { id: 'white_nights', from: '06-01', to: '07-10', boost: { cameras: 1.2, soviet: 1.1 } },
       { id: 'school_start', from: '08-15', to: '09-05', boost: { phones: 1.3, electronics: 1.25, laptops: 1.35, books: 1.2 } },
+      // M6 seasons of news: city days the paper covers that move no demand (empty boost: no hint).
+      { id: 'city_day', from: '05-25', to: '05-28', boost: {} },
+      { id: 'graduates', from: '06-22', to: '06-26', boost: {} },
+      { id: 'fleet_day', from: '07-24', to: '07-29', boost: {} },
+      { id: 'teachers_day', from: '10-01', to: '10-05', boost: {} },
     ] as readonly { id: string; from: string; to: string; boost: Readonly<Record<string, number>> }[],
     /** Per-tag random walk, stepped once a day at day open: d += U(−step, step) + revert × (1 − d), clamped. */
     drift: { step: 0.025, revert: 0.05, min: 0.8, max: 1.25 },
@@ -652,6 +659,8 @@ export const tuning = {
       driftHintThreshold: 0.08,
       /** …with this chance per day. */
       driftHintChance: 0.6,
+      /** M6: chance a day's paper (with room left) runs a seasonal market note that matches tuning.demand.seasons. */
+      seasonHintChance: 0.3,
     },
   },
   start: {
@@ -1019,6 +1028,14 @@ export const tuning = {
     iconReturned: 1,
     /** M5 the Collector: his icon handed to the police. */
     iconHandedIn: 0.5,
+    /** M6 the Appraiser: the crew's tin from under the storeroom floor taken to Volkova. */
+    tinHandedIn: 0.75,
+    /** M6 the Flood (heart axis): a pump at fifteen times its price to a neighbour bailing out. */
+    floodGouged: -1,
+    /** M6 the Flood (heart axis): charging a flooded-out neighbour to keep her things dry. */
+    floodCharged: -0.5,
+    /** M6 the Flood (heart axis): the flooded-out family's heirloom bought for next to nothing. */
+    floodCheapBuy: -0.5,
   },
 
   /**
@@ -1270,6 +1287,168 @@ export const tuning = {
       /** Deals with the fence at or above: still in the trade. */
       fenceDeals: 3,
     },
+  },
+
+  /**
+   * M6 the Appraiser (GDD § 7 Employee, § 9 The Appraiser; src/game/staff/appraiser.ts, the person
+   * src/data/appraiser.ts, the arc src/data/stories/appraiser.ts). A second counter (an upgrade)
+   * lets you hire one appraiser, Lev Andreyevich Sablin. He serves walk-in sellers off the line while
+   * you serve yours, with his own eye; his deals and his mistakes land in your books.
+   */
+  appraiser: {
+    /** The first day the office offers the second counter (mid-game; its cost is tuning.upgrades.cost.second_counter). */
+    counterDay: 21,
+    /** Salary for a full month, paid at month end with the rent (prorated by days on staff that month; paid up to the day if fired). */
+    salary: 7_000,
+    /**
+     * His eye: the chance he sees a piece for what it is (a fake, a mix of parts, a refinish) before he
+     * buys. Better than a careful player's first month, worse than a specialist on their own line.
+     */
+    accuracy: 0.8,
+    /** His valuation of a sound piece: true value × (1 ± (1 − accuracy) × valueNoise). */
+    valueNoise: 0.6,
+    /** A slip of the tongue: with (1 − accuracy) × this, he opens so low it insults the seller (who walks and tells the street). */
+    lowballChance: 0.35,
+    /** ...at this share of his estimate. */
+    lowballShare: 0.18,
+    /** He aims at this share of his estimate (buy / pawn loan), never more than maxShare. */
+    offerShare: 0.45,
+    maxShare: 0.58,
+    loanShare: 0.34,
+    loanMaxShare: 0.45,
+    /**
+     * He talks a seller down the way you do with a finding on the mat: their walk-away price drops by
+     * this share × his accuracy (he names the wear, the replaced strap, the going rate).
+     */
+    talkDown: 0.15,
+    /** Where the price lands between the seller's floor and his target (0 = their floor, 1 = his target). */
+    haggleKeep: 0.3,
+    /** He never spends the till below this, over the bills due within billsDays. */
+    cashFloor: 15_000,
+    billsDays: 7,
+    /** In-game seconds he spends on one customer [min, max]. */
+    serveSeconds: [110, 170] as [number, number],
+    /** "Next walk-in" rule: he takes someone off the line only while at least this many are waiting. */
+    overflowAt: 3,
+    /** He leaves the first this many people in line for you. */
+    leaveForYou: 1,
+    /** His trust in you (state.customers.appraiser, −1…1): on hiring, a month paid in full, a month short. */
+    trust: { hired: 0.05, paid: 0.08, short: -0.2 },
+    /** The arc (days are days after the beat before). */
+    arc: {
+      /** Zhora sees him at the second counter, this many days on staff. */
+      zhoraAfter: 8,
+      zhoraChance: 0.5,
+      /** He tells you himself if his trust is at least confideTrust, this many days after Zhora. */
+      confideAfter: 3,
+      confideTrust: 0.15,
+      confideChance: 0.6,
+      /** Otherwise, cold, he is gone one morning this many days after Zhora. */
+      vanishAfter: 10,
+      /** ...if his trust is no more than this (between the two, he waits: a paid month may tip it). */
+      vanishTrust: 0.1,
+      vanishChance: 0.35,
+      /** The tin under the storeroom floor: the crew's money his brother skimmed. */
+      tin: 180_000,
+      /** Days from the tin to what follows it. */
+      afterTin: 4,
+      /** Days from his vanishing to Zhora coming for the money. */
+      afterVanish: 2,
+      /** Trust moves. */
+      trust: { welcome: 0.05, ask: -0.03, askLev: 0.05, askZhora: -0.1 },
+      /** Crew: the debt paid off with the tin. */
+      crewPressure: -0.3,
+      crewRep: 0.1,
+      /** Police: the tin handed to Volkova. */
+      policeHeat: -0.1,
+      policePressure: 0.35,
+      policeRep: 0.08,
+      policeTrust: 0.1,
+      /** Split: your half, and what Zhora's visit costs either way. */
+      splitHeat: 0.05,
+      paidBackPressure: -0.1,
+      deniedPressure: 0.35,
+      deniedRep: -0.15,
+      /** He vanished with the tin: the crew think you have it. */
+      vanishPressure: 0.25,
+      /** ...and what Zhora settles for, if you pay something rather than nothing. */
+      vanishPay: 40_000,
+      /** After his brother comes home, his eye sharpens (added to accuracy). */
+      sharper: 0.06,
+    },
+  },
+
+  /**
+   * M6 The Flood (GDD § 9, a city event; src/game/city/flood.ts, arc src/data/stories/flood.ts,
+   * content src/data/flood.ts). Once per career, in the first spring's ice drift: a seeded day,
+   * warned in the paper days ahead. Days are career days; `D` below is days after the flood day.
+   */
+  flood: {
+    /** The flood day, seeded from the career seed in this range (day 37 = 8 April … day 52 = 23 April). */
+    days: [37, 52] as readonly [number, number],
+    /** The paper starts warning this many days ahead (ice jam upriver). */
+    warnDays: 7,
+    /** The last of those days the water is visibly up in the canal ("rising"). */
+    risingDays: 3,
+    /** Days the street is under water (the flood day and the next). */
+    floodDays: 2,
+    /** Days the water takes to go down after that; the shop floor dries for `dryDays` more. */
+    recedeDays: 3,
+    dryDays: 3,
+    /** Walk-ins on a day the street is under water (× the usual count): only those who must, wade in. */
+    customersScale: 0.6,
+    /**
+     * People sell to survive: from the flood day until the water is down, each walk-in seller has
+     * `chance` to be flooded out: desperation +`desperation` (capped at `cap`), with a flood line.
+     */
+    sellers: { chance: 0.5, desperation: 0.3, cap: 0.95 },
+    /**
+     * Demand while the water is up and for a week after (× on the tag's factor; flood days through
+     * D+`demandDays`): people need cash and pumps, not luxuries. `tools` waits for a tools category.
+     */
+    demand: { tools: 1.6, luxury: 0.85, jewelry: 0.9, watches: 0.92, cameras: 0.85, electronics: 0.9 } as Readonly<Record<string, number>>,
+    demandDays: 7,
+    /** The caretaker's sandbags (the warning beat), and what you pay for them. */
+    sandbagsCost: 4_000,
+    /**
+     * The flood morning (src/game/city/flood.ts floodHit). Stock at risk: the back (low) shelf and
+     * everything not on display (boxes on the storeroom floor); the counter case and the wall
+     * shelves stand clear. Pledges sit on the storeroom's top shelf and are never touched.
+     * Per preparation: chance each piece at risk gets wet, and the clean-up bill (pumping out,
+     * plaster, hiring a dehumidifier).
+     */
+    hit: {
+      none: { chance: 0.55, bill: 12_000 },
+      sandbags: { chance: 0.15, bill: 3_000 },
+      lifted: { chance: 0, bill: 9_000 },
+    } as Readonly<Record<'none' | 'sandbags' | 'lifted', { chance: number; bill: number }>>,
+    /** Condition points a wet piece loses, by category [min, max] (gold shrugs, phones drown). Default `other`. */
+    damage: {
+      gold: [2, 6],
+      coins: [3, 8],
+      militaria: [6, 14],
+      watches: [15, 30],
+      cameras: [30, 50],
+      phones: [45, 70],
+      electronics: [45, 70],
+      icons: [25, 45],
+      other: [15, 35],
+    } as Readonly<Record<string, readonly [number, number]>>,
+    /** Story prices (src/data/stories/flood.ts). */
+    pump: { fair: 3_000, gouge: 15_000 },
+    storageCharge: 1_000,
+    credit: 6_000,
+    /** Chance per morning, once he's due, that Misha comes back with your money, or sends a postcard instead (about 85% repaid). */
+    repaid: { after: 14, chance: 0.4, skipChance: 0.12 },
+    /** Neighbourhood standing for the hero and vulture choices. */
+    rep: { hero: 0.06, small: 0.03, vulture: -0.1, smallVulture: -0.05 },
+    /** Volkova and the gouging complaint (D+3…): heat and her trust. */
+    complaint: { refundHeat: -0.05, refundTrust: 0.05, shrugHeat: 0.12, shrugTrust: -0.15, policeRep: -0.05 },
+    /** Her call when you've been the hero: trust and police standing. */
+    praise: { trust: 0.1, policeRep: 0.03 },
+    /** Flood record (flood.hero_* / flood.vulture_* flags) at or above which the street calls you a hero or a vulture. */
+    heroAt: 2,
+    vultureAt: 2,
   },
 
   save: {

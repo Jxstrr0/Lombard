@@ -90,7 +90,11 @@ Done when: a clean run, a mob-friendly run, and a fence-heavy run all play diffe
 
 - 120 items, 40 regulars, 8 arcs, 3 seasons of news.
   - Items wave B (done, Nov 6): +44 defs in the existing categories plus the new vinyl & media category (32 → 76 with wave B alone), every one with a scripted model. See 05.
+  - 3 seasons of news: done. Four seasons of city life (13–14 stories each, dealt from a per-season deck), five seasonal market notes per season that match `tuning.demand.seasons`, more Victory Day / school / New Year stories and four news-only city days (`src/data/newsSeasons.ts`).
+  - The Flood is the seventh arc (with its follow-ups in `flood_talk`).
 - The Flood event, The Appraiser hire (a visible employee who walks between the back room, the counter and the floor; see 05).
+  - The Flood: done (`src/game/city/flood.ts`, `src/data/flood.ts`, `src/data/stories/flood.ts`, `tuning.flood`; dev `?scenario=flood-warning|flood|flood-after`, `?scenario=paper&on=MM-DD`).
+  - The Appraiser: done (Nov 6): the second counter (an upgrade from day 21, 18,000 ₽) lets you hire Lev Andreyevich Sablin (7,000 ₽ a month, paid with the rent, prorated; let him go from the office, final). He takes the overflow (the walk-in closest to giving up, while three or more wait; never the first in line, a regular, a story, a buyer or a pawner coming back) or only the categories you pick, serves them at the island case and his deals land in your books; a fake he misses is named in the ledger at closing ("his mistake, your money"), a lowball slip insults the seller. A staff-only Rocketbox look on a walk graph (storeroom bench and shelves, behind the counter, the shelves, the wall cases, the second counter). His arc (9 beats, `src/data/stories/appraiser.ts`): he is Yuri Gusev's younger brother, paying the debt to Zhora, and he knows about the biscuit tin under the storeroom floor; it branches on his trust in you (Zhora's visit, your wages) and on what you do with the tin (the crew, Volkova, half each), and he has an epilogue card. `?scenario=appraiser` and `appraiser-*`. See 05.
 - Desktop layout pass (landscape, mouse hotspots, keyboard shortcuts).
 - Save migrations tested across all milestone versions.
 - Localization-ready strings (English only shipped).

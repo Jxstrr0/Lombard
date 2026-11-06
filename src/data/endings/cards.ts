@@ -17,9 +17,12 @@
  * Leopold Germanovich Bessmertny (the Collector, src/data/collector.ts) shows once he has
  * asked after his icon (collector.asked) and reads how it left the shop: collector.sold,
  * .returned, .handed_in, .missed, or .passed (you never bought her).
+ *
+ * M6: Kuzmich (the Flood) shows once the water came into the shop and reads the flood record.
  */
 import type { z } from 'zod'
 import type { EpilogueCard } from '../../game/schema/endings'
+import { APPRAISER } from '../appraiser'
 import { COLLECTOR } from '../collector'
 import { FENCE } from '../fence'
 import { tuning } from '../tuning'
@@ -245,6 +248,40 @@ export const CARDS: Raw[] = [
       },
     ],
   },
+  {
+    // M6 the Flood (src/data/stories/flood.ts): shows once the water came into the shop (flood.hit),
+    // and reads how the shop behaved (hero and vulture choices, the `flood` condition) and how ready it was.
+    id: 'kuzmich',
+    name: 'Kuzmich',
+    role: 'Caretaker, the Kanatnaya yards',
+    show: [{ if: 'flag', flag: 'flood.hit' }],
+    variants: [
+      {
+        when: [{ if: 'flood', hero: { gte: 3 }, vulture: { lte: 0 } }],
+        text: 'Kuzmich still tells the story of the spring the canal came over, and in his version the pawn shop is where the street went for a pump, a dry room and a loan. He has painted a mark on your old door frame at the height the water reached. Under it, in smaller letters, he has written your name.',
+      },
+      {
+        when: [{ if: 'flood', vulture: { gte: 2 } }],
+        text: 'Kuzmich still sweeps the yards on Kanatnaya Street. He sweeps round the pawn shop’s step, carefully, without touching it. When people ask about the spring of the water, he tells them who sold the pumps, and at what price, and spits.',
+      },
+      {
+        when: [{ if: 'flood', hero: { gte: 2 } }],
+        text: 'Kuzmich remembers the spring of the water by who helped, and the pawn shop is on his list, near the top. He brings round a jar of pickled mushrooms every autumn and will not say where they grew.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'flood.unprepared' }, { if: 'flag', flag: 'flood.damaged' }],
+        text: 'Kuzmich still mentions the sandbags you didn’t want. He mentions them to you, to the new tenant, to the pigeons. There is a tidemark on the back shelves that no paint will cover, and he says that is the river’s receipt.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'flood.dry' }],
+        text: 'Kuzmich says the pawn shop was the only dry floor on the street that spring, and takes the credit for it. He has told the story so often that he now remembers carrying the sandbags himself, all of them, uphill.',
+      },
+      {
+        when: [],
+        text: 'Kuzmich still sweeps the yards on Kanatnaya Street and still watches the river every March, leaning on his broom. When the ice comes down he knocks on every door on the embankment, yours included, and says the same thing: “Lift what you can.”',
+      },
+    ],
+  },
   // --- specialists you kept on ---------------------------------------------------
   {
     id: 'faina',
@@ -452,6 +489,46 @@ export const CARDS: Raw[] = [
       {
         when: [],
         text: 'Volkova still does the pawn shops on this side of the water, all eleven, one fewer now. She nods at your old window as she passes. It is not quite a greeting. From her, it is close.',
+      },
+    ],
+  },
+  {
+    id: 'appraiser',
+    name: APPRAISER.name,
+    role: APPRAISER.role,
+    show: [{ if: 'flag', flag: 'appraiser.hired' }],
+    variants: [
+      {
+        when: [{ if: 'flag', flag: 'appraiser.yuri_home' }],
+        text: 'Lev Andreyevich Gusev, his own name on the door now, runs the second counter like a surgery. His brother sits by the window most afternoons and tells customers the scales were better there. They were. Lev moved them back.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'appraiser.tin_police' }],
+        text: 'Lev gave his statement in four sittings and Volkova read every page twice. He works at the state assay office again, under his own name, and walks to work a different way each morning. He sends a card at New Year with a bear on it.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'appraiser.paid_back' }],
+        text: 'Lev’s mother has her new fridge, and Lev has a new job across the river, where nobody knew his brother. Half a tin bought you a quiet year. He says it was the most expensive biscuit he never ate.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'appraiser.denied' }],
+        text: 'Lev left the week the glass went in. He sent the key back by post, with a note: “Somebody always knows.” The new pane is thicker than the old one. It cost about what you kept.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'appraiser.vanished' }],
+        text: 'Nobody on the canal has seen Lev since the four o’clock train. Zhora says Minsk; Venya says Riga; Volkova says nothing, in a way that sounds like a file. The third board in the storeroom is still loose. You never nailed it down.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'appraiser.told_go' }],
+        text: 'Lev Sablin, or Gusev, appraises for a commission shop on the far bank. He nods if you pass the window. You never did lift the third board. Some nights you think about it, which is the same as lifting it, almost.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'appraiser.let_go' }],
+        text: 'Lev took his loupe and left his key on the counter. You found out later whose brother he was, from Zhora, who thought it was very funny. The overflow went back to walking out the door.',
+      },
+      {
+        when: [],
+        text: 'Lev Andreyevich stayed at the second counter to the end, polite, precise and better at this than you, which he never once said aloud. On your last day he called the shop “the patient” and checked its pulse with the third drawer.',
       },
     ],
   },

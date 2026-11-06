@@ -158,6 +158,12 @@ const BaseCondition = z.discriminatedUnion('if', [
     caught: cmp.optional(),
     bribes: cmp.optional(),
   }),
+  // --- M6 the Flood (src/game/city/flood.ts) ---------------------------------------------
+  /**
+   * The career's flood: `day` counts days since the flood day (negative before it), `hero` and
+   * `vulture` count the flood.hero_* and flood.vulture_* choices made so far.
+   */
+  z.object({ if: z.literal('flood'), day: cmp.optional(), hero: cmp.optional(), vulture: cmp.optional() }),
 ])
 
 /** M4: at least one of these holds (one level: no `any` inside `any`). */
@@ -229,6 +235,9 @@ export const Effect = z.discriminatedUnion('do', [
   // --- M5 the Collector (src/game/crime/collector.ts) ----------------------------------
   /** The Collector's icon leaves the shop: sold to him (his price), back to its church, or to the police. */
   z.object({ do: z.literal('collector'), change: z.enum(['sold', 'returned', 'handedIn']) }),
+  // --- M6 the appraiser (src/game/staff/appraiser.ts) ------------------------------------
+  /** He goes in the night (no wage owed), leaves when you let him go (paid to the day), or his eye sharpens (tuning.appraiser.arc.sharper). */
+  z.object({ do: z.literal('staff'), change: z.enum(['vanish', 'leave', 'sharper']) }),
 ])
 export type Effect = z.infer<typeof Effect>
 

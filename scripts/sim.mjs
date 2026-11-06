@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * npm run sim [-- --days 60 --seeds 20]
- * Headless economy report for tuning (docs/02-ARCHITECTURE.md § Testing).
+ * Headless economy report for tuning (docs/02-ARCHITECTURE.md § Testing), with each policy's
+ * evictions and ending titles (M5; runs of tuning.endings.retireDay days or more retire at the end).
  * Loads the TypeScript sources through Vite's module runner.
  */
 import { runnerImport } from 'vite'
@@ -19,7 +20,8 @@ const { module: tuningMod } = await runnerImport('/src/data/tuning.ts')
 const start = tuningMod.tuning.career.startingCash
 
 // careful refuses the crew, so it is also the refuser (Protection ladder on). "trade" is the
-// same policy with the ladder held off: the M2 band (tests/sim.test.ts, docs/05).
+// same policy with the ladder held off: the M2 band (tests/sim.test.ts, docs/05). `trader`
+// (M5 endings calibration) opens lower and pays the crew.
 const lines = [
   [policies.careful, {}, 'careful'],
   [policies.careful, { protectionLadder: false }, 'trade'],
@@ -27,6 +29,7 @@ const lines = [
   [policies.informer, {}, 'informer'],
   [policies.mobFriendly, {}, 'mobFriendly'],
   [policies.careless, {}, 'careless'],
+  [policies.trader, {}, 'trader'],
 ]
 for (const [policy, options, label] of lines) {
   const runs = Array.from({ length: seeds }, (_, i) => sim.simulate(1000 + i, policy, days, options))
@@ -37,6 +40,12 @@ for (const [policy, options, label] of lines) {
     `${label.padEnd(11)} growth/month ${pct(s.medianGrowth).padStart(7)}  busted ${s.busted}/${s.runs}` +
       `  median bust day ${s.medianBustDay ?? '-'}  median worth ${Math.round(s.medianFinalWorth).toLocaleString('en-US')} ₽` +
       `  fakes bought ${s.avgFakesBought.toFixed(1)}  stolen ${s.avgStolen.toFixed(1)}  cash<0 in ${s.cashDips} runs`,
+  )
+  // M5 endings: how the careers ended (a shop still open at the end retires if it may) and their titles.
+  const evictDays = runs.filter((r) => r.end?.kind === 'evicted').map((r) => r.end.day)
+  console.log(
+    `          evicted ${s.evicted}/${s.runs}${evictDays.length ? ` (days ${Math.min(...evictDays)}–${Math.max(...evictDays)})` : ''}` +
+      `  titles: ${Object.entries(s.titles).sort((a, b) => b[1] - a[1]).map(([t, n]) => `${t} ${n}`).join(', ') || '— (too early to retire)'}`,
   )
   // Worth curve of the median run, every 10 days.
   const mid = runs.slice().sort((a, b) => a.finalWorth - b.finalWorth)[Math.floor(runs.length / 2)]

@@ -3,6 +3,7 @@
  * each screen render itself. Screens read state and dispatch actions; they
  * never mutate state.
  *
+ *   career over (M5)       → ending (paper, cards, summary)
  *   career intro pending   → intro
  *   day closed, no history → welcome
  *   day closed             → ledger
@@ -30,6 +31,7 @@ import { backupAgeText, backupReminderDue, lastBackupAt } from '../persist/safet
 import { createButton, el } from './components/button'
 import { Hud } from './components/hud'
 import { CounterScreen } from './screens/counter'
+import { EndingScreen, type EndingStep } from './screens/ending'
 import { InspectScreen, type HotspotView } from './screens/inspect'
 import { IntroScreen } from './screens/intro'
 import { LedgerScreen } from './screens/ledger'
@@ -44,13 +46,14 @@ import type { SlotView } from '../game/save/slots'
 import { ShopSheet } from './screens/shop'
 import { WelcomeScreen } from './screens/welcome'
 
-export type ScreenId = 'intro' | 'welcome' | 'news' | 'counter' | 'inspect' | 'offer' | 'sale' | 'redeem' | 'ledger'
+export type ScreenId = 'intro' | 'welcome' | 'news' | 'counter' | 'inspect' | 'offer' | 'sale' | 'redeem' | 'ledger' | 'ending'
 
 /**
  * `arrived` false: the current customer is still walking in from the door
  * (render/scene.ts), so the counter shows the empty shop until they reach it.
  */
 export function screenFor(state: GameState, arrived = true): ScreenId {
+  if (state.career.end) return 'ending'
   if (state.meta.intro) return 'intro'
   if (state.day.phase === 'closed') return state.history.length > 0 ? 'ledger' : 'welcome'
   if (!state.day.newsRead) return 'news'
@@ -104,6 +107,7 @@ export class Ui {
   private readonly news: NewsScreen
   private readonly sale: SaleScreen
   private readonly redeem: RedeemScreen
+  private readonly ending: EndingScreen
   private readonly settings: SettingsSheet
   private readonly office: OfficeSheet
   private readonly shop: ShopSheet
@@ -115,6 +119,8 @@ export class Ui {
   private build!: HTMLElement
   /** False while the current customer is still walking to the counter. */
   private arrived = true
+  /** Where the ending opens when it comes into view: the paper for an ending reached in play. */
+  private endingStep: EndingStep = 'paper'
   private reminder: HTMLElement
   private reminderText: HTMLElement
   /** The backup reminder already had its one showing this session. */
@@ -146,6 +152,7 @@ export class Ui {
     this.news = new NewsScreen(dispatch)
     this.sale = new SaleScreen(dispatch)
     this.redeem = new RedeemScreen(dispatch)
+    this.ending = new EndingScreen(() => deps.mainMenu())
     this.settings = new SettingsSheet({
       getState: () => deps.store.get(),
       dispatch,
@@ -169,6 +176,7 @@ export class Ui {
       news: this.news,
       sale: this.sale,
       redeem: this.redeem,
+      ending: this.ending,
     }
     for (const s of Object.values(this.screens)) {
       s.root.hidden = true
@@ -236,11 +244,15 @@ export class Ui {
     this.onScreenChange?.('counter')
   }
 
-  /** Back to the game screens for the store's (newly loaded) career. */
-  showGame(): void {
+  /**
+   * Back to the game screens for the store's (newly loaded) career. A career that has
+   * already ended opens on its ending at `endingStep` (the summary from the title screen).
+   */
+  showGame(endingStep: EndingStep = 'summary'): void {
     this._mode = 'game'
     this.title.closeLoad()
     this.title.root.hidden = true
+    this.endingStep = endingStep
     this.render(this.deps.store.get(), null)
   }
 
@@ -272,7 +284,7 @@ export class Ui {
       this.current = id
       document.body.dataset.screen = id
     }
-    this.hud.root.hidden = id === 'welcome' || id === 'ledger' || id === 'intro' || id === 'news'
+    this.hud.root.hidden = id === 'welcome' || id === 'ledger' || id === 'intro' || id === 'news' || id === 'ending'
     this.hud.render(state)
     switch (id) {
       case 'counter':
@@ -302,7 +314,17 @@ export class Ui {
       case 'redeem':
         this.redeem.render(state)
         break
+      case 'ending':
+        this.ending.render(state)
+        if (changed) {
+          this.ending.show(this.endingStep)
+          this.shop.close()
+          this.ledger.closeConfirm()
+        }
+        break
     }
+    // An ending reached from here on (in play) opens on the paper.
+    if (id !== 'ending') this.endingStep = 'paper'
     if (this.shop.isOpen) this.shop.render(state)
     if (this.settings.isOpen) this.settings.render(state)
     if (this.office.isOpen) {

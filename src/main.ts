@@ -17,6 +17,8 @@
  * something to sell, M5; delivery: Zhora with the crew's stolen phones, opening at half, M5);
  * ?scenario=brick opens on the morning after a brick through the stocked counter case (M5 Protection);
  * ?scenario=specialist opens day 1 with Gennady's first-refusal phone call, then Ilya at the counter with the widow's watch (M4 specialists' arcs).
+ * M5 endings: ?scenario=ending&kind=retired|evicted|raided|pushedOut opens a lived-in career that has just ended that way
+ * (&step=paper|cards|summary, default paper); ?scenario=retire opens the ledger on day 90 with Retire offered (&notice=1 adds the landlord's final notice).
  * M5 police: ?scenario=volkova opens day 1 with Detective Volkova first in line, asking about a bulletin watch you bought
  * two days ago and still hold (her three answers); ?scenario=bulletin prints a stolen-goods bulletin in today's paper
  * and puts the piece first in line with a walk-in seller (the passport pill); ?scenario=raid opens on a police raid.
@@ -59,7 +61,9 @@ import { placeItem } from './game/shop/display'
 import type { QueuedVisit } from './game/types'
 import { getRegular } from './data/regulars'
 import { getBeat } from './data/stories'
-import { createInitialState, type GameState } from './game/state'
+import { createInitialState, type CareerEndKind, type GameState } from './game/state'
+import { endingReview, lateCareer } from './game/endings/review'
+import type { EndingStep } from './ui/screens/ending'
 import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
 import { bindKeyboard } from './input/keyboard'
@@ -267,6 +271,15 @@ function regularScenario(s0: GameState, id: string, trust: number | null): GameS
   return { ...s, queue, day: { ...s.day, total: queue.length } }
 }
 
+const END_KINDS: readonly CareerEndKind[] = ['retired', 'evicted', 'raided', 'pushedOut']
+const ENDING_STEPS: readonly EndingStep[] = ['paper', 'cards', 'summary']
+
+/** Dev-only (?scenario=retire[&notice=1]): the ledger after closing day 89, Retire on offer. */
+function retireScenario(seed: number, careerId: string, notice: boolean): GameState {
+  const s = lateCareer(seed, careerId, tuning.endings.retireDay)
+  return notice ? { ...s, story: { ...s.story, flags: [...s.story.flags, 'landlord.notice'] } } : s
+}
+
 /** Screens that show the counter view and leave the 3D area free to drag. */
 const LOOK_SCREENS = new Set<ScreenId>(['counter', 'sale', 'redeem', 'offer'])
 
@@ -386,6 +399,11 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
     if (params.get('scenario') === 'story') initial = storyScenario(initial)
     if (params.get('scenario') === 'specialist') initial = specialistScenario(initial)
+    if (params.get('scenario') === 'ending') {
+      const kind = END_KINDS.find((k) => k === params.get('kind')) ?? 'retired'
+      initial = endingReview(seedParam, initial.meta.careerId, kind)
+    }
+    if (params.get('scenario') === 'retire') initial = retireScenario(seedParam, initial.meta.careerId, params.get('notice') === '1')
     if (params.get('scenario') === 'brick') initial = brickScenario(initial)
     const beatId = BEAT_SCENARIOS[params.get('scenario') ?? '']
     if (beatId) initial = beatScenario(initial, beatId)
@@ -593,7 +611,7 @@ async function boot(): Promise<void> {
     rig.setOfferFocus(state.current?.phase === 'offer')
   }
   sync(store.get(), null)
-  if (review) ui.showGame()
+  if (review) ui.showGame(ENDING_STEPS.find((x) => x === params.get('step')) ?? 'paper')
   else ui.showTitle(slots)
   store.subscribe((state, prev, action) => {
     sync(state, prev)

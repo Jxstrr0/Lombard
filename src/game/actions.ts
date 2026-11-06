@@ -27,6 +27,8 @@ import { noteForfeits, pledgeRedeemLines } from './story/pledges'
 import { updateMarket } from './economy/demand'
 import { chargeExpenses } from './economy/expenses'
 import { runCrimeEvents } from './crime/vandalism'
+import { endCareer } from './endings/end'
+import { checkEviction } from './endings/eviction'
 import { releaseSpecialist, retainSpecialist } from './economy/specialists'
 import { buyUpgrade, restockAcid } from './economy/upgrades'
 import { haggleRound, startHaggle, type HaggleContext } from './haggle/machine'
@@ -85,6 +87,8 @@ export type Action =
   | { type: 'scene/next' }
   /** M4 story scene: pick one of the choices offered on its last line. */
   | { type: 'scene/choose'; choiceId: string }
+  /** M5: retire from the ledger (from tuning.endings.retireDay; the UI confirms first). Ends the career. */
+  | { type: 'career/retire' }
 
 /** Action types after which the career is autosaved. */
 export const AUTOSAVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
@@ -101,11 +105,16 @@ export const AUTOSAVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
   'acid/restock',
   'specialist/retain',
   'specialist/release',
+  'career/retire',
 ])
+
+/** M5: the only actions an ended career still takes (it can't be played on; GDD § 12). */
+const AFTER_END: ReadonlySet<Action['type']> = new Set(['settings/set', 'career/new'])
 
 const rub = (n: number) => `${Math.round(n).toLocaleString('en-US')} ₽`
 
 export function reducer(state: GameState, action: Action): GameState {
+  if (state.career.end && !AFTER_END.has(action.type)) return state
   switch (action.type) {
     case 'day/open':
       return openDay(state)
@@ -214,6 +223,9 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'scene/choose':
       // M5: Volkova's question is a systemic scene (crime/volkova.ts), not an arc beat.
       return isPoliceVisit(state.current) ? policeChoose(state, action.choiceId) : sceneChoose(state, action.choiceId)
+    case 'career/retire':
+      // Between days only: the ledger is where the Retire button lives.
+      return state.day.phase === 'closed' && !state.meta.intro ? endCareer(state, 'retired') : state
     default: {
       const unknown: never = action
       return unknown
@@ -366,7 +378,9 @@ function closeDay(state0: GameState): GameState {
   if (state0.day.phase !== 'open' || state0.current || state0.queue.length > 0) return state0
   const theft = rollShoplifting(state0)
   // M5 police: heat fades, old police events go, maybe a raid tomorrow; old bulletin lines come off.
-  const state = pruneBulletin(rollRaid(heatNight(syncSpecialistsRep(chargeExpenses(theft.state)))))
+  // M5: rent night after the bills: the landlord's notice, or eviction (src/game/endings/eviction.ts).
+  const eviction = checkEviction(pruneBulletin(rollRaid(heatNight(syncSpecialistsRep(chargeExpenses(theft.state))))))
+  const state = eviction.state
   const log = state.day.log
   const sum = (kind: LedgerEntry['kind']) => log.filter((e) => e.kind === kind).reduce((a, e) => a + e.amount, 0)
   const summary: DaySummary = {
@@ -385,13 +399,14 @@ function closeDay(state0: GameState): GameState {
   }
   const history = [...state.history, summary].slice(-tuning.save.historyDays)
   const date = addDays(state.calendar.date, 1)
-  return {
+  const closed: GameState = {
     ...state,
     history,
     calendar: { day: state.calendar.day + 1, date, weekday: weekdayOf(date), season: seasonOf(date) },
     day: { ...state.day, phase: 'closed' },
     narration: theft.stolen.length > 0 ? `Closed for the night. ${log.find((e) => e.kind === 'theft')?.text ?? ''}`.trim() : 'Closed for the night. Rain on the canal.',
   }
+  return eviction.evicted ? endCareer(closed, 'evicted') : closed
 }
 
 // --- counter ------------------------------------------------------------------

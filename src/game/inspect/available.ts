@@ -15,6 +15,7 @@
  * cost a charge or a call for nothing new).
  */
 import { tuning } from '../../data/tuning'
+import { NO_PASSPORT_TELL, PASSPORT_TELL } from '../crime/ledger'
 import { referenceBook } from '../../data/upgrades'
 import { getSpecialist } from '../../data/specialists'
 import { chargeExpense } from '../economy/charge'
@@ -66,6 +67,12 @@ export function toolAvailability(state: GameState, tool: ToolId, def: ItemDef): 
       const fee = tuning.specialists.roster[id]!.perCall
       if (state.cash < fee) return { tool, usable: false, note: `${rub(fee)} fee` }
       return { tool, usable: true, note: rub(fee), seconds }
+    }
+    case 'passport': {
+      // M5: the passport book (crime/ledger.ts), one ask per visit; not on the toolbar (the inspect header has it).
+      const f = state.inspect?.findings.find((x) => x.tellId === PASSPORT_TELL || x.tellId === NO_PASSPORT_TELL)
+      if (f) return { tool, usable: false, note: f.tellId === PASSPORT_TELL ? 'noted' : 'none shown' }
+      return { tool, usable: true }
     }
     default:
       return M1_TOOLS.includes(tool) ? { tool, usable: true } : { tool, usable: false, note: 'later' }

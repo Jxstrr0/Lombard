@@ -67,6 +67,8 @@ export const TOOL_SOUND: Record<ToolId, SoundId> = {
   reference: 'tool_page',
   phone: 'tool_phone',
   specialist: 'tool_phone',
+  /** M5: a page turned in the passport book. */
+  passport: 'tool_page',
 }
 
 export const AUDIO_MIX = {

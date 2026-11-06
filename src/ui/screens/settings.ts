@@ -1,6 +1,6 @@
 /**
  * Settings sheet (Longlight palette): save code copy/load, new career,
- * sound and ambience level, reduce motion, text size. Loading a code and starting over both ask for
+ * sound and ambience level, graphics quality, reduce motion, text size. Loading a code and starting over both ask for
  * confirmation inline (no browser dialogs).
  */
 import type { SoundSettings } from '../../audio/settings'
@@ -23,7 +23,29 @@ export interface SettingsDeps {
   /** Device sound settings (localStorage, not the career). */
   getSound(): SoundSettings
   setSound(patch: Partial<SoundSettings>): void
+  /** Device graphics quality (render/perf.ts). */
+  getGraphics(): GraphicsInfo
+  setGraphics(choice: GraphicsChoice): void
 }
+
+export type GraphicsChoice = 'auto' | 'low' | 'mid' | 'high'
+
+export interface GraphicsInfo {
+  choice: GraphicsChoice
+  /** The tier in use (Auto's current pick). */
+  tier: Exclude<GraphicsChoice, 'auto'>
+  /** Whether this page's WebGL context has MSAA (fixed until reload). */
+  antialias: boolean
+  /** Whether the tier in use wants MSAA. */
+  wantsAntialias: boolean
+}
+
+export const GRAPHICS_CHOICES: readonly { value: GraphicsChoice; label: string }[] = [
+  { value: 'auto', label: 'Auto' },
+  { value: 'low', label: 'Low' },
+  { value: 'mid', label: 'Medium' },
+  { value: 'high', label: 'High' },
+]
 
 export const TEXT_SCALES = [
   { value: 0.9, label: 'Small' },
@@ -47,6 +69,8 @@ export class SettingsSheet {
   private motion: HTMLButtonElement
   private sound: HTMLButtonElement
   private ambience: HTMLButtonElement[] = []
+  private graphics: HTMLButtonElement[] = []
+  private graphicsNote: HTMLElement
   private sizes: HTMLButtonElement[] = []
   private onClose: (() => void) | null = null
 
@@ -157,6 +181,26 @@ export class SettingsSheet {
     }
     soundSec.append(this.sound, ambLabel, ambRow)
 
+    // --- graphics
+    const gfxSec = this.section('Graphics', 'Auto lowers detail if this device can’t keep the shop smooth.')
+    const gfxRow = el('div', 'segmented')
+    gfxRow.setAttribute('role', 'radiogroup')
+    gfxRow.setAttribute('aria-label', 'Graphics quality')
+    for (const g of GRAPHICS_CHOICES) {
+      const b = el('button', 'segment', g.label)
+      b.type = 'button'
+      b.dataset.id = `graphics-${g.value}`
+      b.setAttribute('role', 'radio')
+      b.addEventListener('click', () => {
+        this.deps.setGraphics(g.value)
+        this.render(this.deps.getState())
+      })
+      this.graphics.push(b)
+      gfxRow.append(b)
+    }
+    this.graphicsNote = el('p', 'settings-status')
+    gfxSec.append(gfxRow, this.graphicsNote)
+
     // --- comfort
     const comfort = this.section('Comfort', '')
     this.motion = el('button', 'switch')
@@ -185,7 +229,7 @@ export class SettingsSheet {
     comfort.append(this.motion, sizeLabel, sizeRow)
 
     const foot = el('p', 'settings-foot', `Lombard · build ${__BUILD_SHA__} · ${__BUILD_DATE__} · A Longlight Interactive game`)
-    sheet.append(head, copySec, loadSec, newSec, soundSec, comfort, foot)
+    sheet.append(head, copySec, loadSec, newSec, soundSec, gfxSec, comfort, foot)
     root.append(sheet)
     this.root = root
     this.sheet = sheet
@@ -229,6 +273,18 @@ export class SettingsSheet {
       b.setAttribute('aria-checked', String(on))
       b.disabled = !snd.enabled
     }
+    const gfx = this.deps.getGraphics()
+    for (const [i, b] of this.graphics.entries()) {
+      const on = GRAPHICS_CHOICES[i]!.value === gfx.choice
+      b.classList.toggle('is-selected', on)
+      b.setAttribute('aria-checked', String(on))
+    }
+    const label = (t: GraphicsChoice) => GRAPHICS_CHOICES.find((g) => g.value === t)?.label ?? t
+    const notes: string[] = []
+    if (gfx.choice === 'auto') notes.push(`Using ${label(gfx.tier)}.`)
+    if (gfx.wantsAntialias !== gfx.antialias) notes.push(gfx.wantsAntialias ? 'Smoother edges after the game reloads.' : 'Edge smoothing turns off after the game reloads.')
+    setText(this.graphicsNote, notes.join(' '))
+
     const scale = state.settings.textScale
     for (const [i, b] of this.sizes.entries()) {
       const on = Math.abs(TEXT_SCALES[i]!.value - scale) < 0.01

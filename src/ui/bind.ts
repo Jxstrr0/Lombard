@@ -29,7 +29,7 @@ import { OfficeSheet } from './screens/office'
 import { OfferScreen } from './screens/offer'
 import { RedeemScreen } from './screens/redeem'
 import { SaleScreen } from './screens/sale'
-import { SettingsSheet } from './screens/settings'
+import { SettingsSheet, type GraphicsInfo, type GraphicsChoice } from './screens/settings'
 import { ShopSheet } from './screens/shop'
 import { WelcomeScreen } from './screens/welcome'
 
@@ -55,6 +55,9 @@ export interface UiDeps {
   /** Device sound settings (not part of the career). */
   getSound(): SoundSettings
   setSound(patch: Partial<SoundSettings>): void
+  /** Device graphics quality (localStorage, not the career). */
+  getGraphics(): GraphicsInfo
+  setGraphics(choice: GraphicsChoice): void
 }
 
 export interface UiLayout {
@@ -118,6 +121,8 @@ export class Ui {
       setReduceMotion: deps.setReduceMotion,
       getSound: deps.getSound,
       setSound: deps.setSound,
+      getGraphics: deps.getGraphics,
+      setGraphics: deps.setGraphics,
     })
     this.screens = {
       counter: this.counter,

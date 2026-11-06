@@ -22,6 +22,7 @@ import * as THREE from 'three'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
+import { textureAnisotropy } from './perf'
 
 export interface ShopManifest {
   version: number
@@ -60,7 +61,7 @@ export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string)
     lightmap.channel = 1
     lightmap.flipY = false
     lightmap.colorSpace = THREE.SRGBColorSpace
-    lightmap.anisotropy = 4
+    lightmap.anisotropy = textureAnisotropy()
     owned.push(lightmap)
 
     const cache = new Map<THREE.Material, THREE.Material>()
@@ -89,7 +90,7 @@ export async function loadBakedShop(renderer: THREE.WebGLRenderer, base: string)
       if (m?.map) maps.add(m.map)
     })
     for (const t of maps) {
-      t.anisotropy = 4
+      t.anisotropy = textureAnisotropy()
       owned.push(t)
     }
     group.updateMatrixWorld(true)

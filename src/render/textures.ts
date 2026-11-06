@@ -5,6 +5,7 @@
  */
 import * as THREE from 'three'
 import { Rng } from '../game/rng'
+import { textureAnisotropy } from './perf'
 
 function canvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
   const c = document.createElement('canvas')
@@ -20,7 +21,7 @@ function toTexture(c: HTMLCanvasElement, repeatX = 1, repeatY = 1, srgb = true):
   t.wrapS = t.wrapT = THREE.RepeatWrapping
   t.repeat.set(repeatX, repeatY)
   if (srgb) t.colorSpace = THREE.SRGBColorSpace
-  t.anisotropy = 4
+  t.anisotropy = textureAnisotropy()
   return t
 }
 

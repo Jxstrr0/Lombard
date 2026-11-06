@@ -60,6 +60,8 @@ export interface PolicyParams {
   skepticism: number
   /** Keep cash for bills due within this many days (0 = spend everything). */
   reserveDays: number
+  /** Story choices (by id) to take when a scene offers one of them; otherwise the first choice. */
+  prefer?: readonly string[]
 }
 
 /** Cash the policy is willing to spend right now. */
@@ -102,10 +104,13 @@ export function makePolicy(p: PolicyParams): Policy {
         return state.queue.length > 0 ? { type: 'counter/next' } : { type: 'day/close' }
       }
       if (c.phase === 'resolved') return { type: 'counter/dismiss' }
-      // Story scenes: read on, and take the first choice offered (the sim judges prices, not people).
+      // Story scenes: read on, and take a preferred choice or else the first one (the sim judges prices, not people).
       if (c.phase === 'scene') {
         const sc = c.scene
-        if (sc && !sc.chosen && sc.step >= sc.lines.length - 1 && sc.choices.length > 0) return { type: 'scene/choose', choiceId: sc.choices[0]!.id }
+        if (sc && !sc.chosen && sc.step >= sc.lines.length - 1 && sc.choices.length > 0) {
+          const pick = sc.choices.find((x) => p.prefer?.includes(x.id)) ?? sc.choices[0]!
+          return { type: 'scene/choose', choiceId: pick.id }
+        }
         return { type: 'scene/next' }
       }
       if (c.kind === 'scene') return { type: 'scene/next' }
@@ -201,6 +206,9 @@ export const careful = makePolicy({
   dumpAfterDays: 21,
   skepticism: 0.1,
   reserveDays: 10,
+  // Runs a clean shop: turns down the crew's "insurance" (Protection arc). Paying costs a careful
+  // shop about 2 points of monthly growth (docs/05, Nov 6); the bands measure the trade, not that choice.
+  prefer: ['refuse'],
 })
 
 export const careless = makePolicy({

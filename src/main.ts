@@ -12,7 +12,8 @@
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
- * ?scenario=rolex / ?scenario=laptop open day 1 with a beat of that arc first in line (BEAT_SCENARIOS);
+ * ?scenario=rolex / ?scenario=laptop / ?scenario=protection open day 1 with a beat of that arc first in line (BEAT_SCENARIOS;
+ * protection: Eduard Lvovich's "insurance" offer);
  * ?scenario=specialist opens day 1 with Gennady's first-refusal phone call, then Ilya at the counter with the widow's watch (M4 specialists' arcs).
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
@@ -104,7 +105,7 @@ function storyScenario(s0: GameState): GameState {
 }
 
 /** Dev-only (?scenario=<key>): the beat each arc scenario puts first in line on day 1. */
-const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent' }
+const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent', protection: 'protection.offer' }
 
 function beatScenario(s0: GameState, beatId: string): GameState {
   let s = reducer(s0, { type: 'career/begin', shopName: '' })

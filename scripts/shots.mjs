@@ -710,6 +710,25 @@ async function main() {
       out.push(...h.shots)
       await context.close()
     }
+    {
+      // Dev scenario: the Protection arc's offer (Eduard Lvovich), its three choices and a refusal.
+      const { context, page } = await newPage(browser, PORTRAIT, '?seed=1&scenario=protection')
+      const h = helpers(page, 'protection')
+      await page.waitForFunction(() => ['news', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) === 'news') await h.click('news-done')
+      await h.screen('counter')
+      await h.click('next-customer')
+      await page.waitForTimeout(600)
+      await h.shot('offer', 'Protection offer: Eduard Lvovich, first line')
+      for (let i = 0; i < 6 && !(await h.visible('choice-refuse')); i++) await h.click('scene-next')
+      await page.waitForTimeout(400)
+      await h.shot('choices', 'the offer itself and its three choices: accept, haggle, refuse')
+      await h.click('choice-refuse')
+      await page.waitForTimeout(400)
+      await h.shot('refused', 'his reply to a refusal')
+      out.push(...h.shots)
+      await context.close()
+    }
     // Head look (?look=<yawDeg>,<pitchDeg>, +yaw = right, +pitch = up): the empty counter view, head turned.
     // The player looks along +z, so world +X (the storeroom doorway at x = 3) is on their left.
     for (const [slug, look, what] of [

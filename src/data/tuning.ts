@@ -739,6 +739,26 @@ export const tuning = {
     maxChance: 0.25,
   },
 
+  /**
+   * M4 Protection arc, first half (src/data/stories/protection.ts; the charge is in
+   * src/game/economy/expenses.ts). Pressure is the hidden mob dial (GDD § 8): 0 = they
+   * haven't noticed you; M5 builds the escalation ladder on it.
+   */
+  protection: {
+    /** "Insurance": this share of the calendar month's takings (everything sold), charged with the rent. */
+    share: 0.1,
+    /** The rate if you talked them down when they made the offer. */
+    haggledShare: 0.08,
+    /** Never less than this a month, however slow the month was. */
+    minimum: 4_000,
+    /** Refusing: the locksmith after someone glues the door lock. */
+    locksmith: 2_800,
+    /** Pressure moved by each beat and choice (unbounded; 0 = unnoticed). */
+    pressure: { asked: 0.05, accepted: -0.05, refused: 0.2, glueRefused: 0.15, gluePolice: 0.2, gluePaid: -0.1, bakery: 0.1 },
+    /** Standing with the mob group. */
+    rep: { accepted: 0.15, haggled: 0.05, refused: -0.1, gluePaid: 0.05, gluePolice: -0.15, glueRefused: -0.1 },
+  },
+
   save: {
     /** Day summaries kept in full; older days are folded into career stats. */
     historyDays: 60,

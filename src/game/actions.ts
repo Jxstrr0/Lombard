@@ -33,6 +33,8 @@ import { payForTool, toolExtras } from './inspect/available'
 import { SPECIALIST_TELL, useTool } from './inspect/tools'
 import { amountDue, createLoan, forfeitOverdue, pawnClaim, planRedemptions } from './loans/loans'
 import { axesAfterDeal } from './endings/axes'
+import { fenceAsk, fenceHaggle, isFence, planFence } from './crime/fence'
+import { FENCE_LINES } from '../data/fence'
 import { patienceRepFactor, repAfterDeal, repAfterInsult, repAfterRedeem, repAfterSale, repAfterWalkout, syncSpecialistsRep } from './reputation'
 import { Rng } from './rng'
 import type { ToolId } from './schema/item'
@@ -240,7 +242,8 @@ function log(state: GameState, entry: LedgerEntry): GameState {
 function haggleContext(state: GameState): HaggleContext | null {
   if (!state.current || !state.inspect || state.current.kind !== 'seller') return null
   const item = state.current.item
-  const claim = claimedValue(getItemDef(item.defId), item)
+  // M5: the fence names his price; offers are judged against it (an insult is far under it).
+  const claim = isFence(state.current.customer) ? fenceAsk(state, item) : claimedValue(getItemDef(item.defId), item)
   return {
     customer: state.current.customer,
     item,
@@ -299,6 +302,9 @@ function openDay(state: GameState): GameState {
     // ids, nor the game Rng.
     const storyId = (prefix: string, who: string) => `${prefix}s${s.calendar.day.toString(36)}_${who}`
     const story = planStory(s, storyId)
+    // M5: the fence's call or drop-in, once you've met him (on top of the walk-ins; own streams and ids).
+    const fence = planFence(s, storyId, story.visits.some((v) => isFence(v.visit.customer)))
+    if (fence.visit) story.visits.push({ visit: fence.visit, first: false })
     // M4 specialist warnings: while one runs, some walk-in sellers bring that piece (own streams; no boost, no change).
     const sellers = boostSellers(s, generateDayQueue(rng, tuning.day.customersPerDay - story.sellerPlaces, ids.next))
     const buyers = planBuyers(s, rng, ids.next)
@@ -319,6 +325,7 @@ function openDay(state: GameState): GameState {
     return {
       ...s,
       meta: { ...s.meta, nextId: ids.nextId() },
+      crime: { ...s.crime, fence: fence.fence },
       customers: story.customers,
       queue,
       current: null,
@@ -435,7 +442,7 @@ function nextCustomer(state: GameState): GameState {
 function offerCall(state: GameState, offer: number): GameState {
   const c = itemVisit(state)!
   const live = state.inventory.find((i) => i.id === c.item.id)
-  if (!live) return { ...state, current: { ...c, phase: 'resolved', outcome: 'left', line: 'Sold it already? Never mind. Next time.' } }
+  if (!live) return { ...state, current: { ...c, phase: 'resolved', outcome: 'left', line: isFence(c.customer) ? FENCE_LINES.gone : 'Sold it already? Never mind. Next time.' } }
   const tag = Math.max(offer, state.shop.prices[live.id] ?? 0)
   return { ...state, current: { ...c, item: live, sale: { itemId: live.id, tag, offer, ceiling: offer, round: 0, maxRounds: 1, status: 'open', history: [] } } }
 }
@@ -477,12 +484,13 @@ function makeOffer(state: GameState, amount: number, approach: Approach, evidenc
   if (offer <= 0 || offer > state.cash) return state
   if (state.haggle && state.haggle.status !== 'open') return state
   return withRng(state, (s, rng) => {
-    const h0 = s.haggle ?? startHaggle(ctx, rng)
+    const h0 = s.haggle ?? (isFence(c.customer) ? fenceHaggle(s, c.item) : startHaggle(ctx, rng))
     const { state: h, response } = haggleRound(h0, { offer, approach, evidenceId }, ctx, rng)
     const lineKey = c.wants === 'pawn' && response.kind === 'accept' ? `pawn.${response.lineKey}` : response.lineKey
     const line = pickLine(lineKey, rng, { price: rub(response.price), name: c.customer.name })
     let next: GameState = { ...s, haggle: h, current: { ...c, line } }
-    if (response.mood === 'insulted') next = repAfterInsult(next, c.customer)
+    // The neighbourhood doesn't hear how you spoke to the fence.
+    if (response.mood === 'insulted' && !isFence(c.customer)) next = repAfterInsult(next, c.customer)
     next = advanceTime(next, tuning.day.haggleRoundSeconds)
     if (!next.current) return next // they gave up during the round (cannot happen at the counter, but stay safe)
     if (response.kind === 'accept') return c.wants === 'pawn' ? pawn(next, response.price, line) : buy(next, response.price, line)

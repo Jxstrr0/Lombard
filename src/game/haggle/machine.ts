@@ -62,6 +62,8 @@ export interface HaggleContext {
   claimedValue: number
   /** Findings revealed during inspection (evidence candidates). */
   findings: readonly Finding[]
+  /** M4: a regular's trust in you (−1…1): trusting regulars open lower and hold a lower floor. */
+  trust?: number
 }
 
 export interface HaggleMove {
@@ -98,9 +100,10 @@ export function startHaggle(ctx: HaggleContext, rng: Rng): HaggleState {
   const desperation = clamp01(ctx.customer.desperation)
   const spread = H.perceptionNoise * (1 - knowledge)
   const perceived = Math.max(0, ctx.claimedValue * (1 + H.knowledgeBias * knowledge + rng.range(-spread, spread)))
-  const ask = tidyPrice(perceived * H.askMarkup[t])
+  const trust = clamp(ctx.trust ?? 0, -1, 1)
+  const ask = tidyPrice(perceived * H.askMarkup[t] * (1 - tuning.regulars.askPerTrust * trust))
   const share = Math.max(H.minFloorShare, H.floorShare[t] - H.desperationFloorDrop * desperation)
-  const floor = Math.min(ask, Math.round(perceived * share))
+  const floor = Math.min(ask, Math.round(perceived * share * (1 - tuning.regulars.floorPerTrust * trust)))
   const rounds = H.roundsByTemperament[t] - (rng.chance(H.shortRoundChance) ? 1 : 0)
   const maxRounds = clamp(rounds, H.minRounds, H.maxRounds)
   return { ask, floor, round: 0, maxRounds, irritation: 0, status: 'open', history: [] }

@@ -1,0 +1,194 @@
+/**
+ * M4 schemas: regulars (authored recurring customers) and story arcs.
+ *
+ * A regular is a named person with a fixed 3D look, a temperament, things
+ * they bring, a visiting rhythm and lines that change with how much they
+ * trust you (their memory is GameState.customers[id]).
+ *
+ * An arc is a list of beats. A beat waits until all its conditions hold
+ * (and a seeded chance passes), then one visit plays it: a regular walks in,
+ * maybe talks first (a scene, maybe with a choice), maybe brings a scripted
+ * item to inspect and haggle over, and when the visit ends its outcome is
+ * recorded so later beats can branch on it. Declarative on purpose (docs/02
+ * § Data schemas): no scripting language.
+ */
+import { z } from 'zod'
+
+const id = z.string().regex(/^[a-z0-9_]+$/, 'lowercase letters, digits, _')
+const beatId = z.string().regex(/^[a-z0-9_]+\.[a-z0-9_]+$/, 'arc.beat')
+const unit = z.number().min(0).max(1)
+const int = z.number().int()
+const range = z.tuple([int, int]).refine(([a, b]) => a <= b, 'min ≤ max')
+
+export const TemperamentSchema = z.enum(['stubborn', 'flexible', 'desperate', 'proud'])
+export const AuthenticitySchema = z.enum(['genuine', 'fake', 'frankenstein', 'restored'])
+export const ProvenanceSchema = z.enum(['clean', 'unknown', 'stolen', 'heirloom'])
+export const GroupSchema = z.enum(['neighbourhood', 'police', 'mob', 'specialists'])
+
+const lines = z.array(z.string().min(1)).min(1)
+
+/** What a regular brings on an ordinary visit (one entry is picked by weight). */
+export const RegularItem = z.object({
+  defId: z.string(),
+  weight: z.number().positive().default(1),
+  /** Leave out for the item's own odds of being fake. */
+  authenticity: AuthenticitySchema.optional(),
+  provenance: ProvenanceSchema.optional(),
+  /** Their claim about it; default: one of the item def's claims. */
+  story: lines.optional(),
+})
+
+export const RegularDef = z.object({
+  id,
+  /** As shown at the counter, e.g. "Zinaida Petrovna". Distinct from walk-in first names. */
+  name: z.string().min(1),
+  /** A walk-in archetype id (src/data/customers/walkins.ts) for the label under the name. */
+  archetype: z.string(),
+  /** Their cast id (src/data/customers/cast.json): always the same person. */
+  look: z.string(),
+  temperament: TemperamentSchema,
+  knowledge: unit,
+  desperation: unit,
+  /** One line for the People page: who they are, as the shopkeeper would put it. */
+  bio: z.string().min(1),
+  /**
+   * Ordinary visits: first eligible day, then every [min, max] days after a
+   * visit (seeded), optionally only on some weekdays (0 = Monday), and maybe
+   * stopping on a day. Leave out for someone who only comes in for their arc.
+   */
+  schedule: z
+    .object({
+      from: int.min(1),
+      every: range,
+      weekdays: z.array(int.min(0).max(6)).optional(),
+      until: int.optional(),
+    })
+    .optional(),
+  /** Chance an ordinary visit is a pawn rather than a sale. */
+  pawn: unit.default(0.3),
+  items: z.array(RegularItem).default([]),
+  lines: z.object({
+    /** The first time they walk in. */
+    first: lines,
+    /** Coming back, neither warm nor cold. */
+    again: lines,
+    /** Coming back, trusting you. */
+    warm: lines,
+    /** Coming back after you burned them. */
+    cold: lines,
+  }),
+})
+export type RegularDef = z.infer<typeof RegularDef>
+export type RegularItem = z.infer<typeof RegularItem>
+
+/** Compare a number: at least / at most (both optional; both = a range). */
+const cmp = z.object({ gte: z.number().optional(), lte: z.number().optional() })
+
+export const Condition = z.discriminatedUnion('if', [
+  /** Career day (1 = the first day). */
+  z.object({ if: z.literal('day'), ...cmp.shape }),
+  z.object({ if: z.literal('weekday'), in: z.array(int.min(0).max(6)).min(1) }),
+  /** A story flag is set (or not). */
+  z.object({ if: z.literal('flag'), flag: z.string(), not: z.boolean().optional() }),
+  /**
+   * A beat has played (or, with not, hasn't), optionally with one of these
+   * outcomes or choice ids, at a price/true-value ratio, and some days ago.
+   */
+  z.object({
+    if: z.literal('beat'),
+    beat: beatId,
+    not: z.boolean().optional(),
+    outcome: z.array(z.string()).min(1).optional(),
+    ratio: cmp.optional(),
+    daysAgo: cmp.optional(),
+  }),
+  /** A regular's trust (−1…1) or number of visits. */
+  z.object({ if: z.literal('trust'), who: id, ...cmp.shape }),
+  z.object({ if: z.literal('visits'), who: id, ...cmp.shape }),
+  /** Does this regular have a pawn loan open with you? */
+  z.object({ if: z.literal('loan'), who: id, not: z.boolean().optional() }),
+  /** A specialist on retainer (and their relationship 0–1). */
+  z.object({ if: z.literal('specialist'), id, retained: z.boolean().default(true), relationship: cmp.optional() }),
+  z.object({ if: z.literal('cash'), ...cmp.shape }),
+  z.object({ if: z.literal('rep'), group: GroupSchema, ...cmp.shape }),
+])
+export type Condition = z.infer<typeof Condition>
+
+export const Effect = z.discriminatedUnion('do', [
+  z.object({ do: z.literal('flag'), flag: z.string() }),
+  z.object({ do: z.literal('unflag'), flag: z.string() }),
+  z.object({ do: z.literal('trust'), who: id, delta: z.number() }),
+  z.object({ do: z.literal('rep'), group: GroupSchema, delta: z.number() }),
+  /** Cash changes hands outside a deal (a gift, a debt paid). Logged in the ledger. */
+  z.object({ do: z.literal('cash'), amount: int, text: z.string() }),
+  z.object({ do: z.literal('pressure'), delta: z.number() }),
+  z.object({ do: z.literal('heat'), delta: z.number() }),
+  /** No more beats from this arc. */
+  z.object({ do: z.literal('endArc') }),
+])
+export type Effect = z.infer<typeof Effect>
+
+export const Choice = z.object({
+  id,
+  /** Button text, short: "Tell her the truth". */
+  label: z.string().min(1).max(40),
+  /** What they say back (shown as their line). */
+  reply: z.string().min(1),
+  effects: z.array(Effect).default([]),
+  /** The visit ends after the reply (an item visit doesn't go on to the item). */
+  end: z.boolean().default(false),
+})
+export type Choice = z.infer<typeof Choice>
+
+/** A scripted item: what it is, exactly. Value comes from the item's own rules. */
+export const ScriptItem = z.object({
+  defId: z.string(),
+  authenticity: AuthenticitySchema.default('genuine'),
+  /** For a non-genuine item: which of the def's fake profiles (default: one of that kind). */
+  fakeProfileId: z.string().optional(),
+  provenance: ProvenanceSchema.default('clean'),
+  condition: range.optional(),
+  story: z.string().min(1),
+})
+export type ScriptItem = z.infer<typeof ScriptItem>
+
+/** After the visit: a line (replaces the usual one) and effects, keyed by outcome, or `any`. */
+const Aftermath = z.object({ line: z.string().optional(), effects: z.array(Effect).default([]) })
+
+export const VisitScript = z
+  .object({
+    /** A regular's id: who walks in. */
+    who: id,
+    /** seller: talks (if there's a scene), then sells or pawns the item. scene: just talks. */
+    kind: z.enum(['seller', 'scene']),
+    wants: z.enum(['sell', 'pawn']).default('sell'),
+    item: ScriptItem.optional(),
+    scene: z.object({ lines: lines, choices: z.array(Choice).max(3).default([]) }).optional(),
+    /** Their line when the item is on the mat (after the scene). Default: the item's story. */
+    line: z.string().optional(),
+    after: z.record(z.string(), Aftermath).default({}),
+    /** Walks in first today (before the line outside). */
+    first: z.boolean().default(false),
+  })
+  .refine((v) => v.kind === 'scene' || v.item !== undefined, 'a seller beat needs an item')
+  .refine((v) => v.kind === 'seller' || v.scene !== undefined, 'a scene beat needs a scene')
+export type VisitScript = z.infer<typeof VisitScript>
+
+export const Beat = z.object({
+  id: beatId,
+  /** All must hold on the morning the beat can play. */
+  when: z.array(Condition).default([]),
+  /** Chance per eligible morning (seeded), so beats don't land like clockwork. */
+  chance: unit.default(1),
+  visit: VisitScript,
+})
+export type Beat = z.infer<typeof Beat>
+
+export const Arc = z
+  .object({
+    id,
+    title: z.string().min(1),
+    beats: z.array(Beat).min(1),
+  })
+  .refine((a) => a.beats.every((b) => b.id.startsWith(`${a.id}.`)), 'beat ids start with the arc id')
+export type Arc = z.infer<typeof Arc>

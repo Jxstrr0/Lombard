@@ -501,6 +501,8 @@ async function boot(): Promise<void> {
     const dt = Math.min(raw, 0.1)
     perf?.begin()
     shop.update(dt)
+    // the street's weather (once both are loaded) dims the sun patch on rainy and snowy days
+    if (life && street) life.setWeather(street.todaysWeather)
     life?.update(dt, renderer.domElement.height)
     street?.update(dt)
     const customerState = shop.customerState

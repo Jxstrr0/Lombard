@@ -23,6 +23,7 @@ const ALLOWED_BRANDS = new Set([
   'Severin',
   'Kanon',
   'Weissler',
+  'Tosaki',
 ])
 /** Categories whose items carry no maker's brand (struck by a state mint or a jeweller). */
 const UNBRANDED = new Set(['gold', 'militaria', 'coins'])
@@ -49,6 +50,7 @@ const HALF_EXTENTS: Record<ItemDef['model']['placeholder'], [number, number, num
   order: [0.026, 0.026, 0.014],
   badge: [0.02, 0.025, 0.011],
   coin: [0.013, 0.013, 0.0015],
+  laptop: [0.169, 0.123, 0.158],
 }
 
 describe('item definitions', () => {
@@ -59,8 +61,8 @@ describe('item definitions', () => {
     }
   })
 
-  it('ships 30 defs across 6 categories with unique ids', () => {
-    expect(ITEM_DEFS).toHaveLength(30)
+  it('ships 31 defs across 7 categories with unique ids', () => {
+    expect(ITEM_DEFS).toHaveLength(31)
     const count = (c: string) => ITEM_DEFS.filter((d) => d.category === c).length
     expect(count('gold')).toBe(6)
     expect(count('watches')).toBe(6)
@@ -68,7 +70,8 @@ describe('item definitions', () => {
     expect(count('cameras')).toBe(4)
     expect(count('militaria')).toBe(5)
     expect(count('coins')).toBe(4)
-    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(30)
+    expect(count('electronics')).toBe(1)
+    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(31)
     expect(getItemDef('gold_band_583').category).toBe('gold')
   })
 

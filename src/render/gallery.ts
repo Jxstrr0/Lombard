@@ -64,7 +64,8 @@ export async function runGallery(
       if (glb) swapInGlb(m, back ? glb.clone() : glb)
       m.updateMatrixWorld(true)
       const size = new THREE.Box3().setFromObject(m.getObjectByName('glb') ?? m).getSize(new THREE.Vector3())
-      const k = 0.42 / Math.max(size.x, size.y, size.z)
+      // An upright laptop turned three-quarters spans more of its slot than its bounds suggest.
+      const k = (def.model.rest === 'upright' ? 0.34 : 0.42) / Math.max(size.x, size.y, size.z)
       for (const h of def.model.hotspots) {
         const bead = new THREE.Mesh(new THREE.SphereGeometry(0.012 / k, 8, 6), beadMat)
         bead.position.set(...h.position)
@@ -77,7 +78,9 @@ export async function runGallery(
       const col = slot % cols
       const row = Math.floor(slot / cols)
       holder.position.set((col - (cols - 1) / 2) * 0.5, -(row - (rows - 1) / 2) * 0.55, 0)
-      holder.rotation.set(back ? 0.25 : 0.3, back ? Math.PI + 0.5 : -0.5, 0)
+      // Upright items (a laptop) tip further towards the camera so the keyboard shows.
+      const tilt = def.model.rest === 'upright' ? (back ? 0.3 : 0.5) : back ? 0.25 : 0.3
+      holder.rotation.set(tilt, back ? Math.PI + 0.5 : -0.5, 0)
       scene.add(holder)
     }
   })

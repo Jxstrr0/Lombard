@@ -92,6 +92,8 @@ export const PLACEHOLDER_MODELS = [
   'order',
   'badge',
   'coin',
+  // M4
+  'laptop',
 ] as const
 
 const HexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/)
@@ -102,6 +104,12 @@ export const ItemModel = z.object({
   /** Main material colour for the placeholder (hex). */
   color: HexColor,
   scale: z.number().positive().default(1),
+  /**
+   * How it rests on the counter mat. `flat`: lying down, front (+Z) up, as a phone or coin
+   * would. `upright`: standing as modelled, +Y up, front towards the player (a laptop with
+   * its lid open). Upright items also start the inspect view looking down at them.
+   */
+  rest: z.enum(['flat', 'upright']).default('flat'),
   /** Medal ribbons: equal-width vertical stripes, left to right. */
   ribbon: z.array(HexColor).min(1).optional(),
   /** Which relief/print a medal or coin placeholder draws (free-form key, see src/render/items.ts). */

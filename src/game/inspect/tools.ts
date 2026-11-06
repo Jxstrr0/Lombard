@@ -214,6 +214,12 @@ const CONDITION_TEXT: Record<string, Record<Band, string>> = {
     worn: 'Scuffed corners and a long scratch across the screen.',
     poor: 'A cracked screen corner, a dented frame, buttons worn shiny.',
   },
+  electronics: {
+    mint: 'Lid and palm rest unmarked, the keys still matte, the screen spotless.',
+    good: 'Light scuffs on the lid corners and a shine on the most-used keys.',
+    worn: 'A scratched lid, a palm rest worn pale, a dead pixel near one corner.',
+    poor: 'A cracked hinge cover, missing key caps, a screen scratched right across.',
+  },
   cameras: {
     mint: 'Chrome bright, leatherette intact, the glass clean.',
     good: 'Light brassing on the corners; the controls turn smoothly.',
@@ -259,6 +265,7 @@ const WEIGHT_SUBJECT: Record<ItemDef['model']['placeholder'], string> = {
   order: 'An original of this award usually weighs',
   badge: 'An original of this badge usually weighs',
   coin: 'A coin of this issue weighs',
+  laptop: 'This model usually weighs',
 }
 
 function scaleReading(def: ItemDef, item: ItemInstance, rng: Rng, first: boolean): Omit<Finding, 'id' | 'tool'> {
@@ -288,6 +295,13 @@ function magnetFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Fin
     const text = pulls
       ? 'The magnet clings near the speaker, as it would on almost any phone. It tells you little.'
       : 'Hardly any pull, even near the speaker. Phones vary, so it tells you little.'
+    return { ...base, text, polarity: 'neutral' }
+  }
+  if (def.category === 'electronics') {
+    // Speakers, drive and screws: every laptop has steel and magnets in it somewhere.
+    const text = pulls
+      ? 'The magnet catches at the speakers and the screws, as it would on any laptop. It tells you little.'
+      : 'Barely a tug anywhere. Laptops vary inside, so it tells you little.'
     return { ...base, text, polarity: 'neutral' }
   }
   // A pull where the genuine article has none (or the reverse) is negative evidence.

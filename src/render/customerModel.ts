@@ -12,8 +12,14 @@ import { CAST } from '../data/customers/cast'
 export interface CustomerModel {
   id: string
   root: THREE.Group
-  /** Plays the glb's idle loop, if it has one. */
+  /** Plays the glb's clips (idle, walk). */
   mixer: THREE.AnimationMixer | null
+  /** Crossfade to a clip over `fade` seconds (no-op if it is already playing, or the glb lacks it). */
+  play(clip: 'idle' | 'walk', fade: number): void
+  /** Ground speed the walk clip was made for (m/s), from the cast data. */
+  walkSpeed: number | null
+  /** Clip names the glb carries. */
+  clips: string[]
   /** Each mesh's materials, made transparent so the scene can fade them. */
   materials: THREE.Material[]
   triangles: number
@@ -40,7 +46,7 @@ export class CustomerCast {
     if (!p) {
       p = loadCustomerModel(this.gltf, this.base, id, this.version)
       p.then(
-        (m) => console.info(`[customer] ${id}: ${Math.round(m.triangles)} triangles, ${m.materials.length} materials${m.mixer ? ', idle clip' : ''}`),
+        (m) => console.info(`[customer] ${id}: ${Math.round(m.triangles)} triangles, ${m.materials.length} materials${m.clips.length ? `, clips: ${m.clips.join(' + ')}` : ''}`),
         (err) => {
           console.warn(`[customer] ${id} failed to load`, err)
           // Let a later visit try again.
@@ -89,16 +95,31 @@ async function loadCustomerModel(loader: GLTFLoader, base: string, id: string, v
   })
   // The glbs face +z (towards the street); the customer faces the player.
   root.rotation.y = Math.PI
-  let mixer: THREE.AnimationMixer | null = null
-  const idle = gltf.animations[0]
-  if (idle) {
-    mixer = new THREE.AnimationMixer(root)
-    const action = mixer.clipAction(idle)
-    action.play()
-    // Start people at different points of the breath so two in a row don't match.
-    action.time = (hash(id) % 1000) / 1000 * idle.duration
+  // Clips by name; older glbs had only the idle, first.
+  const clips = {
+    idle: gltf.animations.find((a) => a.name === 'idle') ?? gltf.animations[0] ?? null,
+    walk: gltf.animations.find((a) => a.name === 'walk') ?? null,
   }
-  return { id, root, mixer, materials, triangles }
+  const mixer = clips.idle || clips.walk ? new THREE.AnimationMixer(root) : null
+  const actions = {
+    idle: mixer && clips.idle ? mixer.clipAction(clips.idle) : null,
+    walk: mixer && clips.walk ? mixer.clipAction(clips.walk) : null,
+  }
+  let current: THREE.AnimationAction | null = null
+  const play = (name: 'idle' | 'walk', fade: number) => {
+    const next = actions[name]
+    if (!next || next === current) return
+    next.reset()
+    // Start people at different points of the clip so two in a row don't match.
+    next.time = ((hash(id) % 1000) / 1000) * next.getClip().duration
+    next.play()
+    if (current && fade > 0) current.crossFadeTo(next, fade, false)
+    else current?.stop()
+    current = next
+  }
+  play('idle', 0)
+  const walkSpeed = CAST.find((c) => c.id === id)?.walkSpeed ?? null
+  return { id, root, mixer, materials, triangles, play, walkSpeed, clips: gltf.animations.map((a) => a.name) }
 }
 
 function disposeModel(m: CustomerModel): void {

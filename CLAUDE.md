@@ -68,9 +68,9 @@ In-game UI should feel like the shop (paper tags, receipt fonts, worn plastic), 
 
 ## Workflow rules
 
-- Colby reviews on a phone via GitHub Pages and does not run anything locally. Every change must be reviewable from the deployed build.
+- Kelbo reviews on a phone via GitHub Pages and does not run anything locally. Every change must be reviewable from the deployed build.
 - Before pushing, run `npm run test`, `npm run lint`, and `npm run shots`, and look at the screenshots yourself. Don't push a build you haven't seen.
-- The build number (short commit hash + date) is shown small in a screen corner so Colby can tell a fresh deploy from a cached one.
+- The build number (short commit hash + date) is shown small in a screen corner so Kelbo can tell a fresh deploy from a cached one.
 
 ## Things not to do
 

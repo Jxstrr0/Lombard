@@ -205,7 +205,7 @@ export class Ui {
     mount.appendChild(reminder)
     this.reminder = reminder
 
-    const build = el('div', 'build-number', `${__BUILD_SHA__} · ${__BUILD_DATE__}`)
+    const build = el('div', 'build-number', `v${__GAME_VERSION__} · ${__BUILD_SHA__} · ${__BUILD_DATE__}`)
     build.dataset.id = 'build'
     mount.appendChild(build)
     this.build = build
@@ -213,7 +213,7 @@ export class Ui {
 
   /** Appends which lightmap is live (preview / full bake) to the build number. */
   setBakeInfo(text: string): void {
-    this.build.textContent = `${__BUILD_SHA__} · ${__BUILD_DATE__} · ${text}`
+    this.build.textContent = `v${__GAME_VERSION__} · ${__BUILD_SHA__} · ${__BUILD_DATE__} · ${text}`
   }
 
   get mode(): 'title' | 'game' {

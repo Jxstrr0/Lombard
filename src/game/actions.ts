@@ -20,7 +20,7 @@ import { tuning } from '../data/tuning'
 import { claimedValue, dealerPrice } from './appraise/value'
 import { leftoverStock } from './career/start'
 import { generateDayQueue } from './customers/walkins'
-import { planStory } from './story/plan'
+import { planStory, storyRng } from './story/plan'
 import { afterVisit, sceneChoose, sceneFor, sceneNext } from './story/visit'
 import { updateMarket } from './economy/demand'
 import { chargeExpenses } from './economy/expenses'
@@ -287,8 +287,13 @@ function openDay(state: GameState): GameState {
     const market = updateMarket(s, rng)
     s = { ...s, market }
     const ids = idAllocator(s)
-    // Regulars and story beats first: their sellers take walk-in places.
-    const story = planStory(s, ids.next)
+    // Regulars and story beats first: their sellers take walk-in places. Their ids are keyed by
+    // day and person (each person comes at most once a day) and their queue places come from a
+    // forked stream, so planning a story visit shifts neither the walk-ins' ids (which label their
+    // pawn and look draws, and later their loans' redemption draws), nor another story visitor's
+    // ids, nor the game Rng.
+    const storyId = (prefix: string, who: string) => `${prefix}s${s.calendar.day.toString(36)}_${who}`
+    const story = planStory(s, storyId)
     const sellers = generateDayQueue(rng, tuning.day.customersPerDay - story.sellerPlaces, ids.next)
     const buyers = planBuyers(s, rng, ids.next)
     const redeemers = planRedemptions(s, ids.next)
@@ -296,7 +301,8 @@ function openDay(state: GameState): GameState {
     const first = story.visits.filter((v) => v.first).map((v) => v.visit)
     // Neighbourhood standing stretches (or shortens) how long people wait. No draws.
     const patience = patienceRepFactor(s)
-    const queue = [...first, ...mergeQueue(sellers, [...buyers, ...redeemers, ...later], rng)].map((v) =>
+    const walkIns = mergeQueue(sellers, [...buyers, ...redeemers], rng)
+    const queue = [...first, ...mergeQueue(walkIns, later, storyRng(s, 'queue'))].map((v) =>
       patience === 1 ? v : { ...v, patience: Math.round(v.patience * patience) },
     )
     return {

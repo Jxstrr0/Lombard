@@ -207,7 +207,7 @@ export const careful = makePolicy({
   skepticism: 0.1,
   reserveDays: 10,
   // Runs a clean shop: turns down the crew's "insurance" (Protection arc). Paying costs a careful
-  // shop about 5–7 points of monthly growth (docs/05, Nov 6); the bands measure the trade, not that choice.
+  // shop about 2 points of monthly growth (docs/05, Nov 6); the bands measure the trade, not that choice.
   prefer: ['refuse'],
 })
 

@@ -6,7 +6,8 @@
 export default {
   id: 'eduard',
   name: 'Eduard Lvovich',
-  archetype: 'hustler',
+  // The cast's archetype for this look; "Tradesman" under his name is the trade he'd give.
+  archetype: 'tradesman',
   look: 'male_adult_20',
   temperament: 'proud',
   knowledge: 0.8,

@@ -213,6 +213,36 @@ describe('planning', () => {
     let id = 0
     expect(planStory(s, (p) => `${p}${id++}`).visits).toEqual([])
   })
+
+  it('story visits never reroll the walk-ins: same ids, looks, items, order and game Rng without them', () => {
+    // A day with a story scene that takes its place in the line (no walk-in place, not first),
+    // and the same day with every arc ended. Regulars are away on both.
+    const nobody = (s: GameState): GameState => {
+      const customers = { ...s.customers }
+      for (const r of REGULARS) customers[r.id] = { ...memoryOf(s, r.id), nextDay: 10_000 }
+      return { ...s, customers }
+    }
+    let found: GameState | null = null
+    for (let seed = 1; seed <= 60 && !found; seed++) {
+      const t = recordBeat(only(nobody(onDay(startedState(seed, 'c1'), 12)), 'protection'), 'protection.asking', { day: 3, outcome: 'talked' })
+      if (pickBeats(t).some((b) => b.id === 'protection.offer')) found = t
+    }
+    expect(getBeat('protection.offer')!.visit.first).toBe(false)
+    const quiet = only(found!)
+    const busy = reducer(found!, { type: 'day/open' })
+    const plain = reducer(quiet, { type: 'day/open' })
+    const isStory = (v: QueuedVisit) => v.beatId !== undefined || v.customer.regularId !== undefined
+    expect(busy.queue.some((v) => v.beatId === 'protection.offer')).toBe(true)
+    expect(busy.queue.filter((v) => !isStory(v))).toEqual(plain.queue)
+    expect(busy.meta.rng).toBe(plain.meta.rng)
+    expect(busy.meta.nextId).toBe(plain.meta.nextId)
+  })
+
+  it('which beats come up depends on the career and the day, not on what happened at the counter', () => {
+    const s = only(onDay(startedState(3, 'c1'), 12), 'protection')
+    const ids = (t: GameState) => pickBeats(t).map((b) => b.id)
+    for (const rng of [1, 77, 123_456]) expect(ids({ ...s, meta: { ...s.meta, rng } })).toEqual(ids(s))
+  })
 })
 
 describe('at the counter', () => {
@@ -263,6 +293,8 @@ describe('at the counter', () => {
     s = run(s, { type: 'counter/inspect' }, { type: 'inspect/done' }, { type: 'offer/estimate', value: 50_000 })
     const value = s.current!.item!.trueValue
     s = run(s, { type: 'offer/make', amount: Math.min(s.cash, value), approach: 'straight' })
+    // Whether she takes the first fair offer or counters is the haggle's draw; either way, meet her.
+    if (s.haggle?.status === 'open') s = run(s, { type: 'offer/acceptAsk' })
     expect(s.current?.outcome).toBe('bought')
     expect(s.current?.line).toBe(beat.visit.after.bought!.line)
     expect(s.story.flags).toContain('medals_bought_real')

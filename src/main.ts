@@ -12,6 +12,7 @@
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
+ * ?scenario=item&item=<def id> opens day 1 with a walk-in selling that item first (M6: reviewing new items on the mat);
  * ?scenario=rolex / ?scenario=laptop / ?scenario=protection open day 1 with a beat of that arc first in line (BEAT_SCENARIOS;
  * protection: Eduard Lvovich's "insurance" offer; fence: Venya Mostovoy's first visit, a choice, then him again with
  * something to sell, M5; delivery: Zhora with the crew's stolen phones, opening at half, M5);
@@ -244,6 +245,17 @@ function bulletinScenario(s0: GameState): GameState {
   return brought ? { ...s, queue: [brought, ...s.queue.filter((v) => v !== brought)] } : s
 }
 
+/** Dev-only (?scenario=item&item=<def id>): the first seller in line brings that item (M6 item review). */
+function itemScenario(s0: GameState, defId: string | null): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'day/open' })
+  const def = ITEM_DEFS.find((d) => d.id === defId)
+  const first = s.queue.find((v) => v.kind === 'seller' && v.item)
+  if (!def || !first?.item) return s
+  const visit = { ...first, item: generateItem(def, new Rng(s.meta.seed), first.item.id) }
+  return { ...s, queue: [visit, ...s.queue.filter((v) => v !== first)] }
+}
+
 /** Dev-only (?scenario=raid): heat past the line and a raid ordered for this morning, with the hot watch in stock. */
 function raidScenario(s0: GameState): GameState {
   const s = holdHotWatch(reducer(s0, { type: 'career/begin', shopName: '' }), 6)
@@ -436,6 +448,7 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'volkova-intro') initial = volkovaIntroScenario(initial)
     if (params.get('scenario') === 'bulletin') initial = bulletinScenario(initial)
     if (params.get('scenario') === 'raid') initial = raidScenario(initial)
+    if (params.get('scenario') === 'item') initial = itemScenario(initial, params.get('item'))
     if (params.get('scenario') === 'collector') initial = collectorScenario(initial)
     if (params.get('scenario') === 'collector-offer') initial = collectorOfferScenario(initial)
     const regular = params.get('regular')

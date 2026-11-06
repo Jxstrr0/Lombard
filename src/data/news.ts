@@ -201,6 +201,18 @@ export const HINT_NEWS: Readonly<Record<string, { up: readonly NewsTemplate[]; d
     up: [{ id: 'hint_coin_up', headline: 'Coin collectors swap albums at the metro', body: 'Silver and gold coins are being traded hand to hand by people who all seem to know each other.' }],
     down: [{ id: 'hint_coin_down', headline: 'Coin dealers complain of a dull market', body: 'Collectors are sitting on their albums, says the numismatic society, and on their wallets.' }],
   },
+  instruments: {
+    up: [{ id: 'hint_instr_up', headline: 'Music school short of instruments', body: 'Parents are told to bring their own accordion. Grandfathers are being asked where theirs went.' }],
+    down: [{ id: 'hint_instr_down', headline: 'Pianos and bayans going for nothing', body: 'The classifieds are full of instruments nobody plays. One seller offers to throw in the lessons.' }],
+  },
+  tools: {
+    up: [{ id: 'hint_tools_up', headline: 'Renovation fever grips the Zatonny blocks', body: 'Every second flat is drilling. Neighbours report that the drilling starts at eight sharp and never ends.' }],
+    down: [{ id: 'hint_tools_down', headline: 'Builders’ market stalls drowning in drills', body: 'Half the city bought a drill in spring, a trader says, and the other half borrowed one.' }],
+  },
+  antiques: {
+    up: [{ id: 'hint_antiq_up', headline: 'Moscow buyers seen on the embankment', body: 'Visitors in good coats are asking after samovars and porcelain. The flea market has raised its prices by lunchtime.' }],
+    down: [{ id: 'hint_antiq_down', headline: 'Grandmother’s sideboard goes out of fashion', body: 'Young couples want white walls and flat-pack shelves, an antiques dealer sighs. Crystal is out. So is he.' }],
+  },
 }
 
 export const HINT_ALIAS: Readonly<Record<string, string>> = {

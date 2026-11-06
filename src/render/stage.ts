@@ -23,6 +23,8 @@ import { contactShadowTexture } from './textures'
 const COUNTER_READ_SIZE = 0.09
 /** Items with a largest side over this (m) sit on the counter at true size. */
 const BIG_ITEM = 0.2
+/** M6: items longer than this (a guitar, a chainsaw) are shrunk on the mat to read at this size, m. */
+const MAT_MAX = 0.42
 /** Most a hotspot may sit behind the first surface hit and still count as visible, m. */
 const OCCLUDE_SLACK_MAX = 0.006
 const ZOOM_MIN = 0.45
@@ -360,7 +362,7 @@ export class ItemStage {
     const size = box.getSize(new THREE.Vector3())
     this.size = Math.max(size.x, size.y, size.z, 0.005)
     // Big items (a laptop) already read from the counter: shown at true size, not blown up.
-    this.counterScale = THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, this.size > BIG_ITEM ? 1 : 1.2, 5)
+    this.counterScale = this.size > MAT_MAX ? MAT_MAX / this.size : THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, this.size > BIG_ITEM ? 1 : 1.2, 5)
     // Lying flat: model −Z points down, so lift by the depth below the origin (upright: −Y).
     this.lift = this.upright ? -box.min.y : -box.min.z
     // Footprint for the contact shadow: model X × Y on the mat (upright: X × Z).

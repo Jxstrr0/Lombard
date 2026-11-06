@@ -79,6 +79,16 @@ export const SpecialistDef = z.object({
     doubt: Lines,
     lowball: Lines,
   }),
+  /**
+   * M6: lines for one category that replace `lines` for that verdict (Zhenya talks phones by
+   * default, so tools get their own). Same placeholders.
+   */
+  categoryLines: z
+    .record(
+      z.string(),
+      z.object({ sound: Lines, redone: Lines, mixed: Lines, doubt: Lines, lowball: Lines }).partial(),
+    )
+    .optional(),
   /** Said when you retain them (office sheet status). */
   hello: z.string().min(1),
   /** M4 arcs: their cast id (src/data/customers/cast.json) when they come to the counter. Phone-only: leave out. */

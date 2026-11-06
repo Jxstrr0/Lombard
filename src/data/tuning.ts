@@ -137,7 +137,7 @@ export const tuning = {
     /** Provenance roll for M1 walk-ins (stolen arrives in M5). */
     provenanceWeights: { unknown: 0.55, clean: 0.33, heirloom: 0.12 },
     /** Only these categories can be heirlooms. */
-    heirloomCategories: ['gold', 'watches'] as readonly string[],
+    heirloomCategories: ['gold', 'watches', 'silver', 'antiques'] as readonly string[],
   },
 
   inspect: {
@@ -607,6 +607,12 @@ export const tuning = {
       cameras: { winter: 0.85, spring: 1.05, summer: 1.2, autumn: 0.9 },
       coins: { winter: 1.05, spring: 1, summer: 0.95, autumn: 1 },
       silver: { winter: 1, spring: 1, summer: 1, autumn: 1 },
+      /** M6 wave A. Music schools start in September; summer is for the dacha, not the bayan. */
+      instruments: { winter: 1, spring: 1.05, summer: 0.9, autumn: 1.1 },
+      /** Dacha and renovation season. */
+      tools: { winter: 0.85, spring: 1.15, summer: 1.15, autumn: 0.95 },
+      /** Long evenings, New Year presents for the in-laws. */
+      antiques: { winter: 1.1, spring: 1, summer: 0.95, autumn: 1 },
     } as Readonly<Record<string, Readonly<Partial<Record<'winter' | 'spring' | 'summer' | 'autumn', number>>>>>,
     /**
      * Holidays as date windows (MM-DD, inclusive; a window may wrap the year end) that
@@ -895,7 +901,7 @@ export const tuning = {
       /** Bulletin lines kept (and shown in the ledger) this many days. */
       keepDays: 21,
       /** Categories that get stolen and printed. */
-      categories: ['gold', 'watches', 'phones', 'cameras', 'electronics', 'militaria', 'coins'] as readonly string[],
+      categories: ['gold', 'watches', 'phones', 'cameras', 'electronics', 'militaria', 'coins', 'tools', 'silver'] as readonly string[],
       /** Only everyday pieces get printed: an item def whose top value (baseValue.max) is over this never does. */
       maxValue: 30_000,
     },

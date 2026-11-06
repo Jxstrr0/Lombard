@@ -7,8 +7,16 @@ import { Arc, type Beat } from '../../game/schema/story'
 import laptop from './laptop'
 import medals from './medals'
 import rolex from './rolex'
+// M4 specialists' small arcs (GDD § 2b), one per specialist.
+import faina from './faina'
+import gennady from './gennady'
+import ilya from './ilya'
+import stanislav from './stanislav'
+import zhenya from './zhenya'
 
-export const ARCS: readonly Arc[] = [medals, rolex, laptop].map((raw) => Arc.parse(raw))
+const SPECIALIST_ARCS = [faina, ilya, gennady, stanislav, zhenya]
+
+export const ARCS: readonly Arc[] = [medals, rolex, laptop, ...SPECIALIST_ARCS].map((raw) => Arc.parse(raw))
 
 const beats = new Map<string, Beat>(ARCS.flatMap((a) => a.beats.map((b) => [b.id, b] as const)))
 

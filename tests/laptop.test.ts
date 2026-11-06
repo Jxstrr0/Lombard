@@ -121,14 +121,14 @@ describe('story pledges (engine)', () => {
     expect(cond(['redeemed'])).toBe(false)
   })
 
-  it('a v5 save loads as v6 and keeps playing', () => {
-    const s = reducer(startedState(77, 'v5-career'), { type: 'day/open' })
+  it('a v6 save loads as v7 and keeps playing', () => {
+    const s = reducer(startedState(77, 'v6-career'), { type: 'day/open' })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- deliberately untyped old-shape record
     const raw = JSON.parse(JSON.stringify(s)) as Record<string, any>
-    raw.meta.version = 5
+    raw.meta.version = 6
     raw.story.arcs = { medals: { beats: { 'medals.roof': { day: 3, outcome: 'bought', ratio: 0.5 } } } }
     const m = migrate(raw)
-    expect(STATE_VERSION).toBe(6)
+    expect(STATE_VERSION).toBe(7)
     expect(m.meta.version).toBe(STATE_VERSION)
     expect(m.story.arcs.medals?.beats['medals.roof']).toEqual({ day: 3, outcome: 'bought', ratio: 0.5 })
     expect(pledgeOf(m, 'medals.roof')).toBeUndefined()

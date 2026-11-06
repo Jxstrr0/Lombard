@@ -2,8 +2,10 @@
 import { repOf } from '../reputation'
 import type { Condition } from '../schema/story'
 import type { GameState } from '../state'
+import { getItemDef } from '../../data/items'
 import { pledgeOf } from './pledges'
 import { beatRecord } from './progress'
+import { monthsRetained } from './specialists'
 
 function within(x: number, c: { gte?: number; lte?: number }): boolean {
   return (c.gte === undefined || x >= c.gte) && (c.lte === undefined || x <= c.lte)
@@ -49,6 +51,25 @@ export function holds(c: Condition, state: GameState): boolean {
       return within(state.cash, c)
     case 'rep':
       return within(repOf(state, c.group), c)
+    // --- M4 specialists' small arcs ---
+    case 'retainedMonths':
+      return monthsRetained(state, c.id) >= c.gte
+    case 'specialistEvent':
+      return (state.specialists[c.id]?.events[c.event] ?? 0) >= c.gte
+    case 'arc': {
+      const a = state.story.arcs[c.arc]
+      const started = !!a && Object.keys(a.beats).length > 0
+      const is = c.is === 'started' ? started : c.is === 'ended' ? !!a?.ended : started && !a.ended
+      return is !== (c.not ?? false)
+    }
+    case 'stock':
+      return state.inventory.some((i) => getItemDef(i.defId).category === c.category && (!c.genuine || i.authenticity === 'genuine'))
+    case 'date': {
+      const md = state.calendar.date.slice(5)
+      return c.from <= c.to ? md >= c.from && md <= c.to : md >= c.from || md <= c.to
+    }
+    case 'any':
+      return c.of.some((x) => holds(x, state))
   }
 }
 

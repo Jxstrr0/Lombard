@@ -4,6 +4,7 @@ import type { Effect } from '../schema/story'
 import type { GameState } from '../state'
 import { renewPledge } from './pledges'
 import { adjustTrust, endArc } from './progress'
+import { applyChange, sellToSpecialist, startBoost, walkoutOne } from './specialists'
 
 export function applyEffect(state: GameState, e: Effect, arc: string): GameState {
   switch (e.do) {
@@ -28,6 +29,16 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
       return { ...state, crime: { ...state.crime, heat: state.crime.heat + e.delta } }
     case 'endArc':
       return endArc(state, arc)
+    // --- M4 specialists' small arcs ---
+    case 'specialist':
+      return applyChange(state, e.id, e.change, e.text)
+    case 'boost':
+      return startBoost(state, e.boost)
+    case 'walkout':
+      return walkoutOne(state)
+    case 'sellTo':
+      return sellToSpecialist(state, e.id, e.offer)
+    // --- M4 story pledges (The Student's Laptop) ---
     case 'renew':
       return renewPledge(state, e.who, e.charge, e.redeem)
   }

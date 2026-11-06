@@ -183,13 +183,15 @@ export class ShopScene {
     this.backdropState = { clock, reduceMotion: state.settings.reduceMotion }
     this.backdrop?.setState(clock, state.settings.reduceMotion)
     // Dim the customer while inspecting so they don't fight the item.
-    this.customerTarget = !state.current ? 0 : state.current.phase === 'inspect' ? INSPECT_CUSTOMER_OPACITY : 1
-    const look = state.current ? this.lookOf(state.current.customer) : null
+    // A phone call (M4 specialists) leaves the counter empty.
+    const here = state.current && !state.current.via ? state.current : null
+    this.customerTarget = !here ? 0 : here.phase === 'inspect' ? INSPECT_CUSTOMER_OPACITY : 1
+    const look = here ? this.lookOf(here.customer) : null
     if (look !== this.wantLook) {
       this.wantLook = look
       if (look) this.requestLook(look)
     }
-    const next = state.queue[0]
+    const next = state.queue.find((v) => !v.via)
     this.nextLook = next ? this.lookOf(next.customer) : null
     // Fetch the next person while this one talks.
     if (this.cast && this.nextLook) this.cast.get(this.nextLook).catch(() => {})

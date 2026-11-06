@@ -187,7 +187,7 @@ describe('ledger lines', () => {
 
   it('a settled standing reads as its band; specialists appear once retained', () => {
     let s: GameState = reducer(adjustRep(startedState(1, 'c'), 'youth', -0.7), { type: 'day/open' })
-    s = { ...s, specialists: { jeweler: { retained: true, relationship: 0.6, callsUsed: 0, sinceDay: 1 } } }
+    s = { ...s, specialists: { jeweler: { retained: true, relationship: 0.6, callsUsed: 0, sinceDay: 1, months: 0, events: {}, mods: {}, lowballed: [] } } }
     s = adjustRep(s, 'specialists', 0.6)
     s = { ...s, day: { ...s.day, repDelta: {} } }
     const lines = Object.fromEntries(standingLines(s).map((l) => [l.group, l.text]))

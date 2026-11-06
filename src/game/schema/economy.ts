@@ -81,5 +81,7 @@ export const SpecialistDef = z.object({
   }),
   /** Said when you retain them (office sheet status). */
   hello: z.string().min(1),
+  /** M4 arcs: their cast id (src/data/customers/cast.json) when they come to the counter. Phone-only: leave out. */
+  look: z.string().optional(),
 })
 export type SpecialistDef = z.infer<typeof SpecialistDef>

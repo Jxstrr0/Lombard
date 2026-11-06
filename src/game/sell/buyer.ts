@@ -45,6 +45,7 @@ import { tuning } from '../../data/tuning'
 import { claimedValue } from '../appraise/value'
 import { generateWalkIn } from '../customers/walkins'
 import { demandMultiplier } from '../economy/demand'
+import { specialistSellFactor } from '../economy/specialists'
 import { visibilityBonus } from '../economy/upgrades'
 import { buyerRepFactor } from '../reputation'
 import type { Rng } from '../rng'
@@ -81,7 +82,9 @@ export function sellChance(state: GameState, item: ItemInstance, area: SlotArea,
   const visibility = tuning.shop.visibility[area] * visibilityBonus(state, area)
   const demand = demandMultiplier(state, def.demandTags)
   const rep = clamp(1 + state.reputation.general * S.repPerPoint, S.repClamp[0], S.repClamp[1])
-  return clamp(S.baseChance * price * visibility * demand * rep * buyerRepFactor(state), 0, S.maxChance)
+  // M4 specialist arcs: Faina's customer book, Zhenya's repair desk (1 otherwise).
+  const arcs = specialistSellFactor(state, def.category)
+  return clamp(S.baseChance * price * visibility * demand * rep * buyerRepFactor(state) * arcs, 0, S.maxChance)
 }
 
 export function planBuyers(state: GameState, rng: Rng, nextId: (prefix: string) => string): QueuedVisit[] {

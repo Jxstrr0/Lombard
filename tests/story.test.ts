@@ -63,7 +63,9 @@ describe('story content', () => {
     for (const arc of ARCS) {
       for (const beat of arc.beats) {
         const v = beat.visit
-        expect(getRegular(v.who), `${beat.id} who`).toBeDefined()
+        // M4: a regular, or a specialist (their own arcs); `as` someone they sent.
+        expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who), `${beat.id} who`).toBeDefined()
+        if (v.as) expect(looks.has(v.as.look), `${beat.id} as.look`).toBe(true)
         if (v.item) {
           expect(items.has(v.item.defId), `${beat.id} item`).toBe(true)
           if (v.item.fakeProfileId) {
@@ -83,8 +85,10 @@ describe('story content', () => {
     }
   })
 
+  // Specialists' arcs (M4) are the exception: their beats trigger on their own (GDD § 2b: months, relationship, events).
   it('every beat after the first depends on an earlier beat of its arc', () => {
     for (const arc of ARCS) {
+      if (arc.specialist) continue
       for (const beat of arc.beats.slice(1)) {
         expect(beat.when.some((c) => c.if === 'beat' && c.beat.startsWith(`${arc.id}.`)), beat.id).toBe(true)
       }

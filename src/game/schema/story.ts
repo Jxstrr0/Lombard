@@ -13,6 +13,7 @@
  * § Data schemas): no scripting language.
  */
 import { z } from 'zod'
+import { tuning } from '../../data/tuning'
 
 const id = z.string().regex(/^[a-z0-9_]+$/, 'lowercase letters, digits, _')
 const beatId = z.string().regex(/^[a-z0-9_]+\.[a-z0-9_]+$/, 'arc.beat')
@@ -86,7 +87,7 @@ export type RegularItem = z.infer<typeof RegularItem>
 /** Compare a number: at least / at most (both optional; both = a range). */
 const cmp = z.object({ gte: z.number().optional(), lte: z.number().optional() })
 
-export const Condition = z.discriminatedUnion('if', [
+const BaseCondition = z.discriminatedUnion('if', [
   /** Career day (1 = the first day). */
   z.object({ if: z.literal('day'), ...cmp.shape }),
   z.object({ if: z.literal('weekday'), in: z.array(int.min(0).max(6)).min(1) }),
@@ -113,8 +114,28 @@ export const Condition = z.discriminatedUnion('if', [
   z.object({ if: z.literal('specialist'), id, retained: z.boolean().default(true), relationship: cmp.optional() }),
   z.object({ if: z.literal('cash'), ...cmp.shape }),
   z.object({ if: z.literal('rep'), group: GroupSchema, ...cmp.shape }),
+  // --- M4 specialists' small arcs (GDD § 2b) -----------------------------------------
+  /** On retainer at least `gte` months: retainers paid in full since sinceDay, and that many × monthDays on the books. */
+  z.object({ if: z.literal('retainedMonths'), id, gte: int.min(0) }),
+  /** Something their calls turned out to be, counted (SpecialistEvent in src/game/types.ts). */
+  z.object({ if: z.literal('specialistEvent'), id, event: z.enum(['soundBig', 'wrong', 'wrongSound', 'wrongBought', 'lowballSold']), gte: int.min(1).default(1) }),
+  /** Another arc has started (a beat played), is running (started, not ended) or has ended. */
+  z.object({ if: z.literal('arc'), arc: id, is: z.enum(['started', 'running', 'ended']).default('running'), not: z.boolean().optional() }),
+  /** You hold something in this category (in stock, not on loan); `genuine`: and it really is. */
+  z.object({ if: z.literal('stock'), category: z.string(), genuine: z.boolean().optional() }),
+  /** The calendar date (MM-DD) is within from…to (inclusive; may wrap the year end). */
+  z.object({ if: z.literal('date'), from: z.string().regex(/^\d\d-\d\d$/), to: z.string().regex(/^\d\d-\d\d$/) }),
 ])
+
+/** M4: at least one of these holds (one level: no `any` inside `any`). */
+const AnyCondition = z.object({ if: z.literal('any'), of: z.array(BaseCondition).min(1) })
+
+export const Condition = z.union([BaseCondition, AnyCondition])
 export type Condition = z.infer<typeof Condition>
+
+const changeName = z.string().refine((k) => k in tuning.specialistArcs.changes, 'a tuning.specialistArcs.changes key')
+const boostName = z.string().refine((k) => k in tuning.specialistArcs.boosts, 'a tuning.specialistArcs.boosts key')
+const offerName = z.string().refine((k) => k in tuning.specialistArcs.offers, 'a tuning.specialistArcs.offers key')
 
 export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('flag'), flag: z.string() }),
@@ -127,6 +148,15 @@ export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('heat'), delta: z.number() }),
   /** No more beats from this arc. */
   z.object({ do: z.literal('endArc') }),
+  // --- M4 specialists' small arcs (GDD § 2b) -----------------------------------------
+  /** A named change to a specialist (tuning.specialistArcs.changes); `text` is the ledger line if it moves cash. */
+  z.object({ do: z.literal('specialist'), id, change: changeName, text: z.string().optional() }),
+  /** Something turns up more for a while (tuning.specialistArcs.boosts). */
+  z.object({ do: z.literal('boost'), boost: boostName }),
+  /** One person waiting in the line gives up and leaves (a walkout like any other). */
+  z.object({ do: z.literal('walkout') }),
+  /** A specialist buys from your stock (tuning.specialistArcs.offers). */
+  z.object({ do: z.literal('sellTo'), id, offer: offerName }),
 ])
 export type Effect = z.infer<typeof Effect>
 
@@ -171,8 +201,27 @@ export const VisitScript = z
     after: z.record(z.string(), Aftermath).default({}),
     /** Walks in first today (before the line outside). */
     first: z.boolean().default(false),
+    /**
+     * M4: how it lands. counter: they walk in. phone: a call between customers (nobody walks in).
+     * paper: a note in the morning paper (scene lines = headline, then body; no choices; plays as 'talked').
+     * `who` may also name a specialist (src/data/specialists): they are the one talking.
+     */
+    via: z.enum(['counter', 'phone', 'paper']).default('counter'),
+    /** M4: someone sent by `who` walks in instead (a one-off stranger; `who` still owns the beat). */
+    as: z
+      .object({
+        name: z.string().min(1),
+        archetype: z.string(),
+        look: z.string(),
+        temperament: TemperamentSchema,
+        knowledge: unit,
+        desperation: unit,
+      })
+      .optional(),
   })
   .refine((v) => v.kind === 'scene' || v.item !== undefined, 'a seller beat needs an item')
+  .refine((v) => v.via !== 'paper' || (v.kind === 'scene' && (v.scene?.choices.length ?? 0) === 0), 'a paper beat is a scene without choices')
+  .refine((v) => v.via === 'counter' || v.kind === 'scene', 'only counter visits bring an item')
   .refine((v) => v.kind === 'seller' || v.scene !== undefined, 'a scene beat needs a scene')
 export type VisitScript = z.infer<typeof VisitScript>
 
@@ -183,6 +232,8 @@ export const Beat = z.object({
   /** Chance per eligible morning (seeded), so beats don't land like clockwork. */
   chance: unit.default(1),
   visit: VisitScript,
+  /** M4: the arc's last beat; a specialist released while their arc was under way never plays it. */
+  final: z.boolean().default(false),
 })
 export type Beat = z.infer<typeof Beat>
 
@@ -190,6 +241,11 @@ export const Arc = z
   .object({
     id,
     title: z.string().min(1),
+    /**
+     * M4: a specialist's small arc. Its beats wait while they're off retainer (or retired),
+     * and a `final` beat is skipped for good once they were let go mid-arc (GDD § 2b).
+     */
+    specialist: id.optional(),
     beats: z.array(Beat).min(1),
   })
   .refine((a) => a.beats.every((b) => b.id.startsWith(`${a.id}.`)), 'beat ids start with the arc id')

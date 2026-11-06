@@ -1,5 +1,17 @@
 /* M4 story: the regular badge on the speaker line and a scene's choices. */
 
+/* M4 specialists: "specialist" and "on the phone" share the regular badge's shape, in lilac. */
+.specialist-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(180, 140, 232, 0.14);
+  border: 1px solid rgba(180, 140, 232, 0.5);
+  color: var(--lilac, #b48ce8);
+}
+
 .regular-badge {
   font-size: 0.6875rem;
   font-weight: 600;

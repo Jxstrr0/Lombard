@@ -33,22 +33,47 @@ export function retainSpecialist(state: GameState, id: string): GameState {
   const roster = tuning.specialists.roster[id]
   const cost = retainCost(state, id)
   const prev = state.specialists[id]
-  if (!def || !roster || !cost || prev?.retained || state.cash < cost.fee) return state
+  if (!def || !roster || !cost || prev?.retained || prev?.retired || state.cash < cost.fee) return state
   const next = chargeExpense(state, cost.fee, `Retainer: ${def.name} (rest of the month)`)
   const sp: SpecialistState = {
+    // M4 arcs: what their arc changed (mods, counters) stays with them across a release.
+    ...prev,
     retained: true,
     relationship: prev?.relationship ?? tuning.specialists.relationshipStart,
-    callsUsed: roster.calls - cost.calls,
+    callsUsed: roster.calls + (prev?.mods.freeCalls ?? 0) - cost.calls,
     sinceDay: state.calendar.day,
+    months: 0,
+    events: prev?.events ?? {},
+    mods: prev?.mods ?? {},
+    lowballed: prev?.lowballed ?? [],
   }
   return { ...next, specialists: { ...next.specialists, [id]: sp } }
 }
 
-export function releaseSpecialist(state: GameState, id: string): GameState {
+/** `gentle` (M4, Ilya's arc): let them go with no relationship loss. `retire` (M4 arcs): gone for good. */
+export function releaseSpecialist(state: GameState, id: string, how: { gentle?: boolean; retire?: boolean } = {}): GameState {
   const sp = state.specialists[id]
   if (!sp?.retained) return state
-  const relationship = Math.max(0, sp.relationship - tuning.specialists.releaseRelationshipLoss)
-  return { ...state, specialists: { ...state.specialists, [id]: { ...sp, retained: false, relationship, sinceDay: 0 } } }
+  const loss = how.gentle || how.retire ? 0 : tuning.specialists.releaseRelationshipLoss
+  const relationship = Math.max(0, sp.relationship - loss)
+  const next: SpecialistState = { ...sp, retained: false, relationship, sinceDay: 0, months: 0, releasedDay: state.calendar.day }
+  if (how.retire) next.retired = true
+  return { ...state, specialists: { ...state.specialists, [id]: next } }
+}
+
+/** Calls in a month's allowance: the roster's plus any free calls their arc gave (M4). */
+export function monthlyCalls(state: GameState, id: string): number {
+  return (tuning.specialists.roster[id]?.calls ?? 0) + (state.specialists[id]?.mods.freeCalls ?? 0)
+}
+
+/** M4 arcs: buyer chance × this for an item in `category` (Faina's customer book, Zhenya's repair desk). */
+export function specialistSellFactor(state: GameState, category: string): number {
+  let f = 1
+  for (const sp of Object.values(state.specialists)) {
+    const b = sp.mods.sellBoost
+    if (sp.retained && b && b.categories.includes(category)) f *= b.factor
+  }
+  return f
 }
 
 /** Calls left in this month's allowance (0 if not retained). */
@@ -56,7 +81,7 @@ export function callsLeft(state: GameState, id: string): number {
   const sp = state.specialists[id]
   const roster = tuning.specialists.roster[id]
   if (!sp?.retained || !roster) return 0
-  return Math.max(0, roster.calls - sp.callsUsed)
+  return Math.max(0, monthlyCalls(state, id) - sp.callsUsed)
 }
 
 /** The retained specialist covering this item's category (roster order), if any. */

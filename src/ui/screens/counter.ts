@@ -43,6 +43,8 @@ export class CounterScreen {
   private loanBadge: HTMLElement
   /** M4: shown for authored regulars (they remember you). */
   private regularBadge: HTMLElement
+  /** M4: a specialist talking: "specialist" at the counter, "on the phone" on a call. */
+  private specialistBadge: HTMLElement
   /** M4: a story scene's choices, on its last line. */
   private choices: HTMLElement
   private choiceKey = ''
@@ -80,7 +82,9 @@ export class CounterScreen {
     this.loanBadge.dataset.id = 'loan-badge'
     this.regularBadge = el('span', 'regular-badge', 'regular')
     this.regularBadge.dataset.id = 'regular-badge'
-    this.speaker.append(this.name, this.tag, this.regularBadge, this.loanBadge)
+    this.specialistBadge = el('span', 'specialist-badge', 'specialist')
+    this.specialistBadge.dataset.id = 'specialist-badge'
+    this.speaker.append(this.name, this.tag, this.regularBadge, this.specialistBadge, this.loanBadge)
     this.itemName = el('div', 'item-tag')
     this.itemName.dataset.id = 'counter-item'
     this.line = el('p', 'line')
@@ -143,6 +147,8 @@ export class CounterScreen {
       setText(this.name, c.customer.name)
       setText(this.tag, archetypeLabel(c.customer.archetype))
       this.regularBadge.hidden = !c.customer.regularId
+      this.specialistBadge.hidden = !c.customer.specialistId && !c.via
+      setText(this.specialistBadge, c.via === 'phone' ? 'on the phone' : 'specialist')
       this.loanBadge.hidden = !(c.kind === 'seller' && c.wants === 'pawn' && c.phase !== 'resolved' && c.phase !== 'scene')
       if (c.item) setText(this.itemName, itemNameOf(c.item.defId, 'Something wrapped in a cloth'))
     }

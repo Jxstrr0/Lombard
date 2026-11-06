@@ -1,13 +1,16 @@
 /**
- * Boot: load (or create) the career, create the store, the shop scene and the
- * UI, then start the render loop.
+ * Boot: read the career slots, create the store, the shop scene and the UI,
+ * then start the render loop. The title screen (M4) shows first, over the
+ * dimmed shop of the most recently played career; picking a slot loads it
+ * into the store. Autosave writes only while a slot is being played.
  *
- * Query flags: ?seed=N forces a fresh deterministic career (screenshots),
+ * Query flags: ?seed=N forces a fresh deterministic career and skips the title
+ * screen (screenshots; that career is in no slot and is never saved),
  * ?perf=1 shows the perf overlay, ?gallery=1 shows every placeholder model.
  * ?look=<yawDeg>,<pitchDeg> starts the counter view with the head turned from the
  * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
- * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
+ * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
  * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint, street) for review.
@@ -40,7 +43,8 @@ import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
 import { bindKeyboard } from './input/keyboard'
 import { LookGestures } from './input/look'
-import { deleteCareer, loadLatestCareer, onCareerSaved, saveCareer } from './persist/autosave'
+import { deleteSlot, flushSaves, listSlots, loadSlot, onCareerSaved, putInSlot, saveCareer } from './persist/autosave'
+import { mostRecentSlot, type SlotNo } from './game/save/slots'
 import { keepStorage } from './persist/safety'
 import { CameraRig } from './render/camera'
 import { MIN_FPS, PerfOverlay, TIER_SETTINGS, TierGovernor, initialTier, saveAutoTier, saveChoice, setTextureAnisotropy, type GraphicsChoice, type QualityTier } from './render/perf'
@@ -53,6 +57,8 @@ import { clockForTime } from './render/life/timeOfDay'
 import { Ui, screenFor, type ScreenId } from './ui/bind'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
+/** Text size is a device setting (M4), like reduce motion: the title screen has no career to hold it. */
+const TEXT_SCALE_KEY = 'lombard.textScale'
 
 function newSeed(): number {
   const buf = new Uint32Array(1)
@@ -120,8 +126,26 @@ function storedReduceMotion(): boolean | null {
   }
 }
 
-function autosave(state: GameState): void {
-  saveCareer(state).catch((err) => console.warn('[save] autosave failed', err))
+/** Text size chosen in Settings on this device, or null. */
+function storedTextScale(): number | null {
+  try {
+    const v = Number(localStorage.getItem(TEXT_SCALE_KEY))
+    return Number.isFinite(v) && v >= 0.5 && v <= 2 ? v : null
+  } catch {
+    return null
+  }
+}
+
+function saveTextScale(scale: number): void {
+  try {
+    localStorage.setItem(TEXT_SCALE_KEY, String(scale))
+  } catch {
+    // storage blocked: the choice lasts for this session only
+  }
+}
+
+function autosave(state: GameState, slot: SlotNo): void {
+  saveCareer(state, slot).catch((err) => console.warn('[save] autosave failed', err))
 }
 
 function createRenderer(antialias: boolean, pixelRatioCap: number): THREE.WebGLRenderer | null {
@@ -167,23 +191,29 @@ async function boot(): Promise<void> {
   }
 
   // --- state -----------------------------------------------------------------
-  const seedParam = Number(params.get('seed'))
+  // ?seed=N: a review career, straight to the game, never saved. Otherwise the
+  // title screen, with the last played career's shop dimmed behind it.
+  const seedRaw = Number(params.get('seed'))
+  const seedGiven = Number.isFinite(seedRaw) && seedRaw > 0
+  // A dev ?scenario= is a review career too (seed 1 unless ?seed= says otherwise).
+  const review = seedGiven || params.has('scenario')
+  const seedParam = seedGiven ? seedRaw : 1
+  /** The slot being played; null on the title screen and for a review career (nothing is saved then). */
+  let activeSlot: SlotNo | null = null
   let initial: GameState | null = null
-  if (Number.isFinite(seedParam) && seedParam > 0) {
+  let slots = review ? [] : await listSlots()
+  if (review) {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
     if (params.get('scenario') === 'story') initial = storyScenario(initial)
   } else {
-    try {
-      initial = await loadLatestCareer()
-    } catch (err) {
-      console.warn('[save] could not load the last career, starting a new one', err)
-    }
-    if (!initial) {
-      const seed = newSeed()
-      initial = createInitialState(seed, newCareerId(seed))
-    }
+    const recent = mostRecentSlot(slots)
+    if (recent) initial = await loadSlot(recent.slot)
+    // Before M4 the text size lived in the career: carry the player's choice over once.
+    if (initial && storedTextScale() === null && initial.settings.textScale !== 1) saveTextScale(initial.settings.textScale)
   }
+  // An empty shop behind the title on a first visit (never saved: no slot is active).
+  initial ??= createInitialState(1, 'title-backdrop')
   const store = new Store(initial)
   // Once a career with real progress (a finished day) is safely written, ask the
   // browser to keep the storage. keepStorage asks at most once per page load.
@@ -193,12 +223,20 @@ async function boot(): Promise<void> {
   window.__lombardState = () => store.get()
 
   const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+  /** Device settings (reduce motion, text size) win over whatever the loaded career carries. */
   const applyReduceMotion = () => {
     const rm = storedReduceMotion() ?? reduceMotionQuery.matches
-    if (store.get().settings.reduceMotion !== rm) store.dispatch({ type: 'settings/set', patch: { reduceMotion: rm } })
+    const ts = storedTextScale() ?? store.get().settings.textScale
+    const cur = store.get().settings
+    if (cur.reduceMotion !== rm || cur.textScale !== ts) store.dispatch({ type: 'settings/set', patch: { reduceMotion: rm, textScale: ts } })
   }
   applyReduceMotion()
   reduceMotionQuery.addEventListener('change', applyReduceMotion)
+  /** Swap a career into the store with this device's settings applied. */
+  const enter = (s: GameState) => {
+    store.replace(s)
+    applyReduceMotion()
+  }
 
   // --- audio -----------------------------------------------------------------
   // Nothing is created or fetched until the first gesture (mobile autoplay rules).
@@ -255,15 +293,23 @@ async function boot(): Promise<void> {
   const ui = new Ui(app, {
     store,
     manualNext,
-    replaceState: (s) => store.replace(s),
-    newCareer: () => {
-      const old = store.get().meta.careerId
-      const seed = newSeed()
-      store.dispatch({ type: 'career/new', seed, careerId: newCareerId(seed) })
-      // The new career autosaves on career/new; drop the old one once that landed.
-      saveCareer(store.get())
-        .then(() => deleteCareer(old))
-        .catch((err) => console.warn('[save] could not clear the old career', err))
+    // In-game Load save code: the loaded career takes over this slot (the old one is deleted).
+    replaceState: (s) => {
+      const slot = activeSlot
+      if (!slot) return enter(s)
+      void putInSlot(s, slot).then((stored) => enter(stored ?? s))
+    },
+    mainMenu: () => void mainMenu(),
+    slotLabel: () => (activeSlot ? `slot ${activeSlot}` : null),
+    setTextScale: (scale) => {
+      saveTextScale(scale)
+      store.dispatch({ type: 'settings/set', patch: { textScale: scale } })
+    },
+    title: {
+      play: (slot) => void play(slot),
+      newCareer: (slot) => void newCareerIn(slot),
+      deleteSlot: (slot) => void deleteSlot(slot).then(refreshTitle),
+      loadCode: (state, slot) => void loadCodeInto(state, slot),
     },
     setReduceMotion: (on) => {
       try {
@@ -291,6 +337,43 @@ async function boot(): Promise<void> {
     },
   })
 
+  // --- title screen and slots -------------------------------------------------
+  const refreshTitle = async () => {
+    slots = await listSlots()
+    if (ui.mode === 'title') ui.showTitle(slots)
+  }
+  const start = (state: GameState, slot: SlotNo) => {
+    activeSlot = slot
+    enter(state) // store/replace autosaves it into the slot (and makes it the most recent)
+    ui.showGame()
+  }
+  const play = async (slot: SlotNo) => {
+    const s = await loadSlot(slot)
+    if (s) start(s, slot)
+    else await refreshTitle()
+  }
+  const newCareerIn = async (slot: SlotNo) => {
+    const seed = newSeed()
+    const fresh = createInitialState(seed, newCareerId(seed))
+    // Written before play starts so the slot is claimed; the intro (name the shop) comes next.
+    start((await putInSlot(fresh, slot)) ?? fresh, slot)
+  }
+  const loadCodeInto = async (state: GameState, slot: SlotNo) => {
+    const stored = await putInSlot(state, slot)
+    void keepStorage()
+    start(stored ?? state, slot)
+  }
+  const mainMenu = async () => {
+    const slot = activeSlot
+    activeSlot = null
+    if (slot) {
+      saveCareer(store.get(), slot).catch(() => {})
+      await flushSaves()
+    }
+    slots = await listSlots()
+    ui.showTitle(slots)
+  }
+
   const resize = () => {
     const w = window.innerWidth
     const h = window.innerHeight
@@ -317,13 +400,15 @@ async function boot(): Promise<void> {
     rig.setOfferFocus(state.current?.phase === 'offer')
   }
   sync(store.get(), null)
+  if (review) ui.showGame()
+  else ui.showTitle(slots)
   store.subscribe((state, prev, action) => {
     sync(state, prev)
     audio.play(cuesFor(prev, state, action))
     if (action.type === 'inspect/useTool' && (state.inspect?.findings.length ?? 0) > (prev.inspect?.findings.length ?? 0)) {
       stage.playTool(action.tool, state)
     }
-    if (action.type === 'store/replace' || AUTOSAVE_ACTIONS.has(action.type)) autosave(state)
+    if (activeSlot && (action.type === 'store/replace' || AUTOSAVE_ACTIONS.has(action.type))) autosave(state, activeSlot)
   })
 
   resize()
@@ -339,7 +424,7 @@ async function boot(): Promise<void> {
   })
   // Head look in the counter view: drag the 3D view to turn, tap the item to inspect, double-tap to recentre.
   new LookGestures(renderer.domElement, {
-    enabled: () => rig.canLook && LOOK_SCREENS.has(screenFor(store.get())),
+    enabled: () => ui.mode === 'game' && rig.canLook && LOOK_SCREENS.has(screenFor(store.get())),
     look: (dx, dy) => rig.turnHead(dx, dy),
     dragging: (on) => {
       rig.setLookDragging(on)
@@ -347,7 +432,7 @@ async function boot(): Promise<void> {
     },
     tap: (x, y) => {
       const s = store.get()
-      if (screenFor(s) !== 'counter' || s.current?.phase !== 'present' || s.current.kind !== 'seller') return
+      if (ui.mode !== 'game' || screenFor(s) !== 'counter' || s.current?.phase !== 'present' || s.current.kind !== 'seller') return
       if (stage.hitOnCounter(rig.camera, x, y, window.innerWidth, window.innerHeight)) store.dispatch({ type: 'counter/inspect' })
     },
     doubleTap: () => rig.recentre(),
@@ -356,7 +441,7 @@ async function boot(): Promise<void> {
 
   // --- time pressure: one in-game tick per real second at the counter --------
   window.setInterval(() => {
-    if (document.hidden) return
+    if (document.hidden || ui.mode !== 'game') return
     const s = store.get()
     if (s.day.phase !== 'open') return
     // At the counter the clock runs until the visit is resolved; with the counter

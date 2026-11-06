@@ -3,7 +3,7 @@ import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { openDB } from 'idb'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { closeAutosave, deleteCareer, listCareers, loadLatestCareer, saveCareer } from '../src/persist/autosave'
+import { closeAutosave, deleteCareer, deleteSlot, flushSaves, listCareers, listSlots, loadLatestCareer, loadSlot, putInSlot, saveCareer } from '../src/persist/autosave'
 import { reducer } from '../src/game/actions'
 import { CURRENT_VERSION } from '../src/game/save/migrations'
 import { type GameState } from '../src/game/state'
@@ -184,6 +184,96 @@ describe('corrupt and old records', () => {
   })
 })
 
+describe('career slots (M4)', () => {
+  it('migrates the pre-M4 autosave (no slot) into slot 1 and writes the slot back', async () => {
+    const base = career('legacy', 1, 54_321)
+    const legacy = { ...base, shop: { ...base.shop, name: 'Kelbo Pawn' } }
+    await putRaw({ careerId: 'legacy', savedAt: Date.now(), version: CURRENT_VERSION, state: legacy })
+    const slots = await listSlots()
+    expect(slots.map((s) => s.career?.careerId ?? null)).toEqual(['legacy', null, null])
+    expect(slots[0]!.career).toMatchObject({ shopName: 'Kelbo Pawn', cash: 54_321, day: 1 })
+    const db = await openDB('lombard')
+    expect((await db.get('careers', 'legacy')).slot).toBe(1)
+    db.close()
+    expect(await loadSlot(1)).toEqual(legacy)
+    // Idempotent: a second read changes nothing.
+    expect((await listSlots()).map((s) => s.career?.careerId ?? null)).toEqual(['legacy', null, null])
+  })
+
+  it('migrates an M1-shaped (version 2) record without a slot too, running the state migrations', async () => {
+    const v2 = {
+      meta: { version: 2, seed: 5, careerId: 'm1', rng: 5, nextId: 3 },
+      calendar: { day: 6, weekday: 2, season: 'spring', date: '2014-03-08' },
+      cash: 91_000,
+      shop: { slots: [], upgrades: [], security: 0 },
+      inventory: [],
+      paid: {},
+      loans: [],
+      customers: {},
+      queue: [],
+      current: null,
+      inspect: null,
+      haggle: null,
+      day: { phase: 'closed', clock: 0, served: 0, total: 0, openingCash: 91_000, log: [] },
+      history: [],
+      crime: { heat: 0, pressure: 0, fenceTrust: 0, flags: [] },
+      story: { arcs: {}, pendingEvents: [] },
+      reputation: { general: 0, byGroup: { neighbourhood: 0, police: 0, mob: 0, specialists: 0 } },
+      stats: { customersSeen: 4, itemsBought: 0, itemsSold: 0, totalSpent: 0, totalEarned: 0, bestDeal: 0, worstDeal: 0, fakesBought: 0 },
+      settings: { reduceMotion: false, textScale: 1.15 },
+      narration: 'hi',
+    }
+    await putRaw({ careerId: 'm1', savedAt: Date.now(), version: 2, state: v2 })
+    const [first] = await listSlots()
+    expect(first!.career).toMatchObject({ careerId: 'm1', day: 6, cash: 91_000 })
+    expect((await loadSlot(1))?.meta.version).toBe(CURRENT_VERSION)
+  })
+
+  it('autosaves keep the record in its slot', async () => {
+    await putInSlot(career('a'), 2)
+    await saveCareer(career('a', 1, 777))
+    const slots = await listSlots()
+    expect(slots[1]!.career).toMatchObject({ careerId: 'a', cash: 777 })
+    expect(slots[0]!.career).toBeNull()
+  })
+
+  it('putInSlot replaces the career in that slot and leaves the others', async () => {
+    await putInSlot(career('one'), 1)
+    await putInSlot(career('two'), 2)
+    await putInSlot(career('new-two'), 2)
+    expect((await listSlots()).map((s) => s.career?.careerId ?? null)).toEqual(['one', 'new-two', null])
+    expect((await listCareers()).map((c) => c.careerId).sort()).toEqual(['new-two', 'one'])
+  })
+
+  it('the same save code loaded into a second slot gets its own careerId', async () => {
+    await putInSlot(career('same'), 1)
+    const stored = await putInSlot(career('same', 1, 5), 3)
+    expect(stored?.meta.careerId).not.toBe('same')
+    const slots = await listSlots()
+    expect(slots[0]!.career?.careerId).toBe('same')
+    expect(slots[2]!.career?.careerId).toBe(stored?.meta.careerId)
+  })
+
+  it('deleteSlot removes only that slot; a damaged record occupies its slot until deleted', async () => {
+    await putInSlot(career('keep'), 1)
+    await putRaw({ careerId: 'broken', savedAt: Date.now(), version: CURRENT_VERSION, slot: 2, state: { nope: true } })
+    let slots = await listSlots()
+    expect(slots[1]).toMatchObject({ career: null, damaged: true })
+    await deleteSlot(2)
+    slots = await listSlots()
+    expect(slots[1]).toMatchObject({ career: null, damaged: false })
+    expect(slots[0]!.career?.careerId).toBe('keep')
+  })
+
+  it('a pending autosave of a deleted slot does not bring it back', async () => {
+    await putInSlot(career('gone'), 1)
+    void saveCareer(career('gone', 1, 2), 1)
+    await deleteSlot(1)
+    await flushSaves()
+    expect((await listSlots())[0]!.career).toBeNull()
+  })
+})
+
 describe('write coalescing', () => {
   it('rapid saves collapse to at most two writes and the last state wins', async () => {
     await saveCareer(career('warm')) // open the database first so the count below is only the burst
@@ -239,6 +329,15 @@ describe('storage failures never throw', () => {
     put.mockRestore()
     await saveCareer(career('q', 1, 3))
     expect((await loadLatestCareer())?.cash).toBe(3)
+  })
+
+  it('every slot reads empty (not a throw) without IndexedDB', async () => {
+    // @ts-expect-error simulate a browser with no IndexedDB
+    globalThis.indexedDB = undefined
+    expect((await listSlots()).every((s) => !s.career && !s.damaged)).toBe(true)
+    await expect(loadSlot(1)).resolves.toBeNull()
+    await expect(putInSlot(career('x'), 1)).resolves.toBeNull()
+    await expect(deleteSlot(1)).resolves.toBeUndefined()
   })
 
   it('retries opening the database after a failed open', async () => {

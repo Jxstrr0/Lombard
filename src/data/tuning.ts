@@ -1285,6 +1285,30 @@ export const tuning = {
   },
 
   /**
+   * M6 the twenty new regulars' small threads (src/data/stories/threads/): what their story
+   * choices move. Trust is the regular's own (−1…1); cash is what changes hands outside a deal
+   * (positive = you pay out; the arcs negate it); rep and heat as everywhere else.
+   */
+  threads: {
+    trust: { nod: 0.05, warm: 0.1, big: 0.15, cool: -0.08, hurt: -0.15 },
+    rep: { small: 0.02, shirts: 0.04 },
+    /** Handing a found piece to the police instead of buying it. */
+    heat: { handIn: -0.03 },
+    cash: {
+      /** Snezhana's train fare to the Moscow audition (paid back if she gets the boat job). */
+      snezhanaFare: 1500,
+      /** A wedding present for Patimat's son. */
+      patimatGift: 1000,
+      /** One game of blitz against Zakhar Svirelin, which you lose. */
+      zakharStake: 500,
+      /** The four children's share of Elvira's class trip. */
+      elviraTrip: 2000,
+      /** The shop's name on twelve Mostovik Under-12 shirts. */
+      vityaShirts: 3000,
+    },
+  },
+
+  /**
    * M6 the Appraiser (GDD § 7 Employee, § 9 The Appraiser; src/game/staff/appraiser.ts, the person
    * src/data/appraiser.ts, the arc src/data/stories/appraiser.ts). A second counter (an upgrade)
    * lets you hire one appraiser, Lev Andreyevich Sablin. He serves walk-in sellers off the line while

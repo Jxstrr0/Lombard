@@ -76,7 +76,7 @@ describe('regulars content', () => {
 
   it('everyone who drops in on a schedule has things to bring and a few lines per warmth', () => {
     const scheduled = REGULARS.filter((r) => r.schedule)
-    expect(scheduled.length).toBeGreaterThanOrEqual(16)
+    expect(scheduled.length).toBeGreaterThanOrEqual(36) // M6: forty regulars, less Fedya, Eduard and Zhora (they come only for their arcs)
     for (const r of scheduled) {
       expect(r.items.length, r.id).toBeGreaterThanOrEqual(3)
       expect(r.lines.again.length + r.lines.warm.length + r.lines.cold.length, r.id).toBeGreaterThanOrEqual(6)
@@ -94,7 +94,10 @@ describe('regulars over a 30-day career', () => {
     for (const { seed, final } of runs) {
       const visits = REGULARS.filter((r) => r.schedule).map((r) => final.customers[r.id]?.visits ?? 0)
       expect(visits.filter((v) => v >= 2).length, `seed ${seed}`).toBeGreaterThanOrEqual(10)
-      expect(visits.filter((v) => v >= 1).length, `seed ${seed}`).toBeGreaterThanOrEqual(visits.length - 2)
+      // M6: "most" of those due in the window; a few new regulars start late on purpose (Lera day 25,
+      // Styopa 26, Ernest 40), so a 30-day career may not see them yet.
+      const due = REGULARS.filter((r) => r.schedule && r.schedule.from <= DAYS - 10).map((r) => final.customers[r.id]?.visits ?? 0)
+      expect(due.filter((v) => v >= 1).length, `seed ${seed}`).toBeGreaterThanOrEqual(due.length - 2)
     }
   })
 

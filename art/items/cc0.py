@@ -10,6 +10,9 @@ origin, +Y up, front +Z; in Blender that is Z up, front -Y, and `rot` turns a
 model that faces elsewhere), rescales it (`size`: its largest side in metres),
 decimates it to `tris`, drops glass and flames (no per-item transparency),
 optional `tint` multiplies a material's colour (a brass model retinted silver),
+optional `paint` fills shapes on the resized base colour map (blanks
+the original maker's marks: {"rect": [x0, y0, x1, y1]} or {"ellipse": [cx, cy, rx,
+ry, degrees]}, in 0..1 of the image from its top-left, with "rgb": [r, g, b] 0..255),
 keeps the base colour, normal and metal/roughness maps at `tex` px, and writes:
   art/out/items/<id>.glb    raw model; scripts/items-pack.mjs Draco/KTX2s it
   art/out/items/<id>.json   triangles, materials, bounds and resolved hotspots
@@ -60,6 +63,32 @@ def fetch(asset: str, cache: Path) -> Path:
         r = urllib.request.Request(url, headers={"User-Agent": "lombard-asset-prep"})
         path.write_bytes(urllib.request.urlopen(r, timeout=120).read())
     return gltf
+
+
+def paint(img, ops: list) -> None:
+    """Fill `ops` shapes (see the module docstring) on a Blender image, in place."""
+    import numpy as np
+
+    w, h = img.size
+    a = np.array(img.pixels[:], dtype=np.float32).reshape(h, w, 4)
+    # Blender rows run bottom-up; shapes are given from the top-left
+    v, u = np.mgrid[0:h, 0:w].astype(np.float32)
+    u = (u + 0.5) / w
+    v = 1 - (v + 0.5) / h
+    for op in ops:
+        if "rect" in op:
+            x0, y0, x1, y1 = op["rect"]
+            m = (u >= x0) & (u <= x1) & (v >= y0) & (v <= y1)
+        else:
+            cx, cy, rx, ry, deg = op["ellipse"]
+            t = math.radians(deg)
+            du, dv = u - cx, v - cy
+            eu = du * math.cos(t) + dv * math.sin(t)
+            ev = -du * math.sin(t) + dv * math.cos(t)
+            m = (eu / rx) ** 2 + (ev / ry) ** 2 <= 1
+        a[m, :3] = [c / 255 for c in op["rgb"]]
+    img.pixels[:] = a.ravel()
+    img.update()
 
 
 def three_to_blender(v) -> Vector:
@@ -165,12 +194,24 @@ def prepare(item_id: str, spec: dict, cache: Path, out: Path, tmp: Path, preview
                 img = n.image
                 done.add(img.name)
                 # colour at `tex`; normal and metal/roughness maps at half that (they are UASTC, 4x the bytes)
-                px = spec.get("tex", 512) if "diff" in img.name or "col" in img.name.lower() else spec.get("tex", 512) // 2
+                base = "diff" in img.name or "col" in img.name.lower()
+                px = spec.get("tex", 512) if base else spec.get("tex", 512) // 2
                 img.scale(px, px)
+                if base and spec.get("paint"):
+                    paint(img, spec["paint"])
                 p = tmp / f"{item_id}_{len(done)}.png"
                 img.filepath_raw = str(p)
                 img.file_format = "PNG"
                 img.save()
+                if base and spec.get("paint"):
+                    # the exporter writes the image's original data, not painted pixels: swap in the saved file
+                    painted = bpy.data.images.load(str(p))
+                    painted.colorspace_settings.name = img.colorspace_settings.name
+                    for m2 in bpy.data.materials:
+                        for n2 in (m2.node_tree.nodes if m2.node_tree else []):
+                            if n2.type == "TEX_IMAGE" and n2.image == img:
+                                n2.image = painted
+                    done.add(painted.name)
     # hotspots: first surface hit along each ray (item coordinates)
     bpy.context.view_layer.update()
     resolved = []

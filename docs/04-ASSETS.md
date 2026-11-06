@@ -152,7 +152,8 @@ Wave A adds four categories (instruments, tools, silver & jewellery, household a
   ```
 - **Code-drawn kinds (30 items).** Accordions, balalaika, guitars, violin, trumpet, saxophone, power tools, socket set, sewing machine, spoons, tea-glass holder, cups, beads, cameo, amber pendant, samovar, figurine, vase and gramophone are built at runtime in `src/render/itemsWaveA.ts` (same coordinates; half extents listed at the top of the file and in `tests/items.test.ts`). No download at all; they can get scripted glbs later like the M3 items.
 - On the mat, anything longer than 42 cm is scaled down to fit (`MAT_MAX` in `src/render/stage.ts`); inspect shows it at full size.
-- Known texture text: the ukulele's headstock reads KOLO (so the brand is Kolo), the plane's casting reads MADE IN ENGLAND (fits Leman), and the metal detector's box carries the artist's invented marks (ROYAL SYSTEMS, "Gebo Hunter X"), which don't match our Kladez brand; a recolour or a decal over the box is a polish task.
+- Known texture text: the ukulele's headstock reads KOLO (so the brand is Kolo), the plane's casting reads MADE IN ENGLAND (fits Leman), and the metal detector's box and coil carried the artist's invented marks (ROYAL SYSTEMS, "Gebo Hunter X"). Those are blanked: the entry's `paint` list in `art/items/cc0.json` fills the two side plates, the model line, the badge and the coil sticker on the base colour map, so the shipped texture has no maker's text (the plates and sticker stay, empty).
+- Sizes on the mat: an item sits at true size unless it is smaller than 9 cm (a ring, a coin: blown up to read) or longer than the 42 cm mat (shrunk to fit). Nothing in between grows. A CC0 model whose source is bigger than the real thing is brought down with `model.scale` (vice 0.8, plane 0.75, hand drill 0.8, teapot 0.8, chess set 0.75); the coal samovar draws at 0.8 and the electric one at 0.68.
 
 ## Canal backdrop (decided Nov 2026, M3)
 

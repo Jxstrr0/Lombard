@@ -1123,14 +1123,14 @@
       "glb": "plane_leman_no4.glb",
       "placeholder": "block",
       "color": "#2c3e57",
-      "scale": 1,
+      "scale": 0.75,
       "rest": "upright",
       "size": [
         0.3308,
         0.1978,
         0.0843
       ],
-      "inspectDistance": 0.73,
+      "inspectDistance": 0.55,
       "hotspots": [
         {
           "id": "knob",
@@ -1265,14 +1265,14 @@
       "glb": "hand_drill_burav.glb",
       "placeholder": "block",
       "color": "#7a2a1f",
-      "scale": 1,
+      "scale": 0.8,
       "rest": "flat",
       "size": [
         0.1317,
         0.4857,
         0.1251
       ],
-      "inspectDistance": 1.07,
+      "inspectDistance": 0.85,
       "hotspots": [
         {
           "id": "handle",
@@ -1701,14 +1701,14 @@
       "glb": "vice_kuznets.glb",
       "placeholder": "block",
       "color": "#3b5a3a",
-      "scale": 1,
+      "scale": 0.8,
       "rest": "upright",
       "size": [
         0.3957,
         0.2851,
         0.2005
       ],
-      "inspectDistance": 0.87,
+      "inspectDistance": 0.7,
       "hotspots": [
         {
           "id": "jaws",

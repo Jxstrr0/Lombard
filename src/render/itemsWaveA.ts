@@ -601,15 +601,18 @@ function buildGramophone(g: THREE.Group, color: THREE.Color, brand?: string): vo
   // winding crank at +X
   cyl(g, 0.004, 0.004, 0.05, metal('#b8b4aa'), [0.19, -0.26, 0], 'x', 8)
   box(g, [0.006, 0.05, 0.006], metal('#b8b4aa'), [0.215, -0.24, 0])
-  // tone arm from the back, sound box over the record
-  tube(g, [[0.1, -0.18, -0.13], [0.1, -0.16, -0.05], [0.07, -0.17, 0.05]], 0.008, horn)
+  // horn elbow at the back: a brass post on the case with a ball joint; the tone arm and the horn both leave it
+  cyl(g, 0.02, 0.024, 0.03, horn, [0, -0.185, -0.13], 'y', 20)
+  add(g, new THREE.SphereGeometry(0.026, 20, 14), horn, [0, -0.168, -0.13])
+  // tone arm from the elbow, sound box over the record
+  tube(g, [[0, -0.168, -0.13], [0.035, -0.158, -0.05], [0.07, -0.17, 0.05]], 0.009, horn)
   cyl(g, 0.025, 0.025, 0.012, horn, [0.07, -0.175, 0.06], 'z', 20)
-  // the horn: rises at the back, opens towards the front
+  // the horn grows out of the elbow, rises at the back and opens towards the front
   const h = new THREE.Group()
-  lathe(h, [[0.012, 0], [0.02, 0.15], [0.045, 0.3], [0.09, 0.42], [0.165, 0.47], [0.17, 0.475]], horn, [0, 0, 0], 32)
+  lathe(h, [[0.017, 0], [0.022, 0.15], [0.045, 0.3], [0.09, 0.42], [0.165, 0.47], [0.17, 0.475]], horn, [0, 0, 0], 32)
   // tipped forward 43°, so the mouth looks up and out over the record rather than hiding it
   h.rotation.x = 0.75
-  h.position.set(0.0, -0.2, -0.13)
+  h.position.set(0, -0.17, -0.13)
   g.add(h)
   if (brand) decal(g, 0.1, 0.025, plateTexture(brand, '#5a3218', '#e2c98a', 'italic 700 38px Georgia, serif'), [0, -0.26, 0.1655])
 }

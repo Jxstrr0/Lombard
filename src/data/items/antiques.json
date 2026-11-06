@@ -155,9 +155,9 @@
     "model": {
       "placeholder": "samovar",
       "color": "#c79a3f",
-      "scale": 1,
+      "scale": 0.8,
       "rest": "upright",
-      "inspectDistance": 0.95,
+      "inspectDistance": 0.8,
       "hotspots": [
         {
           "id": "medals",
@@ -293,10 +293,10 @@
     "model": {
       "placeholder": "samovar",
       "color": "#cfcfc8",
-      "scale": 1,
+      "scale": 0.68,
       "rest": "upright",
       "emblem": "electric",
-      "inspectDistance": 0.9,
+      "inspectDistance": 0.68,
       "hotspots": [
         {
           "id": "body",
@@ -1139,9 +1139,9 @@
           "id": "turntable",
           "label": "Turntable",
           "position": [
-            -0.05,
+            -0.07,
             -0.19,
-            0.08
+            -0.05
           ]
         },
         {
@@ -1158,7 +1158,7 @@
           "label": "Horn",
           "position": [
             0.165,
-            0.147,
+            0.174,
             0.19
           ]
         }
@@ -1286,14 +1286,14 @@
       "glb": "teapot_volkhov.glb",
       "placeholder": "block",
       "color": "#f1ece2",
-      "scale": 1,
+      "scale": 0.8,
       "rest": "upright",
       "size": [
         0.2678,
         0.1644,
         0.1647
       ],
-      "inspectDistance": 0.59,
+      "inspectDistance": 0.47,
       "hotspots": [
         {
           "id": "spout",
@@ -1820,14 +1820,14 @@
       "glb": "chess_set_gambit.glb",
       "placeholder": "block",
       "color": "#7a5230",
-      "scale": 1,
+      "scale": 0.75,
       "rest": "flat",
       "size": [
         0.5532,
         0.5532,
         0.1123
       ],
-      "inspectDistance": 1.15,
+      "inspectDistance": 0.9,
       "hotspots": [
         {
           "id": "king",

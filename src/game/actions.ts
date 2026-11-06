@@ -22,6 +22,7 @@ import { leftoverStock } from './career/start'
 import { generateDayQueue } from './customers/walkins'
 import { planStory } from './story/plan'
 import { afterVisit, sceneChoose, sceneFor, sceneNext } from './story/visit'
+import { noteForfeits, pledgeRedeemLines } from './story/pledges'
 import { updateMarket } from './economy/demand'
 import { chargeExpenses } from './economy/expenses'
 import { releaseSpecialist, retainSpecialist } from './economy/specialists'
@@ -283,7 +284,9 @@ function openDay(state: GameState): GameState {
   return withRng(state, (s0, rng) => {
     // Start today's log first so forfeits land in it.
     let s: GameState = { ...s0, day: { phase: 'open', clock: 0, served: 0, total: 0, openingCash: s0.cash, log: [], newsRead: true } }
-    s = forfeitOverdue(s)
+    const pledged = s.loans
+    // Story beats hear about their pledges forfeited this morning.
+    s = noteForfeits(forfeitOverdue(s), pledged)
     const market = updateMarket(s, rng)
     s = { ...s, market }
     const ids = idAllocator(s)
@@ -291,7 +294,7 @@ function openDay(state: GameState): GameState {
     const story = planStory(s, ids.next)
     const sellers = generateDayQueue(rng, tuning.day.customersPerDay - story.sellerPlaces, ids.next)
     const buyers = planBuyers(s, rng, ids.next)
-    const redeemers = planRedemptions(s, ids.next)
+    const redeemers = pledgeRedeemLines(s, planRedemptions(s, ids.next))
     const later = story.visits.filter((v) => !v.first).map((v) => v.visit)
     const first = story.visits.filter((v) => v.first).map((v) => v.visit)
     // Neighbourhood standing stretches (or shortens) how long people wait. No draws.

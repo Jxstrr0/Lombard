@@ -5,9 +5,10 @@
  */
 import { RegularDef } from '../../game/schema/story'
 import edik from './edik'
+import fedya from './fedya'
 import zinaida from './zinaida'
 
-export const REGULARS: readonly RegularDef[] = [zinaida, edik].map((raw) => RegularDef.parse(raw))
+export const REGULARS: readonly RegularDef[] = [zinaida, edik, fedya].map((raw) => RegularDef.parse(raw))
 
 const byId = new Map(REGULARS.map((r) => [r.id, r]))
 

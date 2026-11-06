@@ -96,7 +96,9 @@ export function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string)
     return { visitId, kind: 'scene', customer, patience, beatId: beat.id, line: v.scene?.lines[0] }
   }
   const def = getItemDef(v.item.defId)
-  const item = scriptedItem(def, v.item, storyRng(state, `item:${beat.id}`), nextId('i'))
+  // `same`: one stream per career and key, so the same thing comes back every time.
+  const rng = v.item.same ? new Rng(state.meta.seed).fork(`story:item:${v.item.same}`) : storyRng(state, `item:${beat.id}`)
+  const item = scriptedItem(def, v.item, rng, nextId('i'))
   return { visitId, kind: 'seller', wants: v.wants, customer, item, patience, beatId: beat.id, line: v.line }
 }
 

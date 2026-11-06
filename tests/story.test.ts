@@ -265,7 +265,8 @@ describe('at the counter', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
     const base = onDay(startedState(9, 'c1'), day)
-    const quiet = { ...base, story: { ...base.story, arcs: { medals: { beats: {}, ended: true } } } }
+    // Every arc ended, so only Zinaida's ordinary visit changes the day.
+    const quiet = { ...base, story: { ...base.story, arcs: Object.fromEntries(ARCS.map((a) => [a.id, { beats: {}, ended: true }])) } }
     const askWith = (trust: number) => {
       let s = setMemory(quiet, 'zinaida', { trust })
       s = reducer(s, { type: 'day/open' })

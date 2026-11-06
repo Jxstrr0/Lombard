@@ -99,7 +99,7 @@ function storyScenario(s0: GameState): GameState {
 }
 
 /** Dev-only (?scenario=<key>): the beat each arc scenario puts first in line on day 1. */
-const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca' }
+const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent' }
 
 function beatScenario(s0: GameState, beatId: string): GameState {
   let s = reducer(s0, { type: 'career/begin', shopName: '' })

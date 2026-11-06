@@ -170,8 +170,22 @@ const v4ToV5: Migration = {
   },
 }
 
+/**
+ * v5 → v6 (M4 story pledges): a beat that ended in a pawn now remembers its
+ * loan and how the loan ended (`story.arcs[*].beats[*].loan`, optional). Beats
+ * recorded before had no link to follow, so nothing is filled in: their
+ * pledge conditions read as "never pawned". Only the version moves.
+ */
+const v5ToV6: Migration = {
+  from: 5,
+  to: 6,
+  up(raw) {
+    return raw
+  },
+}
+
 /** Ordered, contiguous chain. Append new steps at the end. */
-export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5]
+export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5, v5ToV6]
 
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())

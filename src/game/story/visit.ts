@@ -9,6 +9,7 @@ import { tuning } from '../../data/tuning'
 import type { GameState } from '../state'
 import type { QueuedVisit, SceneState, VisitOutcome, VisitState } from '../types'
 import { applyEffects } from './effects'
+import { notePawn, noteRedeemed } from './pledges'
 import { arcOf, clampTrust, memoryOf, recordBeat, setMemory } from './progress'
 
 /** The scene a queued visit opens with, if its beat has one. */
@@ -106,9 +107,12 @@ export function afterVisit(state: GameState): GameState {
       nextDay: Math.max(m.nextDay, day + gap),
     })
   }
+  // A story pawner just paid off their pledge: the beat that made the loan hears how it ended.
+  if (c.outcome === 'redeemed' && c.loanId) s = noteRedeemed(s, c.loanId)
   if (c.beatId) {
     const beat = getBeat(c.beatId)
     s = recordBeat(s, c.beatId, { day, outcome: c.outcome, ...(c.scene?.chosen ? { choice: c.scene.chosen } : {}), ...(ratio !== undefined ? { ratio } : {}) })
+    if (c.outcome === 'pawned' && c.item) s = notePawn(s, c.beatId, c.item.id)
     const after = beat?.visit.after[c.outcome] ?? beat?.visit.after.any
     if (after) {
       if (after.line) s = { ...s, current: { ...s.current!, line: after.line } }

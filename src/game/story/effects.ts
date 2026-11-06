@@ -2,6 +2,7 @@
 import { adjustRep } from '../reputation'
 import type { Effect } from '../schema/story'
 import type { GameState } from '../state'
+import { renewPledge } from './pledges'
 import { adjustTrust, endArc } from './progress'
 
 export function applyEffect(state: GameState, e: Effect, arc: string): GameState {
@@ -27,6 +28,8 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
       return { ...state, crime: { ...state.crime, heat: state.crime.heat + e.delta } }
     case 'endArc':
       return endArc(state, arc)
+    case 'renew':
+      return renewPledge(state, e.who, e.charge, e.redeem)
   }
 }
 

@@ -53,7 +53,8 @@ function helpers(page, name) {
       // The customer's strip and buttons wait until they stand at the counter (model loaded, faded in).
       if (dataId === 'next-customer') {
         await page
-          .waitForFunction(() => document.body.dataset.customer !== 'arriving', null, { timeout: 30_000 })
+          // 'in', not just "not arriving": until the next frame the body still says 'away' from the last visit.
+          .waitForFunction(() => document.body.dataset.customer === 'in', null, { timeout: 30_000 })
           .catch(() => console.warn('customer never arrived'))
       }
     },

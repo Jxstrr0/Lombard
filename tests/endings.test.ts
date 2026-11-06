@@ -124,3 +124,15 @@ describe('v7 → v8', () => {
     expect(m.stats.peopleHurt).toBe(0)
   })
 })
+
+describe('crime dials', () => {
+  it('heat and pressure move through addHeat / addPressure and never go below zero', async () => {
+    const { addHeat, addPressure } = await import('../src/game/crime/dials')
+    let s = addHeat(startedState(1, 'c'), 0.3)
+    s = addPressure(s, 0.2)
+    expect(s.crime.heat).toBe(0.3)
+    expect(s.crime.pressure).toBe(0.2)
+    expect(addHeat(s, -1).crime.heat).toBe(0)
+    expect(applyEffect(s, { do: 'pressure', delta: -0.05 }, 'protection').crime.pressure).toBe(0.15)
+  })
+})

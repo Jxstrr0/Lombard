@@ -1,4 +1,5 @@
 /** Apply story effects (src/game/schema/story.ts) to the state. Pure. */
+import { addHeat, addPressure } from '../crime/dials'
 import { flagAxis, nudgeAxis } from '../endings/axes'
 import { adjustRep } from '../reputation'
 import type { Effect } from '../schema/story'
@@ -30,9 +31,9 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
         day: { ...state.day, log: [...state.day.log, { kind: 'story', amount: e.amount, text: e.text }] },
       }
     case 'pressure':
-      return { ...state, crime: { ...state.crime, pressure: state.crime.pressure + e.delta } }
+      return addPressure(state, e.delta, `story:${arc}`)
     case 'heat':
-      return { ...state, crime: { ...state.crime, heat: state.crime.heat + e.delta } }
+      return addHeat(state, e.delta, `story:${arc}`)
     case 'endArc':
       return endArc(state, arc)
     // --- M4 specialists' small arcs ---

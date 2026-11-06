@@ -50,6 +50,12 @@ function helpers(page, name) {
     async click(dataId) {
       await id(dataId).click({ timeout: 10_000 })
       await page.waitForTimeout(120)
+      // The customer's strip and buttons wait until they stand at the counter (model loaded, faded in).
+      if (dataId === 'next-customer') {
+        await page
+          .waitForFunction(() => document.body.dataset.customer !== 'arriving', null, { timeout: 30_000 })
+          .catch(() => console.warn('customer never arrived'))
+      }
     },
     async visible(dataId) {
       return (await page.locator(`[data-id="${dataId}"]:visible`).count()) > 0

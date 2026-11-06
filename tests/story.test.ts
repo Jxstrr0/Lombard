@@ -8,6 +8,7 @@ import { CAST } from '../src/data/customers/cast'
 import { archetypes } from '../src/data/customers/walkins'
 import { SPECIALISTS } from '../src/data/specialists'
 import { FENCE } from '../src/data/fence'
+import { VOLKOVA } from '../src/data/police'
 import { REGULARS, getRegular } from '../src/data/regulars'
 import { ARCS, getBeat } from '../src/data/stories'
 import { holds } from '../src/game/story/conditions'
@@ -75,8 +76,9 @@ describe('story content', () => {
       for (const beat of arc.beats) {
         const v = beat.visit
         // M4: a regular, or a specialist (their own arcs); `as` someone they sent.
-        // M5: or the fence (his own arc).
-        expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who) ?? (v.who === FENCE.id ? FENCE : undefined), `${beat.id} who`).toBeDefined()
+        // M5: or the fence (his own arc), or Detective Volkova (hers).
+        const crime = v.who === FENCE.id ? FENCE : v.who === VOLKOVA.id ? VOLKOVA : undefined
+        expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who) ?? crime, `${beat.id} who`).toBeDefined()
         if (v.as) expect(looks.has(v.as.look), `${beat.id} as.look`).toBe(true)
         if (v.item) {
           expect(items.has(v.item.defId), `${beat.id} item`).toBe(true)
@@ -103,8 +105,10 @@ describe('story content', () => {
       if (arc.specialist) continue
       for (const beat of arc.beats.slice(1)) {
         // Directly, or through an `any` whose every option is an earlier beat of the arc.
+        // M5: or on having met Detective Volkova (her courtesy call, a systemic visit, opens her arc).
         const ofArc = (c: Condition) => c.if === 'beat' && c.beat.startsWith(`${arc.id}.`)
-        expect(beat.when.some((c) => ofArc(c) || (c.if === 'any' && c.of.every(ofArc))), beat.id).toBe(true)
+        const metHer = (c: Condition) => arc.id === 'volkova' && c.if === 'volkova' && c.met === true
+        expect(beat.when.some((c) => ofArc(c) || metHer(c) || (c.if === 'any' && c.of.every(ofArc))), beat.id).toBe(true)
       }
     }
   })

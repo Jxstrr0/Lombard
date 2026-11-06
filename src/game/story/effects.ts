@@ -2,6 +2,7 @@
 import { addHeat, addPressure } from '../crime/dials'
 import { scheduleVandalism } from '../crime/vandalism'
 import { applyFenceChange } from '../crime/fence'
+import { adjustTrust as adjustVolkovaTrust } from '../crime/volkova'
 import { flagAxis, nudgeAxis } from '../endings/axes'
 import { endCareer } from '../endings/end'
 import { tuning } from '../../data/tuning'
@@ -62,6 +63,9 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
     // --- M5 the fence ---
     case 'fence':
       return applyFenceChange(state, e.change)
+    // --- M5 Volkova's arc ---
+    case 'volkova':
+      return adjustVolkovaTrust(state, e.trust)
   }
 }
 

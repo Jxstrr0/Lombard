@@ -40,7 +40,7 @@ import { passportCheck } from './crime/ledger'
 import { isPoliceVisit, planPolice, policeChoose, policeScene, rollRaid } from './crime/volkova'
 import { fenceAsk, fenceHaggle, isFence, planFence } from './crime/fence'
 import { FENCE_LINES } from '../data/fence'
-import { volkovaLines } from '../data/police'
+import { VOLKOVA, volkovaLines } from '../data/police'
 import { patienceRepFactor, repAfterDeal, repAfterInsult, repAfterRedeem, repAfterSale, repAfterWalkout, syncSpecialistsRep } from './reputation'
 import { Rng } from './rng'
 import type { ToolId } from './schema/item'
@@ -330,7 +330,8 @@ function openDay(state: GameState): GameState {
     buyers.push(...referred.visits)
     // M5 police: a raid ordered last night happens now, or Volkova comes in (ids by day and role, the
     // story stream's draws); bulletin pieces walk in with a flagged regular or a walk-in of their own.
-    const police = planPolice(s, storyId)
+    // Her own arc's beat (her, or someone she sends) brings her in today: her police visit waits (ids by day and person).
+    const police = planPolice(s, storyId, story.visits.some((v) => v.visit.visitId === storyId('v', VOLKOVA.id)))
     const brought = bringBulletin(police.state, story.visits.map((v) => v.visit), storyId)
     s = brought.state
     const storyVisits = story.visits.map((v, i) => ({ ...v, visit: brought.story[i]! }))

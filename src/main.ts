@@ -20,6 +20,8 @@
  * M5 police: ?scenario=volkova opens day 1 with Detective Volkova first in line, asking about a bulletin watch you bought
  * two days ago and still hold (her three answers); ?scenario=bulletin prints a stolen-goods bulletin in today's paper
  * and puts the piece first in line with a walk-in seller (the passport pill); ?scenario=raid opens on a police raid.
+ * M5 Volkova's arc: ?scenario=volkova-intro (her courtesy call), and beats first in line (BEAT_SCENARIOS): volkova-father,
+ * volkova-source, volkova-stakeout, volkova-short, volkova-personal, volkova-inform, volkova-leak, volkova-icon, stanislav-icon.
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
@@ -125,6 +127,16 @@ const BEAT_SCENARIOS: Record<string, string> = {
   protection: 'protection.offer',
   fence: 'fence.meet',
   delivery: 'protection.delivery_phones',
+  // M5 Volkova's arc (src/data/stories/volkova.ts) and Stanislav's icon.
+  'volkova-father': 'volkova.father',
+  'volkova-source': 'volkova.source',
+  'volkova-stakeout': 'volkova.stakeout',
+  'volkova-short': 'volkova.short',
+  'volkova-personal': 'volkova.personal',
+  'volkova-inform': 'volkova.inform',
+  'volkova-leak': 'volkova.leak',
+  'volkova-icon': 'volkova.icon',
+  'stanislav-icon': 'stanislav.icon',
 }
 
 function beatScenario(s0: GameState, beatId: string): GameState {
@@ -175,6 +187,15 @@ function volkovaScenario(s0: GameState): GameState {
   const visit: QueuedVisit = { visitId: `vs${s.calendar.day.toString(36)}_volkova`, kind: 'scene', customer: volkovaCustomer(), patience: tuning.police.patience, line: '' }
   const queue = [visit, ...s.queue.filter((v) => v.customer.id !== 'volkova')]
   return { ...s, queue, crime: { ...s.crime, volkova: { ...s.crime.volkova, nextDay: s.calendar.day + 7 } }, day: { ...s.day, total: queue.length } }
+}
+
+/** Dev-only (?scenario=volkova-intro): her courtesy call (every career, days 8–20) is first in line. */
+function volkovaIntroScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'day/open' })
+  const visit: QueuedVisit = { visitId: `vs${s.calendar.day.toString(36)}_intro`, kind: 'scene', customer: volkovaCustomer(), patience: tuning.police.patience, line: '' }
+  const queue = [visit, ...s.queue.filter((v) => v.customer.id !== 'volkova')]
+  return { ...s, queue, day: { ...s.day, total: queue.length } }
 }
 
 /** Dev-only (?scenario=bulletin): today's paper prints a bulletin line, and a walk-in seller brings that very piece in first. */
@@ -370,6 +391,7 @@ async function boot(): Promise<void> {
     if (beatId) initial = beatScenario(initial, beatId)
     if (params.get('scenario') === 'fence') initial = fenceGoodsSecond(initial)
     if (params.get('scenario') === 'volkova') initial = volkovaScenario(initial)
+    if (params.get('scenario') === 'volkova-intro') initial = volkovaIntroScenario(initial)
     if (params.get('scenario') === 'bulletin') initial = bulletinScenario(initial)
     if (params.get('scenario') === 'raid') initial = raidScenario(initial)
     const regular = params.get('regular')

@@ -5,8 +5,8 @@
  *
  * Volkova is fictional. She borrows a walk-in look no regular, specialist or
  * reserved arc character wears (female_adult_07: auburn hair tied back, a brown
- * belted jacket, boots), like the specialists did. Her own arc (GDD § 9) comes
- * later and can sit on her state (crime.volkova) and the police.* story flags.
+ * belted jacket, boots), like the specialists did. Her own arc (GDD § 9) is
+ * src/data/stories/volkova.ts; it sits on her state (crime.volkova) and the police.* flags.
  *
  * Placeholders: {item} the piece (short name), {when} the day you took it in
  * ("on Tuesday"), {cash} an amount, {pieces} how many go, {street} somewhere in town.
@@ -32,6 +32,22 @@ export const volkovaLines = {
   ],
   /** After her introduction, if you reported the glue in your lock (Protection, protection.told_police). */
   introReported: 'You’re the one who reported glue in a lock. Nobody reports glue. I read it twice. We should talk about who sells glue round here, one day.',
+  /**
+   * Her courtesy call (once in every career, tuning.police.volkova.introDays), after the introduction:
+   * no errand, just the new owner meeting the local detective. Choices ≤ 40 characters.
+   */
+  courtesy: {
+    lines: [
+      'Nothing’s wrong. That’s why I’m here: I like to meet people on a day when nothing’s wrong. It makes the other days shorter.',
+      'Gusev had this place twelve years and I never once saw him smile. If you smile now and then you’ll already be an improvement.',
+      'Keep your passport book. Write in it. If something walks in that makes the back of your neck go cold, ring me before you pay for it.',
+    ],
+    choices: { tea: 'Put the kettle on', busy: 'It’s a busy morning' },
+    replies: {
+      tea: 'Go on, then. Three sugars; don’t look at me like that. My father says sugar is the only thing in this country that never lets you down.',
+      busy: 'Of course. Everybody is, when I come in. I’ll see myself out. Eleven shops; I’m good at doors.',
+    },
+  },
   /** She's back. */
   again: ['Detective Volkova again. Don’t get up.', 'Me again. I was passing. I’m always passing.', 'Morning. Put the kettle on if you like; I won’t be long, and I won’t drink it.'],
   /** Asking about a piece you still hold. */

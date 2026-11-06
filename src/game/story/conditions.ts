@@ -3,6 +3,7 @@ import { repOf } from '../reputation'
 import type { Condition } from '../schema/story'
 import type { GameState } from '../state'
 import { getItemDef } from '../../data/items'
+import { pledgeOf } from './pledges'
 import { beatRecord } from './progress'
 import { monthsRetained } from './specialists'
 
@@ -33,6 +34,12 @@ export function holds(c: Condition, state: GameState): boolean {
     case 'loan': {
       const open = state.loans.some((l) => l.customer.regularId === c.who)
       return open !== (c.not ?? false)
+    }
+    case 'pledge': {
+      const p = pledgeOf(state, c.beat)
+      let ok = p !== undefined && c.is.includes(p.status)
+      if (ok && c.daysAgo) ok = p!.day !== undefined && within(state.calendar.day - p!.day, c.daysAgo)
+      return ok !== (c.not ?? false)
     }
     case 'specialist': {
       const s = state.specialists[c.id]

@@ -111,7 +111,8 @@ function beatCustomer(beat: Beat): WalkIn | null {
   return regular ? regularCustomer(regular) : specialistCustomer(v.who)
 }
 
-function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string) => string): QueuedVisit | null {
+/** The visit that plays a beat: its person, and its scripted item or scene. Exported for dev scenarios. */
+export function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string) => string): QueuedVisit | null {
   const customer = beatCustomer(beat)
   if (!customer) return null
   const visitId = nextId('v')
@@ -121,7 +122,9 @@ function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string) => str
     return { visitId, kind: 'scene', customer, patience, beatId: beat.id, line: v.scene?.lines[0], ...(v.via === 'phone' ? { via: 'phone' as const } : {}) }
   }
   const def = getItemDef(v.item.defId)
-  const item = scriptedItem(def, v.item, storyRng(state, `item:${beat.id}`), nextId('i'))
+  // `same`: one stream per career and key, so the same thing comes back every time.
+  const rng = v.item.same ? new Rng(state.meta.seed).fork(`story:item:${v.item.same}`) : storyRng(state, `item:${beat.id}`)
+  const item = scriptedItem(def, v.item, rng, nextId('i'))
   return { visitId, kind: 'seller', wants: v.wants, customer, item, patience, beatId: beat.id, line: v.line }
 }
 
@@ -192,8 +195,9 @@ export function planStory(state: GameState, nextId: (prefix: string) => string):
     busy.add(beat.visit.who)
   }
 
-  // Someone already holding a pledge with you comes in to redeem it, not to sell; skip them today.
-  for (const l of state.loans) if (l.customer.regularId) busy.add(l.customer.regularId)
+  // Someone coming back to redeem a pledge comes in for that, not to sell; skip them today. Someone who has
+  // given up on theirs (redeemDay null) keeps dropping in as usual while it waits out its term.
+  for (const l of state.loans) if (l.customer.regularId && l.redeemDay !== null) busy.add(l.customer.regularId)
 
   const due: { def: RegularDef; nextDay: number }[] = []
   for (const def of REGULARS) {

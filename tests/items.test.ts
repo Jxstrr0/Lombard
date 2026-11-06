@@ -24,6 +24,17 @@ const ALLOWED_BRANDS = new Set([
   'Kanon',
   'Weissler',
   'Tosaki',
+  // M6 wave B (invented)
+  'Mostochas',
+  'Nevka',
+  'Vertex',
+  'Nakashima',
+  'Rubezh',
+  'Liraphon',
+  'Nimbus',
+  'Kosmo',
+  'Mostizdat',
+  'Kanal',
   // M6 wave A (invented)
   'Brunnhofer',
   'Prizyv',
@@ -106,11 +117,17 @@ const HALF_EXTENTS: Record<Exclude<ItemDef['model']['placeholder'], 'block'>, [n
   figurine: [0.07, 0.11, 0.07],
   vase: [0.08, 0.125, 0.08],
   gramophone: [0.22, 0.33, 0.32],
+  // M6 wave B: box and book take model.size (see halfExtents); record is sleeve + disc
+  box: [0, 0, 0],
+  book: [0, 0, 0],
+  record: [0.22, 0.18, 0.0042],
 }
 
 /** Half extents of a def's model: a CC0 glb's block is its own packed size. */
+/** Half-extents for a def: sized placeholders (wave A's block, wave B's box and book) use model.size. */
+const SIZED = new Set(['block', 'box', 'book'])
 const halfExtents = (def: ItemDef): [number, number, number] =>
-  def.model.placeholder === 'block' ? (def.model.size!.map((v) => v / 2) as [number, number, number]) : HALF_EXTENTS[def.model.placeholder]
+  SIZED.has(def.model.placeholder) ? (def.model.size!.map((v) => v / 2) as [number, number, number]) : HALF_EXTENTS[def.model.placeholder as Exclude<ItemDef['model']['placeholder'], 'block'>]
 
 describe('item definitions', () => {
   it('all raw defs parse against the zod schema', () => {
@@ -120,23 +137,24 @@ describe('item definitions', () => {
     }
   })
 
-  it('ships 76 defs across 12 categories with unique ids', () => {
-    expect(ITEM_DEFS).toHaveLength(76)
+  it('ships 120 defs across 13 categories with unique ids', () => {
+    expect(ITEM_DEFS).toHaveLength(120)
     const count = (c: string) => ITEM_DEFS.filter((d) => d.category === c).length
-    expect(count('gold')).toBe(6)
-    expect(count('watches')).toBe(6)
-    expect(count('phones')).toBe(5)
-    expect(count('cameras')).toBe(4)
-    expect(count('militaria')).toBe(5)
-    expect(count('coins')).toBe(4)
-    expect(count('electronics')).toBe(1)
+    expect(count('gold')).toBe(10)
+    expect(count('watches')).toBe(11)
+    expect(count('phones')).toBe(9)
+    expect(count('cameras')).toBe(9)
+    expect(count('militaria')).toBe(10)
+    expect(count('coins')).toBe(10)
+    expect(count('electronics')).toBe(5)
     expect(count('icons')).toBe(1) // M5: the Collector's, story-only
+    expect(count('media')).toBe(11) // M6 wave B
     // M6 wave A
     expect(count('instruments')).toBe(11)
     expect(count('tools')).toBe(11)
     expect(count('silver')).toBe(11)
     expect(count('antiques')).toBe(11)
-    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(76)
+    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(120)
     expect(getItemDef('gold_band_583').category).toBe('gold')
   })
 

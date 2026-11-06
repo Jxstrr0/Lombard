@@ -243,6 +243,7 @@ No real brands. Invented equivalents the player learns:
 - Cameras: *Zenit* (historical, fine), *Kanon*.
 - Laptops: *Tosaki* (the Orbita line).
 - Handbags: *Louis Vieux*, *Guccio*.
+- M6 wave B: watches *Mostochas*; cameras *Nevka*; phones *Vertex* (the luxury candybar); hi-fi *Rubezh* (Soviet decks and a turntable), *Nakashima* (a Japanese deck); consoles *Nimbus*, *Kosmo*; records *Liraphon* (the Mostograd pressing plant), *Kanal*; books *Mostizdat* (the city publisher). The car stereo and dashcam are *Severin*, the VHS recorder *Tosaki*, the tablet and music player *Mangosteen*.
 Each fake brand has deliberate tells that mirror real-world counterfeit tells without naming real companies.
 
 ## UI (portrait phone first)

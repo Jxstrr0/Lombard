@@ -3,6 +3,10 @@ Order of the Red Star: a silver five-pointed star with faceted red enamel rays,
 a silver centre medallion (a soldier in a greatcoat with his rifle, the legend
 round the band, СССР below), and a thick screw post with a big round nut behind.
 
+M6 wave B: the Order of the Patriotic War (id contains "patriotic") shares the
+star, the back and the nut, adding a silver sunburst, crossed rifle and sabre,
+and a gilt centre with a hammer and sickle on red, ОТЕЧЕСТВЕННАЯ ВОЙНА on white.
+
 Placeholder convention (src/render/items.ts): star r 0.025 in XY (inner radius
 0.0105), face +Z, front of the medallion at z ≈ 0.0033, back of the star at
 z ≈ −0.002, screw post behind to z ≈ −0.012, nut r ≈ 0.0145 around z = −0.0095.
@@ -121,7 +125,101 @@ def back(it: lib.Item, base, silver, relief) -> None:
     f.line([(0.0032 * math.cos(t), 0.0032 * math.sin(t)) for t in [2 * math.pi * i / 40 for i in range(41)]], 0.00028, h=0.00014)
 
 
+# ---------------------------------------------------------------------------
+# M6 wave B: Order of the Patriotic War (2nd class)
+
+
+def sunburst(silver) -> None:
+    """Silver rays fanning out between the star's points, behind it."""
+    pts = []
+    for g in range(5):
+        mid = math.pi / 2 + math.pi / 5 + 2 * math.pi * g / 5
+        for j in range(-4, 5):
+            a = mid + j * 0.115
+            r1 = 0.0222 - abs(j) * 0.0006
+            w = 0.045
+            ray = [(math.cos(a - w) * 0.008, math.sin(a - w) * 0.008), (math.cos(a) * r1, math.sin(a) * r1), (math.cos(a + w) * 0.008, math.sin(a + w) * 0.008)]
+            pts.append(ray)
+    for i, ray in enumerate(pts):
+        o = lib.polygon(f"ray{i}", ray, 0.0011, silver, z=BACK + 0.0002, facing=1, bevel=0.00012)
+        lib.auto_smooth(o, 40)
+
+
+def arms(silver) -> None:
+    """The crossed rifle and sabre behind the star, their ends showing between the rays."""
+    def strip(name, a, b, w0, w1, z0, h):
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        n = math.hypot(dx, dy)
+        nx, ny = -dy / n, dx / n
+        poly = [(a[0] + nx * w0, a[1] + ny * w0), (b[0] + nx * w1, b[1] + ny * w1), (b[0] - nx * w1, b[1] - ny * w1), (a[0] - nx * w0, a[1] - ny * w0)]
+        o = lib.polygon(name, poly, h, silver, z=z0, facing=1, bevel=0.0001)
+        lib.auto_smooth(o, 40)
+
+    d = 0.0168
+    strip("rifle", (-d, -d), (d, d), 0.0011, 0.0005, BACK + 0.0009, 0.0009)  # butt low left, muzzle up right
+    strip("rifle.butt", (-d - 0.0009, -d - 0.0009), (-d + 0.0035, -d + 0.0035), 0.0017, 0.0013, BACK + 0.0009, 0.0011)
+    strip("sabre", (d, -d), (-d * 1.06, d * 1.06), 0.0006, 0.0002, BACK + 0.001, 0.0007)  # blade up left
+    strip("sabre.guard", (d - 0.0026, -d - 0.0004), (d + 0.0004, -d + 0.0026), 0.0012, 0.0012, BACK + 0.001, 0.0009)
+
+
+def gilt_medallion(it: lib.Item, gilt, enamel, white) -> None:
+    prof = [
+        (0.0071, 0.0012),
+        (MED_R - 0.0002, 0.0012),
+        (MED_R, 0.0014),
+        (MED_R, 0.0029),
+        (MED_R - 0.00015, 0.00312),
+        (MED_R - 0.0005, 0.00312),
+        (MED_R - 0.00065, BAND_Z),
+        (0.0071, BAND_Z),
+        (0.0069, 0.00302),
+        (0.0067, 0.00302),
+        (0.0066, FIELD_Z + 0.00005),
+        (0.0066, 0.0012),
+        (0.0071, 0.0012),
+    ]
+    ring = lib.lathe("medallion", prof, gilt, segments=96, axis="z", cap=False)
+    lib.auto_smooth(ring, 35)
+    band = lib.lathe("medallion.band", [(0.0070, BAND_Z), (0.0070, BAND_Z + 0.0001), (MED_R - 0.0007, BAND_Z + 0.0001), (MED_R - 0.0007, BAND_Z)], white, segments=96, axis="z", cap=False)
+    lib.auto_smooth(band, 35)
+    inner = lib.lathe("medallion.field", [(0, 0.0012), (0.00665, 0.0012), (0.00665, FIELD_Z), (0.0033, FIELD_Z), (0, FIELD_Z)], enamel, segments=72, axis="z", cap=False)
+    lib.auto_smooth(inner, 35)
+
+    f = aw.Face(1, gilt, BAND_Z + 0.0001, MED_R, relief=0.00022)
+    f.arc("ОТЕЧЕСТВЕННАЯ ВОЙНА", 0.0079, 0.0014, start=math.pi / 2 + 0.05, spacing=0.8)
+    f.poly(lib.star_points(5, 0.0009, 0.00037, (0, -0.0079)), h=0.00022, bevel=0)
+
+    f = aw.Face(1, gilt, FIELD_Z, MED_R, relief=0.0003)
+    k = 2.6  # hammer and sickle filling the field
+
+    def C(px, py):
+        return f.C(128 + (px - 128) * k, 128 + (py - 128) * k)
+
+    cx, cy = C(130, 126)
+    r = f.S(13 * k)
+    f.line([(cx + r * math.cos(a), cy + r * math.sin(a)) for a in [math.radians(d) for d in range(150, -70, -20)]], f.S(3.4 * k), h=f.h)
+    f.line([C(120, 133), C(126, 127)], f.S(3 * k), h=f.h)  # sickle handle
+    f.line([C(119, 115), C(141, 136)], f.S(3 * k), h=f.h * 1.05)  # hammer handle
+    f.poly([C(116, 111), C(124, 119), C(128, 115), C(120, 107)], h=f.h * 1.1)  # hammer head
+
+
+def build_patriotic(it: lib.Item) -> None:
+    it.ao_size = 1024
+    enamel = lib.material(it, "enamel", lib.shade(it.color, 0.82), metal=0.0, rough=0.1, alpha=0.93)
+    silver = lib.material(it, "silver", "#c9c9c4", metal=1.0, rough=0.34)
+    relief = lib.material(it, "relief", "#dcdcd6", metal=1.0, rough=0.26)
+    gilt = lib.material(it, "gilt", "#d8b25a", metal=1.0, rough=0.3)
+    white = lib.material(it, "white", "#f1eee4", metal=0.0, rough=0.15)
+    sunburst(silver)
+    arms(silver)
+    base = star(it, silver, enamel)
+    gilt_medallion(it, gilt, enamel, white)
+    back(it, base, silver, relief)
+
+
 def build(it: lib.Item) -> None:
+    if "patriotic" in it.id:
+        return build_patriotic(it)
     it.ao_size = 1024
     enamel = lib.material(it, "enamel", lib.shade(it.color, 0.82), metal=0.0, rough=0.1, alpha=0.93)
     silver = lib.material(it, "silver", "#c9c9c4", metal=1.0, rough=0.34)

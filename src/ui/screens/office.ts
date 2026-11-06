@@ -40,6 +40,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   phones: 'phones',
   cameras: 'cameras',
   electronics: 'electronics',
+  media: 'records & media',
   silver: 'silver & amber',
   tools: 'tools',
 }

@@ -7,7 +7,8 @@
  * ?look=<yawDeg>,<pitchDeg> starts the counter view with the head turned from the
  * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
- * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line.
+ * Dev only, with ?seed: ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
+ * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
  */
 import '@fontsource/space-grotesk/400.css'
 import '@fontsource/space-grotesk/500.css'
@@ -26,6 +27,10 @@ import { ITEM_DEFS } from './data/items'
 import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
+import { regularCustomer } from './game/story/plan'
+import type { QueuedVisit } from './game/types'
+import { getRegular } from './data/regulars'
+import { getBeat } from './data/stories'
 import { createInitialState, type GameState } from './game/state'
 import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
@@ -67,6 +72,17 @@ function redeemScenario(s0: GameState): GameState {
   s = reducer({ ...s, loans: [loan] }, { type: 'day/open' })
   const visit = s.queue.find((v) => v.loanId === loan.id)
   return visit ? { ...s, queue: [visit, ...s.queue.filter((v) => v !== visit)] } : s
+}
+
+/** Dev-only (?seed=N&scenario=story): Zinaida Petrovna is first in line with the medals arc's choice scene. */
+function storyScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'day/open' })
+  const who = getRegular('zinaida')
+  const beat = getBeat('medals.truth')
+  if (!who || !beat) return s
+  const visit: QueuedVisit = { visitId: 'v-dev-story', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
+  return { ...s, queue: [visit, ...s.queue] }
 }
 
 /** Screens that show the counter view and leave the 3D area free to drag. */
@@ -150,6 +166,7 @@ async function boot(): Promise<void> {
   if (Number.isFinite(seedParam) && seedParam > 0) {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
+    if (params.get('scenario') === 'story') initial = storyScenario(initial)
   } else {
     try {
       initial = await loadLatestCareer()

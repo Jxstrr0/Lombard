@@ -11,6 +11,10 @@
  * wandered far, and city flavour to fill the page.
  */
 import type { Season } from '../game/state'
+import { DRY_DAYS_ONLY, HOLIDAY_MORE, SEASON_FLAVOUR, SEASON_HINTS } from './newsSeasons'
+
+/** M6: seasonal market notes, and the flavour kept out of the paper while the Flood is on (src/data/newsSeasons.ts). */
+export { DRY_DAYS_ONLY, SEASON_HINTS }
 
 export interface NewsTemplate {
   id: string
@@ -18,6 +22,9 @@ export interface NewsTemplate {
   body: string
   /** Only printed in these seasons (default: any). */
   seasons?: readonly Season[]
+  /** M6: demand tags the story hints at, and which way (season hints, the flood); default none. */
+  tags?: readonly string[]
+  direction?: 'up' | 'down' | 'flat'
 }
 
 export const PAPER = {
@@ -36,7 +43,7 @@ export const FIRST_DAY: readonly NewsTemplate[] = [
   },
 ]
 
-export const HOLIDAY_NEWS: Readonly<Record<string, readonly NewsTemplate[]>> = {
+const BASE_HOLIDAY_NEWS: Readonly<Record<string, readonly NewsTemplate[]>> = {
   womens_day: [
     {
       id: 'wd_tulips',
@@ -212,7 +219,7 @@ export const HINT_ALIAS: Readonly<Record<string, string>> = {
 }
 
 /** City flavour, printed to fill the page. */
-export const FLAVOUR_NEWS: readonly NewsTemplate[] = [
+const BASE_FLAVOUR_NEWS: readonly NewsTemplate[] = [
   {
     id: 'fl_cat',
     headline: 'Cat elected to the district council',
@@ -312,6 +319,14 @@ export const FLAVOUR_NEWS: readonly NewsTemplate[] = [
  * your counter a few days later; buying one brings Detective Volkova round. No digits in the
  * templates (the item's own name may have some).
  */
+/** Holiday stories: the originals plus M6's (src/data/newsSeasons.ts HOLIDAY_MORE). */
+export const HOLIDAY_NEWS: Readonly<Record<string, readonly NewsTemplate[]>> = Object.fromEntries(
+  [...new Set([...Object.keys(BASE_HOLIDAY_NEWS), ...Object.keys(HOLIDAY_MORE)])].map((k) => [k, [...(BASE_HOLIDAY_NEWS[k] ?? []), ...(HOLIDAY_MORE[k] ?? [])]]),
+)
+
+/** City flavour: the originals plus M6's seasonal stories (src/data/newsSeasons.ts SEASON_FLAVOUR). */
+export const FLAVOUR_NEWS: readonly NewsTemplate[] = [...BASE_FLAVOUR_NEWS, ...SEASON_FLAVOUR]
+
 export const BULLETIN = {
   cyr: 'РОЗЫСК',
   title: 'Police bulletin',

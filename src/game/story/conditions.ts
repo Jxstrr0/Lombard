@@ -6,6 +6,7 @@ import { getItemDef } from '../../data/items'
 import { pledgeOf } from './pledges'
 import { beatRecord } from './progress'
 import { monthsRetained } from './specialists'
+import { floodOffset, floodRecord } from '../city/flood'
 
 function within(x: number, c: { gte?: number; lte?: number }): boolean {
   return (c.gte === undefined || x >= c.gte) && (c.lte === undefined || x <= c.lte)
@@ -86,6 +87,13 @@ export function holds(c: Condition, state: GameState): boolean {
       const f = state.crime.fence
       if (c.met !== undefined && f.met !== c.met) return false
       return (!c.deals || within(f.deals, c.deals)) && (!c.refusals || within(f.refusals, c.refusals)) && (!c.trust || within(state.crime.fenceTrust, c.trust))
+    }
+    // --- M6 the Flood ---
+    case 'flood': {
+      if (c.day && !within(floodOffset(state), c.day)) return false
+      if (!c.hero && !c.vulture) return true
+      const r = floodRecord(state)
+      return (!c.hero || within(r.hero, c.hero)) && (!c.vulture || within(r.vulture, c.vulture))
     }
     case 'any':
       return c.of.some((x) => holds(x, state))

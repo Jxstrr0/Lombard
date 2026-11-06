@@ -28,6 +28,7 @@ import { FENCE_ID, fenceCustomer } from '../crime/fence'
 import { volkovaCustomer } from '../crime/volkova'
 import { VOLKOVA } from '../../data/police'
 import { COLLECTOR_ID, collectorCustomer } from '../crime/collector'
+import { FLOOD_ID, floodCustomer } from '../city/flood'
 import { allHold } from './conditions'
 import { beatRecord, memoryOf, warmthOf } from './progress'
 import { scriptedItem } from './scripted'
@@ -119,7 +120,7 @@ export function pickBeats(state: GameState): Beat[] {
  */
 export type StoryIds = (prefix: string, who: string) => string
 
-/** Who plays a beat at the counter: a regular, a specialist (M4), the fence, the Collector or Volkova (M5), or someone `who` sent (M4 `as`). */
+/** Who plays a beat at the counter: a regular, a specialist (M4), the fence, the Collector or Volkova (M5), Kuzmich (M6 the Flood), or someone `who` sent (M4 `as`). */
 function beatCustomer(beat: Beat): WalkIn | null {
   const v = beat.visit
   if (v.as) {
@@ -128,6 +129,7 @@ function beatCustomer(beat: Beat): WalkIn | null {
   if (v.who === FENCE_ID) return fenceCustomer()
   if (v.who === VOLKOVA.id) return volkovaCustomer()
   if (v.who === COLLECTOR_ID) return collectorCustomer()
+  if (v.who === FLOOD_ID) return floodCustomer()
   const regular = REGULARS.find((r) => r.id === v.who)
   return regular ? regularCustomer(regular) : specialistCustomer(v.who)
 }

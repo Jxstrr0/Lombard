@@ -30,11 +30,13 @@ const lines = [
   [policies.mobFriendly, {}, 'mobFriendly'],
   [policies.careless, {}, 'careless'],
   [policies.trader, {}, 'trader'],
+  [policies.neighbour, {}, 'neighbour'],
 ]
 for (const [policy, options, label] of lines) {
   const runs = Array.from({ length: seeds }, (_, i) => sim.simulate(1000 + i, policy, days, options))
   const s = sim.summarize(runs, start)
   const pct = (x) => `${(x * 100).toFixed(1)}%`
+  const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]
   const mean = (f) => (runs.reduce((a, r) => a + f(r), 0) / runs.length).toFixed(2)
   console.log(
     `${label.padEnd(11)} growth/month ${pct(s.medianGrowth).padStart(7)}  busted ${s.busted}/${s.runs}` +
@@ -81,6 +83,13 @@ for (const [policy, options, label] of lines) {
     `          volkova: met ${runs.filter((r) => r.crime.volkova.met).length}/${runs.length}  trust ${mean((r) => r.crime.volkova.trust)}` +
       `  father sold ${has('volkova.father_sold')}  honest ${branch(['volkova.source', 'volkova.rang'])}  bought ${branch(['dirty.volkova_loan', 'volkova.reported', 'dirty.volkova_audit'])}` +
       `  lied ${branch(['heart.volkova_truth', 'volkova.grudge'])}  informed ${has('volkova.informed')} leaked ${has('volkova.leaked')} crackdown ${has('volkova.crackdown')}`,
+  )
+  // M6 the Flood: its day, how ready the shop was, what the water cost, hero and vulture choices.
+  const prep = (p) => runs.filter((r) => r.flood.prep === p).length
+  console.log(
+    `          flood: day ${median(runs.map((r) => r.flood.day))}  sandbags ${prep('sandbags')} lifted ${prep('lifted')} none ${prep('none')}` +
+      `  damaged ${mean((r) => r.flood.damaged)}  bill ₽${mean((r) => r.flood.bill)}  hero ${mean((r) => r.flood.hero)}  vulture ${mean((r) => r.flood.vulture)}` +
+      `  credit ${has('flood.hero_credit')} repaid ${has('flood.credit_repaid')} lost ${has('flood.credit_lost')}  gouged ${has('flood.gouged')} refunded ${has('flood.refunded')} shrugged ${has('flood.shrugged')}  praised ${has('flood.volkova_praised')}`,
   )
   // M5 the Collector: how many shops he asked, bought his icon, and what became of her.
   console.log(

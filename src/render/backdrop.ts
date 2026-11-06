@@ -47,6 +47,8 @@ export interface BackdropStreet {
   ice: number
   /** A boat on the water: x, z, heading (+1 towards +x), strength 0..1. */
   boat: [number, number, number, number]
+  /** M6 the Flood: the water's height (world y) when the canal is up, else null or absent. */
+  floodY?: number | null
 }
 
 /** Ripple look. Offsets are in texels of the render; noise scales in cycles per metre of water. */
@@ -94,6 +96,8 @@ uniform sampler2D extraMap;
 uniform vec3 lights;  // lamps and shop fronts, early windows, late windows
 uniform vec4 weather; // wet, snow, ice, cloud drift (s)
 uniform vec4 boat;    // x, z on the water, heading (+-1), strength
+uniform float floodY; // M6 the Flood: the water's height (world y); below -50 = none
+uniform vec2 depthCode; // the canal layer's depth code: z0, metres per code (255 = sky)
 #endif
 varying vec2 vUv;
 varying vec3 vWorld;
@@ -137,6 +141,36 @@ void main() {
     // Frozen canal: grey-blue ice with a little grain, a ghost of the reflections left.
     float grain = texture2D(noiseMap, vUv * vec2(7.0, 26.0)).r;
     col = mix(col, vec3(0.66, 0.70, 0.73) * (0.86 + 0.2 * grain), ice * 0.82);
+  }
+  // M6 the Flood: the canal up its walls and over the street. The depth layer gives the surface each
+  // texel shows; where that sits below the water's height, show brown water at that height instead.
+  if (floodY > -50.0) {
+    vec3 fd = vWorld - eye;
+    float code = ex.r * 255.0;
+    float zr = code > 254.5 ? 1e4 : depthCode.x + code * depthCode.y;
+    float ys = eye.y + fd.y * ((zr - eye.z) / max(fd.z, 1e-3));
+    float under = smoothstep(0.0, 0.025, floodY - ys) * (1.0 - sky);
+    // a dark wet band on the walls just above the waterline, and a pale scum line at it
+    float above = ys - floodY;
+    col *= 1.0 - 0.28 * (1.0 - smoothstep(0.0, 0.25, above)) * step(0.0, above) * (1.0 - sky);
+    if (under > 0.004) {
+      vec2 fp = eye.xz + fd.xz * ((floodY - eye.y) / min(fd.y, -1e-3));
+      vec2 f1 = texture2D(noiseMap, fp * layerScale.xy * 1.6 + time * layerDrift.xy * 0.6).rg;
+      vec2 f2 = texture2D(noiseMap, fp * layerScale.zw * 1.6 + time * layerDrift.zw * 0.6).rg;
+      vec2 fn = f1 + f2 - 1.0;
+      vec3 skyc = texture2D(map, vec2(vUv.x + fn.x * 0.03, 0.96)).rgb;
+      vec3 murk = vec3(0.30, 0.23, 0.14);
+      float graze = clamp(1.0 - (-fd.y / length(fd)) * 4.0, 0.0, 1.0);
+      vec3 water = mix(murk, skyc * 0.55, 0.08 + 0.22 * graze);
+      // shallow at its edge: a ghost of the street under it
+      float shallow = 1.0 - smoothstep(0.0, 0.2, floodY - ys);
+      water = mix(water, col * 0.55 + murk * 0.35, shallow * 0.55);
+      water *= 0.92 + 0.16 * fn.r * motion;
+      float fg = smoothstep(0.74, 0.98, f1.g * 0.5 + f2.g * 0.5 + fn.r * 0.25);
+      water += glint * fg * motion * 0.5 * (0.3 + dot(skyc, vec3(0.3)));
+      water += vec3(0.10, 0.09, 0.07) * (1.0 - smoothstep(0.0, 0.02, floodY - ys));
+      col = mix(col, water, under);
+    }
   }
   // Clouds drifting through the render's own sky.
   vec2 cp = vec2(vUv.x * 2.4 + weather.w * 0.0036, vUv.y * 1.3);
@@ -226,9 +260,11 @@ export class CanalBackdrop {
   }
 
   /** The street layer's canal data texture (art/street canal_extra.png): turns on clouds, weather, night lights and the wake. */
-  attachStreet(extra: THREE.Texture): void {
+  attachStreet(extra: THREE.Texture, depth: { z0: number; step: number }): void {
     const u = this.material.uniforms
     u.extraMap = { value: extra }
+    u.floodY = { value: -99 }
+    u.depthCode = { value: new THREE.Vector2(depth.z0, depth.step) }
     u.lights = { value: new THREE.Vector3() }
     u.weather = { value: new THREE.Vector4() }
     u.boat = { value: new THREE.Vector4(0, 0, 1, 0) }
@@ -247,6 +283,7 @@ export class CanalBackdrop {
     const w = u.weather!.value as THREE.Vector4
     w.set(street.wet, street.snow, street.ice, w.w)
     ;(u.boat!.value as THREE.Vector4).fromArray(street.boat)
+    u.floodY!.value = street.floodY ?? -99
   }
 
   update(dt: number): void {

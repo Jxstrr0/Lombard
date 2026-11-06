@@ -98,4 +98,28 @@ export const STREET = {
   sunset: { winter: 15.8, spring: 19.6, summer: 22.4, autumn: 17.4 } satisfies Record<Season, number>,
   /** The canal is frozen in winter (no boats). */
   iceSeasons: ['winter'] satisfies Season[] as Season[],
+  /**
+   * M6 the Flood (src/game/city/flood.ts floodView): the water's height in the canal render
+   * (world y; the canal normally lies at y −0.65, the pavements at about +0.12) by days after the
+   * flood day, from the paper's first warning to the last of the mud, and the rain on its days.
+   */
+  flood: {
+    /** [days after the flood day, water y]; between entries the level is eased, outside them there is no flood water. */
+    levels: [
+      [-7, -0.56],
+      [-4, -0.42],
+      [-3, -0.3],
+      [-1, -0.04],
+      [0, 0.45],
+      [1, 0.4],
+      [2, 0.1],
+      [3, -0.2],
+      [4, -0.4],
+      [7, -0.6],
+    ] as readonly (readonly [number, number])[],
+    /** Rain on these phases (intensity), whatever the day's weather roll said. */
+    rain: { rising: 0.7, flood: 0.9 } as Partial<Record<string, number>>,
+    /** Fewer people out while the street is under water (× how often they pass). */
+    busier: 0.35,
+  },
 } as const

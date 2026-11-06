@@ -135,6 +135,25 @@ export const PAPER_SECTIONS: Raw[] = [
     // Weather, the way the morning paper always ends.
     id: 'weather',
     stories: [
+      // M6 the Flood: the last paper remembers the spring of the water (src/data/stories/flood.ts).
+      {
+        id: 'weather_flood_hero',
+        when: [{ if: 'flag', flag: 'flood.hit' }, { if: 'flood', hero: { gte: 2 }, vulture: { lte: 0 } }],
+        headline: 'Weather: the river behaves itself',
+        body: 'The hydrological bureau expects no high water this spring. On Kanatnaya Street they still talk about the last time, and about the pawn shop that lent its pump and kept the neighbours’ things dry upstairs. Caretakers have kept a few sandbags by, just in case.',
+      },
+      {
+        id: 'weather_flood_vulture',
+        when: [{ if: 'flag', flag: 'flood.hit' }, { if: 'flood', vulture: { gte: 2 } }],
+        headline: 'Weather: high water expected; traders warned',
+        body: 'The bureau warns of high water on the canals next spring. The district reminds traders that pumps are to be sold at a fair price this time, and residents of Kanatnaya Street remind each other which shop did not.',
+      },
+      {
+        id: 'weather_flood',
+        when: [{ if: 'flag', flag: 'flood.hit' }, { if: 'date', from: '03-01', to: '05-31' }],
+        headline: 'Weather: the thaw, and a watchful eye on the river',
+        body: 'The ice is moving under the bridges again. The tidemark from the last flood can still be seen on the walls of the embankment, and the canal district is keeping its wellingtons by the door.',
+      },
       {
         id: 'weather_winter',
         when: [{ if: 'date', from: '12-01', to: '02-29' }],

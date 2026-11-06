@@ -89,6 +89,7 @@ Done when: a clean run, a mob-friendly run, and a fence-heavy run all play diffe
 ## M6 — Launch polish (status: not started)
 
 - 120 items, 40 regulars, 8 arcs, 3 seasons of news.
+  - Items, wave A (built, Nov 6): 76 items. 44 new in four new categories: instruments, tools, silver & jewellery, household antiques (11 each); 14 of them CC0 Poly Haven models, 30 code-drawn. Wave B (existing categories, vinyl and media) is separate.
   - 40 regulars: done (Nov 6). Twenty more, each with a schedule, memory, a 2–4 beat thread (`src/data/stories/threads`), their own lines and an epilogue card; looks from the Rocketbox Adults pool (7 new faces, 13 recoloured relatives). See 05.
   - 3 seasons of news: done. Four seasons of city life (13–14 stories each, dealt from a per-season deck), five seasonal market notes per season that match `tuning.demand.seasons`, more Victory Day / school / New Year stories and four news-only city days (`src/data/newsSeasons.ts`).
   - The Flood is the seventh arc (with its follow-ups in `flood_talk`).

@@ -14,6 +14,11 @@ export type Metal = 'gold' | 'silver' | 'base'
  * without a match are real metal and react like the genuine article.
  */
 export const ACID_FAKE_REACTIONS: readonly { match: RegExp; text: string }[] = [
+  // M6 silver: plated nickel silver ("melchior") and silvered steel, before the gold-plate lines below.
+  { match: /melchior/, text: 'The bright skin goes at the first drop, and the scratch under it turns a dirty blue-green.' },
+  // M6: imitation amber, pearls and cameos; the stone takes the drop badly, whatever the setting is.
+  { match: /plastic|glass|resin/, text: 'Where the drop sat, the surface goes dull and slightly tacky.' },
+  { match: /silvered/, text: 'The bright skin lifts away under the acid; the scratch beneath stays grey.' },
   { match: /brass|copper|bronze|tombac/, text: 'The scratch fizzes green under the acid.' },
   { match: /steel|iron|nickel/, text: 'The thin gold line lifts away under the acid; the scratch beneath stays grey.' },
   { match: /silver/, text: 'The top of the scratch dissolves and the line under it clouds milky white.' },
@@ -26,6 +31,8 @@ export const ACID_GENUINE: Record<Metal, string> = {
   silver: 'The test drop turns the scratch a creamy red, the way {purity} silver does.',
   base: 'The acid bites straight into the scratch. No precious metal here, and a coin like this was never meant to have any.',
 }
+/** M6: a piece with no metal to test (amber, pearls). */
+export const ACID_NO_METAL = 'There is no metal here for the acid to judge. The drop just sits on the surface.'
 export const ACID_PURITY_FALLBACK: Record<Metal, string> = { gold: 'gold', silver: 'solid', base: '' }
 
 /** Purity marks recognised in a def id or name. */

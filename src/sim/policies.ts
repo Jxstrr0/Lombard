@@ -313,3 +313,28 @@ export const careless = makePolicy({
   skepticism: 0,
   reserveDays: 0,
 })
+
+/**
+ * M5 endings calibration (not in the M2 bands, `npm run sim` only): checks like the careful shop
+ * and keeps a rent reserve, but opens lower and stops sooner, pays the crew's "insurance" and
+ * takes the harder story choices. Fewer fair deals and less love from the neighbourhood, and
+ * thinner margins than you'd think (sellers walk), so some of these shops scrape by or lose the lease.
+ */
+export const trader = makePolicy({
+  name: 'trader',
+  tools: ['scale', 'loupe', 'magnet', 'loupe', 'acid', 'reference'],
+  passOnRedFlags: true,
+  openAt: 0.3,
+  maxAt: 0.5,
+  step: 0.05,
+  acceptAskAt: 0.45,
+  loanOpenAt: 0.2,
+  loanMaxAt: 0.38,
+  markup: 1.1,
+  takeOfferAt: 0.92,
+  holdAt: 1,
+  dumpAfterDays: 21,
+  skepticism: 0.1,
+  reserveDays: 10,
+  prefer: ['accept', 'busy', 'refuse', 'market', 'wave', 'liar', 'keep', 'rules'],
+})

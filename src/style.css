@@ -3303,3 +3303,231 @@ body[data-screen='title'] .build-number {
     gap: 8px;
   }
 }
+
+/* --- M5: endings --------------------------------------------------------------------- */
+
+/* Ledger: the landlord's final notice and "Hand back the keys" (shop feel, red ink). */
+.receipt-notice {
+  margin: 8px 0 0;
+  padding: 6px 8px;
+  border: 1.5px solid var(--ink-red);
+  color: var(--ink-red);
+  font-weight: 600;
+  line-height: 1.35;
+  transform: rotate(-0.4deg);
+}
+
+.receipt-notice::before {
+  content: 'FINAL NOTICE · ';
+  letter-spacing: 0.08em;
+}
+
+.receipt-retire-text {
+  margin: 0 0 10px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.btn-retire {
+  width: 100%;
+}
+
+.retire-sheet {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.retire-h {
+  margin: 0;
+  font-size: 1.375rem;
+  color: var(--ivory);
+}
+
+.retire-sheet .settings-section {
+  border-bottom: 0;
+}
+
+/* The ending: the last paper, the cards, the career's final ledger. */
+.ending-screen {
+  pointer-events: auto;
+  justify-content: stretch;
+  z-index: 5;
+  background: radial-gradient(130% 80% at 50% 0%, rgba(40, 34, 26, 0.6), rgba(12, 11, 10, 0.94));
+}
+
+.ending-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: calc(18px + var(--safe-top)) 14px 22px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ending-screen[data-step='cards'] .ending-scroll {
+  display: flex;
+  flex-direction: column;
+}
+
+.ending-actions {
+  flex-wrap: wrap;
+  padding: 12px 16px calc(14px + var(--safe-bottom));
+  background: var(--strip-bg);
+  border-top: 1px solid var(--strip-edge);
+}
+
+.ending-actions > .btn-ghost {
+  flex: 0 1 auto;
+  padding: 0 12px;
+}
+
+/* An index card, typed: a red rule under the header, faint blue lines below. */
+.epi-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: auto;
+  padding: 18px 18px 22px;
+  color: var(--ink);
+  background:
+    linear-gradient(transparent 0 46px, rgba(158, 43, 31, 0.45) 46px 47px, transparent 47px),
+    repeating-linear-gradient(transparent 0 25px, rgba(60, 90, 140, 0.16) 25px 26px),
+    linear-gradient(var(--paper), var(--paper-shade));
+  background-position: 0 0, 0 52px, 0 0;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  transform: rotate(0.5deg);
+}
+
+.epi-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 30px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.epi-card-name {
+  margin: 4px 0 0;
+  font-family: Georgia, 'Times New Roman', 'Liberation Serif', serif;
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+.epi-card-role {
+  margin: 2px 0 12px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.epi-card-text {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+/* The career's final ledger: the receipt, with the title stamped on it. */
+.career-receipt {
+  font-size: 0.875rem;
+}
+
+.career-title {
+  margin: 14px 0 6px;
+  padding: 12px 10px;
+  border: 2px solid var(--ink);
+  text-align: center;
+  transform: rotate(-0.8deg);
+}
+
+.career-title-kicker {
+  display: block;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.career-title-name {
+  margin: 4px 0 6px;
+  font-family: Georgia, 'Times New Roman', 'Liberation Serif', serif;
+  font-size: 1.625rem;
+  line-height: 1.1;
+}
+
+.career-title-strap {
+  margin: 0;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.career-rows {
+  grid-template-columns: auto 1fr;
+}
+
+/* Labels stay on one line (also at the larger text size); a long value wraps at its spaces. */
+.career-rows dt {
+  white-space: nowrap;
+}
+
+.career-rows dd {
+  overflow-wrap: break-word;
+}
+
+/* Title screen: an ended career keeps its slot, shown with its title. */
+.slot-side {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.slot-card.is-ended {
+  border-color: rgba(180, 140, 232, 0.4);
+  background: linear-gradient(135deg, rgba(123, 63, 196, 0.16), var(--card) 60%);
+}
+
+.slot-main > .slot-title {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  line-height: 1.25;
+  color: var(--lilac);
+  /* The whole title, on two lines if it needs them. */
+  white-space: normal;
+}
+
+.slot-card.is-ended .slot-renew {
+  color: var(--clay-light);
+}
+
+@media (orientation: landscape) and (min-width: 700px) {
+  .ending-paper {
+    max-width: 640px;
+  }
+
+  .ending-actions {
+    justify-content: center;
+  }
+
+  .ending-actions > .btn {
+    flex: 0 1 280px;
+  }
+
+  .ending-actions > .btn-ghost {
+    flex: 0 1 auto;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .ending-scroll {
+    padding-top: calc(10px + var(--safe-top));
+  }
+
+  .ending-actions {
+    padding-top: 8px;
+    padding-bottom: calc(8px + var(--safe-bottom));
+  }
+}

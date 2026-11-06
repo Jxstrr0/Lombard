@@ -8,6 +8,8 @@
  */
 import { vandalismLines } from '../data/vandalismLines'
 import { reducer, type Action } from '../game/actions'
+import { canRetire } from '../game/endings/end'
+import { titleOf, type TitleId } from '../game/endings/title'
 import { isPoliceVisit } from '../game/crime/volkova'
 import { createInitialState, type GameState } from '../game/state'
 import { recordBeat } from '../game/story/progress'
@@ -42,6 +44,8 @@ export interface RunResult {
   axes: GameState['career']['axes']
   /** Actions dispatched (sanity: guards against a stuck policy). */
   steps: number
+  /** M5: the ending title (retired at the end of the run if it was allowed to), or null. */
+  title: TitleId | null
   /** M5 police: heat at the end, Volkova's visits, pieces the police took, raids, and whether it was shut down. */
   police: { heat: number; visits: number; seized: number; raids: number; shut: boolean }
   /** M5: how the career ended (the run stops that day), or null. */
@@ -87,6 +91,8 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
   let steps = 0
   const police = { heat: 0, visits: 0, seized: 0, raids: 0, shut: false }
   for (let d = 0; d < days; d++) {
+    // M5: an ended career (evicted, or a forced ending) can't be played on.
+    if (s.career.end) break
     const day = s.calendar.day
     let guard = 0
     // Play from "closed, before opening" through the close of this day.
@@ -106,7 +112,7 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
       if (action.type === 'day/close') police.seized += s.day.log.filter((e) => e.kind === 'story' && e.itemId && (e.text.startsWith('Volkova took') || e.text.startsWith('Seized'))).length
       s = next
       policy.after?.(s, action, ctx)
-      if (s.calendar.day !== day) break // day/close advanced the calendar
+      if (s.calendar.day !== day || s.career.end) break // day/close advanced the calendar (or the career ended)
     }
     // The day's ledger (the brick and the glazier land in the morning's log, insurance at closing).
     for (const e of s.day.log) {
@@ -119,6 +125,8 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
     if (bustDay === null && worth < 0) bustDay = day
     if (s.career.end) break // M5: a forced ending (pushed out, say): nothing more to play.
   }
+  // M5: a shop still standing at the end of the run retires if it may (from tuning.endings.retireDay).
+  if (!s.career.end && canRetire(s) && s.day.phase === 'closed') s = reducer(s, { type: 'career/retire' })
   const minCash = Math.min(...points.map((p) => p.cash))
   police.heat = s.crime.heat
   police.raids = s.crime.flags.includes('police.raided') ? 1 + (s.career.end?.kind === 'raided' ? 1 : 0) : 0
@@ -137,6 +145,7 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
     steps,
     police,
     end: s.career.end,
+    title: titleOf(s),
     axes: s.career.axes,
     heat: s.crime.heat,
     pressure: s.crime.pressure,
@@ -167,6 +176,9 @@ export interface Summary {
   avgStolen: number
   /** Runs whose closing cash ever went below zero. */
   cashDips: number
+  /** M5: runs evicted, and how often each ending title came up. */
+  evicted: number
+  titles: Record<string, number>
 }
 
 const median = (xs: number[]) => {
@@ -188,5 +200,7 @@ export function summarize(results: RunResult[], startWorth: number): Summary {
     avgFakesBought: results.reduce((a, r) => a + r.stats.fakesBought, 0) / Math.max(1, results.length),
     avgStolen: results.reduce((a, r) => a + (r.stats.itemsStolen ?? 0), 0) / Math.max(1, results.length),
     cashDips: results.filter((r) => r.minCash < 0).length,
+    evicted: results.filter((r) => r.end?.kind === 'evicted').length,
+    titles: results.reduce<Record<string, number>>((acc, r) => (r.title ? { ...acc, [r.title]: (acc[r.title] ?? 0) + 1 } : acc), {}),
   }
 }

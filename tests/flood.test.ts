@@ -19,6 +19,7 @@ import { tagFactor, updateMarket } from '../src/game/economy/demand'
 import { epilogueCards, epiloguePaper } from '../src/game/endings/epilogue'
 import { endCareer } from '../src/game/endings/end'
 import { holds } from '../src/game/story/conditions'
+import { floodReview, paperReview } from '../src/game/city/review'
 import { Rng } from '../src/game/rng'
 import { addDays, seasonOf, type GameState, type Season } from '../src/game/state'
 
@@ -322,6 +323,28 @@ describe('seasons of news', () => {
       }
     }
     expect(minGap).toBeGreaterThanOrEqual(7)
+  })
+})
+
+describe('dev review careers (src/game/city/review.ts)', () => {
+  it('flood scenarios open on the right morning with the right beat first; the paper scenario on its date', () => {
+    const w = floodReview(3, 'r', 'warning')
+    expect(floodOffset(w)).toBe(-3)
+    expect(w.queue[0]!.beatId).toBe('flood.sandbags')
+    expect(w.market.news[0]!.id).toBe(floodNews(w)!.id)
+    const f = floodReview(3, 'r', 'flood')
+    expect(floodOffset(f)).toBe(0)
+    expect(f.queue[0]!.beatId).toBe('flood.pump')
+    expect(f.story.flags).toContain(FLOOD_FLAGS.hit)
+    expect(f.narration).toContain(FLOOD_MORNING.none)
+    const a = floodReview(3, 'r', 'after')
+    expect(floodPhase(a)).toBe('receding')
+    expect(a.queue[0]!.beatId).toBe('flood.storage')
+    const p = paperReview(3, 'r', null)
+    expect(p.calendar.date.slice(5)).toBe('09-01')
+    expect(p.calendar.season).toBe('autumn')
+    expect(p.market.news.length).toBeGreaterThan(0)
+    expect(p.day.newsRead).toBe(false)
   })
 })
 

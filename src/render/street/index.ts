@@ -26,6 +26,7 @@ import * as THREE from 'three'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 import { STREET, type WalkLane } from '../../data/street'
 import type { GameState, Season } from '../../game/state'
+import { floodView } from '../../game/city/flood'
 import type { CanalBackdrop } from '../backdrop'
 import { shopHour } from '../life/timeOfDay'
 import type { QualityTier } from '../perf'
@@ -103,6 +104,9 @@ export class StreetLife {
   private events: StreetEvent[] = []
   private time = 0
   private weather: Weather = { kind: 'clear', intensity: 0 }
+  /** M6 the Flood: the water's height today (world y), or null; and whether the street is under it. */
+  private floodY: number | null = null
+  private flooded = false
   private season: Season = 'spring'
   private dark = 0
   private tint: [number, number, number] = [1, 1, 1]
@@ -144,7 +148,7 @@ export class StreetLife {
     this.things = new SpriteLayer('street-things', 40, props, manifest.props.atlas, extra, backdrop.texture, info)
     this.weatherGlass = new WeatherGlass(backdrop.texture, backdrop.frame)
     for (const c of manifest.props.cells) this.cells.set(c.id, c)
-    backdrop.attachStreet(extra)
+    backdrop.attachStreet(extra, manifest.canal.depth)
     scene.add(this.people.mesh, this.things.mesh, this.weatherGlass.mesh)
   }
 
@@ -168,13 +172,19 @@ export class StreetLife {
     this.seed = state.meta.seed
     const day = state.calendar.day
     const w = weatherFor(this.seed, day, this.season)
-    this.weather = this.flags.weather ? { kind: this.flags.weather, intensity: this.flags.weather === 'clear' ? 0 : 0.85 } : w
+    // M6 the Flood: rain while the water rises and stands; the canal's level from the warning to the mud.
+    const flood = floodView(state)
+    const floodRain = STREET.flood.rain[flood.phase]
+    const today: Weather = floodRain !== undefined && w.kind !== 'snow' ? { kind: 'rain', intensity: Math.max(floodRain, w.intensity) } : w
+    this.weather = this.flags.weather ? { kind: this.flags.weather, intensity: this.flags.weather === 'clear' ? 0 : 0.85 } : today
+    this.floodY = floodLevel(flood.offset)
+    this.flooded = flood.phase === 'flood'
     this.ice = (STREET.iceSeasons as readonly Season[]).includes(this.season)
     const hour = shopHour(this.clockOverride ?? state.day.clock)
     const light = outdoorLight(hour, this.season)
     this.tint = light.tint
     this.dark = light.dark
-    const key = `${this.seed}:${day}:${this.season}:${this.weather.kind}`
+    const key = `${this.seed}:${day}:${this.season}:${this.weather.kind}:${this.flooded}`
     if (key !== this.planKey) {
       this.planKey = key
       this.plan = new StreetPlan(mixSeed(this.seed, day), this.mood())
@@ -242,7 +252,7 @@ export class StreetLife {
   }
 
   private mood() {
-    return { weather: this.weather.kind, dark: this.dark, ice: this.ice, busy: this.flags.busy }
+    return { weather: this.weather.kind, dark: this.dark, ice: this.ice, busy: this.flags.busy * (this.flooded ? STREET.flood.busier : 1) }
   }
 
   private pushBackdrop(): void {
@@ -252,8 +262,9 @@ export class StreetLife {
       dark: this.dark,
       wet: w.kind === 'rain' ? 0.45 + 0.55 * w.intensity : 0,
       snow: w.kind === 'snow' ? 0.5 + 0.5 * w.intensity : 0,
-      ice: this.ice ? 1 : 0,
+      ice: this.ice && this.floodY === null ? 1 : 0,
       boat: this.boatWake,
+      floodY: this.floodY,
     })
   }
 
@@ -467,3 +478,18 @@ async function loadData(url: string): Promise<THREE.Texture> {
 }
 
 export type { WalkLane }
+
+/** M6 the Flood: the canal's height `d` days after the flood day (STREET.flood.levels, eased), or null outside them. */
+export function floodLevel(d: number): number | null {
+  const L = STREET.flood.levels
+  if (d < L[0]![0] || d > L[L.length - 1]![0]) return null
+  for (let i = 1; i < L.length; i++) {
+    const [d1, y1] = L[i]!
+    const [d0, y0] = L[i - 1]!
+    if (d <= d1) {
+      const t = (d - d0) / (d1 - d0)
+      return y0 + (y1 - y0) * t * t * (3 - 2 * t)
+    }
+  }
+  return null
+}

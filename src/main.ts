@@ -468,7 +468,9 @@ async function boot(): Promise<void> {
   const itemLoader = params.get('noglb') === '1' ? null : createItemLoader(renderer, import.meta.env.BASE_URL, __BUILD_SHA__)
   // Customers are 3D cast members (Rocketbox); ?nocast=1 (or ?noglb=1) keeps the old silhouette, ?customer=<id> casts one person as everyone.
   if (itemLoader && params.get('nocast') !== '1') {
-    shop.setCast(new CustomerCast(itemLoader.gltf, import.meta.env.BASE_URL, __BUILD_SHA__), castOverride(params))
+    // With MSAA on (mid/high), cut-out hair edges are smoothed by alpha-to-coverage.
+    const msaa = renderer.getContextAttributes()?.antialias === true
+    shop.setCast(new CustomerCast(itemLoader.gltf, import.meta.env.BASE_URL, __BUILD_SHA__, msaa), castOverride(params))
   }
   // ?walk=0: customers appear at the counter instead of walking in from the door (screenshots).
   if (params.get('walk') === '0') shop.setWalking(false)

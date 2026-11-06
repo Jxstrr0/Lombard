@@ -62,7 +62,7 @@ Done when: screenshots look like a real shop and the phone still holds 30 fps.
 ## M4 — People and story (status: in progress. Story engine, regulars and the first arc (the grandmother’s medals) are in; workers on the title screen, reputation, specialists, the laptop and regular-only looks)
 
 - 20 regulars with schedules, memory, and dialogue.
-- Remaining 3 specialists (militaria, antiques, electronics) with their small arcs.
+- Remaining 3 specialists (militaria, antiques, electronics) with their small arcs. Specialists ✅ (Nov 6): Gennady Shurygin (militaria), Stanislav Lyubimov (antiques, icons, instruments), Zhenya Kroshkina (phones, cameras, electronics) are in the Office next to Faina and Ilya. Arcs: all five are written as design notes in GDD § 2b; wiring them onto the story engine is still to do.
 - Story engine and 4 arcs: Grandmother's Medals, Dubai Rolex Guy, The Student's Laptop, Protection (first half).
 - Reputation by group. Shoplifting and security upgrades.
 - Title screen, career slots, settings (motion, text size), Longlight-branded menu.

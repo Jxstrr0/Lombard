@@ -24,14 +24,18 @@ import type {
 
 export type { ItemInstance } from './types'
 
-export const STATE_VERSION = 4
+export const STATE_VERSION = 5
 
 export type Season = 'winter' | 'spring' | 'summer' | 'autumn'
 export type ISODate = string
 export type CustomerId = string
 export type ArcId = string
 export type UpgradeId = string
-export type Group = 'neighbourhood' | 'police' | 'mob' | 'specialists'
+/**
+ * Reputation groups (src/game/reputation.ts owns the rules). `youth` = the local
+ * kids and students (GDD § 6 "reputation with the local kids"); added in v4.
+ */
+export type Group = 'neighbourhood' | 'youth' | 'police' | 'mob' | 'specialists'
 
 export type SlotArea = 'counter' | 'wall' | 'back'
 
@@ -103,6 +107,8 @@ export interface CareerStats {
   /** Biggest loss on a single item. */
   worstDeal: number
   fakesBought: number
+  /** Items shoplifted off the open shelves (M4). */
+  itemsStolen: number
 }
 
 export interface Settings {
@@ -140,6 +146,10 @@ export interface GameState {
   crime: { heat: number; pressure: number; fenceTrust: number; flags: string[] }
   /** M4: arc progress and story flags (set by beats, read by their conditions). */
   story: { arcs: Record<ArcId, ArcProgress>; pendingEvents: ScheduledEvent[]; flags: string[] }
+  /**
+   * general: the M1 standing in points (unbounded; walkouts −1), read by buyer chance.
+   * byGroup: −1…1 per group, changed only through adjustRep (src/game/reputation.ts).
+   */
   reputation: { general: number; byGroup: Record<Group, number> }
   stats: CareerStats
   settings: Settings
@@ -206,7 +216,7 @@ export function createInitialState(seed: number, careerId: string): GameState {
     story: { arcs: {}, pendingEvents: [], flags: [] },
     reputation: {
       general: 0,
-      byGroup: { neighbourhood: 0, police: 0, mob: 0, specialists: 0 },
+      byGroup: { neighbourhood: 0, youth: 0, police: 0, mob: 0, specialists: 0 },
     },
     stats: {
       customersSeen: 0,
@@ -217,6 +227,7 @@ export function createInitialState(seed: number, careerId: string): GameState {
       bestDeal: 0,
       worstDeal: 0,
       fakesBought: 0,
+      itemsStolen: 0,
     },
     settings: { reduceMotion: false, textScale: 1 },
     narration: placeholderIdleLine,

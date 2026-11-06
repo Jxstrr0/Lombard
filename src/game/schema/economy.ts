@@ -15,6 +15,8 @@ export const UpgradeDef = z.object({
   cost: z.number().int().positive(),
   /** Upgrade ids that must be owned first. */
   requires: z.array(z.string()).default([]),
+  /** Office section: tools and books, or cases and security (M4). */
+  group: z.enum(['tools', 'security']).default('tools'),
   effects: z
     .object({
       /** Unlocks this tool (for the categories below, if given). */
@@ -26,8 +28,12 @@ export const UpgradeDef = z.object({
       refTier: z.number().int().min(2).max(3).optional(),
       /** Buyer-visibility multiplier per display area. */
       visibility: z.partialRecord(SlotArea, z.number().positive()).optional(),
-      /** Added to shop.security (theft, later). */
+      /** Added to shop.security (deters shoplifting; src/game/shop/theft.ts). */
       security: z.number().optional(),
+      /** Display areas thieves can't reach once this is installed (M4). */
+      protects: z.array(SlotArea).optional(),
+      /** Records what happens in the shop: evidence for the M5 crime layer (stored only). */
+      records: z.boolean().optional(),
     })
     .default({}),
 })

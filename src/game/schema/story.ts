@@ -23,7 +23,7 @@ const range = z.tuple([int, int]).refine(([a, b]) => a <= b, 'min ≤ max')
 export const TemperamentSchema = z.enum(['stubborn', 'flexible', 'desperate', 'proud'])
 export const AuthenticitySchema = z.enum(['genuine', 'fake', 'frankenstein', 'restored'])
 export const ProvenanceSchema = z.enum(['clean', 'unknown', 'stolen', 'heirloom'])
-export const GroupSchema = z.enum(['neighbourhood', 'police', 'mob', 'specialists'])
+export const GroupSchema = z.enum(['neighbourhood', 'youth', 'police', 'mob', 'specialists'])
 
 const lines = z.array(z.string().min(1)).min(1)
 

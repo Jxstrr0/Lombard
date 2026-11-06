@@ -13,6 +13,13 @@
  * she picks: the piece you still hold first, then a bulletin piece, then the latest.
  * With no trail she reads your passport book instead (a routine visit).
  *
+ * ## The courtesy call
+ * Every career meets her once, hot or not: on a seeded day in tuning.police.volkova.introDays
+ * (introDay) she drops in to introduce herself (`vs<day>_intro`), unless heat brought her in sooner
+ * (then her first visit is the introduction). Tea or not; it sets crime.volkova.met, which opens her
+ * own arc (src/data/stories/volkova.ts). Those beats are story visits (a `beatId`): isPoliceVisit
+ * leaves them alone, and on a day one brings her in, her police visit waits (planPolice storyToday).
+ *
  * ## Your answers (policeChoose)
  * - cooperate: you lose the piece (or tell what you know, if it's gone); her trust
  *   and the precinct's opinion rise, heat drops; more so with a passport noted or the
@@ -68,16 +75,29 @@ export function volkovaCustomer(): WalkIn {
   }
 }
 
-/** Is this visit (queued or at the counter) one of Volkova's? */
-export function isPoliceVisit(v: Pick<VisitState, 'customer'> | null | undefined): boolean {
-  return v?.customer.id === VOLKOVA.id
+/**
+ * Is this visit (queued or at the counter) one of Volkova's systemic police visits? Her own
+ * arc's beats (src/data/stories/volkova.ts, a `beatId`) play like any other story visit.
+ */
+export function isPoliceVisit(v: Pick<VisitState, 'customer' | 'beatId'> | null | undefined): boolean {
+  return v?.customer.id === VOLKOVA.id && !v.beatId
 }
 
 /** Which kind of police visit, from its id (`vs<day>_<role>`). */
-export function policeRole(visitId: string): 'raid' | 'recheck' | 'visit' {
+export function policeRole(visitId: string): 'raid' | 'recheck' | 'intro' | 'visit' {
   if (visitId.endsWith('_raid')) return 'raid'
   if (visitId.endsWith('_recheck')) return 'recheck'
+  if (visitId.endsWith('_intro')) return 'intro'
   return 'visit'
+}
+
+/**
+ * The day of her courtesy call (GDD § 9 Volkova): once in every career, in tuning.police.volkova.introDays,
+ * whatever the heat. One draw per career (its own fork of the seed), so it never moves.
+ */
+export function introDay(state: GameState): number {
+  const [a, b] = V.introDays
+  return new Rng(state.meta.seed).fork('police:intro').int(a, b)
 }
 
 /** A fork of the career seed for one police draw today (never the game Rng). */
@@ -95,7 +115,8 @@ function setVolkova(state: GameState, patch: Partial<GameState['crime']['volkova
   return { ...state, crime: { ...state.crime, volkova: { ...state.crime.volkova, ...patch } } }
 }
 
-function adjustTrust(state: GameState, delta: number): GameState {
+/** Her trust in you moves (clamped); also the story effect { do: 'volkova', trust }. */
+export function adjustTrust(state: GameState, delta: number): GameState {
   const trust = round(Math.min(V.trustMax, Math.max(V.trustMin, state.crime.volkova.trust + delta)))
   return setVolkova(state, { trust })
 }
@@ -135,10 +156,12 @@ export function seize(state: GameState, itemId: string, text: string): GameState
 
 /**
  * Morning: a raid ordered last night happens now (before anyone walks in), a recheck
- * comes due, or Volkova's ordinary visit. At most one police visit a day. Returns the
- * visit (raids go first in line) and the state with her schedule updated.
+ * comes due, her courtesy call, or Volkova's ordinary visit. At most one police visit a day.
+ * Returns the visit (raids go first in line) and the state with her schedule updated.
+ * `storyToday`: one of her own arc's beats brings her in today already, so a recheck or a visit
+ * waits for tomorrow (the raid doesn't wait).
  */
-export function planPolice(state: GameState, nextId: StoryIds): { state: GameState; visit: QueuedVisit | null; first: boolean } {
+export function planPolice(state: GameState, nextId: StoryIds, storyToday = false): { state: GameState; visit: QueuedVisit | null; first: boolean } {
   const day = state.calendar.day
   let s = state
   const patience = tuning.police.patience
@@ -149,11 +172,22 @@ export function planPolice(state: GameState, nextId: StoryIds): { state: GameSta
     s = executeRaid(s)
     return { state: setVolkova(s, { nextDay: every() }), visit: make('raid'), first: true }
   }
+  if (storyToday) {
+    const due = eventsToday(s, RECHECK)
+    if (due.length > 0) {
+      s = dropEvents(s, (e) => e.kind === RECHECK && e.day === day)
+      for (const e of due) s = addEvent(s, { ...e, day: day + 1 })
+    }
+    const v0 = s.crime.volkova
+    return { state: v0.nextDay !== 0 && v0.nextDay <= day ? setVolkova(s, { nextDay: day + 1 }) : s, visit: null, first: false }
+  }
   if (eventsToday(s, RECHECK).length > 0) {
     const nextDay = s.crime.volkova.nextDay
     return { state: nextDay !== 0 && nextDay <= day ? setVolkova(s, { nextDay: day + 1 }) : s, visit: make('recheck'), first: false }
   }
   const v = s.crime.volkova
+  // Her courtesy call: the new owner meets the local detective, hot or not (unless heat brought her sooner).
+  if (!v.met && !volkovaInterested(s) && day >= introDay(s)) return { state: s, visit: make('intro'), first: false }
   if (!volkovaInterested(s)) return { state: v.nextDay !== 0 && v.nextDay <= day ? setVolkova(s, { nextDay: 0 }) : s, visit: null, first: false }
   let nextDay = v.nextDay
   if (nextDay === 0) nextDay = day + policeRng(s, 'first').int(V.firstVisitDays[0], V.firstVisitDays[1])
@@ -215,16 +249,11 @@ export function policeScene(state: GameState, visitId: string): { state: GameSta
   const role = policeRole(visitId)
   const rng = policeRng(state, `lines:${role}`)
   if (role === 'raid') return raidScene(state)
+  if (role === 'intro' && !state.crime.volkova.met) return introScene(state)
   let s = state
   const lines: string[] = []
   if (!s.crime.volkova.met) {
-    lines.push(...volkovaLines.intro)
-    s = setFlag(setVolkova(s, { met: true }), 'police.met')
-    // Protection hook: you went to the police about the glue in your lock, and she read the report.
-    if (s.story.flags.includes('protection.told_police')) {
-      lines.push(volkovaLines.introReported)
-      s = adjustTrust(s, V.reportedTrust)
-    }
+    s = meet(s, lines)
   } else if (role === 'visit') {
     lines.push(rng.pick(volkovaLines.again))
   }
@@ -255,6 +284,43 @@ export function policeScene(state: GameState, visitId: string): { state: GameSta
   const envelope = bribeAmount(s)
   if (s.cash >= envelope) choices.push({ id: 'bribe', label: fill(volkovaLines.choices.bribe, { cash: rub(envelope) }) })
   return { state: s, scene: { lines, step: 0, choices } }
+}
+
+/** Meeting her: the introduction, without an errand. */
+function meet(state: GameState, lines: string[]): GameState {
+  lines.push(...volkovaLines.intro)
+  let s = setFlag(setVolkova(state, { met: true }), 'police.met')
+  // Protection hook: you went to the police about the glue in your lock, and she read the report.
+  if (s.story.flags.includes('protection.told_police')) {
+    lines.push(volkovaLines.introReported)
+    s = adjustTrust(s, V.reportedTrust)
+  }
+  return s
+}
+
+/** Her courtesy call (role 'intro'): who she is, what she does, a cup of tea or not. */
+function introScene(state: GameState): { state: GameState; scene: SceneState } {
+  const lines: string[] = []
+  const s = meet(state, lines)
+  lines.push(...volkovaLines.courtesy.lines)
+  const C = volkovaLines.courtesy
+  return { state: s, scene: { lines, step: 0, choices: [{ id: 'tea', label: C.choices.tea }, { id: 'busy', label: C.choices.busy }] } }
+}
+
+/** Your answer at her courtesy call. */
+function introChoose(state: GameState, choiceId: string): GameState {
+  const cur = state.current!
+  const scene = cur.scene!
+  const C = volkovaLines.courtesy
+  let s = state
+  let reply: string
+  if (choiceId === 'tea') {
+    s = setFlag(adjustTrust(s, V.introTea), 'police.tea')
+    reply = C.replies.tea
+  } else if (choiceId === 'busy') {
+    reply = C.replies.busy
+  } else return state
+  return { ...s, current: { ...s.current!, scene: { ...scene, chosen: choiceId }, line: reply } }
 }
 
 function recheckScene(state: GameState, lines: string[]): { state: GameState; scene: SceneState } {
@@ -295,6 +361,7 @@ export function policeChoose(state: GameState, choiceId: string): GameState {
   const scene = c?.scene
   if (!c || !isPoliceVisit(c) || c.phase !== 'scene' || !scene || scene.chosen || scene.step < scene.lines.length - 1) return state
   if (!scene.choices.some((x) => x.id === choiceId)) return state
+  if (policeRole(c.visitId) === 'intro' && (choiceId === 'tea' || choiceId === 'busy')) return introChoose(state, choiceId)
   const subject = pickSubject(state)
   if (!subject) return state
   const { trail, where } = subject

@@ -94,6 +94,8 @@ export const PLACEHOLDER_MODELS = [
   'coin',
   // M4
   'laptop',
+  // M5
+  'icon',
 ] as const
 
 const HexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/)
@@ -133,6 +135,8 @@ export const ItemDef = z.object({
   magnetic: z.boolean(),
   /** Spawn weight among all defs. */
   rarity: z.number().positive().default(1),
+  /** M5: only a story brings it in (the Collector's icon): never a walk-in's, a bulletin's or a fence's piece. */
+  storyOnly: z.boolean().default(false),
   /** Chance an instance of this def is not genuine (before tuning multipliers). */
   fakeChance: z.number().min(0).max(1),
   tells: z.array(Tell),

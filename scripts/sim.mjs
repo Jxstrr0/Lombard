@@ -26,6 +26,7 @@ const lines = [
   [policies.careful, {}, 'careful'],
   [policies.careful, { protectionLadder: false }, 'trade'],
   [policies.fenceFriend, {}, 'fence'],
+  [policies.informer, {}, 'informer'],
   [policies.mobFriendly, {}, 'mobFriendly'],
   [policies.careless, {}, 'careless'],
   [policies.trader, {}, 'trader'],
@@ -72,5 +73,18 @@ for (const [policy, options, label] of lines) {
   console.log(
     `          police: Volkova visits ${mean((r) => r.police.visits)}  seized ${mean((r) => r.police.seized)}  raided ${runs.filter((r) => r.police.raids > 0).length}/${runs.length}` +
       `  shut ${runs.filter((r) => r.police.shut).length}/${runs.length}  bribes ${mean((r) => r.crime.volkova.bribes)}  lies ${mean((r) => r.crime.volkova.lies)}`,
+  )
+  // M5 Volkova's arc: met her, which second half, and the crew beat.
+  const has = (f) => runs.filter((r) => r.flags.includes(f)).length
+  const branch = (b) => runs.filter((r) => r.flags.some((f) => b.includes(f))).length
+  console.log(
+    `          volkova: met ${runs.filter((r) => r.crime.volkova.met).length}/${runs.length}  trust ${mean((r) => r.crime.volkova.trust)}` +
+      `  father sold ${has('volkova.father_sold')}  honest ${branch(['volkova.source', 'volkova.rang'])}  bought ${branch(['dirty.volkova_loan', 'volkova.reported', 'dirty.volkova_audit'])}` +
+      `  lied ${branch(['heart.volkova_truth', 'volkova.grudge'])}  informed ${has('volkova.informed')} leaked ${has('volkova.leaked')} crackdown ${has('volkova.crackdown')}`,
+  )
+  // M5 the Collector: how many shops he asked, bought his icon, and what became of her.
+  console.log(
+    `          collector: asked ${has('collector.asked')}  bought ${has('collector.bought')}  passed ${has('collector.passed')}` +
+      `  sold ${has('collector.sold')}  returned ${has('collector.returned')}  police ${has('collector.handed_in')}  missed ${has('collector.missed')}`,
   )
 }

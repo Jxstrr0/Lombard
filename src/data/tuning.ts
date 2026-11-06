@@ -552,6 +552,8 @@ export const tuning = {
       'gennady.family': { relationship: 0.2 },
       'gennady.market': { firstRefusal: false },
       'stanislav.turned_away': { relationship: -0.15 },
+      /** Stanislav 4: you told the police about his icon; he goes abroad "for his health" and you'd have to hire him again. */
+      'stanislav.vanishes': { relationship: -0.3, release: 'gentle' },
       'zhenya.free_month': { freeMonths: 1 },
       /** Zhenya 2: slower, as long as anyone's call, and right more often for good. */
       'zhenya.slow_down': { callSeconds: 'standard', accuracy: 0.08 },
@@ -944,6 +946,10 @@ export const tuning = {
       },
       /** A routine visit with nothing to ask about: she glances at your passport book. */
       routine: { goodTrust: 0.05, goodHeat: -0.03, thinTrust: -0.03, thinHeat: 0.03, thinShare: 0.5 },
+      /** Her courtesy call: once in every career, on a day in [min, max] (seeded), unless heat brought her in sooner. */
+      introDays: [8, 20] as readonly [number, number],
+      /** You put the kettle on for her at the courtesy call. */
+      introTea: 0.05,
       /** Her trust on meeting you if you went to the police about the glue in your lock (Protection's protection.told_police). */
       reportedTrust: 0.05,
       /** Her trust in you: −1…1. */
@@ -1000,6 +1006,137 @@ export const tuning = {
     protectionHeldOut: 1,
     /** Any deal with the fence, either way (src/game/crime/fence.ts); on top of stolenBought for a stolen piece. */
     fenceDeal: -0.3,
+    /** M5 Volkova's arc: you helped her catch someone, or told her the truth when it cost you (the clean axis). */
+    helpedPolice: 0.5,
+    /** M5 Volkova's arc: you told her what you know about Eduard Lvovich's crew (the clean axis). */
+    informed: 0.75,
+    /** M5 the Collector: his icon taken back to its church (with the heart.* flag on top). */
+    iconReturned: 1,
+    /** M5 the Collector: his icon handed to the police. */
+    iconHandedIn: 0.5,
+  },
+
+  /**
+   * M5 Detective Volkova's own arc (src/data/stories/volkova.ts, GDD § 9). Branches on how you've
+   * treated her at the counter (crime.volkova): honest, bought, or lied to. Her trust moves with
+   * { do: 'volkova', trust } (src/game/crime/volkova.ts adjustTrust); heat through addHeat; pressure
+   * through addPressure. Days are days after the beat before.
+   */
+  volkovaArc: {
+    /** Her own story starts no earlier than this day (her courtesy call is days 8–20). */
+    startDay: 12,
+    /** Days between one of her beats and the next. */
+    gap: 6,
+    /** Honest branch: her trust at least this, never a lie, no envelope. */
+    honestTrust: 0,
+    /** Lied-to branch: this many lies (caught or not), or one caught; no envelope. */
+    lies: 2,
+    /** Her father's Pobeda: what you paid ÷ its true value. Fair at or over `fair` (a step over a regular's, tuning.regulars.trust), a lowball at or under `low`. */
+    father: { fair: 0.55, low: 0.35 },
+    trust: {
+      fatherFair: 0.1,
+      fatherLow: -0.15,
+      sourceYes: 0.1,
+      sourceNo: 0.02,
+      stakeoutRang: 0.2,
+      stakeoutBought: -0.3,
+      recital: 0.1,
+      patrol: 0.05,
+      shortLent: 0.05,
+      shortRefused: -0.15,
+      auditTold: -0.4,
+      liabilityKept: 0.05,
+      liabilityRefused: -0.2,
+      comeClean: 0.3,
+      grudge: -0.2,
+      iconTruth: 0.15,
+      iconCover: -0.15,
+      informed: 0.15,
+      informNo: -0.05,
+    },
+    heat: {
+      stakeoutRang: -0.1,
+      stakeoutBought: 0.15,
+      shortLent: -0.05,
+      shortRefused: 0.1,
+      auditQuiet: 0.05,
+      auditTold: -0.15,
+      liabilityKept: 0.15,
+      liabilityRefused: 0.05,
+      comeClean: -0.1,
+      grudge: 0.12,
+      iconTruth: -0.08,
+      iconCover: 0.12,
+      informed: -0.05,
+    },
+    /** Standing with the precinct (police group). */
+    rep: { stakeoutRang: 0.08, auditTold: 0.05, informed: 0.05, iconTruth: 0.05, grudge: -0.05 },
+    /** Cash, in roubles (+ to you, − from you). */
+    cash: { shortLoan: -12_000, fireFine: -6_000, liabilityFee: 8_000 },
+    /** Telling her about the crew, and what follows. */
+    inform: {
+      /** Pressure the moment you tell her (word gets round that the police are asking about Eduard Lvovich). */
+      pressure: 0.3,
+      /** Days after telling her before it settles: a leak, or her crackdown. */
+      after: 5,
+      /** Chance the crew finds out who talked, on the day it settles; more if you've been paying her (her precinct leaks). */
+      leak: 0.35,
+      leakBought: 0.65,
+      /** The crew found out: pressure, and standing with them. A brick that night too. */
+      leakPressure: 0.35,
+      leakRep: -0.25,
+      /** Her crackdown: two of the crew held for a week, cars searched. */
+      crackdownPressure: -0.45,
+      /** Her favour for an honest source: a patrol car on your corner for a fortnight while the crew leans on you (a pause, not a cure). */
+      patrolPressure: -0.1,
+    },
+    /**
+     * Stanislav Lyubimov's fourth beat (src/data/stories/stanislav.ts stanislav.icon): one of his icons
+     * through your books as an unredeemed pawn, to give it a past. Its own thing, not The Collector's icon.
+     */
+    stanislavIcon: {
+      /** He's retained you this many months at least. */
+      months: 3,
+      /** His fee for the favour, and what it costs you with the police and earns you with the crew. */
+      fee: 15_000,
+      bookedHeat: 0.1,
+      bookedRep: 0.1,
+      /** Refused: the crew hears he dropped you. */
+      refusedRep: -0.1,
+      refusedPressure: 0.1,
+      /** You told the police: heat off you, and the crew notices their friend has left town. */
+      toldHeat: -0.1,
+      toldPressure: 0.2,
+    },
+  },
+
+  /**
+   * M5 the Collector (src/data/collector.ts, src/game/crime/collector.ts, the arc
+   * src/data/stories/collector.ts; GDD § 9): Leopold Germanovich Bessmertny wants one icon,
+   * stolen from the Intercession church, and pays absurdly for it.
+   */
+  collector: {
+    /** His first visit (collector.wish): from this day, this chance a morning. */
+    wishDay: 18,
+    wishChance: 0.35,
+    /** The roofer brings the icon this many days after the wish, this chance a morning. */
+    iconAfter: 6,
+    iconChance: 0.5,
+    /** The roofer opens at this share of what the icon would fetch (he wants it gone). */
+    anchor: 0.35,
+    /** Bessmertny comes back for it this many days after you bought it. */
+    offerAfter: 4,
+    offerChance: 0.6,
+    /** What he pays, in a hatbox. Absurd on purpose: about four months of a good shop. */
+    price: 350_000,
+    /** The papers after each ending, this many days on; the museum opens later. */
+    paperAfter: 2,
+    museumAfter: 12,
+    /** Passed on: the icon turns up elsewhere this many days later. */
+    elsewhereAfter: 10,
+    /** Heat and standing per ending (story effects). */
+    heat: { sold: 0.25, returned: -0.05, handedIn: -0.15 },
+    rep: { soldPolice: -0.05, returnedNeighbourhood: 0.08, handedInPolice: 0.08 },
   },
 
   /**

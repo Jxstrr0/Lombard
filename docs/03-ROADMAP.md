@@ -63,7 +63,7 @@ Done when: screenshots look like a real shop and the phone still holds 30 fps.
 
 ## M4 — People and story (status: in progress. Story engine, regulars and the first arc (the grandmother’s medals) are in, and reputation by group with shoplifting; workers on the title screen, specialists, the laptop and regular-only looks)
 
-- 20 regulars with schedules, memory, and dialogue.
+- 20 regulars with schedules, memory, and dialogue. Ordinary regulars ✅ (Nov 6): Zinaida plus 15 more on their own schedules (see 05); the arc characters come with their arcs.
 - Remaining 3 specialists (militaria, antiques, electronics) with their small arcs. Specialists ✅ (Nov 6): Gennady Shurygin (militaria), Stanislav Lyubimov (antiques, icons, instruments), Zhenya Kroshkina (phones, cameras, electronics) are in the Office next to Faina and Ilya. Arcs ✅ (Nov 6): all five small arcs run on the story engine (`src/data/stories/{faina,ilya,gennady,stanislav,zhenya}.ts`), with phone-call and morning-paper beats, retained-months and call-event conditions, specialist effects in `tuning.specialistArcs`, and the released-specialist rule (see 05). Stanislav's fourth beat (the icon through your books) waits for Volkova in M5.
 - Story engine and 4 arcs: Grandmother's Medals, Dubai Rolex Guy, The Student's Laptop, Protection (first half).
 - Reputation by group. Shoplifting and security upgrades. ✅ Done: five groups (neighbourhood, youth, police, mob, specialists) in `src/game/reputation.ts`, shown in the ledger as vague lines; shoplifting off open shelves from day 8; door chime, convex mirror, lockable wall case and security camera in the Office (see 05).

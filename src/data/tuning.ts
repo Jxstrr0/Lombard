@@ -87,6 +87,13 @@ export const tuning = {
     maxPerDay: 2,
     /** Extra days, [min, max], added to a regular's first scheduled day so they don't all arrive on schedule.from. */
     firstVisitJitter: [0, 2] as [number, number],
+    /**
+     * In-game seconds of queue patience a regular has on top of a walk-in's
+     * (tuning.day.queuePatience): they came to see you and will wait for it.
+     * Was an inline 60; at 60, a careful (slow) player lost about a third of
+     * regulars' visits to the queue (docs/05, Nov 6 2026).
+     */
+    extraPatience: 240,
     /** A regular this cold waits longer between visits (× every). */
     coldAt: -0.25,
     coldEveryScale: 1.6,

@@ -52,6 +52,9 @@ function item(defId: string, authenticity: ItemInstance['authenticity'] = 'genui
   return generateItem(forced, new Rng(5), id)
 }
 
+/** Who plays whom: Faina and Zhenya are women, Ilya and Stanislav men. */
+const SPECIALIST_GENDER: Record<string, 'f' | 'm'> = { jeweler: 'f', watchmaker: 'm', antiquary: 'm', technician: 'f' }
+
 const eligible = (s: GameState, prefix = '') => new Set(eligibleBeats(s).map((b) => b.id).filter((id) => id.startsWith(prefix)))
 
 describe('specialist arcs: content', () => {
@@ -94,13 +97,14 @@ describe('specialist arcs: content', () => {
     for (const [id, o] of Object.entries(tuning.specialistArcs.offers)) for (const c of o.categories) expect(cats.has(c), `${id} ${c}`).toBe(true)
   })
 
-  it('specialists who come to the counter wear a regular-only look nobody else wears', () => {
+  it('specialists who come to the counter wear a look of their gender that no regular or other specialist wears', () => {
     const taken = new Map(REGULARS.map((r) => [r.look, r.id]))
     for (const sp of SPECIALISTS) {
       const counter = ARCS.find((a) => a.specialist === sp.id)!.beats.some((b) => b.visit.who === sp.id && b.visit.via === 'counter')
       if (!counter) continue
       expect(sp.look, sp.id).toBeDefined()
-      expect(looks.get(sp.look!)?.regular, `${sp.id} ${sp.look}`).toBe(true)
+      expect(looks.get(sp.look!), `${sp.id} ${sp.look}`).toBeDefined()
+      expect(looks.get(sp.look!)!.gender, `${sp.id} ${sp.look}`).toBe(SPECIALIST_GENDER[sp.id])
       expect(taken.get(sp.look!), `${sp.id} shares ${sp.look}`).toBeUndefined()
       taken.set(sp.look!, sp.id)
     }
@@ -432,7 +436,7 @@ describe('specialist arcs: paper and cross-arc beats', () => {
   })
 
   it('a specialist at the counter or on the phone is themselves', () => {
-    expect(specialistCustomer('watchmaker')).toMatchObject({ name: 'Ilya Semyonovich Brodsky', specialistId: 'watchmaker', portraitKey: 'business_male_04' })
+    expect(specialistCustomer('watchmaker')).toMatchObject({ name: 'Ilya Semyonovich Brodsky', specialistId: 'watchmaker', portraitKey: 'male_adult_03' })
     expect(specialistCustomer('nobody')).toBeNull()
   })
 })

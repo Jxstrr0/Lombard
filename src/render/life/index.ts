@@ -11,6 +11,8 @@
  *   dust drifting in it.
  * - tubeLight.ts: a fluorescent tube in the storeroom that stutters now and then.
  * - teaGlass.ts: a glass of tea by the counter lamp, steaming, sipped, topped up.
+ * - flood.ts (M6): Kuzmich's sandbags at the door and canal water on the floor
+ *   through the Flood's days (floodView); hidden otherwise, two draws when shown.
  *
  * Reduce motion: nothing drifts, flickers or sweeps; the clock still shows
  * the time. Low tier: no particles (dust, steam).
@@ -20,9 +22,11 @@
  * textures.
  */
 import * as THREE from 'three'
+import { floodView } from '../../game/city/flood'
 import type { GameState } from '../../game/state'
 import type { QualityTier } from '../perf'
 import { LIGHT_OVERCAST, Sunlight } from './sunlight'
+import { FloodInside } from './flood'
 import { TeaGlass } from './teaGlass'
 import { shopHour, sunAt } from './timeOfDay'
 import { TubeLight } from './tubeLight'
@@ -34,6 +38,7 @@ export class ShopLife {
   readonly sunlight = new Sunlight()
   readonly tube = new TubeLight()
   readonly tea = new TeaGlass()
+  readonly flood = new FloodInside()
   private clockSeconds = 0
   private clockOverride: number | null = null
   private reduceMotion = false
@@ -41,7 +46,7 @@ export class ShopLife {
 
   constructor() {
     this.group.name = 'shop-life'
-    this.group.add(this.clock.mesh, this.sunlight.group, this.tube.group, this.tea.group)
+    this.group.add(this.clock.mesh, this.sunlight.group, this.tube.group, this.tea.group, this.flood.group)
   }
 
   /** ?time=HH:MM: show this shop time (as day.clock seconds) whatever the game's clock says. */
@@ -65,6 +70,8 @@ export class ShopLife {
     }
     const open = state.day.phase === 'open'
     this.tea.sync(this.clockSeconds, open, state.current !== null)
+    const flood = floodView(state)
+    this.flood.sync(flood.phase === 'before' || flood.phase === 'after' ? null : flood)
   }
 
   setTier(tier: QualityTier): void {
@@ -97,5 +104,6 @@ export class ShopLife {
     this.sunlight.dispose()
     this.tube.dispose()
     this.tea.dispose()
+    this.flood.dispose()
   }
 }

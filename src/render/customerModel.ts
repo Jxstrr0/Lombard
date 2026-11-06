@@ -118,8 +118,7 @@ async function loadCustomerModel(loader: GLTFLoader, base: string, id: string, v
     current = next
   }
   play('idle', 0)
-  const entry = CAST.find((c) => c.id === id) as { walkSpeed?: number } | undefined
-  const walkSpeed = entry?.walkSpeed ?? null
+  const walkSpeed = CAST.find((c) => c.id === id)?.walkSpeed ?? null
   return { id, root, mixer, materials, triangles, play, walkSpeed, clips: gltf.animations.map((a) => a.name) }
 }
 

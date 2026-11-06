@@ -740,9 +740,10 @@ export const tuning = {
   },
 
   /**
-   * M4 Protection arc, first half (src/data/stories/protection.ts; the charge is in
-   * src/game/economy/expenses.ts). Pressure is the hidden mob dial (GDD § 8): 0 = they
-   * haven't noticed you; M5 builds the escalation ladder on it.
+   * Protection arc (src/data/stories/protection.ts; the charge is in src/game/economy/expenses.ts,
+   * the brick in src/game/crime/vandalism.ts). Pressure is the hidden mob dial (GDD § 8): 0 = they
+   * haven't noticed you. M4 is the first half; M5 adds the ladder for refusers (pressure-gated
+   * rungs, the brick, the landlord, pushed out) and, for payers, fewer thefts and the crew's deliveries.
    */
   protection: {
     /** "Insurance": this share of the calendar month's takings (everything sold), charged with the rent. */
@@ -754,9 +755,93 @@ export const tuning = {
     /** Refusing: the locksmith after someone glues the door lock. */
     locksmith: 2_800,
     /** Pressure moved by each beat and choice (unbounded; 0 = unnoticed). */
-    pressure: { asked: 0.05, accepted: -0.05, refused: 0.2, glueRefused: 0.15, gluePolice: 0.2, gluePaid: -0.1, bakery: 0.1 },
+    pressure: {
+      asked: 0.05,
+      accepted: -0.05,
+      refused: 0.2,
+      glueRefused: 0.15,
+      gluePolice: 0.2,
+      gluePaid: -0.1,
+      bakery: 0.1,
+      // M5 ladder.
+      properlyRefused: 0.15,
+      properlyPaid: -0.2,
+      windowRefused: 0.15,
+      windowPaid: -0.25,
+      ultimatumRefused: 0.2,
+      ultimatumPaid: -0.3,
+      /** Stanislav Lyubimov has a word over dinner (his arc, stanislav.word). */
+      stanislavWord: -0.3,
+      /** The street turned out for you and the crew went elsewhere. */
+      streetStood: -0.5,
+      boxKept: -0.05,
+      boxRefused: 0.15,
+      /** Waving away one of the crew's deliveries. */
+      deliveryPassed: 0.03,
+    },
     /** Standing with the mob group. */
-    rep: { accepted: 0.15, haggled: 0.05, refused: -0.1, gluePaid: 0.05, gluePolice: -0.15, glueRefused: -0.1 },
+    rep: {
+      accepted: 0.15,
+      haggled: 0.05,
+      refused: -0.1,
+      gluePaid: 0.05,
+      gluePolice: -0.15,
+      glueRefused: -0.1,
+      // M5.
+      properlyPaid: 0.05,
+      properlyRefused: -0.1,
+      windowPaid: 0.05,
+      windowRefused: -0.15,
+      ultimatumPaid: 0.05,
+      ultimatumRefused: -0.2,
+      /** Each month's envelope, counted by Zhora. */
+      monthPaid: 0.02,
+      boxKept: 0.15,
+      boxRefused: -0.15,
+      deliveryBought: 0.03,
+      deliveryPassed: -0.02,
+    },
+    /**
+     * M5 ladder for refusers: each rung waits for the last (days) and for pressure to be at least
+     * its `At`. Stanislav's word (stanislav.word, if you let him) holds every rung for `wordDays`.
+     */
+    ladder: {
+      /** "Next month I'll come and ask you properly": days after the bakery story. */
+      properlyAfter: 28,
+      properlyAt: 0.4,
+      /** Eduard Lvovich drops in about your glass this many days after the brick. */
+      windowAfter: 3,
+      /** The landlord's message, this many days after the window talk. */
+      ultimatumAfter: 14,
+      ultimatumAt: 0.75,
+      /** Refusing the landlord's message: this many days later it's settled, one way or the other. */
+      settleAfter: 7,
+      /** The street stands with you: neighbourhood standing at least this, and the crew moves on. Under it, you're pushed out. */
+      streetStands: 0.25,
+      wordDays: 30,
+    },
+    /** Paying at the landlord's message: the months you "owe", up front. */
+    backPay: 15_000,
+    /** The brick through the counter case (src/game/crime/vandalism.ts), from its own seeded stream. */
+    brick: {
+      /** Chance that one piece from the case (any of them, equally) is gone by morning. */
+      stolen: 0.2,
+      /** Each piece still there took glass with this chance: condition down by `damage` points (value follows). */
+      damaged: 0.35,
+      damage: 15,
+      minCondition: 5,
+      /** The glazier: new glass after this many days, and the bill then. */
+      repairDays: 2,
+      glazier: 2_500,
+      /** While the glass is out, the counter case is as exposed to shoplifters as the wall (tuning.theft.exposure). */
+      openExposure: 1,
+    },
+    /** Payers: "nobody touches this shop". Shoplifting × this while you pay. */
+    paidTheftScale: 0.35,
+    /** Payers: the crew's own deliveries (stolen; they open at `anchor` × what it would fetch). */
+    delivery: { firstAfter: 10, gap: 14, anchor: 0.5, heat: 0.06 },
+    /** The box in the back room: what they pay for the room, and the attention it draws. */
+    box: { fee: 5_000, heat: 0.1 },
   },
 
   /**
@@ -775,6 +860,12 @@ export const tuning = {
     lowball: -0.35,
     /** Buying, or lending on, a piece that turns out to be stolen, known or not. */
     stolenBought: -0.5,
+    /** M5 Protection: each month's insurance paid. */
+    protectionPaid: -0.5,
+    /** M5 Protection: each time you tell the crew no. */
+    protectionRefused: 0.5,
+    /** M5 Protection: held out to the end and the crew went elsewhere. */
+    protectionHeldOut: 1,
   },
 
   /** M5 endings (src/game/endings/). */

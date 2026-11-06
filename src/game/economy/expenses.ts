@@ -15,11 +15,15 @@
  *   - "insurance" while the Protection arc's paying flag is set (M4,
  *     src/data/stories/protection.ts): tuning.protection.share (or haggledShare)
  *     of the month's net takings at the till, never under tuning.protection.minimum.
+ *     M5: each month paid counts dirty on the ending axes (tuning.axes.protectionPaid)
+ *     and a little with the mob (tuning.protection.rep.monthPaid).
  * The first month of a retainer is charged (prorated) when retaining; see specialists.ts.
  */
 import { getSpecialist } from '../../data/specialists'
 import { PROTECTION_FLAGS } from '../../data/stories/protection'
 import { tuning } from '../../data/tuning'
+import { nudgeAxis } from '../endings/axes'
+import { adjustRep } from '../reputation'
 import { addDays, type GameState, type ISODate } from '../state'
 import type { LedgerEntry, SpecialistState } from '../types'
 
@@ -119,12 +123,14 @@ export function chargeExpenses(state: GameState): GameState {
     entries.push({ kind: 'expense', amount: -insurance.amount, text: `Insurance, ${monthName(date)} (${how})` })
     cash -= insurance.amount
   }
-  return {
+  const charged: GameState = {
     ...state,
     cash,
     specialists,
     day: { ...state.day, log: [...state.day.log, ...entries] },
   }
+  if (!insurance) return charged
+  return adjustRep(nudgeAxis(charged, 'clean', tuning.axes.protectionPaid, 'insurance'), 'mob', tuning.protection.rep.monthPaid, 'insurance')
 }
 
 /** M4 arcs at a month end on retainer: months paid in full, accuracy drift, a free month used up. */

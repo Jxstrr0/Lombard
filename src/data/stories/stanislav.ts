@@ -7,8 +7,11 @@
  *
  * Flags other arcs read: protection.stanislav_card (he left his card),
  * stanislav_owed and protection.stanislav_word (you let him have a word: no
- * pressure for a month from that beat's day). Reads protection.running.
+ * pressure for a month from that beat's day: the Protection ladder's rungs wait
+ * tuning.protection.ladder.wordDays, and pressure drops). Reads protection.running.
  */
+import { tuning } from '../tuning'
+
 export default {
   id: 'stanislav',
   title: 'Stanislav Edgarovich Lyubimov',
@@ -86,7 +89,12 @@ export default {
               id: 'accept',
               label: 'Have a word',
               reply: 'Consider it done. Sleep well, my dear. You owe me nothing. Yet.',
-              effects: [{ do: 'flag', flag: 'stanislav_owed' }, { do: 'flag', flag: 'protection.stanislav_word' }],
+              // M5: the crew eases off (pressure), and the Protection ladder waits tuning.protection.ladder.wordDays.
+              effects: [
+                { do: 'flag', flag: 'stanislav_owed' },
+                { do: 'flag', flag: 'protection.stanislav_word' },
+                { do: 'pressure', delta: tuning.protection.pressure.stanislavWord },
+              ],
             },
             {
               id: 'decline',

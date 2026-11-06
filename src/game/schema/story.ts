@@ -138,6 +138,9 @@ const BaseCondition = z.discriminatedUnion('if', [
   z.object({ if: z.literal('stock'), category: z.string(), genuine: z.boolean().optional() }),
   /** The calendar date (MM-DD) is within from…to (inclusive; may wrap the year end). */
   z.object({ if: z.literal('date'), from: z.string().regex(/^\d\d-\d\d$/), to: z.string().regex(/^\d\d-\d\d$/) }),
+  // --- M5 ---------------------------------------------------------------------------
+  /** The hidden mob dial (crime.pressure, ≥ 0). */
+  z.object({ if: z.literal('pressure'), ...cmp.shape }),
 ])
 
 /** M4: at least one of these holds (one level: no `any` inside `any`). */
@@ -163,6 +166,7 @@ export type RedeemPlan = z.infer<typeof RedeemPlan>
 const changeName = z.string().refine((k) => k in tuning.specialistArcs.changes, 'a tuning.specialistArcs.changes key')
 const boostName = z.string().refine((k) => k in tuning.specialistArcs.boosts, 'a tuning.specialistArcs.boosts key')
 const offerName = z.string().refine((k) => k in tuning.specialistArcs.offers, 'a tuning.specialistArcs.offers key')
+const axisWeight = z.string().refine((k) => k in tuning.axes, 'a tuning.axes key') as z.ZodType<keyof typeof tuning.axes>
 
 export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('flag'), flag: z.string() }),
@@ -191,6 +195,13 @@ export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('walkout') }),
   /** A specialist buys from your stock (tuning.specialistArcs.offers). */
   z.object({ do: z.literal('sellTo'), id, offer: offerName }),
+  // --- M5 ---------------------------------------------------------------------------
+  /** Move an ending axis (src/game/endings/axes.ts) by a tuning.axes weight. */
+  z.object({ do: z.literal('axis'), axis: z.enum(['clean', 'heart']), weight: axisWeight }),
+  /** Vandalism tonight (src/game/crime/vandalism.ts): a brick through the counter case. */
+  z.object({ do: z.literal('vandalism'), kind: z.enum(['brick']) }),
+  /** A forced ending (src/game/endings/end.ts). */
+  z.object({ do: z.literal('endCareer'), kind: z.enum(['evicted', 'raided', 'pushedOut']) }),
 ])
 export type Effect = z.infer<typeof Effect>
 
@@ -249,6 +260,11 @@ export const VisitScript = z
      * `who` may also name a specialist (src/data/specialists): they are the one talking.
      */
     via: z.enum(['counter', 'phone', 'paper']).default('counter'),
+    /**
+     * M5: a seller beat's seller anchors their asking price on this share of what the piece
+     * would fetch (the crew's deliveries come cheap). Default: the usual claimed value.
+     */
+    anchor: unit.optional(),
     /** M4: someone sent by `who` walks in instead (a one-off stranger; `who` still owns the beat). */
     as: z
       .object({

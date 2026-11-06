@@ -14,6 +14,9 @@
  * - traffic: people through the door today / trafficBaseline, clamped.
  * - youth: theftRepFactor (good standing with the local kids lowers it).
  * - security: 1 / (1 + shop.security × perSecurity), from the mirror, chime, camera, counter case.
+ * - M5 Protection: a bricked counter case is open until the glazier comes
+ *   (tuning.protection.brick.openExposure), and a shop that pays the crew loses
+ *   less (× tuning.protection.paidTheftScale).
  * Capped at maxChance. A stolen item leaves inventory, display, tags and `paid`, and
  * gets a 'theft' ledger entry; career stats count it. When a draw would have been a
  * theft without the security factor, the strongest deterrent you own gets one
@@ -24,6 +27,8 @@ import { getItemDef } from '../../data/items'
 import { theftLines, theftWhere } from '../../data/theftLines'
 import { tuning } from '../../data/tuning'
 import { getUpgrade } from '../../data/upgrades'
+import { PROTECTION_FLAGS } from '../../data/stories/protection'
+import { caseBroken } from '../crime/vandalism'
 import { protectedAreas } from '../economy/upgrades'
 import { theftRepFactor } from '../reputation'
 import { Rng } from '../rng'
@@ -53,7 +58,11 @@ function trafficFactor(state: GameState): number {
 /** Tonight's chance before security (exposure, cheapness, traffic, youth). */
 function rawChance(state: GameState, item: ItemInstance, area: SlotArea): number {
   if (protectedAreas(state).has(area)) return 0
-  return T.base * T.exposure[area] * cheapness(item.trueValue) * trafficFactor(state) * theftRepFactor(state)
+  // M5 Protection: a bricked case has no glass until the glazier comes; and the crew keeps
+  // the street's light fingers off a shop that pays.
+  const exposure = area === 'counter' && caseBroken(state) ? tuning.protection.brick.openExposure : T.exposure[area]
+  const paying = state.story.flags.includes(PROTECTION_FLAGS.paying) ? tuning.protection.paidTheftScale : 1
+  return T.base * exposure * cheapness(item.trueValue) * trafficFactor(state) * theftRepFactor(state) * paying
 }
 
 /** Tonight's chance that `item` on display in `area` is stolen. */

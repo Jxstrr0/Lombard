@@ -9,6 +9,7 @@
 import { getItemDef } from '../data/items'
 import type { Action } from '../game/actions'
 import { claimedValue } from '../game/appraise/value'
+import { BRICK, caseBroken } from '../game/crime/vandalism'
 import { upcomingBills } from '../game/economy/expenses'
 import { availableTools } from '../game/inspect/available'
 import type { ToolId } from '../game/schema/item'
@@ -22,6 +23,8 @@ export interface PolicyContext {
   acquired: Record<string, number>
   /** Haggle rounds so far on the current visit. */
   rounds: number
+  /** M5 (heedsThreats): what it took out of the counter case before a brick, to put back after the glazier. */
+  evacuated?: string[]
 }
 
 export interface Policy {
@@ -62,6 +65,16 @@ export interface PolicyParams {
   reserveDays: number
   /** Story choices (by id) to take when a scene offers one of them; otherwise the first choice. */
   prefer?: readonly string[]
+  /**
+   * M5: takes "lock up carefully tonight" seriously: with a brick coming, the counter case goes
+   * into the safe at closing, and nothing goes back in it until the glazier has been.
+   */
+  heedsThreats?: boolean
+}
+
+/** M5: a brick is due tonight, or the case has no glass yet. */
+function caseUnsafe(state: GameState): boolean {
+  return state.crime.events.some((e) => e.kind === BRICK) || caseBroken(state)
 }
 
 /** Cash the policy is willing to spend right now. */
@@ -163,13 +176,30 @@ function estimateOf(state: GameState, itemId: string, p: PolicyParams): number {
 
 /** Put stock on display and tag it (between customers and while closed). */
 function arrangeStep(state: GameState, ctx: PolicyContext, p: PolicyParams): Action | null {
+  const avoidCase = p.heedsThreats === true && caseUnsafe(state)
+  if (avoidCase) {
+    const inCase = state.shop.slots.find((s) => s.area === 'counter' && s.itemId)
+    if (inCase) {
+      ctx.evacuated = [...(ctx.evacuated ?? []), inCase.itemId!]
+      return { type: 'shop/place', itemId: inCase.itemId!, slotId: null }
+    }
+  } else if (ctx.evacuated?.length) {
+    // New glass: what came out goes back in, while there's room.
+    const free = state.shop.slots.find((s) => s.area === 'counter' && s.itemId === null)
+    const back = ctx.evacuated.find((id) => state.inventory.some((i) => i.id === id))
+    if (!free || !back) ctx.evacuated = []
+    else {
+      ctx.evacuated = ctx.evacuated.filter((id) => id !== back)
+      return { type: 'shop/place', itemId: back, slotId: free.id }
+    }
+  }
   const placed = new Set(state.shop.slots.filter((s) => s.itemId).map((s) => s.itemId!))
   for (const it of state.inventory) {
     const est = ctx.estimate[it.id] ?? estimateOf(state, it.id, p)
     if (state.shop.prices[it.id] === undefined) return { type: 'shop/price', itemId: it.id, price: Math.round(est * p.markup) }
     if (!placed.has(it.id)) {
       // Best slots for the most valuable stock: counter, then wall, then back.
-      const free = state.shop.slots.find((s) => s.itemId === null)
+      const free = state.shop.slots.find((s) => s.itemId === null && !(avoidCase && s.area === 'counter'))
       if (free) return { type: 'shop/place', itemId: it.id, slotId: free.id }
     }
   }
@@ -190,7 +220,7 @@ function closedStep(state: GameState, ctx: PolicyContext, p: PolicyParams): Acti
   return { type: 'day/open' }
 }
 
-export const careful = makePolicy({
+const CAREFUL: PolicyParams = {
   name: 'careful',
   tools: ['scale', 'loupe', 'magnet', 'loupe', 'acid', 'reference'],
   passOnRedFlags: true,
@@ -206,10 +236,20 @@ export const careful = makePolicy({
   dumpAfterDays: 21,
   skepticism: 0.1,
   reserveDays: 10,
-  // Runs a clean shop: turns down the crew's "insurance" (Protection arc). Paying costs a careful
-  // shop about 2 points of monthly growth (docs/05, Nov 6); the bands measure the trade, not that choice.
+  // Runs a clean shop: turns down the crew's "insurance" and every rung after (Protection arc).
+  // M5 makes refusing cost (the brick, the glazier); see docs/05 for the sim numbers.
   prefer: ['refuse'],
-})
+  // And when Eduard Lvovich says "lock up carefully tonight", it empties the counter case.
+  heedsThreats: true,
+}
+
+export const careful = makePolicy(CAREFUL)
+
+/**
+ * M5: the same careful trader, mob-friendly. Pays the crew whenever asked, keeps their box, and buys
+ * their deliveries like any other good deal (the M5 "done when": a mob-friendly run plays differently).
+ */
+export const mobFriendly = makePolicy({ ...CAREFUL, name: 'mobFriendly', prefer: ['accept', 'pay', 'keep'] })
 
 export const careless = makePolicy({
   name: 'careless',

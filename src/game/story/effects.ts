@@ -1,6 +1,9 @@
 /** Apply story effects (src/game/schema/story.ts) to the state. Pure. */
 import { addHeat, addPressure } from '../crime/dials'
+import { scheduleVandalism } from '../crime/vandalism'
 import { flagAxis, nudgeAxis } from '../endings/axes'
+import { endCareer } from '../endings/end'
+import { tuning } from '../../data/tuning'
 import { adjustRep } from '../reputation'
 import type { Effect } from '../schema/story'
 import type { GameState } from '../state'
@@ -48,6 +51,13 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
     // --- M4 story pledges (The Student's Laptop) ---
     case 'renew':
       return renewPledge(state, e.who, e.charge, e.redeem)
+    // --- M5 ---
+    case 'axis':
+      return nudgeAxis(state, e.axis, tuning.axes[e.weight], `story:${arc}`)
+    case 'vandalism':
+      return scheduleVandalism(state, e.kind)
+    case 'endCareer':
+      return endCareer(state, e.kind)
   }
 }
 

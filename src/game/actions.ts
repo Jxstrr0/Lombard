@@ -14,11 +14,14 @@
  * Between customers (and while closed) the player can arrange the display: shop/place, shop/price.
  */
 import { getItemDef } from '../data/items'
+import { getBeat } from '../data/stories'
 import { pickLine, visitLines } from '../data/lines'
 import { tuning } from '../data/tuning'
 import { claimedValue, dealerPrice } from './appraise/value'
 import { leftoverStock } from './career/start'
 import { generateDayQueue } from './customers/walkins'
+import { planStory } from './story/plan'
+import { afterVisit, sceneChoose, sceneFor, sceneNext } from './story/visit'
 import { updateMarket } from './economy/demand'
 import { chargeExpenses } from './economy/expenses'
 import { releaseSpecialist, retainSpecialist } from './economy/specialists'
@@ -32,7 +35,7 @@ import type { ToolId } from './schema/item'
 import { planBuyers, saleRound, startSale } from './sell/buyer'
 import { clearItem, placeItem, setPrice } from './shop/display'
 import { addDays, createInitialState, seasonOf, weekdayOf, type GameState, type Settings } from './state'
-import type { Approach, DaySummary, LedgerEntry, QueuedVisit, VisitOutcome } from './types'
+import type { Approach, DaySummary, ItemVisit, LedgerEntry, QueuedVisit, VisitOutcome, VisitState } from './types'
 
 export type Action =
   | { type: 'day/open' }
@@ -64,6 +67,10 @@ export type Action =
   | { type: 'specialist/retain'; id: string }
   | { type: 'specialist/release'; id: string }
   | { type: 'settings/set'; patch: Partial<Settings> }
+  /** M4 story scene: next line, or end the scene (an item visit moves on to the item). */
+  | { type: 'scene/next' }
+  /** M4 story scene: pick one of the choices offered on its last line. */
+  | { type: 'scene/choose'; choiceId: string }
 
 /** Action types after which the career is autosaved. */
 export const AUTOSAVE_ACTIONS: ReadonlySet<Action['type']> = new Set([
@@ -124,8 +131,8 @@ export function reducer(state: GameState, action: Action): GameState {
       return state.current.wants === 'pawn' ? pawn(accepted, h.ask) : buy(accepted, h.ask)
     }
     case 'counter/pass': {
-      const c = state.current
-      if (!c || c.phase === 'resolved' || c.kind === 'redeem') return state
+      const c = itemVisit(state)
+      if (!c || c.phase === 'resolved' || c.phase === 'scene' || c.kind === 'redeem') return state
       const name = getItemDef(c.item.defId).name
       return withRng(state, (s, rng) =>
         resolve(s, 'passed', c.kind === 'buyer' ? pickLine('sale.refused.flexible', rng, {}) : rng.pick(visitLines.pass), {
@@ -188,6 +195,10 @@ export function reducer(state: GameState, action: Action): GameState {
       return { ...createInitialState(action.seed, action.careerId), settings: state.settings }
     case 'settings/set':
       return { ...state, settings: { ...state.settings, ...action.patch } }
+    case 'scene/next':
+      return endOrStepScene(state)
+    case 'scene/choose':
+      return sceneChoose(state, action.choiceId)
     default: {
       const unknown: never = action
       return unknown
@@ -202,6 +213,12 @@ function withRng(state: GameState, fn: (s: GameState, rng: Rng) => GameState): G
   const rng = Rng.from(state.meta.rng)
   const next = fn(state, rng)
   return { ...next, meta: { ...next.meta, rng: rng.state } }
+}
+
+/** The customer at the counter if they brought an item (not a story scene visitor). */
+function itemVisit(state: GameState): ItemVisit | null {
+  const c = state.current
+  return c && c.kind !== 'scene' ? c : null
 }
 
 /** Allocates ids from meta.nextId; returns the updated meta via the closure's counter. */
@@ -223,6 +240,7 @@ function haggleContext(state: GameState): HaggleContext | null {
     item,
     claimedValue: state.current.wants === 'pawn' ? pawnClaim(claim, state.current.customer) : claim,
     findings: state.inspect.findings,
+    ...(state.current.customer.regularId ? { trust: state.customers[state.current.customer.regularId]?.trust ?? 0 } : {}),
   }
 }
 
@@ -267,13 +285,18 @@ function openDay(state: GameState): GameState {
     const market = updateMarket(s, rng)
     s = { ...s, market }
     const ids = idAllocator(s)
-    const sellers = generateDayQueue(rng, tuning.day.customersPerDay, ids.next)
+    // Regulars and story beats first: their sellers take walk-in places.
+    const story = planStory(s, ids.next)
+    const sellers = generateDayQueue(rng, tuning.day.customersPerDay - story.sellerPlaces, ids.next)
     const buyers = planBuyers(s, rng, ids.next)
     const redeemers = planRedemptions(s, ids.next)
-    const queue = mergeQueue(sellers, [...buyers, ...redeemers], rng)
+    const later = story.visits.filter((v) => !v.first).map((v) => v.visit)
+    const first = story.visits.filter((v) => v.first).map((v) => v.visit)
+    const queue = [...first, ...mergeQueue(sellers, [...buyers, ...redeemers, ...later], rng)]
     return {
       ...s,
       meta: { ...s.meta, nextId: ids.nextId() },
+      customers: story.customers,
       queue,
       current: null,
       inspect: null,
@@ -339,21 +362,26 @@ function nextCustomer(state: GameState): GameState {
   if (state.day.phase !== 'open' || state.current || state.queue.length === 0) return state
   const [visit, ...rest] = state.queue
   if (!visit) return state
+  const scene = sceneFor(visit)
+  const common = {
+    visitId: visit.visitId,
+    wants: visit.wants,
+    loanId: visit.loanId,
+    sale: null,
+    customer: visit.customer,
+    elapsed: 0,
+    phase: scene ? ('scene' as const) : ('present' as const),
+    ...(visit.beatId ? { beatId: visit.beatId } : {}),
+    ...(scene ? { scene } : {}),
+  }
+  const current: VisitState =
+    visit.kind === 'scene'
+      ? { ...common, kind: 'scene', line: scene?.lines[0] ?? visit.line ?? '' }
+      : { ...common, kind: visit.kind, item: visit.item, line: scene?.lines[0] ?? visit.line ?? visit.item.story }
   const base: GameState = {
     ...state,
     queue: rest,
-    current: {
-      visitId: visit.visitId,
-      kind: visit.kind,
-      wants: visit.wants,
-      loanId: visit.loanId,
-      sale: null,
-      customer: visit.customer,
-      item: visit.item,
-      phase: 'present',
-      line: visit.line ?? visit.item.story,
-      elapsed: 0,
-    },
+    current,
     inspect: visit.kind === 'seller' ? { findings: [], toolUses: {}, estimate: null } : null,
     haggle: null,
     stats: { ...state.stats, customersSeen: state.stats.customersSeen + 1 },
@@ -361,7 +389,7 @@ function nextCustomer(state: GameState): GameState {
   if (visit.kind !== 'buyer') return base
   // Buyer: the item must still be on display with a tag.
   return withRng(base, (s, rng) => {
-    const c = s.current!
+    const c = itemVisit(s)!
     const live = s.inventory.find((i) => i.id === visit.item.id)
     const onDisplay = s.shop.slots.some((sl) => sl.itemId === visit.item.id)
     const tag = s.shop.prices[visit.item.id]
@@ -374,7 +402,7 @@ function nextCustomer(state: GameState): GameState {
 }
 
 function applyTool(state: GameState, tool: ToolId, hotspot?: string): GameState {
-  const c = state.current
+  const c = itemVisit(state)
   const insp = state.inspect
   if (!c || !insp || c.phase !== 'inspect') return state
   const def = getItemDef(c.item.defId)
@@ -399,7 +427,7 @@ function applyTool(state: GameState, tool: ToolId, hotspot?: string): GameState 
 }
 
 function makeOffer(state: GameState, amount: number, approach: Approach, evidenceId?: string): GameState {
-  const c = state.current
+  const c = itemVisit(state)
   const ctx = haggleContext(state)
   if (!c || !ctx || c.phase !== 'offer') return state
   const offer = Math.round(amount)
@@ -427,7 +455,7 @@ function makeOffer(state: GameState, amount: number, approach: Approach, evidenc
 }
 
 function buy(state: GameState, price: number, line?: string): GameState {
-  const c = state.current
+  const c = itemVisit(state)
   if (!c) return state
   const def = getItemDef(c.item.defId)
   const fake = c.item.authenticity !== 'genuine'
@@ -454,7 +482,7 @@ function buy(state: GameState, price: number, line?: string): GameState {
 
 /** Accept a pawn: lend `principal`, hold the item until it is redeemed or forfeited. */
 function pawn(state: GameState, principal: number, line?: string): GameState {
-  const c = state.current
+  const c = itemVisit(state)
   if (!c) return state
   const def = getItemDef(c.item.defId)
   return withRng(state, (s, rng) => {
@@ -514,7 +542,7 @@ function counterSale(state: GameState, amount: number): GameState {
 }
 
 function sellToBuyer(state: GameState, price: number, line?: string): GameState {
-  const c = state.current
+  const c = itemVisit(state)
   if (!c || !c.sale) return state
   const def = getItemDef(c.item.defId)
   const next = removeSold(state, c.item.id, price)
@@ -550,10 +578,30 @@ function removeSold(state: GameState, itemId: string, price: number): GameState 
   }
 }
 
-function resolve(state: GameState, outcome: VisitOutcome, line: string, entry: LedgerEntry, price?: number): GameState {
+function resolve(state: GameState, outcome: VisitOutcome, line: string, entry: LedgerEntry | null, price?: number): GameState {
   const c = state.current
   if (!c) return state
-  return log({ ...state, current: { ...c, phase: 'resolved', outcome, line, price } }, entry)
+  const next: GameState = { ...state, current: { ...c, phase: 'resolved', outcome, line, price } }
+  // Regulars remember; story beats record how they went (and may change the line).
+  return afterVisit(entry ? log(next, entry) : next)
+}
+
+/** "Go on" in a story scene: the next line; at the end, the item (or the visit ends). */
+function endOrStepScene(state: GameState): GameState {
+  const step = sceneNext(state)
+  if (!step) return state
+  if (step.kind === 'line') return step.state
+  const s = step.state
+  const c = s.current!
+  if (step.outcome) return resolve(s, step.outcome, c.line, null)
+  if (c.kind === 'scene') return s
+  return { ...s, current: { ...c, phase: 'present', line: sceneItemLine(c) } }
+}
+
+/** The line once the scene is done and the item is on the mat. */
+function sceneItemLine(c: ItemVisit): string {
+  const beat = c.beatId ? getBeat(c.beatId) : undefined
+  return beat?.visit.line ?? c.item.story
 }
 
 /** Advance in-game time while a customer is at the counter; waiting customers lose patience. */
@@ -577,7 +625,7 @@ function advanceTime(state: GameState, seconds: number): GameState {
       kind: 'walkout',
       amount: 0,
       text: `${v.customer.name} got tired of waiting and left`,
-      defId: v.item.defId,
+      ...(v.item ? { defId: v.item.defId } : {}),
     })
     next = {
       ...next,

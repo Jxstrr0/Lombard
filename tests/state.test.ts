@@ -39,7 +39,7 @@ describe('day loop', () => {
     expect(a).toEqual(b)
     expect(a.queue).toHaveLength(tuning.day.customersPerDay)
     expect(a.day.phase).toBe('open')
-    const ids = new Set(a.queue.flatMap((v) => [v.visitId, v.customer.id, v.item.id]))
+    const ids = new Set(a.queue.flatMap((v) => [v.visitId, v.customer.id, v.item!.id]))
     expect(ids.size).toBe(a.queue.length * 3)
   })
 
@@ -67,7 +67,7 @@ describe('day loop', () => {
 
   it('an accepted offer moves cash and the item', () => {
     let s = run(startedState(11, 'c1'), { type: 'day/open' }, { type: 'counter/next' }, { type: 'counter/inspect' }, { type: 'inspect/done' })
-    const item = s.current!.item
+    const item = s.current!.item!
     // Offer the item's full value: any sane haggle accepts that.
     s = run(s, { type: 'offer/make', amount: generous(item, s.cash), approach: 'straight' })
     expect(s.current?.outcome).toBe('bought')
@@ -102,7 +102,7 @@ describe('day loop', () => {
 
   it('selling to the dealer pays cash and removes the item', () => {
     let s = run(startedState(11, 'c1'), { type: 'day/open' }, { type: 'counter/next' }, { type: 'counter/inspect' }, { type: 'inspect/done' })
-    s = run(s, { type: 'offer/make', amount: generous(s.current!.item, s.cash), approach: 'straight' }, { type: 'counter/dismiss' })
+    s = run(s, { type: 'offer/make', amount: generous(s.current!.item!, s.cash), approach: 'straight' }, { type: 'counter/dismiss' })
     while (s.queue.length > 0) s = run(s, { type: 'counter/next' }, { type: 'counter/pass' }, { type: 'counter/dismiss' })
     s = reducer(s, { type: 'day/close' })
     const item = s.inventory[0]!

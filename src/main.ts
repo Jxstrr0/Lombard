@@ -277,7 +277,7 @@ async function boot(): Promise<void> {
     ui.setCustomerArrivedQuiet(shop.customerState !== 'arriving')
     ui.render(state, prev)
     stage.sync(state)
-    stage.setWaiting(state.current?.phase === 'present' && shop.customerState === 'arriving')
+    stage.setWaiting((state.current?.phase === 'present' || state.current?.phase === 'scene') && shop.customerState === 'arriving')
     rig.reduceMotion = stage.reduceMotion = state.settings.reduceMotion
     // A new customer steps up: face the counter again.
     if (prev && state.current && state.current.visitId !== prev.current?.visitId) rig.recentre()
@@ -369,7 +369,7 @@ async function boot(): Promise<void> {
       document.body.dataset.customer = customerState
       ui.setCustomerArrived(customerState !== 'arriving')
       const c = store.get().current
-      stage.setWaiting(c?.phase === 'present' && customerState === 'arriving')
+      stage.setWaiting((c?.phase === 'present' || c?.phase === 'scene') && customerState === 'arriving')
     }
     stage.update(dt, rig)
     rig.update(dt)

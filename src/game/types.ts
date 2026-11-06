@@ -49,6 +49,8 @@ export interface WalkIn {
   /** 0–1: how badly they need the money today. */
   desperation: number
   portraitKey: string
+  /** M4: set when this is one of the authored regulars (src/data/regulars); their memory is state.customers[regularId]. */
+  regularId?: string
 }
 
 export type Approach = 'straight' | 'evidence' | 'sympathy' | 'walk'
@@ -83,27 +85,27 @@ export interface HaggleState {
   history: HaggleRound[]
 }
 
-export type VisitPhase = 'present' | 'inspect' | 'offer' | 'resolved'
+/** scene: a story beat's conversation (lines, maybe a choice) before anything else happens. */
+export type VisitPhase = 'scene' | 'present' | 'inspect' | 'offer' | 'resolved'
 /**
  * bought / pawned: you took the item. sold: a buyer took one of yours.
  * redeemed: a pawner paid off their loan. passed / walked / left: no deal.
+ * talked: a story scene with no item ended (M4).
  */
-export type VisitOutcome = 'bought' | 'pawned' | 'sold' | 'redeemed' | 'passed' | 'walked' | 'left'
+export type VisitOutcome = 'bought' | 'pawned' | 'sold' | 'redeemed' | 'passed' | 'walked' | 'left' | 'talked'
 
 /**
  * seller: brings an item to sell or pawn (inspect → offer → haggle).
  * buyer: wants one of your displayed items (sale haggle, no inspect).
  * redeem: comes back to pay off a loan and collect their item.
+ * scene: a story visitor with nothing to sell (M4): they talk, maybe ask you to choose, and leave.
  */
-export type VisitKind = 'seller' | 'buyer' | 'redeem'
+export type VisitKind = 'seller' | 'buyer' | 'redeem' | 'scene'
 export type SellerWants = 'sell' | 'pawn'
 
-export interface QueuedVisit {
+interface QueuedBase {
   visitId: string
-  kind: VisitKind
   customer: WalkIn
-  /** seller: their item. buyer: a snapshot of the displayed item they want. redeem: the pledged item. */
-  item: ItemInstance
   /** Seconds of in-game time they will wait in the queue before leaving. */
   patience: number
   /** seller only. */
@@ -112,17 +114,37 @@ export interface QueuedVisit {
   loanId?: string
   /** Opening line at the counter (default: item.story). */
   line?: string
+  /** M4: the story beat this visit plays (src/data/stories); its script lives in the data, not the save. */
+  beatId?: string
 }
 
-export interface VisitState {
+/** A visit in the line outside. Scene visitors (M4) bring no item. */
+export type QueuedVisit =
+  | (QueuedBase & {
+      kind: Exclude<VisitKind, 'scene'>
+      /** seller: their item. buyer: a snapshot of the displayed item they want. redeem: the pledged item. */
+      item: ItemInstance
+    })
+  | (QueuedBase & { kind: 'scene'; item?: undefined })
+
+/** A story beat's conversation at the counter (M4). */
+export interface SceneState {
+  lines: string[]
+  /** Index of the line showing. */
+  step: number
+  /** Offered on the last line; empty = just "Go on". */
+  choices: { id: string; label: string }[]
+  /** The choice made, once made (its reply is the line showing). */
+  chosen?: string
+}
+
+interface VisitBase {
   visitId: string
-  kind: VisitKind
   wants?: SellerWants
   loanId?: string
   /** buyer only: the sale haggle (null for other kinds). */
   sale: SaleState | null
   customer: WalkIn
-  item: ItemInstance
   phase: VisitPhase
   /** What the customer is saying right now. */
   line: string
@@ -131,7 +153,16 @@ export interface VisitState {
   outcome?: VisitOutcome
   /** Cash that changed hands: price paid (bought), principal (pawned), sale price (sold), amount repaid (redeemed). */
   price?: number
+  /** M4: the story beat this visit plays. */
+  beatId?: string
+  /** M4: the beat's conversation, while phase is 'scene' (kept after, with the choice made). */
+  scene?: SceneState
 }
+
+/** The customer at the counter. Scene visitors (M4) bring no item. */
+export type ItemVisit = VisitBase & { kind: Exclude<VisitKind, 'scene'>; item: ItemInstance }
+export type SceneVisit = VisitBase & { kind: 'scene'; item?: undefined }
+export type VisitState = ItemVisit | SceneVisit
 
 /** A walk-in buyer haggling over one of your displayed items. */
 export interface SaleState {
@@ -204,7 +235,8 @@ export interface InspectState {
   estimate: number | null
 }
 
-export type LedgerKind = 'buy' | 'sell' | 'walkout' | 'pass' | 'expense' | 'loan' | 'redeem' | 'forfeit'
+/** story (M4): cash a story beat moved outside a deal (a gift, an old debt). */
+export type LedgerKind = 'buy' | 'sell' | 'walkout' | 'pass' | 'expense' | 'loan' | 'redeem' | 'forfeit' | 'story'
 
 export interface LedgerEntry {
   kind: LedgerKind

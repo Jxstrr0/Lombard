@@ -9,6 +9,7 @@
     "dev": "vite",
     "prebuild": "node scripts/copy-decoders.mjs",
     "build": "tsc --noEmit && vite build",
+    "postbuild": "node scripts/check-bundle.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "eslint . && tsc --noEmit",

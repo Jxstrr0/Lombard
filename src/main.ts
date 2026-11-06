@@ -11,7 +11,8 @@
  * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
- * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
+ * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
+ * ?scenario=specialist opens day 1 with Gennady's first-refusal phone call, then Ilya at the counter with the widow's watch (M4 specialists' arcs).
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
  * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint, street) for review.
  * Street outside the window (render/street): ?street=0 off, ?street=busy, ?weather=clear|rain|snow,
@@ -35,6 +36,7 @@ import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
 import { regularCustomer } from './game/story/plan'
+import { specialistCustomer } from './game/story/specialists'
 import type { QueuedVisit } from './game/types'
 import { getRegular } from './data/regulars'
 import { getBeat } from './data/stories'
@@ -95,6 +97,23 @@ function storyScenario(s0: GameState): GameState {
   if (!who || !beat) return s
   const visit: QueuedVisit = { visitId: 'v-dev-story', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
   return { ...s, queue: [visit, ...s.queue] }
+}
+
+/** Dev-only (?seed=N&scenario=specialist): a specialist's phone call (a choice), then a specialist at the counter (a choice). */
+function specialistScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'specialist/retain', id: 'collector' })
+  s = reducer(s, { type: 'specialist/retain', id: 'watchmaker' })
+  s = reducer(s, { type: 'day/open' })
+  const visits: QueuedVisit[] = []
+  for (const id of ['gennady.first_refusal', 'ilya.widow']) {
+    const beat = getBeat(id)
+    const customer = beat ? specialistCustomer(beat.visit.who) : null
+    if (!beat || !customer) continue
+    const via = beat.visit.via === 'phone' ? { via: 'phone' as const } : {}
+    visits.push({ visitId: `v-dev-${id}`, kind: 'scene', customer, patience: tuning.story.patience, beatId: id, line: beat.visit.scene?.lines[0], ...via })
+  }
+  return { ...s, queue: [...visits, ...s.queue], day: { ...s.day, total: s.day.total + visits.length } }
 }
 
 /** Screens that show the counter view and leave the 3D area free to drag. */
@@ -206,6 +225,7 @@ async function boot(): Promise<void> {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
     if (params.get('scenario') === 'story') initial = storyScenario(initial)
+    if (params.get('scenario') === 'specialist') initial = specialistScenario(initial)
   } else {
     const recent = mostRecentSlot(slots)
     if (recent) initial = await loadSlot(recent.slot)

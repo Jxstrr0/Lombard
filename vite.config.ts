@@ -32,6 +32,24 @@ export default defineConfig({
   },
   build: {
     target: 'es2022',
-    chunkSizeWarningLimit: 900,
+    // The biggest chunks (three.js, content) are ~750–780 kB; scripts/check-bundle.mjs holds the real limits.
+    chunkSizeWarningLimit: 800,
+    rolldownOptions: {
+      output: {
+        // M6 perf pass: split the eager JS by how often it changes, so a new deploy
+        // re-downloads only what moved (Kelbo reviews every push on a phone) and the
+        // chunks download in parallel. All four still load up front: the game logic
+        // reads its content synchronously. Lazy chunks (street, life, stats, dev
+        // scenarios, gallery) stay lazy because nothing here matches them.
+        codeSplitting: {
+          groups: [
+            { name: 'three', test: /node_modules[\\/]three[\\/]/, priority: 30 },
+            { name: 'vendor', test: /node_modules[\\/](zod|fflate|idb)[\\/]/, priority: 20 },
+            // Authored content: items, regulars, stories, endings, news, lines.
+            { name: 'content', test: /[\\/]src[\\/]data[\\/]/, priority: 10 },
+          ],
+        },
+      },
+    },
   },
 })

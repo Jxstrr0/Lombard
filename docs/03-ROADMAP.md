@@ -101,6 +101,7 @@ Done when: a clean run, a mob-friendly run, and a fence-heavy run all play diffe
 - Save migrations tested across all milestone versions. ✅ (Nov 6): a mid-career fixture per state version, v1–v9, each made by the last build of that version (`tests/fixtures/saves`: the autosave record and the save code), migrated, schema-checked, played five days on and round-tripped (`tests/saveFixtures.test.ts`). Found and fixed: since v4 a save with a story scene in the line or at the counter read as damaged. The rule (bump, migration, fixture) is in 02 § Save.
 - Localization-ready strings (English only shipped).
 - Performance final pass; first-load under 15 MB.
+  - Done (Nov 6): measured 13.9 MiB to the first customer at the counter (12.1 MiB on the wire), 43–51 draw calls, under 100k triangles, 35–37 MB textures on every tier. JS split into `index` / `three` / `content` / `vendor` chunks, dev scenarios lazy, and `scripts/check-bundle.mjs` fails the build over 15 MiB. Avatar KTX2, a smaller HDRI and an ETC1S lightmap are parked. See 05.
 
 Done when: it ships on the hub as 1.0.
 

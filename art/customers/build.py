@@ -4,7 +4,8 @@ The customer cast (docs/04-ASSETS.md § Customers). Nobody opens the Blender UI.
     blender -b --factory-startup --python art/customers/build.py -- --rocketbox <dir> [--only id,id] [--preview]
 
 For every cast member in src/data/customers/cast.json (id, source = avatar
-folder in the Microsoft Rocketbox repo, gender m/f) this writes
+folder in the Microsoft Rocketbox repo, gender m/f; walk-in looks and, marked
+`regular`, looks kept for authored regulars; the build treats both alike) this writes
 public/assets/customers/<id>.glb: the avatar facing glTF +Z (Blender -Y; the
 game turns it by pi), feet on the floor, pelvis over the origin, two looping
 clips, `idle` then `walk` (in place, walking towards +Z), three materials
@@ -43,7 +44,8 @@ lowest vertex per frame). Channels that never leave the rest pose are not
 keyed, so the glb leaves them out. Textures:
 head JPEG 1024, body JPEG BODY_PX, hair (alpha) PNG8 at HAIR_PX alpha-tested
 (MASK). PAINT_OUT blanks text, logos and real insignia per avatar before the
-resize (rectangles in source texture pixels, top-left origin). Needs
+resize (rectangles in source texture pixels, top-left origin), and holds the few
+recolours (greyed hair, a shirt and a hoodie turned black). Needs
 ImageMagick (`convert`) for the PNG8 step; without it hair stays RGBA PNG.
 Output is byte-for-byte reproducible. Geometry is Draco-compressed (about a
 third smaller; the game's shared loader in src/render/loaders.ts decodes it);
@@ -114,10 +116,25 @@ KINDS = {
 TEXTURE_NAME = {'glasses': '{slot}_opacity_color.tga'}
 
 # Text, logos and real insignia painted out of the source textures (2048 px
-# sources; see common.paint for the op format). Back pockets carry a stitched
-# "R" monogram; shoes and labels carry the library's "fashion by Rocketbox"
-# and made-up shoe brands; the navy cap badge has a crown over the anchor.
+# sources; see common.paint for the op format), plus a few recolours that make
+# the regular-only looks read as who they are (grey hair, a black shirt). Back
+# pockets carry a stitched "R" monogram or arcuate-style stitching; shoes and
+# labels carry the library's "fashion by Rocketbox" and made-up brands; the navy
+# cap badge has a crown over the anchor.
 _DENIM = dict(mode='clone', feather=4)
+# Recolours (common.paint mode 'grey'; feather 0 so neighbouring boxes meet without a seam).
+_GREY_HAIR = dict(mode='grey', level=0.46, gain=1.3, tint=(234, 234, 236), amount=0.9, feather=0)
+_BLACKEN = dict(mode='grey', level=0.02, gain=0.5, tint=(236, 238, 244), soft=(120, 170), feather=0)
+
+
+def _around(hole, bottom, w=2048):
+    """Boxes tiling the head texture above `bottom` (the eye and mouth parts sit below it)
+    except `hole` (eyes, nostrils, lips), for a recolour that skips the face's dark features."""
+    x0, y0, x1, y1 = hole
+    boxes = ((0, 0, w, y0), (0, y0, x0, bottom), (x1, y0, w, bottom), (x0, y1, x1, bottom))
+    return tuple(b for b in boxes if b[2] > b[0] and b[3] > b[1])
+
+
 PAINT_OUT: dict[str, dict[str, list[dict]]] = {
     'pilot_male_03': {'head': [
         dict(box=(313, 1275, 407, 1343), sample=(282, 1290, 306, 1320), feather=2),  # crown on the cap badge
@@ -148,6 +165,35 @@ PAINT_OUT: dict[str, dict[str, list[dict]]] = {
     'business_male_07': {'body': [
         dict(box=(148, 155, 250, 218), dx=0, dy=115, **_DENIM),  # pocket monogram, left
         dict(box=(1872, 148, 1962, 218), dx=0, dy=125, **_DENIM),  # pocket monogram, right
+    ]},
+    # ---- regular-only looks (M4)
+    'male_adult_11': {'body': [
+        dict(box=(155, 128, 245, 192), dx=0, dy=125, **_DENIM),  # pocket monogram, left
+        dict(box=(1815, 120, 1922, 198), dx=0, dy=125, **_DENIM),  # pocket monogram, right
+        # olive shirt -> black (a tough-looking regular)
+        *(dict(box=b, **_BLACKEN) for b in ((662, 51, 1345, 1900), (0, 901, 598, 1229), (1397, 901, 2048, 1229))),
+    ]},
+    'male_adult_20': {'body': [
+        dict(box=(128, 115, 245, 170), dx=0, dy=130, mode='heal', feather=6),  # arcuate pocket stitching, left
+        dict(box=(1815, 128, 1945, 190), dx=0, dy=130, mode='heal', feather=6),  # and right
+        # brown hoodie -> black (a tough-looking regular)
+        *(dict(box=b, **_BLACKEN) for b in ((655, 51, 1372, 1925), (0, 900, 635, 1413), (1403, 900, 2048, 1413))),
+    ]},
+    'male_adult_12': {'body': [
+        dict(box=(140, 122, 250, 192), dx=0, dy=130, **_DENIM),  # pocket monogram, left
+        dict(box=(1835, 140, 1925, 200), dx=0, dy=130, **_DENIM),  # pocket monogram, right
+    ]},
+    'male_adult_17': {'body': [
+        dict(box=(1072, 1026, 1146, 1056), sample=(1150, 1013, 1180, 1025), lum=(80, 255), feather=1),  # hoodie chest logo and name
+    ]},
+    # The older regulars go grey: Rocketbox has no grey-haired woman and few grey men.
+    'business_female_03': {
+        # the hair cards a shade lighter than the scalp under them, or the fringe reads as dark streaks
+        'opacity': [dict(box=(0, 0, 2048, 2048), **{**_GREY_HAIR, 'level': 0.6, 'amount': 1.0})],
+        'head': [dict(box=b, soft=(70, 130), **{**_GREY_HAIR, 'level': 0.4}) for b in _around((800, 560, 1240, 870), 1180)],
+    },
+    'male_adult_14': {'head': [
+        dict(box=b, soft=(60, 130), **_GREY_HAIR) for b in _around((700, 540, 1330, 1100), 1100)
     ]},
 }
 

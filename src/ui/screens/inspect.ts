@@ -11,6 +11,7 @@
  * note ("no kit", "no retainer") in place of their time.
  */
 import { getItemDef } from '../../data/items'
+import { t } from '../../data/strings'
 import { tuning } from '../../data/tuning'
 import type { Action } from '../../game/actions'
 import { availableTools, TOOLBAR, toolAvailability, type ToolAvailability } from '../../game/inspect/available'
@@ -21,7 +22,7 @@ import type { GameState } from '../../game/state'
 import type { Finding } from '../../game/types'
 import { createButton, el, setText } from '../components/button'
 import { FindingStack } from '../components/findings'
-import { TOOL_LABEL } from '../format'
+import { toolLabel } from '../format'
 import { icons, type IconName } from '../icons'
 
 export interface HotspotView {
@@ -33,6 +34,8 @@ export interface HotspotView {
 }
 
 const BUSY_MS = 700
+/** `t` for the toolbar loop, whose availability rows are also called `t`. */
+const tr = t
 
 export class InspectScreen {
   readonly root: HTMLElement
@@ -65,7 +68,7 @@ export class InspectScreen {
 
     this.gestureLayer = el('div', 'gesture-layer')
     this.gestureLayer.dataset.id = 'inspect-gesture'
-    this.gestureLayer.setAttribute('aria-label', 'Drag to turn the item, pinch or scroll to zoom')
+    this.gestureLayer.setAttribute('aria-label', t('inspect.gesture'))
 
     this.header = el('div', 'inspect-header')
     this.itemName = el('div', 'item-tag item-tag-lg')
@@ -84,19 +87,19 @@ export class InspectScreen {
     this.fx.setAttribute('aria-hidden', 'true')
 
     const panel = el('div', 'inspect-panel')
-    const hint = el('p', 'inspect-hint inspect-hint-touch', 'Drag to turn · pinch to zoom · tap a marker to look closely')
+    const hint = el('p', 'inspect-hint inspect-hint-touch', t('inspect.hintTouch'))
     // Shown instead of the touch hint with a mouse (ui/desktop.css).
-    const mouseHint = el('p', 'inspect-hint inspect-hint-mouse', 'Drag or ← → to turn · scroll to zoom · click a marker to look closely')
+    const mouseHint = el('p', 'inspect-hint inspect-hint-mouse', t('inspect.hintMouse'))
     const toolbar = el('div', 'toolbar')
     toolbar.setAttribute('role', 'toolbar')
-    toolbar.setAttribute('aria-label', 'Tools')
+    toolbar.setAttribute('aria-label', t('inspect.tools'))
     this.toolbar = toolbar
     const actions = el('div', 'actions inspect-actions')
     actions.append(
-      createButton({ id: 'inspect-pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) }),
+      createButton({ id: 'inspect-pass', label: t('common.pass'), onPress: () => dispatch({ type: 'counter/pass' }) }),
       createButton({
         id: 'inspect-done',
-        label: 'Done — make an offer',
+        label: t('inspect.done'),
         variant: 'primary',
         onPress: () => dispatch({ type: 'inspect/done' }),
       }),
@@ -147,8 +150,8 @@ export class InspectScreen {
         this.def = null
       }
     }
-    setText(this.itemName, this.def?.name ?? 'Unknown item')
-    setText(this.claim, `${c.customer.name}: “${c.item.story}”`)
+    setText(this.itemName, this.def?.name ?? t('inspect.unknown'))
+    setText(this.claim, t('inspect.claim', { name: c.customer.name, story: c.item.story }))
     const labels: Record<string, string> = {}
     for (const h of this.def?.model.hotspots ?? []) labels[h.id] = h.label
     this.findings.render(insp.findings, labels)
@@ -193,7 +196,9 @@ export class InspectScreen {
         const b = el('button', 'tool')
         b.type = 'button'
         b.dataset.id = `tool-${tool}`
-        b.innerHTML = `${icons[tool as IconName] ?? icons.doc}<span class="tool-name">${TOOL_LABEL[tool]}</span><span class="tool-cost"><span class="tc-clock">${icons.clock}</span><span class="tc-lock">${icons.lock}</span><span class="tool-secs">${tuning.inspect.toolSeconds[tool]} s</span><span class="tool-note"></span></span><span class="tool-uses" hidden></span>`
+        b.innerHTML = `${icons[tool as IconName] ?? icons.doc}<span class="tool-name"></span><span class="tool-cost"><span class="tc-clock">${icons.clock}</span><span class="tc-lock">${icons.lock}</span><span class="tool-secs"></span><span class="tool-note"></span></span><span class="tool-uses" hidden></span>`
+        b.querySelector<HTMLElement>('.tool-name')!.textContent = toolLabel(tool)
+        b.querySelector<HTMLElement>('.tool-secs')!.textContent = t('fmt.seconds', { n: tuning.inspect.toolSeconds[tool] })
         if (tool === 'loupe') b.classList.add('is-selected')
         b.addEventListener('click', () => {
           if (this.toolUsable.get(tool)) this.useTool(tool)
@@ -211,35 +216,38 @@ export class InspectScreen {
       // Locked: the note replaces the time ("no kit"). Usable: "20 s · 9 left".
       const noteEl = b.querySelector<HTMLElement>('.tool-note')!
       b.querySelector<HTMLElement>('.tool-secs')!.hidden = !t.usable && !!note
-      setText(noteEl, note ? (t.usable ? ` · ${note}` : note) : '')
+      setText(noteEl, note ? (t.usable ? tr('inspect.toolNote', { note }) : note) : '')
       const secs = t.seconds ?? tuning.inspect.toolSeconds[t.tool]
-      setText(b.querySelector<HTMLElement>('.tool-secs')!, `${secs} s`)
-      b.setAttribute(
-        'aria-label',
-        `${TOOL_LABEL[t.tool]}, ${secs} seconds${t.tool === 'loupe' ? ', look over the whole item' : ''}${note ? `, ${note}` : ''}${t.usable ? '' : ', unavailable'}`,
-      )
+      setText(b.querySelector<HTMLElement>('.tool-secs')!, tr('fmt.seconds', { n: secs }))
+      const aria = [tr('inspect.toolAria', { tool: toolLabel(t.tool), secs })]
+      if (t.tool === 'loupe') aria.push(tr('inspect.toolAriaLoupe'))
+      if (note) aria.push(note)
+      if (!t.usable) aria.push(tr('inspect.toolAriaLocked'))
+      b.setAttribute('aria-label', aria.join(tr('common.listSep')))
       const uses = insp.toolUses[t.tool] ?? 0
       const badge = b.querySelector<HTMLElement>('.tool-uses')!
       badge.hidden = uses === 0
-      setText(badge, `×${uses}`)
+      setText(badge, tr('fmt.times', { n: uses }))
     }
   }
 
   /** "Passport? 2 s" until asked, then what the book says: noted, or none shown. */
   private renderPassport(state: GameState): void {
-    const t = this.def ? toolAvailability(state, 'passport', this.def) : { tool: 'passport' as const, usable: false, note: '' }
+    const avail = this.def ? toolAvailability(state, 'passport', this.def) : { tool: 'passport' as const, usable: false, note: '' }
     const asked = state.inspect?.findings.find((f) => f.tool === 'passport')
     const secs = tuning.inspect.toolSeconds.passport
-    const label = asked ? (asked.tellId === PASSPORT_TELL ? 'Passport noted' : 'No passport') : 'Ask for a passport'
-    const key = `${label}|${t.usable}`
+    const label = asked ? (asked.tellId === PASSPORT_TELL ? t('inspect.passportNoted') : t('inspect.passportNone')) : t('inspect.passportAsk')
+    const key = `${label}|${avail.usable}`
     if (this.passport.dataset.key === key) return
     this.passport.dataset.key = key
-    this.passport.innerHTML = `${icons.passport}<span class="passport-label"></span>${asked ? '' : `<span class="passport-secs">${secs} s</span>`}`
+    this.passport.innerHTML = `${icons.passport}<span class="passport-label"></span>${asked ? '' : '<span class="passport-secs"></span>'}`
     this.passport.querySelector('.passport-label')!.textContent = label
+    const secsEl = this.passport.querySelector('.passport-secs')
+    if (secsEl) secsEl.textContent = t('fmt.seconds', { n: secs })
     this.passport.classList.toggle('is-noted', asked?.tellId === PASSPORT_TELL)
     this.passport.classList.toggle('is-refused', !!asked && asked.tellId !== PASSPORT_TELL)
-    this.passport.setAttribute('aria-disabled', String(!t.usable))
-    this.passport.setAttribute('aria-label', asked ? label : `Ask for a passport for the book, ${secs} seconds`)
+    this.passport.setAttribute('aria-disabled', String(!avail.usable))
+    this.passport.setAttribute('aria-label', asked ? label : t('inspect.passportAria', { secs }))
   }
 
   private useTool(tool: ToolId, hotspot?: string): void {
@@ -260,7 +268,7 @@ export class InspectScreen {
         b = el('button', 'hotspot')
         b.type = 'button'
         b.dataset.id = `hotspot-${h.id}`
-        b.setAttribute('aria-label', `Look closely: ${h.label} (${tuning.inspect.toolSeconds.loupe} seconds)`)
+        b.setAttribute('aria-label', t('inspect.hotspotAria', { label: h.label, secs: tuning.inspect.toolSeconds.loupe }))
         b.innerHTML = `<span class="hotspot-ring">${icons.loupe}</span><span class="hotspot-label"></span>`
         b.querySelector('.hotspot-label')!.textContent = h.label
         const id = h.id
@@ -297,31 +305,36 @@ export class InspectScreen {
     } else if (f.tool === 'scale') {
       // The reading is the first number in grams among this use's findings (the
       // weight finding comes first; tells found on the same use follow it).
-      let reading = 'weighed'
+      let reading = t('inspect.fxWeighed')
       for (const g of fresh) {
         const m = /(\d+(?:[.,]\d+)?)\s?(?:g|grams?)\b/i.exec(g.text)
         if (m) {
-          reading = `${m[1]!.replace(',', '.')} g`
+          reading = t('fmt.grams', { n: m[1]!.replace(',', '.') })
           break
         }
       }
-      node.innerHTML = `<span class="fx-scale">${icons.scale}<span class="fx-scale-lcd">${reading}</span></span>`
+      node.innerHTML = `<span class="fx-scale">${icons.scale}<span class="fx-scale-lcd"></span></span>`
+      node.querySelector('.fx-scale-lcd')!.textContent = reading
     } else if (f.tool === 'magnet') {
       let magnetic = false
       const c = state.current
       if (c?.item && this.def) magnetic = fakeProfileOf(this.def, c.item)?.magnetic ?? this.def.magnetic
       node.classList.add(magnetic ? 'is-stuck' : 'is-free')
-      node.innerHTML = `<span class="fx-magnet">${icons.magnet}</span><span class="fx-magnet-word">${magnetic ? 'snap!' : 'no pull'}</span>`
+      node.innerHTML = `<span class="fx-magnet">${icons.magnet}</span><span class="fx-magnet-word"></span>`
+      node.querySelector('.fx-magnet-word')!.textContent = magnetic ? t('inspect.fxSnap') : t('inspect.fxNoPull')
     } else if (f.tool === 'acid') {
       // Read the reaction off the finding (never the hidden item): negative = it fizzed.
       const fizz = fresh.some((g) => g.tool === 'acid' && g.polarity === 'negative')
       node.classList.add(fizz ? 'is-fizz' : 'is-holds')
-      node.innerHTML = `<span class="fx-drop"></span><span class="fx-splash"></span><span class="fx-word">${fizz ? 'fizz…' : 'holds'}</span>`
+      node.innerHTML = `<span class="fx-drop"></span><span class="fx-splash"></span><span class="fx-word"></span>`
+      node.querySelector('.fx-word')!.textContent = fizz ? t('inspect.fxFizz') : t('inspect.fxHolds')
     } else if (f.tool === 'reference') {
       const m = /([\d,]+ ₽)–([\d,]+ ₽)/.exec(f.text)
-      node.innerHTML = `<span class="fx-book">${icons.reference}<span class="fx-word">${m ? `${m[1]}–${m[2]}` : 'not listed'}</span></span>`
+      node.innerHTML = `<span class="fx-book">${icons.reference}<span class="fx-word"></span></span>`
+      node.querySelector('.fx-word')!.textContent = m ? t('fmt.range', { low: m[1]!, high: m[2]! }) : t('inspect.fxNotListed')
     } else if (f.tool === 'specialist') {
-      node.innerHTML = `<span class="fx-phone">${icons.specialist}<span class="fx-word">ring… ring…</span></span>`
+      node.innerHTML = `<span class="fx-phone">${icons.specialist}<span class="fx-word"></span></span>`
+      node.querySelector('.fx-word')!.textContent = t('inspect.fxRing')
     } else {
       return
     }

@@ -3,6 +3,7 @@
  * buttons that follow the day loop. Reads state and dispatches actions; never
  * mutates state.
  */
+import { t, type PlainKey } from '../../data/strings'
 import type { Action } from '../../game/actions'
 import type { GameState } from '../../game/state'
 import type { VisitOutcome } from '../../game/types'
@@ -23,15 +24,15 @@ function lookHintSeen(): boolean {
 
 type Primary = 'counter/next' | 'day/close' | 'counter/inspect' | 'counter/dismiss' | 'scene/next'
 
-const OUTCOME: Record<VisitOutcome, string> = {
-  bought: 'Bought',
-  pawned: 'Pawned',
-  sold: 'Sold',
-  redeemed: 'Redeemed',
-  passed: 'Passed',
-  walked: 'Walked out',
-  left: 'Left',
-  talked: 'Talked',
+const OUTCOME: Record<VisitOutcome, PlainKey> = {
+  bought: 'outcome.bought',
+  pawned: 'outcome.pawned',
+  sold: 'outcome.sold',
+  redeemed: 'outcome.redeemed',
+  passed: 'outcome.passed',
+  walked: 'outcome.walked',
+  left: 'outcome.left',
+  talked: 'outcome.talked',
 }
 
 export class CounterScreen {
@@ -78,11 +79,11 @@ export class CounterScreen {
     this.speaker = el('div', 'speaker')
     this.name = el('span', 'speaker-name')
     this.tag = el('span', 'speaker-tag')
-    this.loanBadge = el('span', 'loan-badge', 'wants a loan')
+    this.loanBadge = el('span', 'loan-badge', t('counter.badgeLoan'))
     this.loanBadge.dataset.id = 'loan-badge'
-    this.regularBadge = el('span', 'regular-badge', 'regular')
+    this.regularBadge = el('span', 'regular-badge', t('counter.badgeRegular'))
     this.regularBadge.dataset.id = 'regular-badge'
-    this.specialistBadge = el('span', 'specialist-badge', 'specialist')
+    this.specialistBadge = el('span', 'specialist-badge', t('counter.badgeSpecialist'))
     this.specialistBadge.dataset.id = 'specialist-badge'
     this.speaker.append(this.name, this.tag, this.regularBadge, this.specialistBadge, this.loanBadge)
     this.itemName = el('div', 'item-tag')
@@ -97,16 +98,16 @@ export class CounterScreen {
     this.choices.dataset.id = 'scene-choices'
     this.choices.hidden = true
     const actions = el('div', 'actions counter-actions')
-    this.secondary = createButton({ id: 'pass', label: 'Pass', onPress: () => dispatch({ type: 'counter/pass' }) })
+    this.secondary = createButton({ id: 'pass', label: t('common.pass'), onPress: () => dispatch({ type: 'counter/pass' }) })
     this.primary = createButton({
       id: 'next-customer',
-      label: 'Next customer',
+      label: t('counter.next'),
       variant: 'primary',
       onPress: () => dispatch({ type: this.primaryAction }),
     })
     actions.append(gear(openSettings), ...(shopButton ? [shopButton] : []), this.secondary, this.primary)
     strip.append(dialogue, this.choices, actions)
-    this.lookHint = el('p', 'look-hint', 'Drag to look around')
+    this.lookHint = el('p', 'look-hint', t('counter.lookHint'))
     this.lookHint.dataset.id = 'look-hint'
     this.lookHint.hidden = true
     root.append(this.lookHint, strip)
@@ -148,12 +149,12 @@ export class CounterScreen {
       setText(this.tag, archetypeLabel(c.customer.archetype))
       this.regularBadge.hidden = !c.customer.regularId
       this.specialistBadge.hidden = !c.customer.specialistId && !c.via
-      setText(this.specialistBadge, c.via === 'phone' ? 'on the phone' : 'specialist')
+      setText(this.specialistBadge, c.via === 'phone' ? t('counter.badgePhone') : t('counter.badgeSpecialist'))
       this.loanBadge.hidden = !(c.kind === 'seller' && c.wants === 'pawn' && c.phase !== 'resolved' && c.phase !== 'scene')
-      if (c.item) setText(this.itemName, itemNameOf(c.item.defId, 'Something wrapped in a cloth'))
+      if (c.item) setText(this.itemName, itemNameOf(c.item.defId, t('counter.wrapped')))
     }
     this.itemName.hidden = !c?.item || c.phase === 'resolved'
-    setText(this.line, c ? `“${c.line}”` : walking ? 'The door opens.' : state.narration)
+    setText(this.line, c ? t('common.quote', { text: c.line }) : walking ? t('counter.doorOpens') : state.narration)
     this.line.classList.toggle('narration', !c)
 
     const resolved = c?.phase === 'resolved'
@@ -161,7 +162,7 @@ export class CounterScreen {
     this.stamp.hidden = !resolved || c?.outcome === 'talked'
     if (resolved && c.outcome) {
       const priced = (c.outcome === 'bought' || c.outcome === 'sold' || c.outcome === 'pawned' || c.outcome === 'redeemed') && c.price !== undefined
-      const text = priced ? `${OUTCOME[c.outcome]} · ${rub(c.price!)}` : OUTCOME[c.outcome]
+      const text = priced ? t('counter.stampPriced', { outcome: t(OUTCOME[c.outcome]), price: rub(c.price!) }) : t(OUTCOME[c.outcome])
       setText(this.stamp, text)
       this.stamp.dataset.outcome = c.outcome
     }
@@ -174,14 +175,14 @@ export class CounterScreen {
     // Between visitors the next person walks in by themselves (the lull); there is nothing to press.
     this.primary.hidden = walking || choosing || (!c && state.queue.length > 0 && !this.manualNext)
     if (scene) {
-      this.setPrimary('scene/next', 'scene-next', 'Go on', undefined)
+      this.setPrimary('scene/next', 'scene-next', t('counter.goOn'), undefined)
     } else if (!c) {
-      if (state.queue.length > 0) this.setPrimary('counter/next', 'next-customer', 'Next customer', 'person')
-      else this.setPrimary('day/close', 'close-up', 'Close up', 'door')
+      if (state.queue.length > 0) this.setPrimary('counter/next', 'next-customer', t('counter.next'), 'person')
+      else this.setPrimary('day/close', 'close-up', t('counter.closeUp'), 'door')
     } else if (c.phase === 'present') {
-      this.setPrimary('counter/inspect', 'inspect', 'Inspect', 'loupe')
+      this.setPrimary('counter/inspect', 'inspect', t('counter.inspect'), 'loupe')
     } else {
-      this.setPrimary('counter/dismiss', 'dismiss', 'Done', undefined)
+      this.setPrimary('counter/dismiss', 'dismiss', t('counter.done'), undefined)
     }
   }
 

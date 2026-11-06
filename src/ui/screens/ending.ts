@@ -13,18 +13,19 @@
  * screen starts at its summary (the screen is told by Ui).
  */
 import { PAPER } from '../../data/news'
+import { t, type PlainKey } from '../../data/strings'
 import { epilogueOf, type Epilogue, type EpilogueCardView, type EpilogueStory } from '../../game/endings/epilogue'
 import type { CareerEndKind, GameState } from '../../game/state'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
-import { longDate, rub, signedRub, WEEKDAYS } from '../format'
+import { count, fullDate, longDate, rub, signedRub } from '../format'
 
 export type EndingStep = 'paper' | 'cards' | 'summary'
 
-const HOW: Record<CareerEndKind, string> = {
-  retired: 'Retired',
-  evicted: 'Evicted for the rent',
-  raided: 'Shut down by the police',
-  pushedOut: 'Pushed out by the crew',
+const HOW: Record<CareerEndKind, PlainKey> = {
+  retired: 'ending.how.retired',
+  evicted: 'ending.how.evicted',
+  raided: 'ending.how.raided',
+  pushedOut: 'ending.how.pushedOut',
 }
 
 export class EndingScreen {
@@ -71,11 +72,11 @@ export class EndingScreen {
     this.scroll.append(this.paper, this.card, this.summary)
 
     const footer = el('footer', 'ending-actions actions')
-    this.back = createButton({ id: 'ending-back', label: 'Back', icon: 'back', variant: 'ghost', onPress: () => this.go(-1) })
-    this.skip = createButton({ id: 'ending-skip', label: 'Skip', variant: 'ghost', onPress: () => this.show('summary') })
-    this.next = createButton({ id: 'ending-next', label: 'Next', variant: 'primary', onPress: () => this.go(1) })
-    this.again = createButton({ id: 'ending-again', label: 'Read it again', icon: 'doc', onPress: () => this.show('paper') })
-    this.menu = createButton({ id: 'ending-menu', label: 'Main menu', variant: 'primary', onPress: mainMenu })
+    this.back = createButton({ id: 'ending-back', label: t('common.back'), icon: 'back', variant: 'ghost', onPress: () => this.go(-1) })
+    this.skip = createButton({ id: 'ending-skip', label: t('common.skip'), variant: 'ghost', onPress: () => this.show('summary') })
+    this.next = createButton({ id: 'ending-next', label: t('common.next'), variant: 'primary', onPress: () => this.go(1) })
+    this.again = createButton({ id: 'ending-again', label: t('ending.again'), icon: 'doc', onPress: () => this.show('paper') })
+    this.menu = createButton({ id: 'ending-menu', label: t('common.mainMenu'), variant: 'primary', onPress: mainMenu })
     footer.append(this.back, this.skip, this.again, this.next, this.menu)
     root.append(this.scroll, footer)
     this.root = root
@@ -129,11 +130,11 @@ export class EndingScreen {
     this.back.hidden = this.step !== 'cards'
     this.skip.hidden = onSummary
     if (this.step === 'paper') {
-      setButtonLabel(this.next, cards > 0 ? 'What became of them' : 'The summary')
+      setButtonLabel(this.next, cards > 0 ? t('ending.whatBecame') : t('ending.summary'))
       this.paintPaper(e.paper, s)
     } else if (this.step === 'cards') {
       const last = this.cardIndex >= cards - 1
-      setButtonLabel(this.next, last ? 'The summary' : 'Next')
+      setButtonLabel(this.next, last ? t('ending.summary') : t('common.next'))
       this.paintCard(e.cards[this.cardIndex]!, this.cardIndex, cards)
     } else {
       this.paintSummary(e)
@@ -142,8 +143,7 @@ export class EndingScreen {
   }
 
   private paintPaper(stories: EpilogueStory[], s: GameState): void {
-    const { date, weekday } = s.calendar
-    setText(this.dateLine, `${WEEKDAYS[weekday]}, ${longDate(date)} · Final edition · ${PAPER.price}`)
+    setText(this.dateLine, t('ending.dateline', { date: fullDate(s.calendar.date), price: PAPER.price }))
     this.stories.replaceChildren(
       ...stories.map((n, i) => {
         const story = el('section', i === 0 ? 'paper-story is-lead' : 'paper-story')
@@ -157,30 +157,30 @@ export class EndingScreen {
   private paintCard(c: EpilogueCardView, i: number, n: number): void {
     this.card.dataset.card = c.id
     const head = el('header', 'epi-card-head')
-    head.append(el('span', 'epi-card-count', `${i + 1} of ${n}`), el('span', 'epi-card-kicker', 'What became of them'))
+    head.append(el('span', 'epi-card-count', t('ending.cardCount', { i: i + 1, n })), el('span', 'epi-card-kicker', t('ending.whatBecame')))
     this.card.replaceChildren(head, el('h2', 'epi-card-name', c.name), el('p', 'epi-card-role', c.role), el('p', 'epi-card-text', c.text))
   }
 
   private paintSummary(e: Epilogue): void {
     const m = e.summary
     const head = el('header', 'receipt-head')
-    head.append(el('div', 'receipt-shop', m.shopName.toUpperCase()), el('div', 'receipt-cyr', 'ЛОМБАРД · МОСТОГРАД'), el('div', 'receipt-title', 'Career · final ledger'))
+    head.append(el('div', 'receipt-shop', m.shopName.toUpperCase()), el('div', 'receipt-cyr', t('common.cyrCity')), el('div', 'receipt-title', t('ending.ledgerTitle')))
     const title = el('div', 'career-title')
     title.dataset.id = 'ending-title'
-    title.append(el('span', 'career-title-kicker', 'Ending'), el('h2', 'career-title-name', m.titleName), el('p', 'career-title-strap', m.strap))
+    title.append(el('span', 'career-title-kicker', t('ending.kicker')), el('h2', 'career-title-name', m.titleName), el('p', 'career-title-strap', m.strap))
     const rows: [string, string, string?][] = [
-      ['How it ended', HOW[m.kind]],
-      ['Days run', String(m.daysRun)],
-      ['Last day', longDate(m.endDate)],
-      ['Best single deal', m.bestDeal > 0 ? signedRub(m.bestDeal) : 'None to speak of'],
-      ['Worst mistake', m.worstDeal > 0 ? signedRub(-m.worstDeal) : 'None that cost you'],
-      ['Fakes bought', String(m.fakesBought)],
-      ['People helped', String(m.peopleHelped)],
-      ['People hurt', String(m.peopleHurt)],
-      ['Worth at the end', rub(m.wealth), 'total'],
+      [t('ending.how'), t(HOW[m.kind])],
+      [t('ending.daysRun'), count(m.daysRun)],
+      [t('ending.lastDay'), longDate(m.endDate)],
+      [t('ending.best'), m.bestDeal > 0 ? signedRub(m.bestDeal) : t('ending.bestNone')],
+      [t('ending.worst'), m.worstDeal > 0 ? signedRub(-m.worstDeal) : t('ending.worstNone')],
+      [t('ending.fakes'), count(m.fakesBought)],
+      [t('ending.helped'), count(m.peopleHelped)],
+      [t('ending.hurt'), count(m.peopleHurt)],
+      [t('ending.worth'), rub(m.wealth), 'total'],
     ]
     const dl = el('dl', 'receipt-summary career-rows')
     for (const [k, v, cls] of rows) dl.append(el('dt', cls ?? '', k), el('dd', cls ?? '', v))
-    this.summary.replaceChildren(head, title, dl, el('div', 'receipt-foot', 'Thank you for everything · Спасибо за всё'))
+    this.summary.replaceChildren(head, title, dl, el('div', 'receipt-foot', t('ending.foot')))
   }
 }

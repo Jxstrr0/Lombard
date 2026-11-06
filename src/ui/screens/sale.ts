@@ -100,7 +100,7 @@ export class SaleScreen {
   render(state: GameState): void {
     this.state = state
     const c = state.current
-    if (!c || !c.sale) return
+    if (!c || !c.sale || !c.item) return
     if (c.visitId !== this.visitId) {
       this.visitId = c.visitId
       this.rounds = 0

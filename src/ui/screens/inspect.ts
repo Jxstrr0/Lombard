@@ -125,7 +125,7 @@ export class InspectScreen {
   render(state: GameState, prev: GameState | null): void {
     const c = state.current
     const insp = state.inspect
-    if (!c || !insp) return
+    if (!c || !insp || !c.item) return
     if (c.visitId !== this.visitId) {
       this.visitId = c.visitId
       this.findings.reset()
@@ -279,7 +279,7 @@ export class InspectScreen {
     } else if (f.tool === 'magnet') {
       let magnetic = false
       const c = state.current
-      if (c && this.def) magnetic = fakeProfileOf(this.def, c.item)?.magnetic ?? this.def.magnetic
+      if (c?.item && this.def) magnetic = fakeProfileOf(this.def, c.item)?.magnetic ?? this.def.magnetic
       node.classList.add(magnetic ? 'is-stuck' : 'is-free')
       node.innerHTML = `<span class="fx-magnet">${icons.magnet}</span><span class="fx-magnet-word">${magnetic ? 'snap!' : 'no pull'}</span>`
     } else if (f.tool === 'acid') {

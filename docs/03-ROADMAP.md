@@ -59,7 +59,7 @@ Done when: the simulator shows a careful policy growing ~15%/month and a careles
 
 Done when: screenshots look like a real shop and the phone still holds 30 fps.
 
-## M4 — People and story (status: not started)
+## M4 — People and story (status: in progress. Story engine, regulars and the first arc (the grandmother’s medals) are in; workers on the title screen, reputation, specialists, the laptop and regular-only looks)
 
 - 20 regulars with schedules, memory, and dialogue.
 - Remaining 3 specialists (militaria, antiques, electronics) with their small arcs.

@@ -1,0 +1,35 @@
+/* M4 story: the regular badge on the speaker line and a scene's choices. */
+
+.regular-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(217, 119, 87, 0.14);
+  border: 1px solid rgba(217, 119, 87, 0.45);
+  color: var(--clay-light, #e8967a);
+}
+
+.scene-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 2px 0 10px;
+}
+
+.scene-choices > .btn-choice {
+  justify-content: flex-start;
+  text-align: left;
+  min-height: 48px;
+  padding: 0 14px;
+  border-style: dashed;
+  border-color: rgba(239, 231, 212, 0.35);
+  background: rgba(239, 231, 212, 0.06);
+}
+
+.scene-choices > .btn-choice::before {
+  content: '—';
+  margin-right: 8px;
+  color: var(--clay-light, #e8967a);
+}

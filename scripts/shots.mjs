@@ -541,6 +541,28 @@ async function main() {
       out.push(...h.shots)
       await context.close()
     }
+    {
+      // Dev scenario: a regular (Zinaida Petrovna) comes in for a story scene with a choice.
+      const { context, page } = await newPage(browser, PORTRAIT, '?seed=1&scenario=story')
+      const h = helpers(page, 'story')
+      await page.waitForFunction(() => ['news', 'counter'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+      if ((await page.evaluate(() => document.body.dataset.screen)) === 'news') await h.click('news-done')
+      await h.screen('counter')
+      await h.click('next-customer')
+      await page.waitForTimeout(600)
+      await h.shot('scene', 'story scene: regular badge, first line, Go on')
+      await h.click('scene-next')
+      await page.waitForTimeout(400)
+      await h.shot('choices', 'last line: up to three choices, Go on hidden')
+      await h.click('choice-truth')
+      await page.waitForTimeout(400)
+      await h.shot('reply', 'her reply to the truth; Go on ends the visit')
+      await h.click('scene-next')
+      await page.waitForTimeout(600)
+      await h.shot('talked', 'resolved: Talked, no stamp')
+      out.push(...h.shots)
+      await context.close()
+    }
     // Head look (?look=<yawDeg>,<pitchDeg>, +yaw = right, +pitch = up): the empty counter view, head turned.
     // The player looks along +z, so world +X (the storeroom doorway at x = 3) is on their left.
     for (const [slug, look, what] of [

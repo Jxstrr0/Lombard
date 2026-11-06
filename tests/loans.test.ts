@@ -8,7 +8,7 @@ import { amountDue, createLoan, forfeitOverdue, loanTerms, pawnChance, planRedem
 import { Rng } from '../src/game/rng'
 import type { GameState } from '../src/game/state'
 import type { ItemInstance, Loan, WalkIn } from '../src/game/types'
-import { startedState } from './helpers'
+import { playScene, startedState } from './helpers'
 
 const T = tuning.loans
 const run = (s: GameState, ...actions: Action[]) => actions.reduce(reducer, s)
@@ -25,7 +25,7 @@ function pawnerAtOffer(seed: number): GameState {
 /** Lend generously so any sane haggle accepts. */
 function pawnFirst(seed: number): GameState {
   const s = pawnerAtOffer(seed)
-  const item = s.current!.item
+  const item = s.current!.item!
   const amount = Math.min(s.cash, Math.max(100, claimedValue(getItemDef(item.defId), item)))
   return reducer(s, { type: 'offer/make', amount, approach: 'straight' })
 }
@@ -36,10 +36,11 @@ function finishDay(s0: GameState, onRedeem?: (s: GameState) => void): GameState 
   if (s.current?.phase === 'resolved') s = reducer(s, { type: 'counter/dismiss' })
   for (let guard = 0; guard < 100 && s.queue.length > 0; guard++) {
     s = reducer(s, { type: 'counter/next' })
+    s = playScene(s)
     if (s.current?.kind === 'redeem') {
       onRedeem?.(s)
       s = reducer(s, { type: 'loan/return' })
-    } else s = reducer(s, { type: 'counter/pass' })
+    } else if (s.current?.phase !== 'resolved') s = reducer(s, { type: 'counter/pass' })
     s = reducer(s, { type: 'counter/dismiss' })
   }
   return reducer(s, { type: 'day/close' })
@@ -89,7 +90,7 @@ describe('pawning through the reducer', () => {
     expect(s.cash).toBe(before.cash - principal)
     expect(s.loans).toHaveLength(1)
     const l = s.loans[0]!
-    expect(l.item.id).toBe(before.current!.item.id)
+    expect(l.item.id).toBe(before.current!.item!.id)
     expect(l.principal).toBe(principal)
     expect(l.startDay).toBe(1)
     expect(l.dueDay).toBe(1 + T.termDays)
@@ -108,7 +109,7 @@ describe('pawning through the reducer', () => {
   it('the haggle anchors on the smaller pawn claim', () => {
     const s = pawnerAtOffer(7)
     const c = s.current!
-    const claim = claimedValue(getItemDef(c.item.defId), c.item)
+    const claim = claimedValue(getItemDef(c.item!.defId), c.item!)
     const after = reducer(s, { type: 'offer/make', amount: 100, approach: 'straight' })
     if (after.haggle && after.haggle.status === 'open') expect(after.haggle.ask).toBeLessThan(claim)
   })
@@ -132,7 +133,7 @@ describe('redemption', () => {
     expect(s.calendar.day).toBe(redeemDay)
     const visit = s.queue.find((v) => v.kind === 'redeem')!
     expect(visit.loanId).toBe(l0.id)
-    expect(visit.item.id).toBe(l0.item.id)
+    expect(visit.item!.id).toBe(l0.item.id)
     expect(visit.line).toBeTruthy()
     // Serve the redeemer first.
     s = { ...s, queue: [visit, ...s.queue.filter((v) => v !== visit)] }

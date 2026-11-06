@@ -60,7 +60,7 @@ export function toolAvailability(state: GameState, tool: ToolId, def: ItemDef): 
       const id = specialistFor(state, def)
       if (!id) return { tool, usable: false, note: coversCategory(def) ? 'no retainer' : 'nobody' }
       if (usedThisVisit(state, tool)) return { tool, usable: false, note: 'called' }
-      const seconds = specialistCallSeconds(id)
+      const seconds = specialistCallSeconds(id, state.specialists[id]?.mods)
       const left = callsLeft(state, id)
       if (left > 0) return { tool, usable: true, note: `${left} left`, seconds }
       const fee = tuning.specialists.roster[id]!.perCall
@@ -91,6 +91,6 @@ export function payForTool(state: GameState, tool: ToolId, def: ItemDef): GameSt
 export function toolExtras(state: GameState, def: ItemDef): ToolExtras {
   const id = specialistFor(state, def)
   const extras: ToolExtras = { refTier: refTier(state) }
-  if (id) extras.specialist = { id, relationship: state.specialists[id]!.relationship }
+  if (id) extras.specialist = { id, relationship: state.specialists[id]!.relationship, mods: state.specialists[id]!.mods }
   return extras
 }

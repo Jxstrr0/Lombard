@@ -20,12 +20,13 @@ import { tuning } from '../../data/tuning'
 import { generateItem } from '../items/generate'
 import { pawnOpeningLine } from '../loans/loans'
 import { Rng } from '../rng'
-import type { Beat, RegularDef } from '../schema/story'
+import type { Arc, Beat, RegularDef } from '../schema/story'
 import type { CustomerState, GameState } from '../state'
 import type { QueuedVisit, WalkIn } from '../types'
 import { allHold } from './conditions'
 import { beatRecord, memoryOf, warmthOf } from './progress'
 import { scriptedItem } from './scripted'
+import { specialistCustomer } from './specialists'
 
 export interface StoryPlan {
   /** Visits to merge into today's queue; `first` ones go to the front. */
@@ -34,6 +35,8 @@ export interface StoryPlan {
   sellerPlaces: number
   /** Regulars' memory with next scheduled days updated. */
   customers: Record<string, CustomerState>
+  /** M4: beats that land in this morning's paper (story/visit.ts playPaperBeats). */
+  paper: Beat[]
 }
 
 export function storyRng(state: GameState, label: string): Rng {
@@ -54,12 +57,26 @@ export function regularCustomer(def: RegularDef): WalkIn {
   }
 }
 
-function eligibleBeats(state: GameState): Beat[] {
+/**
+ * M4 (GDD § 2b): a specialist's arc waits while they're off retainer or retired, and once they were
+ * let go while it was under way (a beat had played by then), its final beat never plays.
+ */
+function specialistAllows(state: GameState, arc: Arc, beat: Beat): boolean {
+  if (!arc.specialist) return true
+  const sp = state.specialists[arc.specialist]
+  if (!sp?.retained || sp.retired) return false
+  if (!beat.final || sp.releasedDay === undefined) return true
+  return !Object.values(state.story.arcs[arc.id]?.beats ?? {}).some((r) => r.day <= sp.releasedDay!)
+}
+
+/** Beats that could play this morning (before the daily chance). Exported for tests. */
+export function eligibleBeats(state: GameState): Beat[] {
   const out: Beat[] = []
   for (const arc of ARCS) {
     if (state.story.arcs[arc.id]?.ended) continue
     for (const beat of arc.beats) {
       if (beatRecord(state, beat.id)) continue
+      if (!specialistAllows(state, arc, beat)) continue
       if (!allHold(beat.when, state)) continue
       out.push(beat)
     }
@@ -84,15 +101,24 @@ export function pickBeats(state: GameState): Beat[] {
   return picked
 }
 
+/** Who plays a beat at the counter: a regular, a specialist (M4), or someone `who` sent (M4 `as`). */
+function beatCustomer(beat: Beat): WalkIn | null {
+  const v = beat.visit
+  if (v.as) {
+    return { id: `as_${beat.id.replace('.', '_')}`, name: v.as.name, archetype: v.as.archetype, temperament: v.as.temperament, knowledge: v.as.knowledge, desperation: v.as.desperation, portraitKey: v.as.look }
+  }
+  const regular = REGULARS.find((r) => r.id === v.who)
+  return regular ? regularCustomer(regular) : specialistCustomer(v.who)
+}
+
 function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string) => string): QueuedVisit | null {
-  const who = REGULARS.find((r) => r.id === beat.visit.who)
-  if (!who) return null
-  const customer = regularCustomer(who)
+  const customer = beatCustomer(beat)
+  if (!customer) return null
   const visitId = nextId('v')
   const v = beat.visit
   const patience = tuning.story.patience
   if (v.kind === 'scene' || !v.item) {
-    return { visitId, kind: 'scene', customer, patience, beatId: beat.id, line: v.scene?.lines[0] }
+    return { visitId, kind: 'scene', customer, patience, beatId: beat.id, line: v.scene?.lines[0], ...(v.via === 'phone' ? { via: 'phone' as const } : {}) }
   }
   const def = getItemDef(v.item.defId)
   const item = scriptedItem(def, v.item, storyRng(state, `item:${beat.id}`), nextId('i'))
@@ -150,10 +176,15 @@ export function planStory(state: GameState, nextId: (prefix: string) => string):
   const day = state.calendar.day
   const customers = { ...state.customers }
   const visits: StoryPlan['visits'] = []
+  const paper: Beat[] = []
   let sellerPlaces = 0
   const busy = new Set<string>()
 
   for (const beat of pickBeats(state)) {
+    if (beat.visit.via === 'paper') {
+      paper.push(beat)
+      continue
+    }
     const visit = beatVisit(state, beat, nextId)
     if (!visit) continue
     visits.push({ visit, first: beat.visit.first })
@@ -179,5 +210,5 @@ export function planStory(state: GameState, nextId: (prefix: string) => string):
     sellerPlaces++
     customers[def.id] = { ...customers[def.id]!, nextDay: nextVisitDay(state, def, customers[def.id]!) }
   }
-  return { visits, sellerPlaces, customers }
+  return { visits, sellerPlaces, customers, paper }
 }

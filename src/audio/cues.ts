@@ -32,7 +32,8 @@ export function cuesFor(prev: GameState, next: GameState, action: Action | { typ
   const c = next.current
   const p = prev.current
 
-  if (c && c.visitId !== p?.visitId) {
+  // A phone call (M4 specialists) rings no door bell; nobody walks in.
+  if (c && c.visitId !== p?.visitId && !c.via) {
     cues.push({ sound: 'door_bell' })
     if (c.item && (c.phase === 'present' || c.phase === 'scene')) cues.push({ sound: 'set_down', delay: AUDIO_MIX.setDownDelay })
   }

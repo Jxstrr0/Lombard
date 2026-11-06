@@ -18,13 +18,14 @@ import type {
   MarketState,
   QueuedVisit,
   SpecialistState,
+  StoryBoost,
   VisitOutcome,
   VisitState,
 } from './types'
 
 export type { ItemInstance } from './types'
 
-export const STATE_VERSION = 5
+export const STATE_VERSION = 6
 
 export type Season = 'winter' | 'spring' | 'summer' | 'autumn'
 export type ISODate = string
@@ -144,8 +145,11 @@ export interface GameState {
   day: DayState
   history: DaySummary[]
   crime: { heat: number; pressure: number; fenceTrust: number; flags: string[] }
-  /** M4: arc progress and story flags (set by beats, read by their conditions). */
-  story: { arcs: Record<ArcId, ArcProgress>; pendingEvents: ScheduledEvent[]; flags: string[] }
+  /**
+   * M4: arc progress and story flags (set by beats, read by their conditions).
+   * boosts (v6): specialist warnings running ("plated chains turn up more for two weeks").
+   */
+  story: { arcs: Record<ArcId, ArcProgress>; pendingEvents: ScheduledEvent[]; flags: string[]; boosts: StoryBoost[] }
   /**
    * general: the M1 standing in points (unbounded; walkouts −1), read by buyer chance.
    * byGroup: −1…1 per group, changed only through adjustRep (src/game/reputation.ts).
@@ -213,7 +217,7 @@ export function createInitialState(seed: number, careerId: string): GameState {
     day: { phase: 'closed', clock: 0, served: 0, total: 0, openingCash: tuning.career.startingCash, log: [], newsRead: true },
     history: [],
     crime: { heat: 0, pressure: 0, fenceTrust: 0, flags: [] },
-    story: { arcs: {}, pendingEvents: [], flags: [] },
+    story: { arcs: {}, pendingEvents: [], flags: [], boosts: [] },
     reputation: {
       general: 0,
       byGroup: { neighbourhood: 0, youth: 0, police: 0, mob: 0, specialists: 0 },

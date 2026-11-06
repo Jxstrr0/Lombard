@@ -17,7 +17,7 @@ import { getItemDef } from '../data/items'
 import { getBeat } from '../data/stories'
 import { pickLine, visitLines } from '../data/lines'
 import { tuning } from '../data/tuning'
-import { claimedValue, dealerPrice } from './appraise/value'
+import { claimedValue, dealerPrice, tidyPrice } from './appraise/value'
 import { leftoverStock } from './career/start'
 import { generateDayQueue } from './customers/walkins'
 import { planStory, storyRng } from './story/plan'
@@ -26,6 +26,7 @@ import { boostSellers, noteBought, noteCall, pruneBoosts, referralBuyers } from 
 import { noteForfeits, pledgeRedeemLines } from './story/pledges'
 import { updateMarket } from './economy/demand'
 import { chargeExpenses } from './economy/expenses'
+import { runCrimeEvents } from './crime/vandalism'
 import { releaseSpecialist, retainSpecialist } from './economy/specialists'
 import { buyUpgrade, restockAcid } from './economy/upgrades'
 import { haggleRound, startHaggle, type HaggleContext } from './haggle/machine'
@@ -243,7 +244,10 @@ function haggleContext(state: GameState): HaggleContext | null {
   if (!state.current || !state.inspect || state.current.kind !== 'seller') return null
   const item = state.current.item
   // M5: the fence names his price; offers are judged against it (an insult is far under it).
-  const claim = isFence(state.current.customer) ? fenceAsk(state, item) : claimedValue(getItemDef(item.defId), item)
+  const full = isFence(state.current.customer) ? fenceAsk(state, item) : claimedValue(getItemDef(item.defId), item)
+  // M5: a story seller may open cheap on purpose (the crew's deliveries: visit.anchor).
+  const anchor = state.current.beatId ? (getBeat(state.current.beatId)?.visit.anchor ?? 1) : 1
+  const claim = anchor === 1 ? full : tidyPrice(full * anchor)
   return {
     customer: state.current.customer,
     item,
@@ -293,6 +297,9 @@ function openDay(state: GameState): GameState {
     const pledged = s.loans
     // Story beats hear about their pledges forfeited this morning.
     s = pruneBoosts(noteForfeits(forfeitOverdue(s), pledged))
+    // M5: last night's vandalism (the brick) and the glazier, from their own streams.
+    const crimeNight = runCrimeEvents(s)
+    s = crimeNight.state
     s = { ...s, market: updateMarket(s, rng) }
     const ids = idAllocator(s)
     // Regulars and story beats first: their sellers take walk-in places. Their ids are keyed by
@@ -332,7 +339,7 @@ function openDay(state: GameState): GameState {
       inspect: null,
       haggle: null,
       day: { ...s.day, total: queue.length, newsRead: market.news.length === 0, nextArrival: lullRng(s, 'open').range(...tuning.day.firstArrivalSeconds) },
-      narration: `The shop is open. ${queue.length} people are waiting outside.`,
+      narration: `${crimeNight.morning ? `${crimeNight.morning} ` : ''}The shop is open. ${queue.length} people are waiting outside.`,
     }
   })
 }

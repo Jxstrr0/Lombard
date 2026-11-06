@@ -205,14 +205,24 @@ describe('planning', () => {
     expect(opened.queue).toHaveLength(tuning.day.customersPerDay)
   })
 
-  it('a regular holding a pledge does not come in to sell', () => {
+  it('a regular coming back for a pledge does not come in to sell', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
     let s = noArcs(onlyZinaida(onDay(startedState(5, 'c1'), day)))
-    const fake = { customer: regularCustomer(def) } as unknown as GameState['loans'][number]
+    const fake = { customer: regularCustomer(def), redeemDay: day + 5 } as unknown as GameState['loans'][number]
     s = { ...s, loans: [fake] }
     let id = 0
     expect(planStory(s, (p) => `${p}${id++}`).visits).toEqual([])
+  })
+
+  it('a regular who has given up on a pledge still drops in on schedule', () => {
+    const def = zina()
+    const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
+    let s = noArcs(onlyZinaida(onDay(startedState(5, 'c1'), day)))
+    const fake = { customer: regularCustomer(def), redeemDay: null } as unknown as GameState['loans'][number]
+    s = { ...s, loans: [fake] }
+    let id = 0
+    expect(planStory(s, (p) => `${p}${id++}`).visits.map((v) => v.visit.customer.regularId)).toEqual(['zinaida'])
   })
 })
 

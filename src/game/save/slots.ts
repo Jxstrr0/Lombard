@@ -7,7 +7,10 @@
  * The slot number lives on the stored record, not in GameState: a save code
  * carries a career, and the device it is loaded on picks the slot.
  */
-import type { GameState } from '../state'
+import { ENDING_TITLES } from '../../data/endings'
+import { daysRun } from '../endings/end'
+import { titleOf } from '../endings/title'
+import type { CareerEndKind, GameState } from '../state'
 
 export type SlotNo = 1 | 2 | 3
 export const SLOT_NUMBERS: readonly SlotNo[] = [1, 2, 3]
@@ -71,6 +74,8 @@ export interface SlotCareer {
   progress: boolean
   /** Real time of the last autosave (ms since epoch). */
   savedAt: number
+  /** M5: how an ended career ended, its title (display name) and days run; null while it is still running. */
+  end: { kind: CareerEndKind; title: string; daysRun: number } | null
 }
 
 export interface SlotView {
@@ -90,13 +95,24 @@ export function summarizeCareer(state: GameState, savedAt: number): SlotCareer {
     intro: state.meta.intro,
     progress: state.history.length > 0,
     savedAt,
+    end: endOf(state),
   }
 }
 
-/** The occupied slot played most recently (the title screen's Continue), or null. */
-export function mostRecentSlot(slots: readonly SlotView[]): SlotView | null {
+function endOf(state: GameState): SlotCareer['end'] {
+  const title = titleOf(state)
+  if (!state.career.end || !title) return null
+  return { kind: state.career.end.kind, title: ENDING_TITLES[title].name, daysRun: daysRun(state) }
+}
+
+/**
+ * The occupied slot played most recently, or null. `playable` (the title screen's Continue)
+ * skips careers that have ended: there is nothing to continue.
+ */
+export function mostRecentSlot(slots: readonly SlotView[], playable = false): SlotView | null {
   let best: SlotView | null = null
   for (const s of slots) {
+    if (playable && s.career?.end) continue
     if (s.career && (!best?.career || s.career.savedAt > best.career.savedAt)) best = s
   }
   return best

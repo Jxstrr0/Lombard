@@ -17,6 +17,8 @@
  * Leopold Germanovich Bessmertny (the Collector, src/data/collector.ts) shows once he has
  * asked after his icon (collector.asked) and reads how it left the shop: collector.sold,
  * .returned, .handed_in, .missed, or .passed (you never bought her).
+ *
+ * M6: Kuzmich (the Flood) shows once the water came into the shop and reads the flood record.
  */
 import type { z } from 'zod'
 import type { EpilogueCard } from '../../game/schema/endings'
@@ -243,6 +245,40 @@ export const CARDS: Raw[] = [
       {
         when: [],
         text: 'Zhora still has Gusev’s IOU folded in his wallet. He shows it to people sometimes, as if it explained something. Nobody has ever asked him what.',
+      },
+    ],
+  },
+  {
+    // M6 the Flood (src/data/stories/flood.ts): shows once the water came into the shop (flood.hit),
+    // and reads how the shop behaved (hero and vulture choices, the `flood` condition) and how ready it was.
+    id: 'kuzmich',
+    name: 'Kuzmich',
+    role: 'Caretaker, the Kanatnaya yards',
+    show: [{ if: 'flag', flag: 'flood.hit' }],
+    variants: [
+      {
+        when: [{ if: 'flood', hero: { gte: 3 }, vulture: { lte: 0 } }],
+        text: 'Kuzmich still tells the story of the spring the canal came over, and in his version the pawn shop is where the street went for a pump, a dry room and a loan. He has painted a mark on your old door frame at the height the water reached. Under it, in smaller letters, he has written your name.',
+      },
+      {
+        when: [{ if: 'flood', vulture: { gte: 2 } }],
+        text: 'Kuzmich still sweeps the yards on Kanatnaya Street. He sweeps round the pawn shop’s step, carefully, without touching it. When people ask about the spring of the water, he tells them who sold the pumps, and at what price, and spits.',
+      },
+      {
+        when: [{ if: 'flood', hero: { gte: 2 } }],
+        text: 'Kuzmich remembers the spring of the water by who helped, and the pawn shop is on his list, near the top. He brings round a jar of pickled mushrooms every autumn and will not say where they grew.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'flood.unprepared' }, { if: 'flag', flag: 'flood.damaged' }],
+        text: 'Kuzmich still mentions the sandbags you didn’t want. He mentions them to you, to the new tenant, to the pigeons. There is a tidemark on the back shelves that no paint will cover, and he says that is the river’s receipt.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'flood.dry' }],
+        text: 'Kuzmich says the pawn shop was the only dry floor on the street that spring, and takes the credit for it. He has told the story so often that he now remembers carrying the sandbags himself, all of them, uphill.',
+      },
+      {
+        when: [],
+        text: 'Kuzmich still sweeps the yards on Kanatnaya Street and still watches the river every March, leaning on his broom. When the ice comes down he knocks on every door on the embankment, yours included, and says the same thing: “Lift what you can.”',
       },
     ],
   },

@@ -25,6 +25,7 @@ import { afterVisit, playPaperBeats, sceneChoose, sceneFor, sceneNext } from './
 import { boostSellers, noteBought, noteCall, pruneBoosts, referralBuyers } from './story/specialists'
 import { noteForfeits, pledgeRedeemLines } from './story/pledges'
 import { updateMarket } from './economy/demand'
+import { floodHit, floodMorningLine, floodSellers, floodWalkIns } from './city/flood'
 import { chargeExpenses } from './economy/expenses'
 import { runCrimeEvents } from './crime/vandalism'
 import { endCareer } from './endings/end'
@@ -336,6 +337,10 @@ function openDay(state: GameState): GameState {
     const crimeNight = runCrimeEvents(s)
     s = crimeNight.state
     s = { ...s, market: updateMarket(s, rng) }
+    // M6 the Flood: the flood morning soaks what the water can reach and bills the clean-up (own stream).
+    const flooded = floodHit(s)
+    s = flooded.state
+    const floodMorning = flooded.morning ?? floodMorningLine(s)
     // M5 police: trails reaching you today land their heat; maybe a stolen-goods bulletin in the paper.
     s = printBulletin(matureTrails(s))
     const ids = idAllocator(s)
@@ -350,7 +355,9 @@ function openDay(state: GameState): GameState {
     const fence = planFence(s, storyId, story.visits.some((v) => isFence(v.visit.customer)))
     if (fence.visit) story.visits.push({ visit: fence.visit, first: false })
     // M4 specialist warnings: while one runs, some walk-in sellers bring that piece (own streams; no boost, no change).
-    const sellers = boostSellers(s, generateDayQueue(rng, tuning.day.customersPerDay - story.sellerPlaces, ids.next))
+    // M6 the Flood: fewer walk-ins while the street is under water, many of them flooded out (own streams).
+    const walkInCount = floodWalkIns(s, tuning.day.customersPerDay - story.sellerPlaces)
+    const sellers = floodSellers(s, boostSellers(s, generateDayQueue(rng, walkInCount, ids.next)))
     const buyers = planBuyers(s, rng, ids.next)
     const redeemers = pledgeRedeemLines(s, planRedemptions(s, ids.next))
     // M4: the buyer a specialist sends once a month (Faina), and beats that land in the morning paper.
@@ -386,7 +393,7 @@ function openDay(state: GameState): GameState {
       inspect: null,
       haggle: null,
       day: { ...s.day, total: queue.length, newsRead: market.news.length === 0, nextArrival: lullRng(s, 'open').range(...tuning.day.firstArrivalSeconds) },
-      narration: `${crimeNight.morning ? `${crimeNight.morning} ` : ''}The shop is open. ${queue.length} people are waiting outside.`,
+      narration: `${crimeNight.morning ? `${crimeNight.morning} ` : ''}${floodMorning ? `${floodMorning} ` : ''}The shop is open. ${queue.length} people are waiting outside.`,
     }
   })
 }

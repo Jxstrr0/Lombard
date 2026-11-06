@@ -31,11 +31,13 @@ const lines = [
   [policies.careless, {}, 'careless'],
   [policies.trader, {}, 'trader'],
   [policies.appraiser, {}, 'appraiser'],
+  [policies.neighbour, {}, 'neighbour'],
 ]
 for (const [policy, options, label] of lines) {
   const runs = Array.from({ length: seeds }, (_, i) => sim.simulate(1000 + i, policy, days, options))
   const s = sim.summarize(runs, start)
   const pct = (x) => `${(x * 100).toFixed(1)}%`
+  const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)]
   const mean = (f) => (runs.reduce((a, r) => a + f(r), 0) / runs.length).toFixed(2)
   console.log(
     `${label.padEnd(11)} growth/month ${pct(s.medianGrowth).padStart(7)}  busted ${s.busted}/${s.runs}` +
@@ -52,7 +54,7 @@ for (const [policy, options, label] of lines) {
   const mid = runs.slice().sort((a, b) => a.finalWorth - b.finalWorth)[Math.floor(runs.length / 2)]
   console.log('          worth by day: ' + mid.days.filter((d) => d.day % 10 === 0).map((d) => `${d.day}:${Math.round(d.worth / 1000)}k`).join('  '))
   // Regulars (M4): visits per regular over the whole run, averaged across seeds.
-  const ids = [...new Set(runs.flatMap((r) => Object.keys(r.customers)))].sort()
+  const ids = [...new Set(runs.flatMap((r) => Object.keys(r.customers)))].filter((id) => id !== 'appraiser').sort() // Lev: staff, not a regular
   const avg = (id) => runs.reduce((a, r) => a + (r.customers[id]?.visits ?? 0), 0) / runs.length
   console.log(`          regular visits in ${days} days: ` + ids.map((id) => `${id} ${avg(id).toFixed(1)}`).join('  '))
   // M5: the crime dials and the ending axes, averaged across seeds.
@@ -95,6 +97,13 @@ for (const [policy, options, label] of lines) {
         `  vanished ${has('appraiser.vanished')} let go ${has('appraiser.told_go') + has('appraiser.let_go')}`,
     )
   }
+  // M6 the Flood: its day, how ready the shop was, what the water cost, hero and vulture choices.
+  const prep = (p) => runs.filter((r) => r.flood.prep === p).length
+  console.log(
+    `          flood: day ${median(runs.map((r) => r.flood.day))}  sandbags ${prep('sandbags')} lifted ${prep('lifted')} none ${prep('none')}` +
+      `  damaged ${mean((r) => r.flood.damaged)}  bill ₽${mean((r) => r.flood.bill)}  hero ${mean((r) => r.flood.hero)}  vulture ${mean((r) => r.flood.vulture)}` +
+      `  credit ${has('flood.hero_credit')} repaid ${has('flood.credit_repaid')} lost ${has('flood.credit_lost')}  gouged ${has('flood.gouged')} refunded ${has('flood.refunded')} shrugged ${has('flood.shrugged')}  praised ${has('flood.volkova_praised')}`,
+  )
   // M5 the Collector: how many shops he asked, bought his icon, and what became of her.
   console.log(
     `          collector: asked ${has('collector.asked')}  bought ${has('collector.bought')}  passed ${has('collector.passed')}` +

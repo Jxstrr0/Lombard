@@ -186,7 +186,7 @@ export default {
         who: 'appraiser',
         kind: 'scene',
         first: true,
-        as: { name: 'Yuri Gusev', archetype: 'pensioner', look: 'male_adult_05', temperament: 'flexible', knowledge: 0.9, desperation: 0.2 },
+        as: { name: 'Yuri Gusev', archetype: 'pensioner', look: 'male_adult_04', temperament: 'flexible', knowledge: 0.9, desperation: 0.2 },
         scene: {
           lines: [
             'Yuri Gusev. I had this counter, before you. Eleven years. You’ve moved the scales; they were better by the window.',

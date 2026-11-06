@@ -158,6 +158,12 @@ const BaseCondition = z.discriminatedUnion('if', [
     caught: cmp.optional(),
     bribes: cmp.optional(),
   }),
+  // --- M6 the Flood (src/game/city/flood.ts) ---------------------------------------------
+  /**
+   * The career's flood: `day` counts days since the flood day (negative before it), `hero` and
+   * `vulture` count the flood.hero_* and flood.vulture_* choices made so far.
+   */
+  z.object({ if: z.literal('flood'), day: cmp.optional(), hero: cmp.optional(), vulture: cmp.optional() }),
 ])
 
 /** M4: at least one of these holds (one level: no `any` inside `any`). */

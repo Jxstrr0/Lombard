@@ -20,6 +20,7 @@
  * - laptop: standing as its owner sees it (model.rest "upright"): base 0.336 × 0.026 × 0.236 in the XZ
  *   plane (y −0.1175…−0.0915, keyboard up, front edge +Z at z ≈ 0.157), hinge at the back (z ≈ −0.072),
  *   lid 0.228 × 0.0075 open at 110°, screen facing +Z and a little up, lid top at y ≈ 0.122, z ≈ −0.15
+ * - icon (M5): a painted panel 0.16 × 0.2 × 0.024 under a silver cover, face +Z, bare wood back −Z
  *
  * `model.scale` multiplies the whole model (kept for parity with glb models).
  * Models are cached by defId; ItemModels.evict disposes geometries, materials and textures.
@@ -106,6 +107,9 @@ export function buildPlaceholder(spec: ModelSpec): THREE.Group {
       break
     case 'laptop':
       buildLaptop(g, color)
+      break
+    case 'icon':
+      buildIcon(g, color)
       break
   }
   const s = spec.scale ?? 1
@@ -1434,4 +1438,152 @@ function buildLaptop(g: THREE.Group, color: THREE.Color): void {
   screen.position.set(0, 0.008, lidT / 2 + 0.0002)
   lid.add(screen)
   g.add(lid)
+}
+
+// --- icon (M5, the Collector's) -------------------------------------------------------------
+
+const ICON = { w: 0.16, h: 0.2, t: 0.024 } as const
+
+/** The painted panel under its silver cover: canvas colour plus a metalness map (silver frame, painted window). */
+function iconFace(color: THREE.Color): { map: THREE.CanvasTexture; metal: THREE.CanvasTexture } {
+  const W = 320
+  const H = 400
+  const win = { x: 62, y: 56, w: 196, h: 300 }
+  const map = canvasTexture(W, H, (ctx) => {
+    // Silver cover, chased in rows of little leaves.
+    const grad = ctx.createLinearGradient(0, 0, W, H)
+    grad.addColorStop(0, shade(color, 1.15))
+    grad.addColorStop(0.5, shade(color, 0.85))
+    grad.addColorStop(1, shade(color, 1.05))
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, W, H)
+    ctx.strokeStyle = shade(color, 0.6)
+    ctx.lineWidth = 2
+    for (let i = 0; i < 60; i++) {
+      const along = (i % 15) / 15
+      const side = Math.floor(i / 15)
+      const x = side < 2 ? 20 + along * (W - 40) : side === 2 ? 28 : W - 28
+      const y = side === 0 ? 28 : side === 1 ? H - 28 : 30 + along * (H - 60)
+      ctx.beginPath()
+      ctx.ellipse(x, y, 7, 4, (i * 0.7) % Math.PI, 0, Math.PI * 2)
+      ctx.stroke()
+    }
+    ctx.strokeRect(10, 10, W - 20, H - 20)
+    ctx.strokeRect(win.x - 6, win.y - 6, win.w + 12, win.h + 12)
+    // The dent, top left.
+    const dent = ctx.createRadialGradient(36, 34, 2, 36, 34, 22)
+    dent.addColorStop(0, shade(color, 0.45))
+    dent.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = dent
+    ctx.fillRect(10, 10, 52, 50)
+    // The painted window: dark gold ground, her red-brown cloak, face, halo.
+    ctx.fillStyle = '#6b4a1c'
+    ctx.fillRect(win.x, win.y, win.w, win.h)
+    const cx = win.x + win.w / 2
+    ctx.fillStyle = '#c89b3c'
+    ctx.beginPath()
+    ctx.arc(cx, win.y + 92, 46, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#5a1f17'
+    ctx.beginPath()
+    ctx.moveTo(cx, win.y + 52)
+    ctx.quadraticCurveTo(cx + 70, win.y + 70, cx + 84, win.y + win.h - 40)
+    ctx.lineTo(cx - 84, win.y + win.h - 40)
+    ctx.quadraticCurveTo(cx - 70, win.y + 70, cx, win.y + 52)
+    ctx.fill()
+    ctx.fillStyle = '#b98a5e'
+    ctx.beginPath()
+    ctx.ellipse(cx, win.y + 96, 17, 23, 0, 0, Math.PI * 2)
+    ctx.fill()
+    // The child on her arm, a smaller face and halo.
+    ctx.fillStyle = '#c89b3c'
+    ctx.beginPath()
+    ctx.arc(cx - 34, win.y + 150, 22, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#b98a5e'
+    ctx.beginPath()
+    ctx.ellipse(cx - 34, win.y + 152, 9, 12, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#c89b3c'
+    ctx.fillRect(cx - 50, win.y + 66, 3, 120)
+    // The little canal boat at her feet.
+    ctx.fillStyle = '#2c2416'
+    ctx.beginPath()
+    ctx.moveTo(cx - 22, win.y + win.h - 22)
+    ctx.lineTo(cx + 22, win.y + win.h - 22)
+    ctx.lineTo(cx + 14, win.y + win.h - 14)
+    ctx.lineTo(cx - 14, win.y + win.h - 14)
+    ctx.fill()
+    ctx.fillRect(cx + 4, win.y + win.h - 40, 2, 20)
+    // A drip of candle wax on the hem.
+    ctx.fillStyle = 'rgba(240,232,205,0.9)'
+    ctx.beginPath()
+    ctx.ellipse(cx + 60, win.y + win.h + 2, 6, 10, 0.2, 0, Math.PI * 2)
+    ctx.fill()
+    // Crackle over the paint.
+    ctx.strokeStyle = 'rgba(30,18,8,0.35)'
+    ctx.lineWidth = 1
+    for (let i = 0; i < 70; i++) {
+      const x = win.x + hash01(i) * win.w
+      const y = win.y + hash01(i + 97) * win.h
+      ctx.beginPath()
+      ctx.moveTo(x, y)
+      ctx.lineTo(x + (hash01(i + 13) - 0.5) * 24, y + (hash01(i + 29) - 0.5) * 24)
+      ctx.stroke()
+    }
+  })
+  const metalTex = new THREE.CanvasTexture(
+    (() => {
+      const c = document.createElement('canvas')
+      c.width = W
+      c.height = H
+      const ctx = c.getContext('2d')
+      if (ctx) {
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, W, H)
+        ctx.fillStyle = '#000000'
+        ctx.fillRect(win.x, win.y, win.w, win.h)
+      }
+      return c
+    })(),
+  )
+  return { map, metal: metalTex }
+}
+
+/** The back of the panel: bare lime wood, two dovetailed battens, a half-scraped parish number in white paint. */
+function iconBack(): THREE.CanvasTexture {
+  return canvasTexture(320, 400, (ctx) => {
+    ctx.fillStyle = '#9a7a52'
+    ctx.fillRect(0, 0, 320, 400)
+    ctx.strokeStyle = 'rgba(60,40,20,0.35)'
+    for (let i = 0; i < 40; i++) {
+      ctx.beginPath()
+      ctx.moveTo(8 * i, 0)
+      ctx.bezierCurveTo(8 * i + 6, 140, 8 * i - 6, 260, 8 * i + 3, 400)
+      ctx.stroke()
+    }
+    ctx.fillStyle = '#7a5c3a'
+    ctx.fillRect(0, 70, 320, 26)
+    ctx.fillRect(0, 300, 320, 26)
+    ctx.fillStyle = 'rgba(240,238,230,0.85)'
+    ctx.font = 'bold 34px serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('ПОКР', 150, 200)
+    ctx.fillText('№ 47', 165, 244)
+    // Scraped away: streaks of bare wood over the paint.
+    ctx.fillStyle = '#9a7a52'
+    for (let i = 0; i < 9; i++) ctx.fillRect(40 + i * 28, 168 + (i % 3) * 9, 18, 56)
+  })
+}
+
+function buildIcon(g: THREE.Group, color: THREE.Color): void {
+  const { w, h, t } = ICON
+  const { map, metal: metalnessMap } = iconFace(color)
+  const front = new THREE.MeshStandardMaterial({ map, metalnessMap, metalness: 1, roughness: 0.38 })
+  const back = new THREE.MeshStandardMaterial({ map: iconBack(), roughness: 0.85 })
+  const edge = new THREE.MeshStandardMaterial({ color: '#7a5c3a', roughness: 0.8 })
+  // BoxGeometry groups: +X, −X, +Y, −Y, +Z (front), −Z (back).
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(w, h, t), [edge, edge, edge, edge, front, back])
+  panel.name = 'panel'
+  g.add(panel)
 }

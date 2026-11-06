@@ -7,7 +7,7 @@
  * Release asks for a second tap (no refund for the month); everything else
  * applies at once. The reducer only accepts these actions while closed.
  */
-import { ITEM_DEFS } from '../../data/items'
+import { SPAWN_DEFS } from '../../data/items'
 import { getSpecialist, SPECIALISTS } from '../../data/specialists'
 import { tuning } from '../../data/tuning'
 import { UPGRADES } from '../../data/upgrades'
@@ -39,7 +39,7 @@ const CATEGORY_LABEL: Record<string, string> = {
 }
 
 /** Categories some item def belongs to (a specialist whose line never walks in yet says so). */
-const STOCKED = new Set<string>(ITEM_DEFS.map((d) => d.category))
+const STOCKED = new Set<string>(SPAWN_DEFS.map((d) => d.category))
 
 function due(inDays: number): string {
   if (inDays <= 0) return 'tonight'

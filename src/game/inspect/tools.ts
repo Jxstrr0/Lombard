@@ -245,6 +245,12 @@ const CONDITION_TEXT: Record<string, Record<Band, string>> = {
     worn: 'Worn flat on the high points, with a few rim knocks.',
     poor: 'Worn smooth, scratched, the date barely legible.',
   },
+  icons: {
+    mint: 'The paint is whole and the cover bright; it was looked after.',
+    good: 'Soot from candles in the corners, a little flaking at the edge.',
+    worn: 'Flaking paint along the joins, the cover rubbed thin at the corners.',
+    poor: 'Paint lost in patches, the panel split, the cover bent away from it.',
+  },
 }
 const CONDITION_FALLBACK = CONDITION_TEXT.gold!
 
@@ -273,6 +279,7 @@ const WEIGHT_SUBJECT: Record<ItemDef['model']['placeholder'], string> = {
   badge: 'An original of this badge usually weighs',
   coin: 'A coin of this issue weighs',
   laptop: 'This model usually weighs',
+  icon: 'A panel this size under a silver cover usually weighs',
 }
 
 function scaleReading(def: ItemDef, item: ItemInstance, rng: Rng, first: boolean): Omit<Finding, 'id' | 'tool'> {

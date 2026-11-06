@@ -1,0 +1,627 @@
+{
+  "_doc": "CC0 item models from Poly Haven, prepared by art/items/cc0.py (docs/04-ASSETS.md \u00a7 Items). Keyed by item def id.",
+  "drill_hartwig": {
+    "src": "Drill_01",
+    "tris": 6000,
+    "tex": 512,
+    "hotspots": {
+      "chuck": {
+        "view": "front",
+        "px": [
+          40,
+          45
+        ]
+      },
+      "vents": {
+        "view": "front",
+        "px": [
+          205,
+          48
+        ]
+      },
+      "trigger": {
+        "view": "front",
+        "px": [
+          132,
+          100
+        ]
+      },
+      "battery": {
+        "view": "front",
+        "px": [
+          190,
+          205
+        ]
+      }
+    }
+  },
+  "ukulele_pinaka": {
+    "src": "Ukulele_01",
+    "tris": 6000,
+    "tex": 512,
+    "hotspots": {
+      "headstock": {
+        "view": "front",
+        "px": [
+          127,
+          29
+        ]
+      },
+      "neck": {
+        "view": "front",
+        "px": [
+          127,
+          80
+        ]
+      },
+      "soundhole": {
+        "view": "front",
+        "px": [
+          127,
+          169
+        ]
+      },
+      "bridge": {
+        "view": "front",
+        "px": [
+          127,
+          214
+        ]
+      }
+    }
+  },
+  "vice_kuznets": {
+    "src": "bench_vice_01",
+    "tris": 6000,
+    "tex": 512,
+    "keep": [
+      "frame",
+      "clamp",
+      "dial",
+      "bar"
+    ],
+    "rot": [
+      0,
+      0,
+      -90
+    ],
+    "hotspots": {
+      "jaws": {
+        "view": "front",
+        "px": [
+          55,
+          85
+        ]
+      },
+      "anvil": {
+        "view": "front",
+        "px": [
+          200,
+          98
+        ]
+      },
+      "screw": {
+        "view": "front",
+        "px": [
+          22,
+          140
+        ]
+      },
+      "base": {
+        "view": "front",
+        "px": [
+          120,
+          152
+        ]
+      }
+    }
+  },
+  "blowtorch_plamya": {
+    "src": "brass_blowtorch",
+    "tris": 6000,
+    "tex": 512,
+    "rot": [
+      0,
+      0,
+      -90
+    ],
+    "hotspots": {
+      "nozzle": {
+        "view": "front",
+        "px": [
+          40,
+          42
+        ]
+      },
+      "valve": {
+        "view": "front",
+        "px": [
+          132,
+          95
+        ]
+      },
+      "tank": {
+        "view": "front",
+        "px": [
+          130,
+          160
+        ]
+      },
+      "handle": {
+        "view": "front",
+        "px": [
+          212,
+          150
+        ]
+      }
+    }
+  },
+  "candelabrum_vasilyev": {
+    "src": "brass_candleholders",
+    "tris": 8000,
+    "tex": 512,
+    "keep": [
+      "candleholder_02"
+    ],
+    "hotspots": {
+      "base": {
+        "view": "front",
+        "px": [
+          127,
+          232
+        ]
+      },
+      "stem": {
+        "view": "front",
+        "px": [
+          127,
+          180
+        ]
+      },
+      "arm": {
+        "view": "front",
+        "px": [
+          95,
+          128
+        ]
+      },
+      "sconce": {
+        "view": "front",
+        "px": [
+          63,
+          100
+        ]
+      }
+    }
+  },
+  "cigarette_case_silver_875": {
+    "src": "cigarette_case",
+    "tris": 4000,
+    "tex": 512,
+    "keep": [
+      "^cigarette_case$"
+    ],
+    "rot": [
+      90,
+      0,
+      0
+    ],
+    "hotspots": {
+      "engraving": {
+        "view": "front",
+        "px": [
+          127,
+          110
+        ]
+      },
+      "cartouche": {
+        "view": "front",
+        "px": [
+          127,
+          200
+        ]
+      },
+      "clasp": {
+        "view": "front",
+        "px": [
+          214,
+          128
+        ]
+      },
+      "back": {
+        "view": "back",
+        "px": [
+          127,
+          128
+        ]
+      }
+    }
+  },
+  "plane_leman_no4": {
+    "src": "hand_plane_no4",
+    "tris": 6000,
+    "tex": 512,
+    "hotspots": {
+      "knob": {
+        "view": "front",
+        "px": [
+          22,
+          170
+        ]
+      },
+      "tote": {
+        "view": "front",
+        "px": [
+          225,
+          115
+        ]
+      },
+      "lever": {
+        "view": "front",
+        "px": [
+          150,
+          95
+        ]
+      },
+      "sole": {
+        "view": "bottom",
+        "px": [
+          128,
+          128
+        ]
+      }
+    }
+  },
+  "figurine_horse_volkhov": {
+    "src": "horse_statue_01",
+    "tris": 8000,
+    "tex": 512,
+    "hotspots": {
+      "head": {
+        "view": "front",
+        "px": [
+          95,
+          35
+        ]
+      },
+      "legs": {
+        "view": "front",
+        "px": [
+          60,
+          100
+        ]
+      },
+      "tail": {
+        "view": "front",
+        "px": [
+          190,
+          170
+        ]
+      },
+      "base": {
+        "view": "bottom",
+        "px": [
+          127,
+          128
+        ]
+      }
+    }
+  },
+  "clock_hollweg": {
+    "src": "mantel_clock_01",
+    "tris": 8000,
+    "tex": 512,
+    "hotspots": {
+      "dial": {
+        "view": "front",
+        "px": [
+          127,
+          104
+        ]
+      },
+      "foot": {
+        "view": "front",
+        "px": [
+          60,
+          172
+        ]
+      },
+      "top": {
+        "view": "front",
+        "px": [
+          127,
+          75
+        ]
+      },
+      "back": {
+        "view": "back",
+        "px": [
+          127,
+          128
+        ]
+      }
+    }
+  },
+  "metal_detector_kladez": {
+    "src": "metal_detector",
+    "tris": 8000,
+    "tex": 512,
+    "rot": [
+      0,
+      0,
+      -90
+    ],
+    "hotspots": {
+      "box": {
+        "view": "front",
+        "px": [
+          185,
+          62
+        ]
+      },
+      "coil": {
+        "view": "front",
+        "px": [
+          55,
+          243
+        ]
+      },
+      "shaft": {
+        "view": "front",
+        "px": [
+          110,
+          165
+        ]
+      },
+      "grip": {
+        "view": "front",
+        "px": [
+          150,
+          50
+        ]
+      }
+    },
+    "paint": [
+      {
+        "rect": [
+          0.5869,
+          0.458,
+          0.6191,
+          0.665
+        ],
+        "rgb": [
+          52,
+          60,
+          68
+        ]
+      },
+      {
+        "rect": [
+          0.8809,
+          0.4561,
+          0.915,
+          0.667
+        ],
+        "rgb": [
+          52,
+          60,
+          68
+        ]
+      },
+      {
+        "rect": [
+          0.6777,
+          0.5742,
+          0.8193,
+          0.5928
+        ],
+        "rgb": [
+          65,
+          73,
+          81
+        ]
+      },
+      {
+        "rect": [
+          0.6943,
+          0.6182,
+          0.7666,
+          0.6514
+        ],
+        "rgb": [
+          52,
+          60,
+          68
+        ]
+      },
+      {
+        "ellipse": [
+          0.4961,
+          0.8008,
+          0.0557,
+          0.0449,
+          -20
+        ],
+        "rgb": [
+          66,
+          70,
+          70
+        ]
+      },
+      {
+        "ellipse": [
+          0.4961,
+          0.8008,
+          0.0518,
+          0.041,
+          -20
+        ],
+        "rgb": [
+          197,
+          130,
+          58
+        ]
+      }
+    ]
+  },
+  "teapot_volkhov": {
+    "src": "tea_set_01",
+    "tris": 6000,
+    "tex": 512,
+    "keep": [
+      "teapot"
+    ],
+    "rot": [
+      0,
+      0,
+      -90
+    ],
+    "hotspots": {
+      "spout": {
+        "view": "front",
+        "px": [
+          35,
+          125
+        ]
+      },
+      "handle": {
+        "view": "front",
+        "px": [
+          225,
+          130
+        ]
+      },
+      "lid": {
+        "view": "front",
+        "px": [
+          127,
+          95
+        ]
+      },
+      "body": {
+        "view": "front",
+        "px": [
+          127,
+          165
+        ]
+      },
+      "base": {
+        "view": "bottom",
+        "px": [
+          127,
+          128
+        ]
+      }
+    }
+  },
+  "hand_drill_burav": {
+    "src": "vintage_hand_drill",
+    "tris": 6000,
+    "tex": 512,
+    "hotspots": {
+      "handle": {
+        "view": "front",
+        "px": [
+          127,
+          36
+        ]
+      },
+      "wheel": {
+        "view": "front",
+        "px": [
+          127,
+          126
+        ]
+      },
+      "crank": {
+        "view": "front",
+        "px": [
+          150,
+          151
+        ]
+      },
+      "chuck": {
+        "view": "front",
+        "px": [
+          127,
+          211
+        ]
+      }
+    }
+  },
+  "lamp_krutov": {
+    "src": "vintage_oil_lamp",
+    "tris": 6000,
+    "tex": 512,
+    "hotspots": {
+      "burner": {
+        "view": "front",
+        "px": [
+          127,
+          40
+        ]
+      },
+      "font": {
+        "view": "front",
+        "px": [
+          127,
+          105
+        ]
+      },
+      "stem": {
+        "view": "front",
+        "px": [
+          127,
+          160
+        ]
+      },
+      "base": {
+        "view": "front",
+        "px": [
+          127,
+          220
+        ]
+      }
+    }
+  },
+  "chess_set_gambit": {
+    "src": "chess_set",
+    "tris": 30000,
+    "tex": 512,
+    "rot": [
+      90,
+      0,
+      0
+    ],
+    "hotspots": {
+      "king": {
+        "view": "front",
+        "px": [
+          115,
+          37
+        ]
+      },
+      "knight": {
+        "view": "front",
+        "px": [
+          68,
+          200
+        ]
+      },
+      "board": {
+        "view": "front",
+        "px": [
+          127,
+          128
+        ]
+      },
+      "back": {
+        "view": "back",
+        "px": [
+          127,
+          128
+        ]
+      }
+    }
+  }
+}

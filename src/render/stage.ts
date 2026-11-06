@@ -20,9 +20,10 @@ import { ItemModels, proxyOf } from './items'
 import type { GlbLoader } from './loaders'
 import { contactShadowTexture } from './textures'
 
+/** Items smaller than this (a ring, a coin) are blown up on the mat to read; anything bigger sits at true size, m. */
 const COUNTER_READ_SIZE = 0.09
-/** Items with a largest side over this (m) sit on the counter at true size. */
-const BIG_ITEM = 0.2
+/** M6: items longer than this (a guitar, a chainsaw) are shrunk on the mat to read at this size, m. */
+const MAT_MAX = 0.42
 /** Most a hotspot may sit behind the first surface hit and still count as visible, m. */
 const OCCLUDE_SLACK_MAX = 0.006
 const ZOOM_MIN = 0.45
@@ -359,8 +360,9 @@ export class ItemStage {
     parent?.add(model)
     const size = box.getSize(new THREE.Vector3())
     this.size = Math.max(size.x, size.y, size.z, 0.005)
-    // Big items (a laptop) already read from the counter: shown at true size, not blown up.
-    this.counterScale = THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, this.size > BIG_ITEM ? 1 : 1.2, 5)
+    // Only small things (a ring, a coin) are blown up to read; a drill or a samovar sits at true size,
+    // and only items longer than the mat (a guitar) are shrunk. Nothing between grows.
+    this.counterScale = this.size > MAT_MAX ? MAT_MAX / this.size : this.size >= COUNTER_READ_SIZE ? 1 : THREE.MathUtils.clamp(COUNTER_READ_SIZE / this.size, 1.2, 5)
     // Lying flat: model −Z points down, so lift by the depth below the origin (upright: −Y).
     this.lift = this.upright ? -box.min.y : -box.min.z
     // Footprint for the contact shadow: model X × Y on the mat (upright: X × Z).

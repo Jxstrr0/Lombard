@@ -6,6 +6,8 @@
  */
 import type { Action } from '../../game/actions'
 import { standingLines } from '../../game/reputation'
+import { heatWords } from '../../data/police'
+import { tuning } from '../../data/tuning'
 import type { GameState } from '../../game/state'
 import type { LedgerEntry } from '../../game/types'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
@@ -40,6 +42,8 @@ export class LedgerScreen {
   private log: HTMLElement
   private standing: HTMLElement
   private stock: HTMLElement
+  /** M5: the word on heat and the bulletin lines still in force (crime/bulletin.ts). */
+  private police: HTMLElement
   private open: HTMLButtonElement
   private loans = new LedgerLoans()
   private key = ''
@@ -71,6 +75,8 @@ export class LedgerScreen {
     this.standing.dataset.id = 'ledger-standing'
     this.stock = el('ul', 'receipt-stock')
     this.stock.dataset.id = 'ledger-stock'
+    this.police = el('ul', 'receipt-police')
+    this.police.dataset.id = 'ledger-police'
     receipt.append(
       head,
       this.summary,
@@ -78,6 +84,8 @@ export class LedgerScreen {
       this.log,
       el('h3', 'receipt-h', 'Word on the street'),
       this.standing,
+      el('h3', 'receipt-h', 'Police'),
+      this.police,
       el('h3', 'receipt-h', 'Pawn loans'),
       this.loans.root,
       el('h3', 'receipt-h', 'In stock'),
@@ -101,7 +109,7 @@ export class LedgerScreen {
     this.loans.render(state)
     setText(this.shopName, state.shop.name.toUpperCase())
     const last = state.history[state.history.length - 1]
-    const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last, state.reputation.byGroup])
+    const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last, state.reputation.byGroup, state.crime.heat, state.crime.bulletin.map((b) => b.id)])
     if (key === this.key) return
     this.key = key
     if (!last) return
@@ -144,6 +152,20 @@ export class LedgerScreen {
       const li = el('li', `standing-${line.group}`, line.text)
       li.dataset.id = `standing-${line.group}`
       this.standing.append(li)
+    }
+
+    this.police.replaceChildren()
+    const band = tuning.police.heatBands.reduce((at, min, i) => (state.crime.heat >= min ? i : at), 0)
+    const word = el('li', 'police-word', heatWords[Math.min(band, heatWords.length - 1)]!)
+    word.dataset.id = 'ledger-heat'
+    this.police.append(word)
+    const lines = state.crime.bulletin.slice().sort((a, b) => b.day - a.day)
+    if (lines.length === 0) this.police.append(el('li', 'receipt-empty', 'Nothing posted lately.'))
+    for (const b of lines) {
+      const li = el('li', 'police-line')
+      li.dataset.id = `ledger-bulletin-${b.id}`
+      li.append(el('span', 'police-day', `Day ${b.day}`), el('span', 'police-text', b.text))
+      this.police.append(li)
     }
 
     this.stock.replaceChildren()

@@ -17,6 +17,9 @@
  * something to sell, M5; delivery: Zhora with the crew's stolen phones, opening at half, M5);
  * ?scenario=brick opens on the morning after a brick through the stocked counter case (M5 Protection);
  * ?scenario=specialist opens day 1 with Gennady's first-refusal phone call, then Ilya at the counter with the widow's watch (M4 specialists' arcs).
+ * M5 police: ?scenario=volkova opens day 1 with Detective Volkova first in line, asking about a bulletin watch you bought
+ * two days ago and still hold (her three answers); ?scenario=bulletin prints a stolen-goods bulletin in today's paper
+ * and puts the piece first in line with a walk-in seller (the passport pill); ?scenario=raid opens on a police raid.
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
@@ -45,6 +48,10 @@ import { beatVisit, regularCustomer, regularVisit } from './game/story/plan'
 import { recordBeat, setMemory } from './game/story/progress'
 import { specialistCustomer } from './game/story/specialists'
 import { fenceGoods } from './game/crime/fence'
+import { bulletinPiece, wearOf } from './game/crime/bulletin'
+import { addEvent, BRING, RAID, TRAIL } from './game/crime/events'
+import { volkovaCustomer } from './game/crime/volkova'
+import { BULLETIN } from './data/news'
 import { BRICK } from './game/crime/vandalism'
 import { placeItem } from './game/shop/display'
 import type { QueuedVisit } from './game/types'
@@ -135,6 +142,64 @@ function fenceGoodsSecond(s: GameState): GameState {
   const met = { ...s, crime: { ...s.crime, fence: { ...s.crime.fence, met: true } } }
   const goods = fenceGoods(met, (prefix, who) => `${prefix}-dev-${who}`)
   return { ...s, queue: [...s.queue.slice(0, 1), goods, ...s.queue.slice(1)], day: { ...s.day, total: s.day.total + 1 } }
+}
+
+/** Dev-only (M5 police): a stolen watch on the bulletin, bought `ago` days back and still in stock, with its trail. */
+function holdHotWatch(s: GameState, ago: number): GameState {
+  const day = s.calendar.day
+  const defId = 'watch_poljot_strela'
+  const piece = bulletinPiece(s, { id: 'b-dev', defId }, 'i-dev-hot', 'My grandfather’s. I’d keep it, but the rent won’t wait.')
+  const name = ITEM_DEFS.find((d) => d.id === defId)?.name ?? defId
+  const text = BULLETIN.line
+    .replaceAll('{item}', name)
+    .replaceAll('{wear}', wearOf(piece.condition))
+    .replaceAll('{place}', BULLETIN.places[0]!)
+    .replaceAll('{when}', BULLETIN.when[0]!.replaceAll('{day}', 'Friday'))
+  const paid = Math.max(1000, Math.round((piece.trueValue * 0.3) / 100) * 100)
+  const bought = day - ago
+  s = {
+    ...s,
+    cash: s.cash - paid,
+    inventory: [...s.inventory, piece],
+    paid: { ...s.paid, [piece.id]: paid },
+    crime: { ...s.crime, heat: 0.18, bulletin: [...s.crime.bulletin, { id: 'b-dev', day: Math.max(1, bought - 1), defId, itemId: piece.id, text }] },
+  }
+  const trail = { item: piece.id, def: defId, seller: 'Kirill Sobolev', bought, passport: 0, tape: 0, bulletin: 1, heat: 0 }
+  return addEvent(s, { day: bought + 1, kind: TRAIL, data: trail })
+}
+
+/** Dev-only (?scenario=volkova): Detective Volkova is first in line, asking about the watch. */
+function volkovaScenario(s0: GameState): GameState {
+  let s = holdHotWatch(reducer(s0, { type: 'career/begin', shopName: '' }), 2)
+  s = reducer(s, { type: 'day/open' })
+  const visit: QueuedVisit = { visitId: `vs${s.calendar.day.toString(36)}_volkova`, kind: 'scene', customer: volkovaCustomer(), patience: tuning.police.patience, line: '' }
+  const queue = [visit, ...s.queue.filter((v) => v.customer.id !== 'volkova')]
+  return { ...s, queue, crime: { ...s.crime, volkova: { ...s.crime.volkova, nextDay: s.calendar.day + 7 } }, day: { ...s.day, total: queue.length } }
+}
+
+/** Dev-only (?scenario=bulletin): today's paper prints a bulletin line, and a walk-in seller brings that very piece in first. */
+function bulletinScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  const day = s.calendar.day
+  const defId = 'gold_signet_583'
+  const piece = bulletinPiece(s, { id: 'b-dev', defId }, 'b-dev')
+  const name = ITEM_DEFS.find((d) => d.id === defId)?.name ?? defId
+  const text = BULLETIN.line
+    .replaceAll('{item}', name)
+    .replaceAll('{wear}', wearOf(piece.condition))
+    .replaceAll('{place}', BULLETIN.places[1]!)
+    .replaceAll('{when}', BULLETIN.when[1]!.replaceAll('{day}', 'Saturday'))
+  s = addEvent({ ...s, crime: { ...s.crime, bulletin: [{ id: 'b-dev', day, defId, text }] } }, { day, kind: BRING, data: { entry: 'b-dev' } })
+  s = reducer(s, { type: 'day/open' })
+  const brought = s.queue.find((v) => v.item && s.crime.bulletin.some((b) => b.itemId === v.item!.id))
+  return brought ? { ...s, queue: [brought, ...s.queue.filter((v) => v !== brought)] } : s
+}
+
+/** Dev-only (?scenario=raid): heat past the line and a raid ordered for this morning, with the hot watch in stock. */
+function raidScenario(s0: GameState): GameState {
+  const s = holdHotWatch(reducer(s0, { type: 'career/begin', shopName: '' }), 6)
+  const hot = addEvent({ ...s, crime: { ...s.crime, heat: 1 } }, { day: s.calendar.day, kind: RAID })
+  return reducer(hot, { type: 'day/open' })
 }
 
 /**
@@ -304,6 +369,9 @@ async function boot(): Promise<void> {
     const beatId = BEAT_SCENARIOS[params.get('scenario') ?? '']
     if (beatId) initial = beatScenario(initial, beatId)
     if (params.get('scenario') === 'fence') initial = fenceGoodsSecond(initial)
+    if (params.get('scenario') === 'volkova') initial = volkovaScenario(initial)
+    if (params.get('scenario') === 'bulletin') initial = bulletinScenario(initial)
+    if (params.get('scenario') === 'raid') initial = raidScenario(initial)
     const regular = params.get('regular')
     if (regular) {
       const trust = params.has('trust') ? Number(params.get('trust')) : NaN

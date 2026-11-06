@@ -65,7 +65,7 @@ Done when: screenshots look like a real shop and the phone still holds 30 fps.
 - Remaining 3 specialists (militaria, antiques, electronics) with their small arcs.
 - Story engine and 4 arcs: Grandmother's Medals, Dubai Rolex Guy, The Student's Laptop, Protection (first half).
 - Reputation by group. Shoplifting and security upgrades.
-- Title screen, career slots, settings (motion, text size), Longlight-branded menu.
+- Title screen, career slots, settings (motion, text size), Longlight-branded menu. ✅ Done: title screen at boot over the dimmed shop, Continue, 3 slots (play, new career → intro, delete with confirm), Load save code / backup file into a chosen slot (replace confirm), device settings from the title, Settings → Main menu in game, the backup reminder, a "More from Longlight" link. The pre-M4 autosave migrates into slot 1. `?seed=N` skips the title.
 - Add to Kelbo.Website hub.
 
 Done when: a 30-day playthrough has recurring characters the tester can name.

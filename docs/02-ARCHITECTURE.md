@@ -126,6 +126,8 @@ Pointer Events for everything (touch, mouse, pen share one code path). Inspect: 
 
 IndexedDB store `careers` keyed by careerId. Save = full `GameState` JSON plus `version`. Migrations live in `src/game/save/migrations.ts` as an ordered list; every schema-changing commit must add a migration. Autosave after each customer resolves and at day end.
 
+**Career slots (M4):** three per device. Each record also carries `slot` (1–3); the pure rules (which record gets which slot, slot card summaries, careerId clashes) are in `src/game/save/slots.ts`, the IndexedDB side in `src/persist/autosave.ts` (`listSlots`, `loadSlot`, `putInSlot`, `deleteSlot`; `saveCareer(state, slot)` keeps a record's slot). `listSlots` is also the migration: records from before slots get free slots newest first and the slot is written back. `main.ts` holds the active slot; autosave writes only while one is active (never on the title screen or for a `?seed` review career). The title screen is `src/ui/screens/title.ts`; `Ui` has a `title` / `game` mode.
+
 **Save code:** `src/game/save/code.ts`
 - Format: `LMB1.` prefix (format version) + base64url of the deflate-compressed JSON state (use `fflate`), plus a short checksum so a truncated paste fails cleanly instead of loading garbage.
 - Keep state lean so codes stay pasteable: store item instances by defId + minimal fields, never derived data; prune resolved story beats and old ledger days to summaries.

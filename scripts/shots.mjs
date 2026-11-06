@@ -1,4 +1,4 @@
-/* global window, document */
+/* global window, document, indexedDB */
 // Headless screenshots of the production build for self-review before pushing.
 // Usage: npm run shots   (builds first, then writes PNGs to shots/)
 //
@@ -8,6 +8,10 @@
 // → shop sheet (stock the counter case, tag prices) → day 2 → a walk-in buyer → sale result.
 // Landscape and desktop shoot counter, inspect, offer and ledger. Four portrait
 // head-look views (?look=) show the empty counter turned left (storeroom), right (wing case), round and up.
+// The game flows use ?seed=1, which skips the title screen. The title screen and career
+// slots (M4) are shot without ?seed in every view, each on a fresh empty database: portrait
+// walks slots, new career, load code into a slot, the backup reminder and delete; landscape and
+// desktop also check the pre-M4 slot migration. SHOTS_ONLY=title runs just those.
 // Portrait runs in one browser while landscape, desktop, the gallery and the perf
 // readout run in a second. Rendering is SwiftShader (software), so shots use DPR 1.
 // Fails on any page error or console error.
@@ -464,6 +468,118 @@ async function playEconomy(page, h) {
   }
 }
 
+/** Settings → Main menu, back to the title screen. */
+async function toTitle(page, h, gear) {
+  await h.click(gear)
+  await page.waitForTimeout(150)
+  await h.click('main-menu')
+  await h.screen('title')
+}
+
+/** A save code copied from Settings (clipboard, or the manual-copy box if the clipboard is blocked). */
+async function copyCode(page, h) {
+  await h.click('copy-code')
+  await page.waitForTimeout(300)
+  const fromClipboard = await page.evaluate(() => navigator.clipboard?.readText?.().catch(() => '') ?? '')
+  return fromClipboard || (await page.locator('[data-id="code-manual"]').inputValue())
+}
+
+/**
+ * Title screen and career slots, portrait (no ?seed: a fresh browser, so an
+ * empty database): empty slots → title settings → new career in slot 1 →
+ * play day 1 → copy its code → main menu → load the code into slot 2 (pick,
+ * replace confirm, cancel, empty slot) → reload with an old backup date for the
+ * GDD §11 reminder → delete confirm → Continue.
+ */
+async function playTitle(page, h) {
+  await h.screen('title')
+  await h.shot('title-empty', 'title screen at first launch: Longlight brand, three empty slots, Load save code, Settings, hub link, build number')
+  await h.click('title-settings')
+  await page.waitForTimeout(200)
+  await h.shot('title-settings', 'settings from the title: device settings only (sound, graphics, motion, text size)')
+  await h.click('settings-close')
+  await h.click('slot-new-1')
+  await h.begin()
+  await h.screen('welcome')
+  await h.open()
+  await h.screen('counter')
+  while (await h.visible('next-customer')) {
+    await h.click('next-customer')
+    await sendAway(h)
+  }
+  await h.click('close-up')
+  await h.screen('ledger')
+  if (await h.visible('backup-later')) await h.click('backup-later')
+  await h.click('settings-ledger')
+  await page.waitForTimeout(150)
+  await h.shot('settings-main-menu', 'in-game settings: save code, load (replaces this slot), Main menu')
+  const code = await copyCode(page, h)
+  await h.click('main-menu')
+  await h.screen('title')
+  await h.shot('title-one', 'title after day 1 in slot 1: Continue, slot card (shop, day, cash, last played), empty slots')
+  await h.click('title-load')
+  await page.locator('[data-id="title-code-input"]').fill(code)
+  await h.click('title-code-read')
+  await page.waitForTimeout(150)
+  await h.shot('title-load-pick', 'load save code from the title: what the code holds, pick a slot')
+  await h.click('title-code-slot-1')
+  await page.waitForTimeout(150)
+  await h.shot('title-load-replace', 'slot 1 is taken: replace confirm')
+  await h.click('title-code-cancel')
+  await h.click('title-code-slot-2')
+  await page.waitForFunction(() => ['welcome', 'ledger'].includes(document.body.dataset.screen ?? ''), null, { timeout: 15_000 })
+  await toTitle(page, h, (await h.visible('settings-ledger')) ? 'settings-ledger' : 'settings-welcome')
+  // GDD §11 reminder: pretend the last backup was 20 days ago, then reload (also proves the slots persist).
+  await page.evaluate(() => localStorage.setItem('lombard.lastBackup', String(Date.now() - 20 * 86_400_000)))
+  await page.reload({ waitUntil: 'networkidle', timeout: 90_000 })
+  await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
+  await h.screen('title')
+  if (!(await h.visible('title-reminder'))) throw new Error('title: backup reminder did not show')
+  await h.shot('title-reminder', 'after a reload: two careers, the backup reminder (last backup 20 days ago)')
+  await h.click('slot-delete-2')
+  await page.waitForTimeout(150)
+  await h.shot('title-delete', 'delete with an inline confirm on the slot card')
+  await h.click('slot-delete-confirm-2')
+  await page.waitForTimeout(300)
+  if (await h.visible('slot-play-2')) throw new Error('title: slot 2 was not deleted')
+  await h.click('title-continue')
+  await h.screen('ledger')
+}
+
+/**
+ * Title screen in landscape / desktop, plus the slot migration end to end: an
+ * M3-style record with no slot is written behind the game's back, the page is
+ * reloaded, and it must show up in slot 1 and play.
+ */
+async function playTitleShort(page, h) {
+  await h.screen('title')
+  await h.shot('title-empty', 'title screen, no careers yet')
+  await page.evaluate(async () => {
+    const s = window.__lombardState()
+    const state = { ...s, meta: { ...s.meta, careerId: 'legacy-m3', intro: false }, shop: { ...s.shop, name: 'Lombard No. 7' }, cash: 61_250 }
+    await new Promise((resolve, reject) => {
+      const open = indexedDB.open('lombard')
+      open.onerror = () => reject(open.error)
+      open.onsuccess = () => {
+        const tx = open.result.transaction('careers', 'readwrite')
+        tx.objectStore('careers').put({ careerId: 'legacy-m3', savedAt: Date.now() - 3 * 86_400_000, version: state.meta.version, state })
+        tx.oncomplete = () => {
+          open.result.close()
+          resolve()
+        }
+        tx.onerror = () => reject(tx.error)
+      }
+    })
+  })
+  await page.reload({ waitUntil: 'networkidle', timeout: 90_000 })
+  await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
+  await h.screen('title')
+  if (!(await h.visible('slot-play-1'))) throw new Error('title: the pre-slot save did not migrate into slot 1')
+  await h.shot('title-migrated', 'a pre-M4 autosave (no slot) migrated into slot 1; Continue')
+  await h.click('title-continue')
+  await h.screen('welcome')
+}
+
 async function main() {
   await rm(OUT, { recursive: true, force: true })
   await mkdir(OUT, { recursive: true })
@@ -489,7 +605,7 @@ async function main() {
     })
     // Pin the quality tier: Auto would step down on a slow headless GPU mid-run.
     const pinned = /[?&]tier=/.test(url) ? url : `${url}${url.includes('?') ? '&' : '?'}tier=mid`
-    await page.goto(`${base}${pinned}`, { waitUntil: 'networkidle' })
+    await page.goto(`${base}${pinned}`, { waitUntil: 'networkidle', timeout: 90_000 })
     await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
     await page.waitForTimeout(400)
     return { context, page }
@@ -591,15 +707,41 @@ async function main() {
       await browser.close()
     }
   }
+  // Title screen and career slots (M4): no ?seed, so the title shows; each view gets a fresh, empty database.
+  const titleShots = (view) => async (browser) => {
+    const { context, page } = await newPage(browser, view, '')
+    const h = helpers(page, `title-${view.name}`)
+    try {
+      if (view === PORTRAIT) await playTitle(page, h)
+      else await playTitleShort(page, h)
+    } catch (err) {
+      await page.screenshot({ path: `${OUT}/title-${view.name}-FAILED.png` }).catch(() => {})
+      errors.push(`[title-${view.name}] flow: ${err.message.split('\n')[0]}`)
+    }
+    await context.close()
+    console.log(`title ${view.name} done at ${secs()} s`)
+    return h.shots
+  }
+  // SHOTS_ONLY=title runs just the title flows (quick iteration on the menus).
+  const only = process.env.SHOTS_ONLY
   // Portrait is the long flow; the other views share a second browser.
   let listing
   try {
     const [portrait, rest] = await Promise.all([
-      run(playView(PORTRAIT)),
       run(async (browser) => {
         const out = []
-        for (const view of VIEWS) if (view !== PORTRAIT) out.push(...(await playView(view)(browser)))
-        out.push(...(await extras(browser)))
+        if (only !== 'title') out.push(...(await playView(PORTRAIT)(browser)))
+        out.push(...(await titleShots(PORTRAIT)(browser)))
+        return out
+      }),
+      run(async (browser) => {
+        const out = []
+        for (const view of VIEWS) {
+          if (view === PORTRAIT) continue
+          out.push(...(await titleShots(view)(browser)))
+          if (only !== 'title') out.push(...(await playView(view)(browser)))
+        }
+        if (only !== 'title') out.push(...(await extras(browser)))
         return out
       }),
     ])

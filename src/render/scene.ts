@@ -19,6 +19,8 @@ import type { OnBytes } from './loadProgress'
 import { INSPECT_POINT } from './camera'
 import { lookFor } from '../game/customers/look'
 import type { CustomerCast, CustomerModel } from './customerModel'
+import { StaffFigure, type StaffWhere } from './staff'
+import { APPRAISER } from '../data/appraiser'
 import { canalBackdropTexture, contactShadowTexture, parquetTexture, plasterTexture } from './textures'
 
 const ROOM = { halfW: 3, halfD: 4, height: 4.2 }
@@ -102,6 +104,11 @@ export class ShopScene {
   private backdropState = { clock: 0, reduceMotion: false }
   private clockOverride: number | null = null
   readonly matPoint = MAT_POINT.clone()
+  /** M6: the appraiser (src/render/staff.ts); his look stays cached while he's on staff. */
+  private staff = new StaffFigure()
+  private staffLook: string | null = null
+  private staffLoading = false
+  private levHere = false
 
   constructor() {
     this.scene.background = new THREE.Color('#0d0c0b')
@@ -114,6 +121,7 @@ export class ShopScene {
     this.buildFixtures()
     this.buildLights()
     this.customer = this.buildCustomer()
+    this.scene.add(this.staff.group)
   }
 
   /** Load the HDRI and set it as the scene environment (reflections + ambient). */
@@ -187,22 +195,58 @@ export class ShopScene {
     this.backdrop?.setState(clock, state.settings.reduceMotion)
     // Dim the customer while inspecting so they don't fight the item.
     // A phone call (M4 specialists) leaves the counter empty.
-    const here = state.current && !state.current.via ? state.current : null
+    // M6: the appraiser talking to you walks up himself (the staff figure); the customer slot stays empty.
+    const levHere = !!state.current && !state.current.via && state.current.customer.id === APPRAISER.id
+    const here = state.current && !state.current.via && !levHere ? state.current : null
     this.customerTarget = !here ? 0 : here.phase === 'inspect' ? INSPECT_CUSTOMER_OPACITY : 1
     const look = here ? this.lookOf(here.customer) : null
     if (look !== this.wantLook) {
       this.wantLook = look
       if (look) this.requestLook(look)
     }
-    const next = state.queue.find((v) => !v.via)
+    this.levHere = levHere
+    this.syncStaff(state, levHere)
+    const next = state.queue.find((v) => !v.via && v.customer.id !== APPRAISER.id)
     this.nextLook = next ? this.lookOf(next.customer) : null
     // Fetch the next person while this one talks.
     if (this.cast && this.nextLook) this.cast.get(this.nextLook).catch(() => {})
-    this.cast?.retain([this.shownLook, this.wantLook, this.nextLook])
+    this.retainLooks()
+  }
+
+  private retainLooks(): void {
+    this.cast?.retain([this.shownLook, this.wantLook, this.nextLook, this.staffLook])
+  }
+
+  /** M6: where the appraiser should be, and his model loaded while he's on staff. */
+  private syncStaff(state: GameState, levHere: boolean): void {
+    const st = state.staff
+    const where: StaffWhere = levHere ? 'counter' : !st.hired ? 'hidden' : state.day.phase !== 'open' ? 'closed' : st.busy ? 'serving' : 'idle'
+    this.staffLook = where === 'hidden' ? null : APPRAISER.look
+    if (this.staffLook && this.cast && !this.staff.hasModel && !this.staffLoading) {
+      this.staffLoading = true
+      this.cast.get(this.staffLook).then(
+        (m) => {
+          this.staffLoading = false
+          if (this.staffLook) this.staff.setModel(m)
+        },
+        () => {
+          this.staffLoading = false
+        },
+      )
+    }
+    if (!this.staffLook && this.staff.hasModel) this.staff.dispose()
+    this.staff.setWhere(where)
+  }
+
+  /** M6: the appraiser's state, for the dev overlay and screenshots ('hidden' when not on staff). */
+  get staffState(): StaffWhere | 'walking' {
+    return this.staff.walking ? 'walking' : this.staff.state
   }
 
   /** 'in' once the current customer stands at the counter, faded in (the UI and screenshots wait for it); 'away' with nobody there. */
   get customerState(): 'away' | 'arriving' | 'in' {
+    // M6: the appraiser at the counter is the staff figure: in once he's at the spot (at once without his model).
+    if (this.levHere) return !this.staff.hasModel || this.staff.arrived ? 'in' : 'arriving'
     if (this.wantLook === null || this.customerTarget === 0) return 'away'
     const ready = this.shownLook === this.wantLook && this.walkPhase === 'here' && Math.abs(this.customerFade - this.customerTarget) < 0.01
     return ready ? 'in' : 'arriving'
@@ -259,7 +303,7 @@ export class ShopScene {
     this.customerOpaque = false
     this.shownLook = p.look
     this.pending = null
-    this.cast?.retain([this.shownLook, this.wantLook, this.nextLook])
+    this.retainLooks()
   }
 
   /**
@@ -283,6 +327,7 @@ export class ShopScene {
 
   update(dt: number): void {
     this.backdrop?.update(dt)
+    this.staff.update(dt)
     this.updateWalk(dt)
     // Fully faded in, draw opaque (a transparent skinned body sorts badly against itself).
     const opaque = this.customerFade > 0.99

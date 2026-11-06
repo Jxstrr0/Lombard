@@ -110,6 +110,19 @@ const BaseCondition = z.discriminatedUnion('if', [
   z.object({ if: z.literal('visits'), who: id, ...cmp.shape }),
   /** Does this regular have a pawn loan open with you? */
   z.object({ if: z.literal('loan'), who: id, not: z.boolean().optional() }),
+  /**
+   * The loan made at a beat that ended in a pawn: still open, redeemed, or
+   * forfeited to the shop. `daysAgo` counts from the day it ended (an open
+   * pledge never meets it). With `not`, the whole test is reversed, so a beat
+   * that wasn't pawned at all meets `{ is: ['open', 'forfeited'], not: true }`.
+   */
+  z.object({
+    if: z.literal('pledge'),
+    beat: beatId,
+    is: z.array(z.enum(['open', 'redeemed', 'forfeited'])).min(1),
+    daysAgo: cmp.optional(),
+    not: z.boolean().optional(),
+  }),
   /** A specialist on retainer (and their relationship 0–1). */
   z.object({ if: z.literal('specialist'), id, retained: z.boolean().default(true), relationship: cmp.optional() }),
   z.object({ if: z.literal('cash'), ...cmp.shape }),
@@ -133,6 +146,20 @@ const AnyCondition = z.object({ if: z.literal('any'), of: z.array(BaseCondition)
 export const Condition = z.union([BaseCondition, AnyCondition])
 export type Condition = z.infer<typeof Condition>
 
+/**
+ * When a story pawner comes back for their pledge, instead of the usual
+ * hidden roll: with `chance` they come back `days` [min, max] after the loan
+ * starts (seeded), otherwise never (the item is forfeited). `line` is what they
+ * say walking in to redeem, `thanks` what they say once it's handed back.
+ */
+export const RedeemPlan = z.object({
+  days: z.tuple([int.min(1), int.min(1)]).refine(([a, b]) => a <= b, 'min ≤ max'),
+  chance: unit.default(1),
+  line: z.string().min(1).optional(),
+  thanks: z.string().min(1).optional(),
+})
+export type RedeemPlan = z.infer<typeof RedeemPlan>
+
 const changeName = z.string().refine((k) => k in tuning.specialistArcs.changes, 'a tuning.specialistArcs.changes key')
 const boostName = z.string().refine((k) => k in tuning.specialistArcs.boosts, 'a tuning.specialistArcs.boosts key')
 const offerName = z.string().refine((k) => k in tuning.specialistArcs.offers, 'a tuning.specialistArcs.offers key')
@@ -148,6 +175,13 @@ export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('heat'), delta: z.number() }),
   /** No more beats from this arc. */
   z.object({ do: z.literal('endArc') }),
+  /**
+   * Renew this regular's open loan (pay interest only): they pay the interest
+   * owed today (unless `charge` is false: you waive it), and the loan starts
+   * a fresh term today on the same principal. `redeem` replans their return;
+   * left out, it stays as it was.
+   */
+  z.object({ do: z.literal('renew'), who: id, charge: z.boolean().default(true), redeem: RedeemPlan.optional() }),
   // --- M4 specialists' small arcs (GDD § 2b) -----------------------------------------
   /** A named change to a specialist (tuning.specialistArcs.changes); `text` is the ledger line if it moves cash. */
   z.object({ do: z.literal('specialist'), id, change: changeName, text: z.string().optional() }),
@@ -181,6 +215,12 @@ export const ScriptItem = z.object({
   provenance: ProvenanceSchema.default('clean'),
   condition: range.optional(),
   story: z.string().min(1),
+  /**
+   * The same thing every visit: beats sharing this key draw the item from one
+   * stream seeded by the career, so it comes back with the same weight, value
+   * and (for a fake) profile. A condition range a step lower shows the wear.
+   */
+  same: id.optional(),
 })
 export type ScriptItem = z.infer<typeof ScriptItem>
 
@@ -199,6 +239,8 @@ export const VisitScript = z
     /** Their line when the item is on the mat (after the scene). Default: the item's story. */
     line: z.string().optional(),
     after: z.record(z.string(), Aftermath).default({}),
+    /** A pawn beat: when (and whether) they come back to redeem; default: the usual hidden roll. */
+    redeem: RedeemPlan.optional(),
     /** Walks in first today (before the line outside). */
     first: z.boolean().default(false),
     /**
@@ -223,6 +265,7 @@ export const VisitScript = z
   .refine((v) => v.via !== 'paper' || (v.kind === 'scene' && (v.scene?.choices.length ?? 0) === 0), 'a paper beat is a scene without choices')
   .refine((v) => v.via === 'counter' || v.kind === 'scene', 'only counter visits bring an item')
   .refine((v) => v.kind === 'seller' || v.scene !== undefined, 'a scene beat needs a scene')
+  .refine((v) => !v.redeem || (v.kind === 'seller' && v.wants === 'pawn'), 'a redeem plan needs a pawn beat')
 export type VisitScript = z.infer<typeof VisitScript>
 
 export const Beat = z.object({

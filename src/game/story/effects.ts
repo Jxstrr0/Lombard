@@ -2,6 +2,7 @@
 import { adjustRep } from '../reputation'
 import type { Effect } from '../schema/story'
 import type { GameState } from '../state'
+import { renewPledge } from './pledges'
 import { adjustTrust, endArc } from './progress'
 import { applyChange, sellToSpecialist, startBoost, walkoutOne } from './specialists'
 
@@ -37,6 +38,9 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
       return walkoutOne(state)
     case 'sellTo':
       return sellToSpecialist(state, e.id, e.offer)
+    // --- M4 story pledges (The Student's Laptop) ---
+    case 'renew':
+      return renewPledge(state, e.who, e.charge, e.redeem)
   }
 }
 

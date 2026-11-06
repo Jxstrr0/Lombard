@@ -10,6 +10,7 @@
  *   forfeitOverdue(state) → state   loans past dueDay + grace: item moves to inventory (paid = principal), 'forfeit' ledger entry
  *
  * Helpers for the walk-in generator and the UI: pawnChance, redeemChance, loanTerms, daysLeft.
+ * Story beats (M4): renewLoan (pay interest only, fresh term).
  */
 import { getItemDef } from '../../data/items'
 import { loanLines } from '../../data/loanLines'
@@ -84,6 +85,16 @@ function owed(principal: number, monthlyRate: number, daysHeld: number): number 
   const interest = (principal * monthlyRate * days) / 30
   // The epsilon keeps float noise (960.0000000001) from rounding up a whole step.
   return Math.ceil((principal + interest) / T.roundTo - 1e-9) * T.roundTo
+}
+
+/**
+ * Renew a loan (pay interest only; M4, story beats): the interest owed today
+ * is paid off and a fresh term starts today on the same principal. The hidden
+ * redeemDay is the caller's to replan.
+ */
+export function renewLoan(loan: Loan, day: number): { loan: Loan; interest: number } {
+  const interest = amountDue(loan, day) - loan.principal
+  return { loan: { ...loan, startDay: day, dueDay: day + T.termDays }, interest }
 }
 
 /** Days until the due day (negative: in the grace period). */

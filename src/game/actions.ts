@@ -23,6 +23,7 @@ import { generateDayQueue } from './customers/walkins'
 import { planStory } from './story/plan'
 import { afterVisit, playPaperBeats, sceneChoose, sceneFor, sceneNext } from './story/visit'
 import { boostSellers, noteBought, noteCall, pruneBoosts, referralBuyers } from './story/specialists'
+import { noteForfeits, pledgeRedeemLines } from './story/pledges'
 import { updateMarket } from './economy/demand'
 import { chargeExpenses } from './economy/expenses'
 import { releaseSpecialist, retainSpecialist } from './economy/specialists'
@@ -285,7 +286,9 @@ function openDay(state: GameState): GameState {
   return withRng(state, (s0, rng) => {
     // Start today's log first so forfeits land in it.
     let s: GameState = { ...s0, day: { phase: 'open', clock: 0, served: 0, total: 0, openingCash: s0.cash, log: [], newsRead: true } }
-    s = pruneBoosts(forfeitOverdue(s))
+    const pledged = s.loans
+    // Story beats hear about their pledges forfeited this morning.
+    s = pruneBoosts(noteForfeits(forfeitOverdue(s), pledged))
     s = { ...s, market: updateMarket(s, rng) }
     const ids = idAllocator(s)
     // Regulars and story beats first: their sellers take walk-in places.
@@ -293,7 +296,7 @@ function openDay(state: GameState): GameState {
     // M4 specialist warnings: while one runs, some walk-in sellers bring that piece (own streams; no boost, no change).
     const sellers = boostSellers(s, generateDayQueue(rng, tuning.day.customersPerDay - story.sellerPlaces, ids.next))
     const buyers = planBuyers(s, rng, ids.next)
-    const redeemers = planRedemptions(s, ids.next)
+    const redeemers = pledgeRedeemLines(s, planRedemptions(s, ids.next))
     // M4: the buyer a specialist sends once a month (Faina), and beats that land in the morning paper.
     const referred = referralBuyers(s, ids.next)
     s = playPaperBeats(referred.state, story.paper)

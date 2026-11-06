@@ -1,7 +1,7 @@
 {
   "name": "lombard",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "description": "A pawn shop sim on the canals of Mostograd. A Longlight Interactive game.",
   "scripts": {

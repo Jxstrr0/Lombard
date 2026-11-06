@@ -57,7 +57,7 @@ import { hashString } from '../rng'
 import type { Verdict } from '../schema/economy'
 import type { Rng } from '../rng'
 import type { FakeProfile, ItemDef, Polarity, Tell, ToolId } from '../schema/item'
-import type { Finding, ItemInstance } from '../types'
+import type { Finding, ItemInstance, SpecialistMods } from '../types'
 
 export interface UseToolInput {
   item: ItemInstance
@@ -77,8 +77,15 @@ export interface UseToolInput {
 export interface ToolExtras {
   /** Reference book tier owned (0 = none). */
   refTier: number
-  /** Retained specialist covering this item's category, if any. */
-  specialist?: { id: string; relationship: number }
+  /** Retained specialist covering this item's category, if any (mods: what their M4 arc changed). */
+  specialist?: CalledSpecialist
+}
+
+/** Who you rang: id, relationship and (M4) their arc's mods. */
+export interface CalledSpecialist {
+  id: string
+  relationship: number
+  mods?: SpecialistMods
 }
 
 export interface UseToolResult {
@@ -175,13 +182,13 @@ export function useTool(input: UseToolInput): UseToolResult {
   if (findings.length === 0) {
     add({ text: NOTHING_NEW[tool] ?? 'Nothing new.', polarity: 'neutral', ...(hotspot ? { hotspot } : {}) })
   }
-  const seconds = tool === 'specialist' && input.extras?.specialist ? specialistCallSeconds(input.extras.specialist.id) : tuning.inspect.toolSeconds[tool]
+  const seconds = tool === 'specialist' && input.extras?.specialist ? specialistCallSeconds(input.extras.specialist.id, input.extras.specialist.mods) : tuning.inspect.toolSeconds[tool]
   return { findings, seconds }
 }
 
-/** How long a call to this specialist takes: their own callSeconds, else the tool default. */
-export function specialistCallSeconds(id: string): number {
-  return tuning.specialists.roster[id]?.callSeconds ?? tuning.inspect.toolSeconds.specialist
+/** How long a call to this specialist takes: their arc's (M4), else their own callSeconds, else the tool default. */
+export function specialistCallSeconds(id: string, mods?: SpecialistMods): number {
+  return mods?.callSeconds ?? tuning.specialists.roster[id]?.callSeconds ?? tuning.inspect.toolSeconds.specialist
 }
 
 // --- text ---------------------------------------------------------------------
@@ -408,10 +415,11 @@ export interface SpecialistOpinion {
  *   value: what they believe it is (sound-but-not → genuine value; doubted-but-sound →
  *     value × doubtValueFactor), ± (1 − accuracy) × valueNoise, quoted ± rangeHalfWidth.
  */
-export function specialistOpinion(def: ItemDef, item: ItemInstance, sp: { id: string; relationship: number }, rng: Rng): SpecialistOpinion {
+export function specialistOpinion(def: ItemDef, item: ItemInstance, sp: CalledSpecialist, rng: Rng): SpecialistOpinion {
   const t = tuning.specialists
   const roster = t.roster[sp.id] ?? { accuracy: 0.5, honesty: 1 }
-  const accuracy = Math.min(t.maxAccuracy, roster.accuracy + sp.relationship * t.relationshipAccuracy)
+  // M4 arcs: mods.accuracy (Ilya's eyes, Zhenya slowing down) and mods.lowball (Faina, once you noticed).
+  const accuracy = Math.min(t.maxAccuracy, roster.accuracy + (sp.mods?.accuracy ?? 0) + sp.relationship * t.relationshipAccuracy)
   const truth = truthOf(item)
   let verdict: Verdict = truth
   if (rng.chance((1 - accuracy) * t.wrongVerdictFactor)) {
@@ -420,7 +428,7 @@ export function specialistOpinion(def: ItemDef, item: ItemInstance, sp: { id: st
   let value = item.trueValue
   if (verdict === 'sound' && truth !== 'sound') value = claimedValue(def, item)
   else if (verdict !== 'sound' && truth === 'sound') value = item.trueValue * t.doubtValueFactor
-  if (truth === 'sound' && verdict === 'sound' && item.trueValue >= t.lowballMinValue && rng.chance((1 - roster.honesty) * t.lowballChance)) {
+  if (truth === 'sound' && verdict === 'sound' && item.trueValue >= t.lowballMinValue && rng.chance((1 - roster.honesty) * t.lowballChance * (sp.mods?.lowball ?? 1))) {
     verdict = 'lowball'
     value *= rng.range(t.lowballFactor[0], t.lowballFactor[1])
   }
@@ -431,11 +439,11 @@ export function specialistOpinion(def: ItemDef, item: ItemInstance, sp: { id: st
   return { verdict, lo, hi, accuracy }
 }
 
-function specialistFinding(def: ItemDef, item: ItemInstance, sp: { id: string; relationship: number }, rng: Rng): Omit<Finding, 'id' | 'tool'> {
+function specialistFinding(def: ItemDef, item: ItemInstance, sp: CalledSpecialist, rng: Rng): Omit<Finding, 'id' | 'tool'> {
   const op = specialistOpinion(def, item, sp, rng)
   const spec = getSpecialist(sp.id)
   const line = spec ? rng.pick(spec.lines[op.verdict]) : 'The specialist gives a range: {lo}–{hi}.'
   const text = fill(line, { lo: rub(op.lo), hi: rub(op.hi), item: def.name })
   const polarity: Polarity = op.verdict === 'sound' ? 'positive' : 'negative'
-  return { tellId: SPECIALIST_TELL, text, reveals: 'authenticity', polarity }
+  return { tellId: SPECIALIST_TELL, text, reveals: 'authenticity', polarity, verdict: op.verdict }
 }

@@ -345,7 +345,7 @@ describe('specialist call', () => {
     expect(call(s1, getItemDef('watch_pobeda_gold')).usable).toBe(false)
     expect(call(s1, getItemDef('phone_mangosteen_m5'))).toMatchObject({ usable: false, note: 'no retainer' })
     expect(call(s1, { ...chain, category: 'tools' })).toMatchObject({ usable: false, note: 'nobody' })
-    expect(toolExtras(s1, chain).specialist).toEqual({ id: 'jeweler', relationship: tuning.specialists.relationshipStart })
+    expect(toolExtras(s1, chain).specialist).toEqual({ id: 'jeweler', relationship: tuning.specialists.relationshipStart, mods: {} })
   })
 
   it('uses the allowance, then the per-call fee, then refuses when cash is short', () => {

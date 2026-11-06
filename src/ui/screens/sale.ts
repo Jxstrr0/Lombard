@@ -113,7 +113,8 @@ export class SaleScreen {
       this.countering = false
     }
     setText(this.name, c.customer.name)
-    setText(this.tag, archetypeLabel(c.customer.archetype))
+    // M4: a specialist's offer on the phone (Gennady's first refusal) says so.
+    setText(this.tag, c.via === 'phone' ? `${archetypeLabel(c.customer.archetype)} · on the phone` : archetypeLabel(c.customer.archetype))
     setText(this.item, itemNameOf(c.item.defId))
     setText(this.tagValue, rub(c.sale.tag))
     setText(this.line, `“${c.line}”`)

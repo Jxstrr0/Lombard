@@ -2,6 +2,48 @@
  * All gameplay numbers live here. Never inline them in src/game.
  * One section per system; each system's owner edits only its own section.
  */
+
+/** M4 specialist arcs: a named change to a specialist (tuning.specialistArcs.changes). See the field notes there. */
+export interface SpecialistChange {
+  relationship?: number
+  accuracy?: number
+  resetAccuracy?: boolean
+  lowball?: number
+  driftPerMonth?: number
+  callSeconds?: number | 'standard'
+  callSecondsScale?: number
+  freeMonths?: number
+  freeCalls?: number
+  firstRefusal?: boolean
+  referral?: readonly string[]
+  sellBoost?: { categories: readonly string[]; factor: number }
+  rentIn?: number
+  release?: 'gentle'
+  retire?: boolean
+  cash?: number
+}
+
+/** M4 specialist arcs: some walk-ins bring a particular item for a while (tuning.specialistArcs.boosts). */
+export interface SpecialistBoost {
+  days: number
+  chance: number
+  defs: readonly string[]
+  authenticity: 'genuine' | 'fake' | 'frankenstein' | 'restored'
+  fakeProfileId?: string
+  provenance: 'clean' | 'unknown' | 'stolen' | 'heirloom'
+  /** Key into src/data/stories/specialistLines.ts BOOST_STORIES (their claim); default: the def's claims. */
+  story?: string
+}
+
+/** M4 specialist arcs: a specialist buying from your stock (tuning.specialistArcs.offers). */
+export interface SpecialistOffer {
+  categories: readonly string[]
+  pick: 'dead' | 'best'
+  share: number
+  min: number
+  deadCondition?: number
+}
+
 export const tuning = {
   career: {
     startingCash: 80_000,
@@ -455,6 +497,84 @@ export const tuning = {
     lowballMinValue: 15_000,
     lowballChance: 0.6,
     lowballFactor: [0.5, 0.7] as [number, number],
+  },
+
+  /**
+   * M4 specialists' small arcs (GDD § 2b; the arcs are src/data/stories/<first name>.ts).
+   * Beats name these presets; no arc file carries a specialist number of its own.
+   */
+  specialistArcs: {
+    /** "Retained N months" = retainers paid in full since sinceDay, and at least N × monthDays days on retainer. */
+    monthDays: 30,
+    /** A sound call on a "piece worth ≥ 15k" (Gennady's first beat): genuine, called sound, worth at least this. */
+    bigValue: 15_000,
+    /** Accuracy drift (Ilya's eyes) never takes anyone below this. */
+    minAccuracy: 0.5,
+    /** Gennady's first-refusal call that evening: he offers true value × this (his mid-range price, take it or leave it). */
+    firstRefusalShare: 0.85,
+    /**
+     * Named changes a beat applies with { do: 'specialist', id, change }. Fields:
+     * relationship (added, 0–1), accuracy (added for good), resetAccuracy (back to the roster's, drift stops),
+     * lowball (× their lowball chance), driftPerMonth (accuracy added at each month end on retainer),
+     * callSeconds ('standard' = inspect.toolSeconds.specialist) or callSecondsScale, freeMonths (next retainers free),
+     * freeCalls (extra calls each month), firstRefusal, referral (one buyer a month for these categories),
+     * sellBoost (buyer chance × factor for these categories while retained), rentIn (₽ a month to you while retained),
+     * release 'gentle' (no relationship loss), retire (released for good), cash (one-off, ledger text from the beat).
+     */
+    changes: {
+      /** Faina 2: you rang and said you noticed; she cools, and stops shading your prices so much. */
+      'faina.noticed': { relationship: -0.2, lowball: 0.5 },
+      /** Faina 2: you said nothing; she sends you a gold buyer once a month. */
+      'faina.quiet': { referral: ['gold'] },
+      /** Faina 4: her customer book. */
+      'faina.book': { cash: -20_000, sellBoost: { categories: ['gold'], factor: 1.3 } },
+      'faina.retire': { retire: true },
+      /** Ilya 2: you keep him on; his eyes slip each month until the operation. */
+      'ilya.keep': { relationship: 0.2, driftPerMonth: -0.02 },
+      'ilya.let_go': { release: 'gentle' },
+      'ilya.busy': { relationship: -0.1 },
+      /** Ilya 4: you advance him the money for the operation (the slipping stops). */
+      'ilya.advance': { cash: -25_000, driftPerMonth: 0 },
+      /** Ilya, weeks after the operation: eyes as they were, and a call a month on the house. */
+      'ilya.restored': { resetAccuracy: true, freeCalls: 1 },
+      /** Ilya 4, refused: he works on, worse each month. */
+      'ilya.worse': { driftPerMonth: -0.03 },
+      'ilya.retire': { retire: true },
+      'gennady.grant': { firstRefusal: true },
+      'gennady.refuse': { relationship: -0.1 },
+      'gennady.family': { relationship: 0.2 },
+      'gennady.market': { firstRefusal: false },
+      'stanislav.turned_away': { relationship: -0.15 },
+      'zhenya.free_month': { freeMonths: 1 },
+      /** Zhenya 2: slower, as long as anyone's call, and right more often for good. */
+      'zhenya.slow_down': { callSeconds: 'standard', accuracy: 0.08 },
+      /** Zhenya 4, yes: a repair desk in your corner. */
+      'zhenya.desk': { rentIn: 4_000, sellBoost: { categories: ['phones', 'electronics'], factor: 1.25 }, callSeconds: 15 },
+      /** Zhenya 4, no: she moves across the river. */
+      'zhenya.across_river': { callSecondsScale: 1.5 },
+    } as Readonly<Record<string, SpecialistChange>>,
+    /**
+     * "Turn up more for two weeks" ({ do: 'boost', boost }): for `days` from the beat, each walk-in
+     * who came to sell (not pawn) brings one of `defs` instead, with this chance (seeded, own stream).
+     */
+    boosts: {
+      /** Faina 3: a real 585 clasp soldered onto a plated rope; the clasp is a different colour. */
+      plated_chains: { days: 14, chance: 0.1, defs: ['gold_rope_chain_585'], authenticity: 'frankenstein', fakeProfileId: 'clasp_swap', provenance: 'unknown' },
+      /** Gennady 3: cast Orders of the Red Star with pressed numbers. */
+      cast_orders: { days: 14, chance: 0.08, defs: ['order_red_star'], authenticity: 'fake', fakeProfileId: 'cast_copy', provenance: 'unknown' },
+      /** Zhenya 3: good phones off the back of a lorry (stolen; Heat reads provenance in M5). */
+      lorry_phones: { days: 14, chance: 0.1, defs: ['phone_mangosteen_m5', 'phone_galaxia_nota3', 'phone_galaxia_stella4'], authenticity: 'genuine', provenance: 'stolen', story: 'lorry_phones' },
+    } as Readonly<Record<string, SpecialistBoost>>,
+    /**
+     * A specialist buys from your stock ({ do: 'sellTo', id, offer }): which items and at what share of true value.
+     * dead = not genuine or condition ≤ deadCondition; best = the most valuable genuine one.
+     */
+    offers: {
+      /** Zhenya 1: your dead phones, for parts, at a fair parts price. */
+      'zhenya.parts': { categories: ['phones'], pick: 'dead', share: 0.9, min: 300, deadCondition: 40 },
+      /** Gennady 4: the medal he wants back for a family, below market. */
+      'gennady.family': { categories: ['militaria'], pick: 'best', share: 0.6, min: 500 },
+    } as Readonly<Record<string, SpecialistOffer>>,
   },
 
   /** M2 seasonal demand, market drift, news, career-start stock (owner: content worker). */

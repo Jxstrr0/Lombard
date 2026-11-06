@@ -145,6 +145,8 @@ const BaseCondition = z.discriminatedUnion('if', [
   /** crime.fence: met (or not), deals and refusals on record, and fenceTrust (−1…1). */
   z.object({ if: z.literal('fence'), met: z.boolean().optional(), deals: cmp.optional(), refusals: cmp.optional(), trust: cmp.optional() }),
   // --- M5 police (src/game/crime/), for the Volkova arc and anything else that reads the police ---
+  /** M5 the Collector: you hold this very kind of piece in stock (or, with `not`, don't). */
+  z.object({ if: z.literal('holds'), defId: z.string(), not: z.boolean().optional() }),
   /** Police heat (0 = the police don't know you exist; unbounded). */
   z.object({ if: z.literal('heat'), ...cmp.shape }),
   /** Detective Volkova: met yet, her trust in you (−1…1), and how many lies, caught lies and bribes. */
@@ -224,6 +226,9 @@ export const Effect = z.discriminatedUnion('do', [
   // --- M5 Volkova's arc -----------------------------------------------------------------
   /** Detective Volkova's trust in you moves by `trust` (clamped to tuning.police.volkova trustMin…trustMax). */
   z.object({ do: z.literal('volkova'), trust: z.number() }),
+  // --- M5 the Collector (src/game/crime/collector.ts) ----------------------------------
+  /** The Collector's icon leaves the shop: sold to him (his price), back to its church, or to the police. */
+  z.object({ do: z.literal('collector'), change: z.enum(['sold', 'returned', 'handedIn']) }),
 ])
 export type Effect = z.infer<typeof Effect>
 

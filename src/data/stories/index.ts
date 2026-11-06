@@ -4,6 +4,7 @@
  * src/game/story for how beats are picked and played.
  */
 import { Arc, type Beat } from '../../game/schema/story'
+import collector from './collector'
 import fence from './fence'
 import laptop from './laptop'
 import medals from './medals'
@@ -19,7 +20,7 @@ import zhenya from './zhenya'
 
 const SPECIALIST_ARCS = [faina, ilya, gennady, stanislav, zhenya]
 
-export const ARCS: readonly Arc[] = [medals, rolex, laptop, ...SPECIALIST_ARCS, protection, fence, volkova].map((raw) => Arc.parse(raw))
+export const ARCS: readonly Arc[] = [medals, rolex, laptop, ...SPECIALIST_ARCS, protection, fence, collector, volkova].map((raw) => Arc.parse(raw))
 
 const beats = new Map<string, Beat>(ARCS.flatMap((a) => a.beats.map((b) => [b.id, b] as const)))
 

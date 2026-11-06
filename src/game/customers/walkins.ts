@@ -1,6 +1,6 @@
 /** Walk-in generation: archetype + name + temperament + item. */
 import { archetypes, firstNames } from '../../data/customers/walkins'
-import { ITEM_DEFS } from '../../data/items'
+import { SPAWN_DEFS } from '../../data/items'
 import { tuning } from '../../data/tuning'
 import { generateItem, pickItemDef } from '../items/generate'
 import { pawnChance, pawnOpeningLine } from '../loans/loans'
@@ -36,7 +36,7 @@ export function generateDayQueue(rng: Rng, count: number, nextId: (prefix: strin
   const [pMin, pMax] = tuning.day.queuePatience
   for (let i = 0; i < count; i++) {
     const customer = generateWalkIn(rng, nextId('c'), queue[queue.length - 1]?.customer.portraitKey)
-    const def = pickItemDef(ITEM_DEFS, rng)
+    const def = pickItemDef(SPAWN_DEFS, rng)
     const item = generateItem(def, rng, nextId('i'))
     // People further back in the line have waited less when you reach them; give them more patience.
     const patience = Math.round(rng.range(pMin, pMax) + i * 25)

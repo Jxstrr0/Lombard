@@ -82,4 +82,9 @@ for (const [policy, options, label] of lines) {
       `  father sold ${has('volkova.father_sold')}  honest ${branch(['volkova.source', 'volkova.rang'])}  bought ${branch(['dirty.volkova_loan', 'volkova.reported', 'dirty.volkova_audit'])}` +
       `  lied ${branch(['heart.volkova_truth', 'volkova.grudge'])}  informed ${has('volkova.informed')} leaked ${has('volkova.leaked')} crackdown ${has('volkova.crackdown')}`,
   )
+  // M5 the Collector: how many shops he asked, bought his icon, and what became of her.
+  console.log(
+    `          collector: asked ${has('collector.asked')}  bought ${has('collector.bought')}  passed ${has('collector.passed')}` +
+      `  sold ${has('collector.sold')}  returned ${has('collector.returned')}  police ${has('collector.handed_in')}  missed ${has('collector.missed')}`,
+  )
 }

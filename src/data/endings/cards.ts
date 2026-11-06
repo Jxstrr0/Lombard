@@ -13,9 +13,14 @@
  * fallback needs nothing but her courtesy call. Venya Mostovoy (the
  * fence, src/data/fence.ts) reads crime.fence (deals vs refusals), fenceTrust and the
  * standing arrangement (dirty.fence_standing).
+ *
+ * Leopold Germanovich Bessmertny (the Collector, src/data/collector.ts) shows once he has
+ * asked after his icon (collector.asked) and reads how it left the shop: collector.sold,
+ * .returned, .handed_in, .missed, or .passed (you never bought her).
  */
 import type { z } from 'zod'
 import type { EpilogueCard } from '../../game/schema/endings'
+import { COLLECTOR } from '../collector'
 import { FENCE } from '../fence'
 import { tuning } from '../tuning'
 
@@ -350,6 +355,38 @@ export const CARDS: Raw[] = [
     ],
   },
   // --- the police and the trade ----------------------------------------------------
+  {
+    id: 'collector',
+    name: COLLECTOR.name,
+    role: COLLECTOR.role,
+    show: [{ if: 'flag', flag: 'collector.asked' }],
+    variants: [
+      {
+        when: [{ if: 'flag', flag: 'collector.sold' }],
+        text: 'The Bessmertny Foundation for Domestic Beauty is open to the public on the first Sunday of the month, by appointment. Our Lady of the Embankment hangs in a room of her own at exactly fifty per cent humidity. Leopold Germanovich visits her every evening. Father Ioann visits on the first Sunday, by appointment, and stands there until they close.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'collector.returned' }],
+        text: 'Leopold Germanovich goes to the evening service at the Intercession church on Kozhevennaya Street, at the back, in a good suit. He paid for the new dome in the end, anonymously, which in his case means everybody knows. He still sends you a card every Easter. It still smells of lilies.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'collector.handed_in' }],
+        text: 'Leopold Germanovich wrote eleven letters to the newspapers about the icon you gave to the police. None was printed. He had them bound in green leather and gave a copy to Detective Volkova, who has, against all expectation, read it.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'collector.missed' }],
+        text: 'Leopold Germanovich is still looking for her. Twelve years, then thirteen. He says it is a nicer number every year. Kostya’s back is worse.',
+      },
+      {
+        when: [{ if: 'flag', flag: 'collector.passed' }],
+        text: 'Leopold Germanovich found her across the river in the end, as he always finds things. He never told you how much he paid. He sent you a photograph of her in her new room, with a note: “You could have been part of this.” It was meant kindly. Mostly.',
+      },
+      {
+        when: [],
+        text: 'Leopold Germanovich is still looking for a lady with a little boat at her feet. His card is still in your drawer. It still smells of lilies.',
+      },
+    ],
+  },
   {
     id: 'volkova',
     name: 'Detective Volkova',

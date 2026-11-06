@@ -479,7 +479,7 @@ export default {
       chance: 0.4,
       visit: {
         who: 'volkova',
-        as: { name: 'Major Kuznetsov', archetype: 'office', look: 'business_male_02', temperament: 'stubborn', knowledge: 0.9, desperation: 0 },
+        as: { name: 'Major Kuznetsov', archetype: 'office', look: 'male_adult_08', temperament: 'stubborn', knowledge: 0.9, desperation: 0 },
         kind: 'scene',
         scene: {
           lines: [

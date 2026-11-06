@@ -3,7 +3,8 @@ Coins: struck relief, beaded border, raised rim, reeded or lettered edge.
 
 Placeholder convention (src/render/items.ts): disc r 0.0125, 2 mm thick,
 obverse +Z, reverse −Z, edge at x = 0.0125; `model.scale` sizes the real coin
-at runtime. `model.emblem` picks the design: smith | eagle | sower | sprinter.
+at runtime. `model.emblem` picks the design: smith | eagle | sower | sprinter, and
+(M6 wave B) imperial5 | imperial10 | workers | george50 | george3 | bridge.
 
 Designs are drawn on the same 256 px canvas grid the placeholder used (centre
 128, beads at radius 112) so the two read alike; `C()` maps canvas pixels to metres.
@@ -218,6 +219,112 @@ def wreath_value(f: Face) -> None:
 
 
 # ---------------------------------------------------------------------------
+# M6 wave B designs
+
+
+def value_wreath(f: Face, value: str, unit: str, date: str, mint: str = "") -> None:
+    """Imperial gold reverse: value, unit and date inside a laurel wreath tied at the bottom."""
+    for s in (-1, 1):
+        for i in range(13):
+            a = -math.pi / 2 + s * (0.3 + i * 0.2)
+            r = S(92)
+            f.poly(ellipse(math.cos(a) * r, math.sin(a) * r, S(4.2), S(9.5), 12, rot=a), h=RELIEF * 0.9)
+        f.line([(math.cos(-math.pi / 2 + s * (0.26 + i * 0.2)) * S(85), math.sin(-math.pi / 2 + s * (0.26 + i * 0.2)) * S(85)) for i in range(14)], S(2), h=RELIEF * 0.6)
+    f.poly(ellipse(*C(128, 218), S(7), S(5), 12), h=RELIEF * 0.8)  # the bow
+    f.text(value, S(30), *C(128, 96))
+    f.text(unit, S(17), *C(128, 132))
+    f.text(date, S(17), *C(128, 160))
+    if mint:
+        f.text(mint, S(9), *C(128, 186))
+    f.beads(70, S(113), S(2.0))
+
+
+def workers(f: Face) -> None:
+    """1924 rouble reverse: a worker points the peasant towards the rising sun, factories behind."""
+    sx, sy = C(186, 150)
+    for i in range(8):
+        a = math.pi * (i + 0.5) / 8
+        f.line([(sx + math.cos(a) * S(26), sy + math.sin(a) * S(26)), (sx + math.cos(a) * S(40), sy + math.sin(a) * S(40))], S(2.4), h=RELIEF * 0.5)
+    f.line([(sx + math.cos(math.pi * i / 16) * S(22), sy + math.sin(math.pi * i / 16) * S(22)) for i in range(17)], S(3.5), h=RELIEF * 0.6)
+    for x, top in ((168, 96), (184, 108), (200, 118)):
+        f.poly([C(x, top), C(x + 7, top), C(x + 7, 150), C(x, 150)], h=RELIEF * 0.55)  # chimneys
+    # the worker (left, with a hammer at his feet) and the peasant (right)
+    for cx, lean, arm in ((96, -4, (150, 80)), (134, 2, None)):
+        hx, hy = C(cx + lean, 70)
+        f.poly(ellipse(hx, hy, S(9), S(9), 16), h=RELIEF * 1.2)
+        f.poly([C(cx - 12, 82), C(cx + 12, 82), C(cx + 14, 132), C(cx - 14, 132)], h=RELIEF * 1.2)
+        f.line([C(cx - 6, 132), C(cx - 10, 186)], S(8), h=RELIEF * 1.15)
+        f.line([C(cx + 6, 132), C(cx + 10, 186)], S(8), h=RELIEF * 1.15)
+        if arm:
+            f.line([C(cx + 8, 88), C(*arm)], S(6), h=RELIEF * 1.15)  # pointing at the sun
+        else:
+            f.line([C(cx - 8, 90), C(cx - 22, 120)], S(6), h=RELIEF * 1.15)
+    f.line([C(70, 186), C(84, 170)], S(4), h=RELIEF)  # hammer handle
+    f.poly([C(78, 162), C(92, 168), C(88, 174), C(74, 168)], h=RELIEF * 1.1)
+    f.poly([C(48, 190), C(208, 190), C(208, 196), C(48, 196)], h=RELIEF * 0.6)
+    f.arc("ОДИН РУБЛЬ", S(100), S(12), start=math.pi / 2, spacing=0.7)
+    f.text("1924", S(14), *C(128, 212))
+    f.beads(72, S(114), S(1.8))
+
+
+def horseman(f: Face) -> None:
+    """A horseman with a lance over a coiled dragon (the St George investment coins).
+    Horse to the right, mid-stride; the rider upright in a cloak, the lance down to the dragon's head."""
+    # the horse: barrel, chest and haunch, a thick neck rising to the head
+    f.poly(ellipse(*C(128, 124), S(44), S(21), 28, rot=-0.08), h=RELIEF * 1.2)
+    f.poly(ellipse(*C(160, 116), S(18), S(19), 20), h=RELIEF * 1.22)  # chest
+    f.poly(ellipse(*C(94, 122), S(19), S(20), 20), h=RELIEF * 1.22)  # haunch
+    f.poly([C(150, 104), C(170, 98), C(190, 70), C(196, 58), C(184, 54), C(166, 76), C(146, 96)], h=RELIEF * 1.24)  # neck
+    f.poly([C(186, 50), C(200, 54), C(214, 76), C(208, 82), C(194, 72), C(182, 62)], h=RELIEF * 1.26)  # head
+    f.poly([C(188, 52), C(190, 42), C(194, 52)], h=RELIEF * 1.26)  # ear
+    f.line([C(184, 56), C(170, 74), C(156, 94)], S(5), h=RELIEF * 1.3)  # mane
+    # legs: a raised foreleg, a planted foreleg, two hind legs
+    f.line([C(164, 132), C(178, 148), C(190, 142)], S(8), h=RELIEF * 1.15)
+    f.line([C(152, 136), C(150, 168), C(152, 192)], S(8), h=RELIEF * 1.12)
+    f.line([C(102, 136), C(92, 164), C(84, 188)], S(8.5), h=RELIEF * 1.15)
+    f.line([C(88, 132), C(100, 164), C(106, 190)], S(8.5), h=RELIEF * 1.12)
+    for x, y in ((190, 142), (152, 193), (84, 189), (106, 191)):
+        f.poly(ellipse(*C(x, y), S(5.5), S(3.5), 10), h=RELIEF * 1.16)  # hooves
+    f.line([C(78, 112), C(62, 124), C(54, 146), C(58, 160)], S(7), h=RELIEF * 0.95)  # tail
+    # the rider: legs along the flank, torso, head, the cloak flying back
+    f.line([C(124, 104), C(130, 126), C(140, 140)], S(7), h=RELIEF * 1.38)
+    f.poly([C(112, 106), C(136, 106), C(134, 72), C(116, 72)], h=RELIEF * 1.4)  # torso
+    f.poly(ellipse(*C(126, 60), S(9), S(10), 16), h=RELIEF * 1.42)  # head
+    f.poly([C(114, 74), C(90, 64), C(70, 80), C(88, 96), C(112, 100)], h=RELIEF * 1.0)  # cloak
+    f.line([C(132, 80), C(150, 92)], S(5), h=RELIEF * 1.44)  # arm on the lance
+    f.line([C(164, 52), C(96, 202)], S(3), h=RELIEF * 1.5)  # the lance
+    # the dragon coiled under the hooves, wing up, head under the lance point
+    f.line([C(48, 204), C(66, 192), C(86, 202), C(106, 194), C(128, 206), C(150, 200), C(168, 208)], S(9), h=RELIEF * 0.95)
+    f.poly([C(66, 192), C(56, 170), C(76, 178), C(80, 166), C(92, 184)], h=RELIEF * 0.9)  # wing
+    f.poly(ellipse(*C(92, 206), S(9), S(6), 12, rot=0.2), h=RELIEF * 1.0)  # head
+    f.beads(80, S(116), S(1.6))
+
+
+def bank_eagle(f: Face, value: str, small: str) -> None:
+    """Modern Bank of Russia reverse: a plain double eagle, the bank's name round it, value below."""
+    eagle(f)
+    f.arc("БАНК РОССИИ", S(100), S(11), start=math.pi / 2, spacing=0.7)
+    f.text(value, S(16), *C(128, 196))
+    if small:
+        f.text(small, S(8), *C(128, 214))
+
+
+def bridge(f: Face) -> None:
+    """Mostograd 300 years: the drawbridge raised, its two leaves open over frosted waves, the city behind."""
+    for s in (-1, 1):
+        f.poly([C(128 + s * 82, 150), C(128 + s * 56, 150), C(128 + s * 56, 104), C(128 + s * 82, 104)][:: s], h=RELIEF * 1.0)  # towers
+        f.poly([C(128 + s * 86, 104), C(128 + s * 52, 104), C(128 + s * 69, 84)][:: s], h=RELIEF * 1.1)  # tower roofs
+        f.line([C(128 + s * 56, 140), C(128 + s * 14, 70)], S(9), h=RELIEF * 1.25)  # the raised leaves
+        f.line([C(128 + s * 69, 84), C(128 + s * 22, 80)], S(1.6), h=RELIEF * 0.9)  # cables
+        f.line([C(128 + s * 110, 150), C(128 + s * 56, 150)], S(6), h=RELIEF * 0.9)  # the approaches
+    for k in range(4):
+        y = 166 + k * 10
+        f.line([C(36 + 24 * i + (12 if k % 2 else 0), y + (3 if i % 2 else -3)) for i in range(8)], S(2.2), h=RELIEF * 0.45)  # waves
+    f.arc("МОСТОГРАД • 300 ЛЕТ", S(100), S(12), start=math.pi / 2, spacing=0.68)
+    f.text("1693–1993", S(9), *C(128, 222))
+
+
+# ---------------------------------------------------------------------------
 # Body
 
 
@@ -276,6 +383,13 @@ EDGES = {
     "eagle": ("letters", "ЧИСТАГО СЕРЕБРА 4 ЗОЛОТНИКА 21 ДОЛЯ • Н•Ф •"),
     "sower": ("reeds", ""),
     "sprinter": ("letters", "СЕРЕБРО 900 • 33.3 • ЛМД • СЕРЕБРО 900 • 33.3 • ЛМД •"),
+    # M6 wave B
+    "imperial5": ("reeds", ""),
+    "imperial10": ("reeds", ""),
+    "workers": ("letters", "ЧИСТАГО СЕРЕБРА 18 ГРАММ • П•Л • ЧИСТАГО СЕРЕБРА 18 ГРАММ •"),
+    "george50": ("reeds", ""),
+    "george3": ("reeds", ""),
+    "bridge": ("reeds", ""),
 }
 
 
@@ -283,8 +397,8 @@ def build(it: lib.Item) -> None:
     it.ao_size = 1024
     emblem = it.model.get("emblem", "smith")
     color = it.color
-    gold = emblem == "sower"
-    proof = emblem == "sprinter"
+    gold = emblem in ("sower", "imperial5", "imperial10", "george50")
+    proof = emblem in ("sprinter", "bridge")
     field = lib.material(it, "field", color, metal=1.0, rough=0.09 if proof else (0.22 if gold else 0.3))
     relief = lib.material(it, "relief", lib.shade(color, 0.98), metal=1.0, rough=0.48 if proof else (0.26 if gold else 0.36))
     body(it, field, relief)
@@ -306,6 +420,20 @@ def build(it: lib.Item) -> None:
         sprinter(obv)
         obv.beads(80, S(116), S(1.6))
         state_emblem(rev, "10", "РУБЛЕЙ")
+    elif emblem in ("imperial5", "imperial10"):
+        eagle(obv)
+        value_wreath(rev, "5" if emblem == "imperial5" else "10", "РУБЛЕЙ", "1898" if emblem == "imperial5" else "1899", "А•Г")
+    elif emblem == "workers":
+        workers(obv)
+        state_emblem(rev, "", "")
+        rev.arc("ПРОЛЕТАРИИ ВСЕХ СТРАН, СОЕДИНЯЙТЕСЬ!", S(100), S(9), start=math.pi / 2, spacing=0.64)
+    elif emblem in ("george50", "george3"):
+        horseman(obv)
+        bank_eagle(rev, "50 РУБЛЕЙ" if emblem == "george50" else "3 РУБЛЯ", "ЗОЛОТО 999 • 7,78" if emblem == "george50" else "СЕРЕБРО 999 • 31,1")
+    elif emblem == "bridge":
+        bridge(obv)
+        obv.beads(80, S(116), S(1.6))
+        bank_eagle(rev, "3 РУБЛЯ", "1993")
     else:
         obv.poly(lib.star_points(5, S(40), S(16)))
 

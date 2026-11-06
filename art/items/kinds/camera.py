@@ -1,5 +1,6 @@
 """
-Cameras: two 35 mm SLRs (Zenit-E, Kanon AE-2) and a screw-mount rangefinder (Weissler IIIc).
+Cameras: two 35 mm SLRs (Zenit-E and its TTL sibling, Kanon AE-2) and a screw-mount rangefinder (Weissler IIIc).
+The M6 wave-B Kanon PowerPix, Kanon D450, Kanon zoom lens and Nevka 8M are box-kind (kinds/box.py).
 
 Placeholder convention (src/render/items.ts): body 0.14 × 0.075 × 0.04, top plate
 up to y ≈ 0.042, lens along +Z centred at y = −0.006 to z ≈ 0.064 (SLR) / 0.06
@@ -136,7 +137,8 @@ def slope_frame(y0: float, z0: float, y1: float, z1: float, t: float, lift: floa
     return op.frame((1, 0, 0), u, n, o)
 
 
-def zenit(it: lib.Item) -> None:
+def zenit(it: lib.Item, ttl: bool = False) -> None:
+    """Zenit-E, or (ttl) the Zenit-TTL: same body, a through-the-lens meter instead of the selenium cell."""
     chrome = lib.material(it, "chrome", it.color, metal=1.0, rough=0.38)
     m = {
         "chrome": chrome,
@@ -152,13 +154,18 @@ def zenit(it: lib.Item) -> None:
     # Nameplate: black panel on the prism slope, raised chrome letters
     panel = lib.polygon("nameplate", op.rrect(0.0142, 0.0041, 0.0008, 3), 0.0002, m["black"], base=False)
     lib.transform(panel, slope_frame(y_sh, zf, y_top, ztf, 0.56))
-    t = lib.text("nameplate.text", "ЗЕНИТ-Е", 0.0056, 0.0003, chrome, pos=(0, 0, 0), bold=1.2)
+    t = lib.text("nameplate.text", "ЗЕНИТ-TTL" if ttl else "ЗЕНИТ-Е", 0.0046 if ttl else 0.0056, 0.0003, chrome, pos=(0, 0, 0), bold=1.2)
     lib.transform(t, slope_frame(y_sh, zf, y_top, ztf, 0.56, lift=0.0002))
-    # Selenium meter cell: honeycomb of little lenses under the nameplate
-    cell = op.rrect(0.0125, 0.0026, 0.0008, 3)
-    lib.polygon("cell.back", [(x, y + 0.0455) for x, y in cell], 0.00015, m["dark"], z=zf, base=False)
-    beads = [(-0.0114 + i * 0.0019 + (0.00095 if j % 2 else 0), 0.0438 + j * 0.0017) for j in range(3) for i in range(12 if j % 2 else 13)]
-    lib.dots("cell.lenses", beads, 0.00085, 0.00035, m["glass"], z=zf + 0.00015, segments=6)
+    if not ttl:
+        # Selenium meter cell: honeycomb of little lenses under the nameplate
+        cell = op.rrect(0.0125, 0.0026, 0.0008, 3)
+        lib.polygon("cell.back", [(x, y + 0.0455) for x, y in cell], 0.00015, m["dark"], z=zf, base=False)
+        beads = [(-0.0114 + i * 0.0019 + (0.00095 if j % 2 else 0), 0.0438 + j * 0.0017) for j in range(3) for i in range(12 if j % 2 else 13)]
+        lib.dots("cell.lenses", beads, 0.00085, 0.00035, m["glass"], z=zf + 0.00015, segments=6)
+    else:
+        # TTL: a plain black band where the cell was, and the meter switch by the lens mount
+        lib.polygon("ttl.band", [(x, y + 0.0455) for x, y in op.rrect(0.0125, 0.0026, 0.0008, 3)], 0.00012, m["black"], z=zf, base=False)
+        lib.box("ttl.switch", (0.0036, 0.0072, 0.0016), m["black"], center=(-0.026, 0.004, 0.0213), bevel=0.0004)
     # Eyepiece on the prism back, cold shoe on top
     back_window("eyepiece", 0.0, 0.0462, 0.017, 0.0095, -0.0165, 0.0028, m["black"], m["glass"], m["dark"])
     for s in (-1, 1):
@@ -178,7 +185,7 @@ def zenit(it: lib.Item) -> None:
     # Release button, serial and factory badge on the top plate
     disc("release.collar", 0.0305, -0.0062, PLATE_TOP, 0.0018, 0.0036, chrome)
     disc("release.button", 0.0305, -0.0062, PLATE_TOP + 0.0018, 0.0020, 0.0021, chrome)
-    op.top_text("serial", "76054123", 0.0455, PLATE_TOP, 0.0146, 0.0019, 0.00005, m["black"], bold=1.0)
+    op.top_text("serial", "84137290" if ttl else "76054123", 0.0455, PLATE_TOP, 0.0146, 0.0019, 0.00005, m["black"], bold=1.0)
     bx, bz = 0.0300, 0.0128
     tri = [(bx - 0.0026, bz + 0.0018), (bx + 0.0026, bz + 0.0018), (bx, bz - 0.0026)]
     lib.transform(lib.stroke("badge", [(x, -z) for x, z in tri], 0.0005, 0.00006, m["black"], closed=True), lib.at(0, PLATE_TOP, 0) @ lib.rot("x", -math.pi / 2))
@@ -209,7 +216,7 @@ def zenit(it: lib.Item) -> None:
             {"barrel": m["black"], "paint": m["white"], "chrome": chrome, "ink": m["black"], "glass": m["glass"], "dark": m["dark"]},
             zebra=True,
             rear=False,
-            serial="7614207",
+            serial="8512096" if ttl else "7614207",
         )
     place_lens(g, lens_kind.SHOULDER, 0.0225, 0.933)
 
@@ -420,7 +427,7 @@ def build(it: lib.Item) -> None:
     it.ao_size = 1024
     brand = it.d.get("brand", "").lower()
     if brand == "zenit":
-        zenit(it)
+        zenit(it, ttl="ttl" in it.id)
     elif brand == "kanon":
         kanon(it)
     elif brand == "weissler" or not any(h["id"] == "prism" for h in it.model.get("hotspots", [])):

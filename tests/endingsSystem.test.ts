@@ -279,6 +279,15 @@ describe('epilogue', () => {
     expect(volkova({ trust: 0.5 })).toContain('inspector')
     expect(volkova({ trust: 0.1 }, ['police.cooperated'])).toContain('handed her a watch')
     expect(volkova({})).toContain('all eleven') // only her introduction
+    // Her own arc (src/data/stories/volkova.ts).
+    expect(volkova({ bribes: 1 }, ['volkova.leaked'])).toContain('I said twice')
+    expect(volkova({ bribes: 1 }, ['dirty.volkova_evidence'])).toContain('bag')
+    expect(volkova({ bribes: 1 }, ['volkova.reported'])).toContain('three months')
+    expect(volkova({ caught: 1 }, ['volkova.grudge'])).toContain('Tuesdays')
+    expect(volkova({ caught: 1 }, ['volkova.friend'])).toContain('bayan')
+    expect(volkova({ trust: 0.6 }, ['volkova.crackdown'])).toContain('clean cars')
+    expect(volkova({ trust: 0.6 }, ['heart.volkova_recital'])).toContain('House of Culture')
+    expect(volkova({ trust: 0.1 }, ['heart.volkova_father', 'police.cooperated'])).toContain('Seventh Bridge')
   })
 
   it('no ending, no epilogue', () => {

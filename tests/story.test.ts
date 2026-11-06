@@ -9,6 +9,7 @@ import { archetypes } from '../src/data/customers/walkins'
 import { SPECIALISTS } from '../src/data/specialists'
 import { FENCE } from '../src/data/fence'
 import { COLLECTOR } from '../src/data/collector'
+import { VOLKOVA } from '../src/data/police'
 import { REGULARS, getRegular } from '../src/data/regulars'
 import { ARCS, getBeat } from '../src/data/stories'
 import { holds } from '../src/game/story/conditions'
@@ -76,8 +77,8 @@ describe('story content', () => {
       for (const beat of arc.beats) {
         const v = beat.visit
         // M4: a regular, or a specialist (their own arcs); `as` someone they sent.
-        // M5: or the fence, or the Collector (their own arcs).
-        const person = v.who === FENCE.id ? FENCE : v.who === COLLECTOR.id ? COLLECTOR : undefined
+        // M5: or the fence, the Collector or Detective Volkova (their own arcs).
+        const person = v.who === FENCE.id ? FENCE : v.who === COLLECTOR.id ? COLLECTOR : v.who === VOLKOVA.id ? VOLKOVA : undefined
         expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who) ?? person, `${beat.id} who`).toBeDefined()
         if (v.as) expect(looks.has(v.as.look), `${beat.id} as.look`).toBe(true)
         if (v.item) {
@@ -105,8 +106,10 @@ describe('story content', () => {
       if (arc.specialist) continue
       for (const beat of arc.beats.slice(1)) {
         // Directly, or through an `any` whose every option is an earlier beat of the arc.
+        // M5: or on having met Detective Volkova (her courtesy call, a systemic visit, opens her arc).
         const ofArc = (c: Condition) => c.if === 'beat' && c.beat.startsWith(`${arc.id}.`)
-        expect(beat.when.some((c) => ofArc(c) || (c.if === 'any' && c.of.every(ofArc))), beat.id).toBe(true)
+        const metHer = (c: Condition) => arc.id === 'volkova' && c.if === 'volkova' && c.met === true
+        expect(beat.when.some((c) => ofArc(c) || metHer(c) || (c.if === 'any' && c.of.every(ofArc))), beat.id).toBe(true)
       }
     }
   })

@@ -37,6 +37,7 @@ const KIND_LABEL: Record<LedgerEntry['kind'], string> = {
   story: 'NOTE',
   theft: 'GONE',
   deterred: 'SEEN',
+  staff: 'STAFF',
 }
 
 

@@ -64,6 +64,8 @@ import { CustomerCast, castOverride } from './render/customerModel'
 import type { ShopLife } from './render/life'
 import { clockForTime } from './render/life/timeOfDay'
 import { Ui, screenFor, type ScreenId } from './ui/bind'
+import { bindLoadingScreen } from './ui/loading'
+import { LoadProgress } from './render/loadProgress'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
 /** Text size is a device setting (M4), like reduce motion: the title screen has no career to hold it. */
@@ -168,11 +170,18 @@ function lookParam(params: URLSearchParams): { yaw: number; pitch: number } | nu
   return { yaw: yaw!, pitch }
 }
 
+/**
+ * The loading screen from index.html. The bar runs over the boot steps: the
+ * bundle itself (it is running, so that much is done), the career slots, then
+ * the HDRI, the baked shop and its lightmap by bytes (LOAD_SHARE), then the
+ * canal backdrop and the first frames.
+ */
+const loading = bindLoadingScreen()
+const LOAD_SHARE = { bundle: 0.15, slots: 0.2, files: 0.9, backdrop: 0.95 } as const
+loading.progress(LOAD_SHARE.bundle)
+
 function showFatal(message: string): void {
-  const el = document.createElement('div')
-  el.className = 'fatal'
-  el.textContent = message
-  document.body.appendChild(el)
+  loading.fail(message)
 }
 
 /** Explicit reduce-motion choice from Settings (overrides the OS setting), or null. */
@@ -243,6 +252,7 @@ async function boot(): Promise<void> {
       loader?.load,
       () => {
         window.__lombardReady = true
+        loading.done()
       },
       params.get('item') ?? undefined,
     )
@@ -261,6 +271,7 @@ async function boot(): Promise<void> {
   let activeSlot: SlotNo | null = null
   let initial: GameState | null = null
   let slots = review ? [] : await listSlots()
+  loading.progress(LOAD_SHARE.slots)
   if (review) {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
@@ -525,20 +536,31 @@ async function boot(): Promise<void> {
 
   // --- loop ------------------------------------------------------------------
   let envReady = false
+  // Byte progress of the big files drives the loading screen's bar.
+  const noBake = params.get('nobake') === '1'
+  const files = new LoadProgress(noBake ? ['env'] : ['env', 'glb', 'lightmap'])
+  files.onChange = () => loading.progress(LOAD_SHARE.slots + (LOAD_SHARE.files - LOAD_SHARE.slots) * files.fraction())
   const envLoad = shop
-    .loadEnvironment(renderer, { envUrl })
+    .loadEnvironment(renderer, { envUrl, onProgress: files.track('env') })
     .catch((err) => console.warn('[env] HDRI failed to load, continuing without it', err))
+    .finally(() => files.done('env'))
   // ?nobake=1 keeps the procedural grey box (for comparing against the bake).
-  const bakeLoad =
-    params.get('nobake') === '1'
-      ? Promise.resolve(null)
-      : shop.loadBaked(renderer, import.meta.env.BASE_URL).then((m) => {
+  const bakeLoad = noBake
+    ? Promise.resolve(null)
+    : shop
+        .loadBaked(renderer, import.meta.env.BASE_URL, { glb: files.track('glb'), lightmap: files.track('lightmap') })
+        .then((m) => {
           if (m) ui.setBakeInfo(`bake ${m.quality}${m.commit ? ` ${m.commit}` : ''}`)
           return m
+        })
+        .finally(() => {
+          files.done('glb')
+          files.done('lightmap')
         })
   // The canal outside the window comes after the shop; ?nobackdrop=1 keeps the old canvas card.
   const backdropLoad = params.get('nobackdrop') === '1' ? Promise.resolve(false) : bakeLoad.then(() => shop.loadBackdrop(renderer, import.meta.env.BASE_URL))
   void Promise.all([envLoad, bakeLoad, backdropLoad]).finally(() => {
+    loading.progress(LOAD_SHARE.backdrop)
     envReady = true
   })
   // Street life outside the window (render/street): loads only once the shop is on screen. ?street=0 turns it off.
@@ -599,6 +621,7 @@ async function boot(): Promise<void> {
     if (envReady && !window.__lombardReady && ++readyFrames > 2) {
       window.__lombardReady = true
       document.body.classList.add('ready')
+      loading.done()
       markReady()
       // Shop life comes after the shop is up, as its own chunk (?life=0 leaves it out).
       if (params.get('life') !== '0') {
@@ -615,4 +638,7 @@ async function boot(): Promise<void> {
   })
 }
 
-void boot()
+boot().catch((err) => {
+  console.error('[boot] failed', err)
+  showFatal('The shop could not open. Check the connection and reload.')
+})

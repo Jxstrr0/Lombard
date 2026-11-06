@@ -11,7 +11,8 @@
  * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
- * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
+ * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
+ * ?scenario=protection opens day 1 with Eduard Lvovich's "insurance" offer (Protection arc) first in line.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
  * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint, street) for review.
  * Street outside the window (render/street): ?street=0 off, ?street=busy, ?weather=clear|rain|snow,
@@ -94,6 +95,17 @@ function storyScenario(s0: GameState): GameState {
   const beat = getBeat('medals.truth')
   if (!who || !beat) return s
   const visit: QueuedVisit = { visitId: 'v-dev-story', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
+  return { ...s, queue: [visit, ...s.queue] }
+}
+
+/** Dev-only (?seed=N&scenario=protection): Eduard Lvovich is first in line with the Protection arc's offer. */
+function protectionScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'day/open' })
+  const who = getRegular('eduard')
+  const beat = getBeat('protection.offer')
+  if (!who || !beat) return s
+  const visit: QueuedVisit = { visitId: 'v-dev-protection', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
   return { ...s, queue: [visit, ...s.queue] }
 }
 
@@ -206,6 +218,7 @@ async function boot(): Promise<void> {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
     if (params.get('scenario') === 'story') initial = storyScenario(initial)
+    if (params.get('scenario') === 'protection') initial = protectionScenario(initial)
   } else {
     const recent = mostRecentSlot(slots)
     if (recent) initial = await loadSlot(recent.slot)

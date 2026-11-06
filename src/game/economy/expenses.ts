@@ -12,9 +12,13 @@
  *   - each retained specialist's retainer for the month ahead, after which every
  *     specialist's call count resets to 0. A retainer paid in full (cash covered
  *     it) grows the relationship by tuning.specialists.relationshipPerMonth.
+ *   - "insurance" while the Protection arc's paying flag is set (M4,
+ *     src/data/stories/protection.ts): tuning.protection.share (or haggledShare)
+ *     of the month's net takings at the till, never under tuning.protection.minimum.
  * The first month of a retainer is charged (prorated) when retaining; see specialists.ts.
  */
 import { getSpecialist } from '../../data/specialists'
+import { PROTECTION_FLAGS } from '../../data/stories/protection'
 import { tuning } from '../../data/tuning'
 import { addDays, type GameState, type ISODate } from '../state'
 import type { LedgerEntry, SpecialistState } from '../types'
@@ -47,6 +51,32 @@ export function isMonthEnd(iso: ISODate): boolean {
   return addDays(iso, 1).slice(5, 7) !== iso.slice(5, 7)
 }
 
+/**
+ * Net takings at the till so far this calendar month: sales and redemptions in,
+ * buys and pawn loans out (closed days from the history, plus today while open).
+ */
+export function monthTakings(state: GameState): number {
+  const firstDay = state.calendar.day - (Number(state.calendar.date.slice(8, 10)) - 1)
+  let total = 0
+  for (const h of state.history) {
+    if (h.day >= firstDay && h.day < state.calendar.day) total += h.earned + h.redeemed - h.spent - h.loaned
+  }
+  if (state.day.phase === 'open') {
+    for (const e of state.day.log) if (e.kind === 'sell' || e.kind === 'redeem' || e.kind === 'buy' || e.kind === 'loan') total += e.amount
+  }
+  return total
+}
+
+/** This month's protection "insurance" so far (charged at month end), or null when not paying. */
+export function protectionFee(state: GameState): { amount: number; share: number; minimum: boolean } | null {
+  const flags = state.story.flags
+  if (!flags.includes(PROTECTION_FLAGS.paying)) return null
+  const t = tuning.protection
+  const share = flags.includes(PROTECTION_FLAGS.haggled) ? t.haggledShare : t.share
+  const cut = Math.round((share * monthTakings(state)) / 100) * 100
+  return cut > t.minimum ? { amount: cut, share, minimum: false } : { amount: t.minimum, share, minimum: true }
+}
+
 export function chargeExpenses(state: GameState): GameState {
   const date = state.calendar.date
   if (!isMonthEnd(date)) return state
@@ -71,6 +101,12 @@ export function chargeExpenses(state: GameState): GameState {
     const relationship = paidInFull ? Math.min(1, sp.relationship + t.relationshipPerMonth) : sp.relationship
     specialists[id] = { ...sp, callsUsed: 0, relationship }
   }
+  const insurance = protectionFee(state)
+  if (insurance) {
+    const how = insurance.minimum ? 'the minimum' : `${Math.round(insurance.share * 100)}% of the till`
+    entries.push({ kind: 'expense', amount: -insurance.amount, text: `Insurance, ${monthName(date)} (${how})` })
+    cash -= insurance.amount
+  }
   return {
     ...state,
     cash,
@@ -90,5 +126,7 @@ export function upcomingBills(state: GameState): UpcomingBill[] {
     const def = getSpecialist(id)
     if (sp.retained && roster && def) bills.push({ label: `Retainer: ${def.short}`, amount: roster.fee, inDays })
   }
+  const insurance = protectionFee(state)
+  if (insurance) bills.push({ label: 'Insurance', amount: insurance.amount, inDays })
   return bills
 }

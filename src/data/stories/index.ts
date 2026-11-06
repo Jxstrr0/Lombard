@@ -5,8 +5,9 @@
  */
 import { Arc, type Beat } from '../../game/schema/story'
 import medals from './medals'
+import protection from './protection'
 
-export const ARCS: readonly Arc[] = [medals].map((raw) => Arc.parse(raw))
+export const ARCS: readonly Arc[] = [medals, protection].map((raw) => Arc.parse(raw))
 
 const beats = new Map<string, Beat>(ARCS.flatMap((a) => a.beats.map((b) => [b.id, b] as const)))
 

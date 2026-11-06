@@ -20,6 +20,11 @@ import type { QueuedVisit } from '../src/game/types'
 const run = (s: GameState, ...actions: Action[]) => actions.reduce(reducer, s)
 const onDay = (s: GameState, day: number): GameState => ({ ...s, calendar: { ...s.calendar, day } })
 const zina = () => getRegular('zinaida')!
+/** Every arc but `keep` has ended, so other arcs' beats stay out of a planning test. */
+const only = (s: GameState, ...keep: string[]): GameState => ({
+  ...s,
+  story: { ...s.story, arcs: Object.fromEntries(ARCS.filter((a) => !keep.includes(a.id)).map((a) => [a.id, { beats: {}, ended: true }])) },
+})
 
 /** An open day with this story visit first in line. */
 function withVisit(s: GameState, visit: Partial<QueuedVisit> & { beatId?: string }): GameState {
@@ -149,14 +154,13 @@ describe('planning', () => {
     const s = onDay(startedState(1, 'c1'), 3)
     const played = recordBeat(s, 'medals.roof', { day: 3, outcome: 'passed' })
     expect(pickBeats(played).some((b) => b.id === 'medals.roof')).toBe(false)
-    const ended = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
-    expect(pickBeats(ended)).toEqual([])
+    expect(pickBeats(only(s))).toEqual([])
   })
 
   it('a beat seller takes a walk-in place and the day keeps its length; planning is deterministic', () => {
     let found = false
     for (let seed = 1; seed <= 40 && !found; seed++) {
-      const s = onDay(startedState(seed, 'c1'), 3)
+      const s = only(onDay(startedState(seed, 'c1'), 3), 'medals')
       if (!pickBeats(s).some((b) => b.id === 'medals.roof')) continue
       found = true
       const a = reducer(s, { type: 'day/open' })
@@ -175,8 +179,8 @@ describe('planning', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
     let s = onDay(startedState(5, 'c1'), day)
-    // Keep the medals arc out of the way.
-    s = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
+    // Keep the arcs out of the way.
+    s = only(s)
     let id = 0
     const plan = planStory(s, (p) => `${p}${id++}`)
     const visit = plan.visits.find((v) => v.visit.customer.regularId === 'zinaida')
@@ -195,7 +199,7 @@ describe('planning', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
     let s = onDay(startedState(5, 'c1'), day)
-    s = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
+    s = only(s)
     const fake = { customer: regularCustomer(def) } as unknown as GameState['loans'][number]
     s = { ...s, loans: [fake] }
     let id = 0
@@ -264,7 +268,7 @@ describe('at the counter', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
     const base = onDay(startedState(9, 'c1'), day)
-    const quiet = { ...base, story: { ...base.story, arcs: { medals: { beats: {}, ended: true } } } }
+    const quiet = only(base)
     const askWith = (trust: number) => {
       let s = setMemory(quiet, 'zinaida', { trust })
       s = reducer(s, { type: 'day/open' })

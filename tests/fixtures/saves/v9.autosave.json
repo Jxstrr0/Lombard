@@ -1,0 +1,3172 @@
+{
+ "careerId": "career-7008",
+ "savedAt": 1793974811000,
+ "version": 9,
+ "state": {
+  "meta": {
+   "version": 9,
+   "seed": 7008,
+   "careerId": "career-7008",
+   "rng": 2513957125,
+   "nextId": 1441,
+   "intro": false
+  },
+  "calendar": {
+   "day": 71,
+   "date": "2014-05-12",
+   "weekday": 0,
+   "season": "spring"
+  },
+  "cash": 5090,
+  "shop": {
+   "name": "Lombard Mostovoy",
+   "slots": [
+    {
+     "id": "counter-1",
+     "area": "counter",
+     "itemId": "iym"
+    },
+    {
+     "id": "counter-2",
+     "area": "counter",
+     "itemId": "is1x_gleb"
+    },
+    {
+     "id": "counter-3",
+     "area": "counter",
+     "itemId": "is1y_alyona"
+    },
+    {
+     "id": "counter-4",
+     "area": "counter",
+     "itemId": null
+    },
+    {
+     "id": "counter-5",
+     "area": "counter",
+     "itemId": "ixf"
+    },
+    {
+     "id": "counter-6",
+     "area": "counter",
+     "itemId": "iyv"
+    },
+    {
+     "id": "wall-1",
+     "area": "wall",
+     "itemId": "isv_jamshid"
+    },
+    {
+     "id": "wall-2",
+     "area": "wall",
+     "itemId": "izf"
+    },
+    {
+     "id": "wall-3",
+     "area": "wall",
+     "itemId": "is1s_alisa"
+    },
+    {
+     "id": "wall-4",
+     "area": "wall",
+     "itemId": "is1v_lyusya"
+    },
+    {
+     "id": "wall-5",
+     "area": "wall",
+     "itemId": "i12s"
+    },
+    {
+     "id": "wall-6",
+     "area": "wall",
+     "itemId": "ikc"
+    },
+    {
+     "id": "wall-7",
+     "area": "wall",
+     "itemId": "i131"
+    },
+    {
+     "id": "wall-8",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-9",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-10",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-11",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "wall-12",
+     "area": "wall",
+     "itemId": null
+    },
+    {
+     "id": "back-1",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-2",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-3",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-4",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-5",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-6",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-7",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-8",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-9",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-10",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-11",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-12",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-13",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-14",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-15",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-16",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-17",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-18",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-19",
+     "area": "back",
+     "itemId": null
+    },
+    {
+     "id": "back-20",
+     "area": "back",
+     "itemId": null
+    }
+   ],
+   "prices": {
+    "ixf": 5906,
+    "iym": 10112,
+    "iyv": 1418,
+    "izf": 5292,
+    "is1s_alisa": 3733,
+    "isv_jamshid": 6001,
+    "is1v_lyusya": 25232,
+    "is1x_gleb": 5103,
+    "i12s": 765,
+    "ikc": 8552,
+    "i131": 5387,
+    "is1y_alyona": 8741
+   },
+   "upgrades": [
+    "acid_kit",
+    "second_counter"
+   ],
+   "acidCharges": 0,
+   "security": 0
+  },
+  "inventory": [
+   {
+    "id": "ixf",
+    "defId": "drill_hartwig",
+    "condition": 87,
+    "authenticity": "fake",
+    "provenance": "clean",
+    "trueValue": 850,
+    "revealed": [],
+    "story": "Hartwig, German. I only used it to hang the shelves.",
+    "fakeProfileId": "hartvig_copy",
+    "weightGrams": 1250.6
+   },
+   {
+    "id": "iym",
+    "defId": "phone_mangosteen_m5",
+    "condition": 72,
+    "authenticity": "fake",
+    "provenance": "unknown",
+    "trueValue": 720,
+    "revealed": [],
+    "story": "My cousin brought it from Moscow. Still had the film on the screen.",
+    "fakeProfileId": "clone",
+    "weightGrams": 94.24
+   },
+   {
+    "id": "iyv",
+    "defId": "hand_drill_burav",
+    "condition": 93,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 2000,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "heft",
+     "@condition",
+     "wheel",
+     "chuck",
+     "handle",
+     "@magnet",
+     "@reference"
+    ],
+    "story": "Grandad’s. It still drills, no batteries needed.",
+    "weightGrams": 1300.23
+   },
+   {
+    "id": "izf",
+    "defId": "phone_mangosteen_m4s",
+    "condition": 78,
+    "authenticity": "genuine",
+    "provenance": "clean",
+    "trueValue": 6450,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "@condition",
+     "logo",
+     "back_glass",
+     "screws",
+     "@magnet",
+     "simtray",
+     "@reference"
+    ],
+    "story": "It's old but it works. The battery lasts till lunch.",
+    "weightGrams": 142.12
+   },
+   {
+    "id": "is1s_alisa",
+    "defId": "phone_mangosteen_m4s",
+    "condition": 40,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 3800,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "heft",
+     "@condition",
+     "back_glass",
+     "screws",
+     "@magnet",
+     "magnet_speaker",
+     "logo",
+     "simtray",
+     "@reference"
+    ],
+    "story": "Mum’s old phone. She got a new one and I got custody of this one.",
+    "weightGrams": 138.73
+   },
+   {
+    "id": "isv_jamshid",
+    "defId": "watch_vostok_komandirskie",
+    "condition": 71,
+    "authenticity": "genuine",
+    "provenance": "heirloom",
+    "trueValue": 5700,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "heft",
+     "@condition",
+     "movement",
+     "crown",
+     "@magnet",
+     "caseback",
+     "@reference"
+    ],
+    "story": "His grandfather’s army watch. Pawned until the foreman pays.",
+    "weightGrams": 59.26
+   },
+   {
+    "id": "is1v_lyusya",
+    "defId": "gold_bracelet_585",
+    "condition": 73,
+    "authenticity": "genuine",
+    "provenance": "heirloom",
+    "trueValue": 30000,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "@condition",
+     "colour",
+     "@magnet",
+     "links",
+     "@reference"
+    ],
+    "story": "My mother’s bracelet. Don’t look at me like that, I always come back.",
+    "weightGrams": 13.61
+   },
+   {
+    "id": "is1x_gleb",
+    "defId": "medal_combat_merit",
+    "condition": 65,
+    "authenticity": "genuine",
+    "provenance": "heirloom",
+    "trueValue": 5850,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "heft",
+     "@condition",
+     "relief",
+     "@magnet",
+     "eyelet",
+     "ribbon",
+     "@reference"
+    ],
+    "story": "Grandfather’s. He never spoke about it. I wrote a poem about him never speaking about it. It’s quite long.",
+    "weightGrams": 23.35
+   },
+   {
+    "id": "i12s",
+    "defId": "coin_poltinnik_1924",
+    "condition": 86,
+    "authenticity": "genuine",
+    "provenance": "clean",
+    "trueValue": 900,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "heft",
+     "@condition",
+     "@magnet",
+     "magnet_coin",
+     "@reference"
+    ],
+    "story": "I need the bus fare home. Truly.",
+    "weightGrams": 9.95
+   },
+   {
+    "id": "ikc",
+    "defId": "amber_beads",
+    "condition": 74,
+    "authenticity": "genuine",
+    "provenance": "clean",
+    "trueValue": 7600,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "heft",
+     "@condition",
+     "amber",
+     "@magnet",
+     "magnet_none",
+     "drill",
+     "clasp",
+     "@reference"
+    ],
+    "story": "They’re very old. Older than the dinosaurs, the beads, I mean.",
+    "weightGrams": 45.64
+   },
+   {
+    "id": "i131",
+    "defId": "cameo_brooch_875",
+    "condition": 68,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 4850,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "@condition",
+     "hallmark",
+     "@magnet",
+     "magnet_none",
+     "frame",
+     "@reference"
+    ],
+    "story": "I wore it to my exams for luck. I passed them all.",
+    "weightGrams": 11.04
+   },
+   {
+    "id": "is1y_alyona",
+    "defId": "gold_earrings_583",
+    "condition": 76,
+    "authenticity": "genuine",
+    "provenance": "clean",
+    "trueValue": 10200,
+    "revealed": [
+     "@passport",
+     "@weight",
+     "heft",
+     "@condition",
+     "colour",
+     "@magnet",
+     "magnet_locks",
+     "lock_right",
+     "@reference"
+    ],
+    "story": "Dima’s present when Mishutka was born. He’ll be back in two weeks. Not the earrings. Dima. Well, both.",
+    "weightGrams": 4.44
+   }
+  ],
+  "paid": {
+   "ixf": 3600,
+   "iym": 5700,
+   "iyv": 810,
+   "izf": 3024,
+   "is1s_alisa": 1920,
+   "isv_jamshid": 1715,
+   "is1v_lyusya": 13217,
+   "is1x_gleb": 2673,
+   "i12s": 390,
+   "ikc": 4100,
+   "i131": 2309,
+   "is1y_alyona": 3746
+  },
+  "loans": [
+   {
+    "id": "lm4",
+    "item": {
+     "id": "is13_zhanna",
+     "defId": "gold_cross_585",
+     "condition": 87,
+     "authenticity": "genuine",
+     "provenance": "heirloom",
+     "trueValue": 8600,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "bail",
+      "colour",
+      "@magnet",
+      "magnet_bail",
+      "@reference"
+     ],
+     "story": "My confirmation cross. I believed until Vova. Now I believe in the post office, which at least arrives.",
+     "weightGrams": 3.22
+    },
+    "customer": {
+     "id": "reg_zhanna",
+     "name": "Zhanna Kuzovkina",
+     "archetype": "office",
+     "temperament": "flexible",
+     "knowledge": 0.4,
+     "desperation": 0.5,
+     "portraitKey": "female_adult_11_b",
+     "regularId": "zhanna"
+    },
+    "principal": 3200,
+    "startDay": 39,
+    "dueDay": 69,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lpl",
+    "item": {
+     "id": "is1a_lyusya",
+     "defId": "gold_band_583",
+     "condition": 82,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 11200,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "hallmark",
+      "colour",
+      "@magnet",
+      "seam",
+      "@reference"
+     ],
+     "story": "The ring again. It knows the way here better than I do.",
+     "weightGrams": 4.98
+    },
+    "customer": {
+     "id": "reg_lyusya",
+     "name": "Lyusya Karavaeva",
+     "archetype": "tradesman",
+     "temperament": "desperate",
+     "knowledge": 0.3,
+     "desperation": 0.7,
+     "portraitKey": "female_adult_09",
+     "regularId": "lyusya"
+    },
+    "principal": 5100,
+    "startDay": 46,
+    "dueDay": 76,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lq7",
+    "item": {
+     "id": "ipz",
+     "defId": "watch_vostok_komandirskie",
+     "condition": 80,
+     "authenticity": "genuine",
+     "provenance": "heirloom",
+     "trueValue": 5950,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "@condition",
+      "@magnet",
+      "movement",
+      "crown",
+      "@reference"
+     ],
+     "story": "Issued to my father in the army. Officers only, those dials.",
+     "weightGrams": 60.28
+    },
+    "customer": {
+     "id": "cpy",
+     "name": "Vera",
+     "archetype": "hustler",
+     "temperament": "stubborn",
+     "knowledge": 0.81,
+     "desperation": 0.5,
+     "portraitKey": "female_adult_07"
+    },
+    "principal": 3600,
+    "startDay": 47,
+    "dueDay": 77,
+    "monthlyRate": 0.1,
+    "redeemDay": 77
+   },
+   {
+    "id": "lqp",
+    "item": {
+     "id": "iq9",
+     "defId": "phone_galaxia_stella4",
+     "condition": 92,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 9600,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "screen",
+      "@magnet",
+      "magnet_speaker",
+      "logo",
+      "@reference"
+     ],
+     "story": "I won it in a raffle at work. I already have a phone.",
+     "weightGrams": 131.03
+    },
+    "customer": {
+     "id": "cq8",
+     "name": "Olga",
+     "archetype": "office",
+     "temperament": "stubborn",
+     "knowledge": 0.57,
+     "desperation": 0.73,
+     "portraitKey": "business_female_02"
+    },
+    "principal": 3582,
+    "startDay": 48,
+    "dueDay": 78,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lqq",
+    "item": {
+     "id": "iqc",
+     "defId": "laptop_tosaki_orbita_c40",
+     "condition": 94,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 14400,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "hinge",
+      "@magnet",
+      "magnet_lid",
+      "serial",
+      "ports",
+      "screen",
+      "logo",
+      "@reference"
+     ],
+     "story": "Bought it last September, before term. It's barely a year old.",
+     "weightGrams": 2073.76
+    },
+    "customer": {
+     "id": "cqb",
+     "name": "Nadia",
+     "archetype": "tradesman",
+     "temperament": "desperate",
+     "knowledge": 0.42,
+     "desperation": 0.86,
+     "portraitKey": "female_adult_04"
+    },
+    "principal": 3672,
+    "startDay": 48,
+    "dueDay": 78,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lxs",
+    "item": {
+     "id": "ixo",
+     "defId": "amber_pendant_925",
+     "condition": 64,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 3450,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "@condition",
+      "hallmark",
+      "amber",
+      "@magnet",
+      "magnet_none",
+      "warmth",
+      "@reference"
+     ],
+     "story": "It brings good health. Not to me, apparently.",
+     "weightGrams": 7.87
+    },
+    "customer": {
+     "id": "cxn",
+     "name": "Marina",
+     "archetype": "sailor",
+     "temperament": "flexible",
+     "knowledge": 0.53,
+     "desperation": 0.67,
+     "portraitKey": "pilot_female_02"
+    },
+    "principal": 1570,
+    "startDay": 60,
+    "dueDay": 90,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lyd",
+    "item": {
+     "id": "iy0",
+     "defId": "medal_victory_germany",
+     "condition": 64,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 1550,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "reverse",
+      "@reference"
+     ],
+     "story": "For the Victory Day parade my son wants a new phone. So.",
+     "weightGrams": 15.94
+    },
+    "customer": {
+     "id": "cxz",
+     "name": "Roman",
+     "archetype": "sailor",
+     "temperament": "desperate",
+     "knowledge": 0.58,
+     "desperation": 0.62,
+     "portraitKey": "pilot_male_03"
+    },
+    "principal": 405,
+    "startDay": 61,
+    "dueDay": 91,
+    "monthlyRate": 0.1,
+    "redeemDay": 91
+   },
+   {
+    "id": "lye",
+    "item": {
+     "id": "iy6",
+     "defId": "gold_rope_chain_585",
+     "condition": 74,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 22200,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "clasp_stamp",
+      "links",
+      "@magnet",
+      "magnet_clasp",
+      "colour",
+      "@reference"
+     ],
+     "story": "I need it gone by Friday. Rent.",
+     "weightGrams": 10.37
+    },
+    "customer": {
+     "id": "cy5",
+     "name": "Misha",
+     "archetype": "tradesman",
+     "temperament": "stubborn",
+     "knowledge": 0.67,
+     "desperation": 0.49,
+     "portraitKey": "delivery_male_01"
+    },
+    "principal": 10000,
+    "startDay": 61,
+    "dueDay": 91,
+    "monthlyRate": 0.1,
+    "redeemDay": 91
+   },
+   {
+    "id": "lvya",
+    "item": {
+     "id": "iy9",
+     "defId": "coin_olympiad_10r",
+     "condition": 87,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 1300,
+     "revealed": [],
+     "story": "Proof condition. It says so on the plastic. Well, the plastic broke.",
+     "weightGrams": 32.89
+    },
+    "customer": {
+     "id": "cy8",
+     "name": "Tanya",
+     "archetype": "pensioner",
+     "temperament": "stubborn",
+     "knowledge": 0.34,
+     "desperation": 0.74,
+     "portraitKey": "female_adult_02"
+    },
+    "principal": 480,
+    "startDay": 61,
+    "dueDay": 91,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "lz1",
+    "item": {
+     "id": "is1q_patimat",
+     "defId": "gold_bracelet_585",
+     "condition": 75,
+     "authenticity": "genuine",
+     "provenance": "heirloom",
+     "trueValue": 23900,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "clasp_stamp",
+      "colour",
+      "@magnet",
+      "@reference"
+     ],
+     "story": "Dagestani gold. My grandmother’s. Heavier than it looks, like all of us. For the wedding hall deposit.",
+     "weightGrams": 13.88
+    },
+    "customer": {
+     "id": "reg_patimat",
+     "name": "Patimat Aliyeva",
+     "archetype": "tradesman",
+     "temperament": "proud",
+     "knowledge": 0.65,
+     "desperation": 0.35,
+     "portraitKey": "female_adult_10",
+     "regularId": "patimat"
+    },
+    "principal": 13000,
+    "startDay": 62,
+    "dueDay": 92,
+    "monthlyRate": 0.1,
+    "redeemDay": 73
+   },
+   {
+    "id": "lzk",
+    "item": {
+     "id": "iz6",
+     "defId": "coin_chervonets_sower",
+     "condition": 77,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 12900,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "magnet_coin",
+      "relief",
+      "emblem",
+      "@reference"
+     ],
+     "story": "A wedding present. The marriage did not last, the coin did.",
+     "weightGrams": 8.65
+    },
+    "customer": {
+     "id": "cz5",
+     "name": "Lev",
+     "archetype": "tradesman",
+     "temperament": "flexible",
+     "knowledge": 0.68,
+     "desperation": 0.37,
+     "portraitKey": "delivery_male_01"
+    },
+    "principal": 6000,
+    "startDay": 63,
+    "dueDay": 93,
+    "monthlyRate": 0.1,
+    "redeemDay": 90
+   },
+   {
+    "id": "lzl",
+    "item": {
+     "id": "is1r_zinaida",
+     "defId": "gold_earrings_583",
+     "condition": 35,
+     "authenticity": "genuine",
+     "provenance": "heirloom",
+     "trueValue": 6200,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "magnet_locks",
+      "stones",
+      "colour",
+      "@reference"
+     ],
+     "story": "My mother’s earrings. I never wear them now. My ears have given up.",
+     "weightGrams": 4.29
+    },
+    "customer": {
+     "id": "reg_zinaida",
+     "name": "Zinaida Petrovna",
+     "archetype": "pensioner",
+     "temperament": "proud",
+     "knowledge": 0.2,
+     "desperation": 0.7,
+     "portraitKey": "business_female_03",
+     "regularId": "zinaida"
+    },
+    "principal": 2250,
+    "startDay": 63,
+    "dueDay": 93,
+    "monthlyRate": 0.1,
+    "redeemDay": 75
+   },
+   {
+    "id": "l12e",
+    "item": {
+     "id": "is1w_jamshid",
+     "defId": "phone_severin_k1",
+     "condition": 91,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 1050,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "battery",
+      "@magnet",
+      "magnet_speaker",
+      "logo",
+      "screen",
+      "@reference"
+     ],
+     "story": "My telephone. It only calls. My mother only answers, so it is enough. But the foreman has not paid, so.",
+     "weightGrams": 82.52
+    },
+    "customer": {
+     "id": "reg_jamshid",
+     "name": "Jamshid Rakhimov",
+     "archetype": "tradesman",
+     "temperament": "desperate",
+     "knowledge": 0.25,
+     "desperation": 0.7,
+     "portraitKey": "male_adult_15_b",
+     "regularId": "jamshid"
+    },
+    "principal": 480,
+    "startDay": 68,
+    "dueDay": 98,
+    "monthlyRate": 0.1,
+    "redeemDay": null
+   },
+   {
+    "id": "l12z",
+    "item": {
+     "id": "i12g",
+     "defId": "watch_vostok_komandirskie",
+     "condition": 49,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 3650,
+     "revealed": [
+      "@passport",
+      "@weight",
+      "heft",
+      "@condition",
+      "@magnet",
+      "magnet_crown",
+      "caseback",
+      "crown",
+      "@reference"
+     ],
+     "story": "Issued to my father in the army. Officers only, those dials.",
+     "weightGrams": 58.84
+    },
+    "customer": {
+     "id": "c12f",
+     "name": "Roman",
+     "archetype": "pensioner",
+     "temperament": "desperate",
+     "knowledge": 0.11,
+     "desperation": 0.82,
+     "portraitKey": "male_adult_03"
+    },
+    "principal": 1134,
+    "startDay": 69,
+    "dueDay": 99,
+    "monthlyRate": 0.1,
+    "redeemDay": 82
+   }
+  ],
+  "specialists": {},
+  "market": {
+   "drift": {
+    "antiques": 1.013,
+    "cameras": 1.072,
+    "coins": 1.004,
+    "electronics": 0.96,
+    "gold": 1.021,
+    "instruments": 1.059,
+    "jewelry": 0.955,
+    "laptops": 1.014,
+    "luxury": 0.964,
+    "militaria": 0.972,
+    "phones": 0.932,
+    "silver": 0.987,
+    "soviet": 1.045,
+    "tools": 0.963,
+    "watches": 0.965
+   },
+   "news": [
+    {
+     "id": "sp_hydro",
+     "headline": "Hydrological bureau publishes its spring water chart",
+     "body": "The bureau’s chart of the river’s spring levels is pinned up at every tram stop. Nobody can read it. Pensioners hold it up to the light anyway and say, darkly, that they remember worse.",
+     "tags": [],
+     "direction": "flat"
+    }
+   ]
+  },
+  "customers": {
+   "zinaida": {
+    "trust": 0.43,
+    "flags": [],
+    "visits": 8,
+    "lastDay": 63,
+    "nextDay": 72,
+    "lastOutcome": "pawned"
+   },
+   "valentin": {
+    "trust": -0.37,
+    "flags": [],
+    "visits": 8,
+    "lastDay": 62,
+    "nextDay": 75,
+    "lastOutcome": "walked"
+   },
+   "alisa": {
+    "trust": 0.23,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 64,
+    "nextDay": 73,
+    "lastOutcome": "bought"
+   },
+   "darya": {
+    "trust": -0.24,
+    "flags": [],
+    "visits": 6,
+    "lastDay": 66,
+    "nextDay": 74,
+    "lastOutcome": "passed"
+   },
+   "yana": {
+    "trust": -0.06,
+    "flags": [],
+    "visits": 7,
+    "lastDay": 69,
+    "nextDay": 81,
+    "lastOutcome": "passed"
+   },
+   "lyusya": {
+    "trust": 0.46,
+    "flags": [],
+    "visits": 7,
+    "lastDay": 67,
+    "nextDay": 76,
+    "lastOutcome": "bought"
+   },
+   "rimma": {
+    "trust": -0.04,
+    "flags": [],
+    "visits": 6,
+    "lastDay": 63,
+    "nextDay": 73,
+    "lastOutcome": "walked"
+   },
+   "ruslan": {
+    "trust": -0.32,
+    "flags": [],
+    "visits": 6,
+    "lastDay": 67,
+    "nextDay": 78,
+    "lastOutcome": "passed"
+   },
+   "inessa": {
+    "trust": -0.32,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 65,
+    "nextDay": 74,
+    "lastOutcome": "walked"
+   },
+   "nika": {
+    "trust": -0.26,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 58,
+    "nextDay": 71,
+    "lastOutcome": "passed"
+   },
+   "gleb": {
+    "trust": 0.12,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 69,
+    "nextDay": 78,
+    "lastOutcome": "bought"
+   },
+   "timofei": {
+    "trust": 0,
+    "flags": [],
+    "visits": 6,
+    "lastDay": 70,
+    "nextDay": 79,
+    "lastOutcome": "passed"
+   },
+   "margarita": {
+    "trust": -0.44,
+    "flags": [],
+    "visits": 8,
+    "lastDay": 71,
+    "nextDay": 79,
+    "lastOutcome": "passed"
+   },
+   "ulyana": {
+    "trust": -0.26,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 65,
+    "nextDay": 77,
+    "lastOutcome": "walked"
+   },
+   "yevstafy": {
+    "trust": -0.43,
+    "flags": [],
+    "visits": 8,
+    "lastDay": 61,
+    "nextDay": 71,
+    "lastOutcome": "walked"
+   },
+   "mikhail": {
+    "trust": 0,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 54,
+    "nextDay": 64,
+    "lastOutcome": "passed"
+   },
+   "edik": {
+    "trust": -0.08,
+    "flags": [],
+    "visits": 6,
+    "lastDay": 51,
+    "nextDay": 71,
+    "lastOutcome": "passed"
+   },
+   "artur": {
+    "trust": 0.24,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 61,
+    "nextDay": 75,
+    "lastOutcome": "talked"
+   },
+   "bakhtiyor": {
+    "trust": -0.18,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 61,
+    "nextDay": 78,
+    "lastOutcome": "walked"
+   },
+   "dilnoza": {
+    "trust": 0.1,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 59,
+    "nextDay": 73,
+    "lastOutcome": "talked"
+   },
+   "jamshid": {
+    "trust": 0.24,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 68,
+    "nextDay": 85,
+    "lastOutcome": "pawned"
+   },
+   "patimat": {
+    "trust": 0.05,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 63,
+    "nextDay": 81,
+    "lastOutcome": "talked"
+   },
+   "snezhana": {
+    "trust": 0.02,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 59,
+    "nextDay": 76,
+    "lastOutcome": "passed"
+   },
+   "kira": {
+    "trust": 0.08,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 69,
+    "nextDay": 84,
+    "lastOutcome": "passed"
+   },
+   "alyona": {
+    "trust": 0.25,
+    "flags": [],
+    "visits": 7,
+    "lastDay": 70,
+    "nextDay": 87,
+    "lastOutcome": "bought"
+   },
+   "grisha": {
+    "trust": 0.16,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 56,
+    "nextDay": 89,
+    "lastOutcome": "talked"
+   },
+   "vitya": {
+    "trust": -0.07,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 68,
+    "nextDay": 82,
+    "lastOutcome": "passed"
+   },
+   "prokhor": {
+    "trust": -0.08,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 64,
+    "nextDay": 77,
+    "lastOutcome": "walked"
+   },
+   "zakhar": {
+    "trust": -0.16,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 57,
+    "nextDay": 71,
+    "lastOutcome": "talked"
+   },
+   "ernest": {
+    "trust": -0.04,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 64,
+    "nextDay": 77,
+    "lastOutcome": "talked"
+   },
+   "styopa": {
+    "trust": 0.24,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 63,
+    "nextDay": 78,
+    "lastOutcome": "talked"
+   },
+   "klava": {
+    "trust": -0.18,
+    "flags": [],
+    "visits": 5,
+    "lastDay": 66,
+    "nextDay": 82,
+    "lastOutcome": "walked"
+   },
+   "elvira": {
+    "trust": -0.03,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 57,
+    "nextDay": 71,
+    "lastOutcome": "talked"
+   },
+   "zhanna": {
+    "trust": 0.14,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 60,
+    "nextDay": 75,
+    "lastOutcome": "walked"
+   },
+   "nonna": {
+    "trust": 0.06,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 70,
+    "nextDay": 84,
+    "lastOutcome": "passed"
+   },
+   "zoya": {
+    "trust": 0.06,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 65,
+    "nextDay": 80,
+    "lastOutcome": "talked"
+   },
+   "lera": {
+    "trust": 0.01,
+    "flags": [],
+    "visits": 4,
+    "lastDay": 61,
+    "nextDay": 76,
+    "lastOutcome": "talked"
+   },
+   "fedya": {
+    "trust": 0.18,
+    "flags": [],
+    "visits": 6,
+    "lastDay": 29,
+    "nextDay": 36,
+    "lastOutcome": "talked"
+   },
+   "zhora": {
+    "trust": -0.04,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 48,
+    "nextDay": 55,
+    "lastOutcome": "passed"
+   },
+   "eduard": {
+    "trust": 0,
+    "flags": [],
+    "visits": 3,
+    "lastDay": 21,
+    "nextDay": 28,
+    "lastOutcome": "talked"
+   },
+   "appraiser": {
+    "trust": 0.23,
+    "flags": [],
+    "visits": 0,
+    "lastDay": 0,
+    "nextDay": 0
+   }
+  },
+  "queue": [
+   {
+    "visitId": "v13o",
+    "kind": "seller",
+    "wants": "sell",
+    "customer": {
+     "id": "c13m",
+     "name": "Alla",
+     "archetype": "office",
+     "temperament": "flexible",
+     "knowledge": 0.75,
+     "desperation": 0.19,
+     "portraitKey": "female_adult_05"
+    },
+    "item": {
+     "id": "i13n",
+     "defId": "metal_detector_kladez",
+     "condition": 81,
+     "authenticity": "fake",
+     "provenance": "unknown",
+     "trueValue": 2950,
+     "revealed": [],
+     "story": "Kladez Hunter, the good one. You can find coins from Catherine’s time with it.",
+     "fakeProfileId": "china_copy",
+     "weightGrams": 1113.32
+    },
+    "patience": 168
+   },
+   {
+    "visitId": "v13r",
+    "kind": "seller",
+    "wants": "sell",
+    "customer": {
+     "id": "c13p",
+     "name": "Inna",
+     "archetype": "office",
+     "temperament": "proud",
+     "knowledge": 0.41,
+     "desperation": 0.45,
+     "portraitKey": "business_female_02"
+    },
+    "item": {
+     "id": "i13q",
+     "defId": "coin_chervonets_sower",
+     "condition": 56,
+     "authenticity": "genuine",
+     "provenance": "clean",
+     "trueValue": 10000,
+     "revealed": [],
+     "story": "Better than a bank. Banks go bust. Gold does not.",
+     "weightGrams": 8.6
+    },
+    "patience": 220
+   },
+   {
+    "visitId": "v13x",
+    "kind": "seller",
+    "wants": "pawn",
+    "customer": {
+     "id": "c13v",
+     "name": "Polina",
+     "archetype": "student",
+     "temperament": "desperate",
+     "knowledge": 0.41,
+     "desperation": 0.63,
+     "portraitKey": "female_adult_03"
+    },
+    "item": {
+     "id": "i13w",
+     "defId": "coin_olympiad_10r",
+     "condition": 74,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 1550,
+     "revealed": [],
+     "story": "The bear mascot cried at the closing ceremony. I cried too. Anyway, the coin.",
+     "weightGrams": 33.61
+    },
+    "patience": 186,
+    "line": "Please, just a loan. I’ll be back for it, I swear, I just need to get through this month."
+   },
+   {
+    "visitId": "vs1z_zakhar",
+    "kind": "scene",
+    "customer": {
+     "id": "reg_zakhar",
+     "name": "Zakhar Svirelin",
+     "archetype": "hustler",
+     "temperament": "flexible",
+     "knowledge": 0.75,
+     "desperation": 0.3,
+     "portraitKey": "male_adult_02_b",
+     "regularId": "zakhar"
+    },
+    "patience": 115182,
+    "beatId": "zakhar.book",
+    "line": "My brother writes poems. Did you know? A little book, printed at his own cost, sixty copies. He sold one to a library and gave the rest away and one of them ended up on my bench, left by a tourist."
+   },
+   {
+    "visitId": "v140",
+    "kind": "seller",
+    "wants": "sell",
+    "customer": {
+     "id": "c13y",
+     "name": "Lev",
+     "archetype": "office",
+     "temperament": "proud",
+     "knowledge": 0.58,
+     "desperation": 0.45,
+     "portraitKey": "business_male_02"
+    },
+    "item": {
+     "id": "i13z",
+     "defId": "medal_for_courage",
+     "condition": 70,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 11800,
+     "revealed": [],
+     "story": "My mother kept it in a biscuit tin. She died in the winter.",
+     "weightGrams": 27.51
+    },
+    "patience": 250
+   },
+   {
+    "visitId": "vs1z_grisha",
+    "kind": "seller",
+    "wants": "sell",
+    "customer": {
+     "id": "reg_grisha",
+     "name": "Grisha Zubov",
+     "archetype": "tradesman",
+     "temperament": "proud",
+     "knowledge": 0.45,
+     "desperation": 0.5,
+     "portraitKey": "male_adult_11_b",
+     "regularId": "grisha"
+    },
+    "item": {
+     "id": "is1z_grisha",
+     "defId": "watch_vostok_komandirskie",
+     "condition": 37,
+     "authenticity": "frankenstein",
+     "provenance": "clean",
+     "trueValue": 1350,
+     "revealed": [],
+     "story": "My watch. They gave it back to me at the gate with my belt and my laces. It stopped the day I went in and started again the day I came out. I wound it, but still.",
+     "fakeProfileId": "dial_swap",
+     "weightGrams": 59.83
+    },
+    "patience": 468,
+    "line": "Afternoon. Tuesday meeting tonight. We sit in a circle and drink tea and don’t do things. It’s harder than it sounds. My watch. They gave it back to me at the gate with my belt and my laces. It stopped the day I went in and started again the day I came out. I wound it, but still."
+   }
+  ],
+  "current": {
+   "visitId": "vs1z_jamshid",
+   "sale": null,
+   "customer": {
+    "id": "reg_jamshid",
+    "name": "Jamshid Rakhimov",
+    "archetype": "tradesman",
+    "temperament": "desperate",
+    "knowledge": 0.25,
+    "desperation": 0.7,
+    "portraitKey": "male_adult_15_b",
+    "regularId": "jamshid"
+   },
+   "elapsed": 0,
+   "phase": "scene",
+   "beatId": "jamshid.home",
+   "scene": {
+    "lines": [
+     "Good day. I came to say goodbye, for the summer. I am going home to Urgut. My mother has found me a wife. I have seen her photograph; she has seen mine. We were both disappointed and both said yes.",
+     "In the autumn I come back. Bakhtiyor says the next building is twelve floors. I will carry every brick and think of my wife and this city, and which is colder."
+    ],
+    "step": 0,
+    "choices": [
+     {
+      "id": "safe",
+      "label": "Safe journey. Come back"
+     }
+    ]
+   },
+   "kind": "scene",
+   "line": "Good day. I came to say goodbye, for the summer. I am going home to Urgut. My mother has found me a wife. I have seen her photograph; she has seen mine. We were both disappointed and both said yes."
+  },
+  "inspect": null,
+  "haggle": null,
+  "day": {
+   "phase": "open",
+   "clock": 98,
+   "served": 2,
+   "total": 10,
+   "openingCash": 5090,
+   "log": [
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on Omeca Aquastar automatic diver from Margarita Vdovina",
+     "defId": "watch_omeca_aquastar"
+    },
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Passed on 583 gold wedding band from Nadia",
+     "defId": "gold_band_583"
+    }
+   ],
+   "newsRead": true,
+   "nextArrival": 118.77420773450285
+  },
+  "history": [
+   {
+    "day": 11,
+    "openingCash": 11178,
+    "closingCash": 31628,
+    "bought": 0,
+    "spent": 0,
+    "sold": 2,
+    "earned": 9990,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 1880,
+    "redeemed": 12340,
+    "stolen": 0
+   },
+   {
+    "day": 12,
+    "openingCash": 31628,
+    "closingCash": 30051,
+    "bought": 2,
+    "spent": 4767,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 3190,
+    "stolen": 0
+   },
+   {
+    "day": 13,
+    "openingCash": 30051,
+    "closingCash": 15729,
+    "bought": 1,
+    "spent": 12852,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 1470,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 14,
+    "openingCash": 15729,
+    "closingCash": 10329,
+    "bought": 1,
+    "spent": 5400,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 15,
+    "openingCash": 10329,
+    "closingCash": 7915,
+    "bought": 1,
+    "spent": 2952,
+    "sold": 1,
+    "earned": 7838,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 7300,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 16,
+    "openingCash": 7915,
+    "closingCash": 27402,
+    "bought": 0,
+    "spent": 0,
+    "sold": 2,
+    "earned": 15717,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 4300,
+    "redeemed": 10870,
+    "stolen": 0
+   },
+   {
+    "day": 17,
+    "openingCash": 27402,
+    "closingCash": 9002,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 19200,
+    "redeemed": 800,
+    "stolen": 0
+   },
+   {
+    "day": 18,
+    "openingCash": 9002,
+    "closingCash": 5582,
+    "bought": 1,
+    "spent": 3420,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 19,
+    "openingCash": 5582,
+    "closingCash": 5582,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 20,
+    "openingCash": 5582,
+    "closingCash": 17082,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 1190,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 10310,
+    "stolen": 0
+   },
+   {
+    "day": 21,
+    "openingCash": 17082,
+    "closingCash": 32832,
+    "bought": 0,
+    "spent": 0,
+    "sold": 3,
+    "earned": 5940,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 9810,
+    "stolen": 0
+   },
+   {
+    "day": 22,
+    "openingCash": 32832,
+    "closingCash": 32832,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 23,
+    "openingCash": 32832,
+    "closingCash": 34792,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 1960,
+    "stolen": 0
+   },
+   {
+    "day": 24,
+    "openingCash": 34792,
+    "closingCash": 34792,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 25,
+    "openingCash": 34792,
+    "closingCash": 34792,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 26,
+    "openingCash": 34792,
+    "closingCash": 34792,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 27,
+    "openingCash": 34792,
+    "closingCash": 56692,
+    "bought": 0,
+    "spent": 0,
+    "sold": 2,
+    "earned": 18800,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 3100,
+    "stolen": 0
+   },
+   {
+    "day": 28,
+    "openingCash": 56692,
+    "closingCash": 53364,
+    "bought": 2,
+    "spent": 6048,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 2720,
+    "stolen": 0
+   },
+   {
+    "day": 29,
+    "openingCash": 53364,
+    "closingCash": 8702,
+    "bought": 2,
+    "spent": 4158,
+    "sold": 1,
+    "earned": 21816,
+    "walkouts": 2,
+    "expenses": 61500,
+    "loaned": 820,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 30,
+    "openingCash": 8702,
+    "closingCash": 3919,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 4783,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 31,
+    "openingCash": 3919,
+    "closingCash": 1033,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 2886,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 32,
+    "openingCash": 1033,
+    "closingCash": 766,
+    "bought": 1,
+    "spent": 267,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 33,
+    "openingCash": 766,
+    "closingCash": 4396,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 3,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 3630,
+    "stolen": 0
+   },
+   {
+    "day": 34,
+    "openingCash": 4396,
+    "closingCash": 5606,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 1210,
+    "stolen": 0
+   },
+   {
+    "day": 35,
+    "openingCash": 5606,
+    "closingCash": 4576,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 4100,
+    "redeemed": 3070,
+    "stolen": 0
+   },
+   {
+    "day": 36,
+    "openingCash": 4576,
+    "closingCash": 476,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 4100,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 37,
+    "openingCash": 476,
+    "closingCash": 476,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 38,
+    "openingCash": 476,
+    "closingCash": 476,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 39,
+    "openingCash": 476,
+    "closingCash": 168,
+    "bought": 1,
+    "spent": 4200,
+    "sold": 1,
+    "earned": 11092,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 3200,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 40,
+    "openingCash": 168,
+    "closingCash": 7718,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 7200,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 41,
+    "openingCash": 7718,
+    "closingCash": 618,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 7100,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 42,
+    "openingCash": 618,
+    "closingCash": 2238,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 1620,
+    "stolen": 0
+   },
+   {
+    "day": 43,
+    "openingCash": 2238,
+    "closingCash": 6181,
+    "bought": 1,
+    "spent": 1397,
+    "sold": 1,
+    "earned": 1130,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 4210,
+    "stolen": 0
+   },
+   {
+    "day": 44,
+    "openingCash": 6181,
+    "closingCash": 2311,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 3000,
+    "loaned": 870,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 45,
+    "openingCash": 2311,
+    "closingCash": 9096,
+    "bought": 1,
+    "spent": 3848,
+    "sold": 1,
+    "earned": 10633,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 46,
+    "openingCash": 9096,
+    "closingCash": 6701,
+    "bought": 1,
+    "spent": 2025,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 5100,
+    "redeemed": 4730,
+    "stolen": 0
+   },
+   {
+    "day": 47,
+    "openingCash": 6701,
+    "closingCash": 8936,
+    "bought": 1,
+    "spent": 5445,
+    "sold": 1,
+    "earned": 9300,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 3600,
+    "redeemed": 1980,
+    "stolen": 0
+   },
+   {
+    "day": 48,
+    "openingCash": 8936,
+    "closingCash": 3699,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 2017,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 7254,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 49,
+    "openingCash": 3699,
+    "closingCash": 7349,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 3650,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 50,
+    "openingCash": 7349,
+    "closingCash": 7349,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 51,
+    "openingCash": 7349,
+    "closingCash": 19019,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 7000,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 4670,
+    "stolen": 0
+   },
+   {
+    "day": 52,
+    "openingCash": 19019,
+    "closingCash": 40129,
+    "bought": 0,
+    "spent": 0,
+    "sold": 3,
+    "earned": 21110,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 53,
+    "openingCash": 40129,
+    "closingCash": 40129,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 54,
+    "openingCash": 40129,
+    "closingCash": 48029,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 7900,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 55,
+    "openingCash": 48029,
+    "closingCash": 65079,
+    "bought": 0,
+    "spent": 0,
+    "sold": 2,
+    "earned": 17050,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 56,
+    "openingCash": 65079,
+    "closingCash": 54284,
+    "bought": 2,
+    "spent": 6705,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 5000,
+    "redeemed": 910,
+    "stolen": 0
+   },
+   {
+    "day": 57,
+    "openingCash": 54284,
+    "closingCash": 51184,
+    "bought": 1,
+    "spent": 3100,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 58,
+    "openingCash": 51184,
+    "closingCash": 56957,
+    "bought": 1,
+    "spent": 999,
+    "sold": 1,
+    "earned": 5912,
+    "walkouts": 2,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 860,
+    "stolen": 0
+   },
+   {
+    "day": 59,
+    "openingCash": 56957,
+    "closingCash": 15143,
+    "bought": 1,
+    "spent": 1640,
+    "sold": 1,
+    "earned": 1696,
+    "walkouts": 1,
+    "expenses": 50500,
+    "loaned": 0,
+    "redeemed": 8630,
+    "stolen": 0
+   },
+   {
+    "day": 60,
+    "openingCash": 15143,
+    "closingCash": 44783,
+    "bought": 2,
+    "spent": 4990,
+    "sold": 1,
+    "earned": 36200,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 1570,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 61,
+    "openingCash": 44783,
+    "closingCash": 42228,
+    "bought": 1,
+    "spent": 370,
+    "sold": 1,
+    "earned": 8700,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 10885,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 62,
+    "openingCash": 42228,
+    "closingCash": 23323,
+    "bought": 2,
+    "spent": 6510,
+    "sold": 1,
+    "earned": 605,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 13000,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 63,
+    "openingCash": 23323,
+    "closingCash": 12049,
+    "bought": 1,
+    "spent": 3024,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 8250,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 64,
+    "openingCash": 12049,
+    "closingCash": 10129,
+    "bought": 1,
+    "spent": 1920,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 1
+   },
+   {
+    "day": 65,
+    "openingCash": 10129,
+    "closingCash": 11722,
+    "bought": 1,
+    "spent": 1845,
+    "sold": 1,
+    "earned": 3438,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 66,
+    "openingCash": 11722,
+    "closingCash": 14652,
+    "bought": 1,
+    "spent": 920,
+    "sold": 1,
+    "earned": 3850,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 67,
+    "openingCash": 14652,
+    "closingCash": 1435,
+    "bought": 1,
+    "spent": 13217,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 68,
+    "openingCash": 1435,
+    "closingCash": 1917,
+    "bought": 0,
+    "spent": 0,
+    "sold": 1,
+    "earned": 962,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 480,
+    "redeemed": 0,
+    "stolen": 0
+   },
+   {
+    "day": 69,
+    "openingCash": 1917,
+    "closingCash": 6699,
+    "bought": 2,
+    "spent": 3063,
+    "sold": 1,
+    "earned": 3759,
+    "walkouts": 1,
+    "expenses": 0,
+    "loaned": 1134,
+    "redeemed": 5220,
+    "stolen": 0
+   },
+   {
+    "day": 70,
+    "openingCash": 6699,
+    "closingCash": 5090,
+    "bought": 2,
+    "spent": 6055,
+    "sold": 2,
+    "earned": 4446,
+    "walkouts": 0,
+    "expenses": 0,
+    "loaned": 0,
+    "redeemed": 0,
+    "stolen": 0
+   }
+  ],
+  "crime": {
+   "heat": 0,
+   "pressure": 0.1,
+   "fenceTrust": -0.2,
+   "flags": [],
+   "bulletin": [
+    {
+     "id": "b1f_0",
+     "day": 51,
+     "defId": "drill_hartwig",
+     "text": "Hartwig 18 V cordless drill, well worn. Taken from a parked car by the Seventh Bridge late on Saturday."
+    },
+    {
+     "id": "b1g_0",
+     "day": 52,
+     "defId": "coin_poltinnik_1924",
+     "text": "Silver poltinnik, well worn. Taken from a widow’s flat on the Fourth Line early on Tuesday."
+    },
+    {
+     "id": "b1i_0",
+     "day": 54,
+     "defId": "perforator_hartwig",
+     "text": "Hartwig rotary hammer, light wear. Taken from a widow’s flat on the Fourth Line early on Thursday.",
+     "itemId": "is1j_bulletin_b1i_0"
+    },
+    {
+     "id": "b1m_0",
+     "day": 58,
+     "defId": "lens_helios_44",
+     "text": "Helios-44-2 58 mm lens, well worn. Taken from a widow’s flat on the Fourth Line late on Monday.",
+     "itemId": "is1r_bulletin_b1m_0"
+    },
+    {
+     "id": "b1m_1",
+     "day": 58,
+     "defId": "vice_kuznets",
+     "text": "Kuznets bench vice, as new. Taken from a widow’s flat on the Fourth Line early on Saturday.",
+     "itemId": "is1q_bulletin_b1m_1"
+    },
+    {
+     "id": "b1o_0",
+     "day": 60,
+     "defId": "laptop_tosaki_orbita_c40",
+     "text": "Tosaki Orbita C40 laptop, badly worn. Taken from a student hostel on Tkachey Lane late on Tuesday."
+    },
+    {
+     "id": "b1t_0",
+     "day": 65,
+     "defId": "silver_earrings_925",
+     "text": "925 silver earrings with garnets, well worn. Taken from a parked car by the Seventh Bridge early on Monday.",
+     "itemId": "is1v_bulletin_b1t_0"
+    },
+    {
+     "id": "b1v_0",
+     "day": 67,
+     "defId": "gold_cross_585",
+     "text": "585 gold cross pendant, well worn. Taken from a hotel room on Bolshaya Mostovaya on Tuesday afternoon."
+    },
+    {
+     "id": "b1v_1",
+     "day": 67,
+     "defId": "medal_for_courage",
+     "text": "Medal \"For Courage\", badly worn. Taken from a changing room at the Volna pool early on Wednesday.",
+     "itemId": "is1y_bulletin_b1v_1"
+    }
+   ],
+   "volkova": {
+    "met": true,
+    "trust": 0.55,
+    "nextDay": 0,
+    "lies": 0,
+    "caught": 0,
+    "bribes": 0
+   },
+   "fence": {
+    "met": true,
+    "deals": 0,
+    "refusals": 4,
+    "nextDay": 85
+   },
+   "events": [
+    {
+     "day": 73,
+     "kind": "police.bring",
+     "data": {
+      "entry": "b1v_0"
+     }
+    }
+   ]
+  },
+  "career": {
+   "axes": {
+    "clean": 1.5,
+    "heart": 12
+   },
+   "end": null
+  },
+  "staff": {
+   "hired": true,
+   "sinceDay": 30,
+   "mode": "next",
+   "categories": [],
+   "accuracyMod": 0.06,
+   "busy": {
+    "visit": {
+     "visitId": "v13u",
+     "kind": "seller",
+     "wants": "sell",
+     "customer": {
+      "id": "c13s",
+      "name": "Alla",
+      "archetype": "hustler",
+      "temperament": "stubborn",
+      "knowledge": 0.66,
+      "desperation": 0.18,
+      "portraitKey": "female_adult_07"
+     },
+     "item": {
+      "id": "i13t",
+      "defId": "coin_poltinnik_1924",
+      "condition": 54,
+      "authenticity": "genuine",
+      "provenance": "clean",
+      "trueValue": 430,
+      "revealed": [],
+      "story": "From my grandfather's collection. He had a whole album of these.",
+      "weightGrams": 9.94
+     },
+     "patience": 264
+    },
+    "until": 120
+   },
+   "pending": [],
+   "record": {
+    "served": 81,
+    "bought": 4,
+    "lent": 1,
+    "spent": 11790,
+    "fakes": 2,
+    "insults": 3,
+    "wages": 7000
+   }
+  },
+  "story": {
+   "arcs": {
+    "laptop": {
+     "beats": {
+      "laptop.rent": {
+       "day": 4,
+       "outcome": "pawned",
+       "choice": "explain",
+       "ratio": 0.268,
+       "loan": {
+        "id": "l2t",
+        "end": "redeemed",
+        "day": 12
+       }
+      },
+      "laptop.shoes": {
+       "day": 15,
+       "outcome": "pawned",
+       "ratio": 0.412,
+       "loan": {
+        "id": "l92",
+        "end": "redeemed",
+        "day": 20
+       }
+      },
+      "laptop.retake": {
+       "day": 24,
+       "outcome": "passed"
+      },
+      "laptop.mum": {
+       "day": 29,
+       "outcome": "talked"
+      }
+     },
+     "ended": true
+    },
+    "protection": {
+     "beats": {
+      "protection.asking": {
+       "day": 5,
+       "outcome": "talked",
+       "choice": "gone"
+      },
+      "protection.offer": {
+       "day": 12,
+       "outcome": "talked",
+       "choice": "refuse"
+      },
+      "protection.glue": {
+       "day": 16,
+       "outcome": "talked",
+       "choice": "refuse"
+      },
+      "protection.bakery": {
+       "day": 21,
+       "outcome": "talked"
+      }
+     }
+    },
+    "rolex": {
+     "beats": {
+      "rolex.dubai": {
+       "day": 7,
+       "outcome": "passed"
+      },
+      "rolex.omeca": {
+       "day": 13,
+       "outcome": "passed",
+       "choice": "humour"
+      },
+      "rolex.ramil": {
+       "day": 19,
+       "outcome": "passed",
+       "choice": "money"
+      },
+      "rolex.real": {
+       "day": 30,
+       "outcome": "passed"
+      },
+      "rolex.across": {
+       "day": 36,
+       "outcome": "talked"
+      }
+     },
+     "ended": true
+    },
+    "medals": {
+     "beats": {
+      "medals.roof": {
+       "day": 7,
+       "outcome": "bought",
+       "ratio": 0.611
+      },
+      "medals.second": {
+       "day": 13,
+       "outcome": "passed"
+      },
+      "medals.truth": {
+       "day": 15,
+       "outcome": "talked",
+       "choice": "truth"
+      },
+      "medals.tea": {
+       "day": 19,
+       "outcome": "talked"
+      }
+     },
+     "ended": true
+    },
+    "volkova": {
+     "beats": {
+      "volkova.father": {
+       "day": 16,
+       "outcome": "walked"
+      },
+      "volkova.inform": {
+       "day": 17,
+       "outcome": "talked",
+       "choice": "stay_out"
+      },
+      "volkova.source": {
+       "day": 18,
+       "outcome": "talked",
+       "choice": "source_yes"
+      },
+      "volkova.stakeout": {
+       "day": 24,
+       "outcome": "left",
+       "choice": "ring"
+      },
+      "volkova.patrol": {
+       "day": 33,
+       "outcome": "talked"
+      },
+      "volkova.recital": {
+       "day": 34,
+       "outcome": "talked",
+       "choice": "go"
+      }
+     }
+    },
+    "alyona": {
+     "beats": {
+      "alyona.ring": {
+       "day": 17,
+       "outcome": "pawned",
+       "ratio": 0.45,
+       "loan": {
+        "id": "la6",
+        "end": "redeemed",
+        "day": 51
+       }
+      },
+      "alyona.renew": {
+       "day": 40,
+       "outcome": "talked",
+       "choice": "renew"
+      },
+      "alyona.dima": {
+       "day": 55,
+       "outcome": "talked"
+      }
+     }
+    },
+    "fence": {
+     "beats": {
+      "fence.meet": {
+       "day": 20,
+       "outcome": "talked",
+       "choice": "refuse"
+      },
+      "fence.notebook": {
+       "day": 48,
+       "outcome": "talked",
+       "choice": "refuse"
+      }
+     }
+    },
+    "collector": {
+     "beats": {
+      "collector.wish": {
+       "day": 20,
+       "outcome": "talked"
+      },
+      "collector.icon": {
+       "day": 26,
+       "outcome": "passed"
+      },
+      "collector.elsewhere": {
+       "day": 36,
+       "outcome": "talked"
+      }
+     },
+     "ended": true
+    },
+    "appraiser": {
+     "beats": {
+      "appraiser.start": {
+       "day": 30,
+       "outcome": "talked",
+       "choice": "welcome"
+      },
+      "appraiser.zhora": {
+       "day": 40,
+       "outcome": "talked",
+       "choice": "ask_lev"
+      },
+      "appraiser.confide": {
+       "day": 44,
+       "outcome": "talked",
+       "choice": "keep_on"
+      },
+      "appraiser.tin": {
+       "day": 45,
+       "outcome": "talked",
+       "choice": "tin_crew"
+      },
+      "appraiser.yuri": {
+       "day": 49,
+       "outcome": "talked"
+      }
+     },
+     "ended": true
+    },
+    "jamshid": {
+     "beats": {
+      "jamshid.monday": {
+       "day": 31,
+       "outcome": "pawned",
+       "ratio": 0.301,
+       "loan": {
+        "id": "lhf",
+        "end": "forfeited",
+        "day": 65
+       }
+      }
+     }
+    },
+    "snezhana": {
+     "beats": {
+      "snezhana.audition": {
+       "day": 32,
+       "outcome": "talked",
+       "choice": "no_thanks"
+      },
+      "snezhana.boat": {
+       "day": 42,
+       "outcome": "talked"
+      }
+     }
+    },
+    "klava": {
+     "beats": {
+      "klava.route": {
+       "day": 33,
+       "outcome": "talked",
+       "choice": "sign"
+      },
+      "klava.valentin": {
+       "day": 54,
+       "outcome": "talked"
+      },
+      "klava.reprieve": {
+       "day": 58,
+       "outcome": "talked"
+      }
+     }
+    },
+    "prokhor": {
+     "beats": {
+      "prokhor.brother": {
+       "day": 34,
+       "outcome": "talked",
+       "choice": "tell"
+      },
+      "prokhor.stool": {
+       "day": 52,
+       "outcome": "talked"
+      }
+     }
+    },
+    "dilnoza": {
+     "beats": {
+      "dilnoza.letter": {
+       "day": 38,
+       "outcome": "talked",
+       "choice": "petition"
+      },
+      "dilnoza.kept": {
+       "day": 59,
+       "outcome": "talked"
+      }
+     },
+     "ended": true
+    },
+    "vitya": {
+     "beats": {
+      "vitya.shirts": {
+       "day": 38,
+       "outcome": "talked",
+       "choice": "no_thanks"
+      },
+      "vitya.final": {
+       "day": 54,
+       "outcome": "talked"
+      }
+     }
+    },
+    "flood": {
+     "beats": {
+      "flood.sandbags": {
+       "day": 39,
+       "outcome": "talked",
+       "choice": "flood_sandbags"
+      },
+      "flood.pump": {
+       "day": 44,
+       "outcome": "talked",
+       "choice": "pump_lend"
+      },
+      "flood.family": {
+       "day": 45,
+       "outcome": "bought",
+       "ratio": 0.341
+      },
+      "flood.storage": {
+       "day": 46,
+       "outcome": "talked",
+       "choice": "store_free"
+      },
+      "flood.credit": {
+       "day": 47,
+       "outcome": "talked",
+       "choice": "credit_no"
+      },
+      "flood.salvage": {
+       "day": 48,
+       "outcome": "passed"
+      },
+      "flood.storage_thanks": {
+       "day": 59,
+       "outcome": "talked"
+      }
+     }
+    },
+    "lera": {
+     "beats": {
+      "lera.rates": {
+       "day": 39,
+       "outcome": "talked",
+       "choice": "show"
+      },
+      "lera.twins": {
+       "day": 61,
+       "outcome": "talked"
+      }
+     }
+    },
+    "grisha": {
+     "beats": {
+      "grisha.reference": {
+       "day": 42,
+       "outcome": "talked",
+       "choice": "write"
+      },
+      "grisha.zhora": {
+       "day": 50,
+       "outcome": "talked",
+       "choice": "right"
+      },
+      "grisha.depot": {
+       "day": 56,
+       "outcome": "talked"
+      }
+     }
+    },
+    "elvira": {
+     "beats": {
+      "elvira.trip": {
+       "day": 46,
+       "outcome": "talked",
+       "choice": "no_thanks"
+      },
+      "elvira.earrings": {
+       "day": 57,
+       "outcome": "talked"
+      }
+     }
+    },
+    "flood_talk": {
+     "beats": {
+      "flood_talk.praise": {
+       "day": 47,
+       "outcome": "talked"
+      },
+      "flood_talk.zinaida_hero": {
+       "day": 50,
+       "outcome": "talked"
+      },
+      "flood_talk.yevstafy_hero": {
+       "day": 51,
+       "outcome": "talked"
+      },
+      "flood_talk.valentin_hero": {
+       "day": 52,
+       "outcome": "talked"
+      },
+      "flood_talk.rimma_hero": {
+       "day": 53,
+       "outcome": "talked"
+      },
+      "flood_talk.paper_hero": {
+       "day": 55,
+       "outcome": "talked"
+      }
+     }
+    },
+    "artur": {
+     "beats": {
+      "artur.alisa": {
+       "day": 49,
+       "outcome": "talked",
+       "choice": "recommend"
+      },
+      "artur.insurance": {
+       "day": 51,
+       "outcome": "talked"
+      },
+      "artur.weddings": {
+       "day": 61,
+       "outcome": "talked",
+       "choice": "luck"
+      }
+     }
+    },
+    "kira": {
+     "beats": {
+      "kira.house": {
+       "day": 53,
+       "outcome": "talked",
+       "choice": "jar"
+      },
+      "kira.table": {
+       "day": 56,
+       "outcome": "talked",
+       "choice": "thanks"
+      },
+      "kira.school": {
+       "day": 69,
+       "outcome": "passed"
+      }
+     }
+    },
+    "zakhar": {
+     "beats": {
+      "zakhar.game": {
+       "day": 57,
+       "outcome": "talked",
+       "choice": "no_thanks"
+      }
+     }
+    },
+    "zoya": {
+     "beats": {
+      "zoya.ears": {
+       "day": 58,
+       "outcome": "talked",
+       "choice": "tell_me"
+      },
+      "zoya.chair": {
+       "day": 65,
+       "outcome": "talked",
+       "choice": "sheep"
+      }
+     }
+    },
+    "zhanna": {
+     "beats": {
+      "zhanna.chain": {
+       "day": 60,
+       "outcome": "walked"
+      }
+     }
+    },
+    "styopa": {
+     "beats": {
+      "styopa.lesson": {
+       "day": 63,
+       "outcome": "talked",
+       "choice": "backup"
+      }
+     }
+    },
+    "patimat": {
+     "beats": {
+      "patimat.invite": {
+       "day": 63,
+       "outcome": "talked",
+       "choice": "no_thanks"
+      }
+     }
+    },
+    "ernest": {
+     "beats": {
+      "ernest.fregat": {
+       "day": 64,
+       "outcome": "talked",
+       "choice": "inessa"
+      }
+     }
+    },
+    "nonna": {
+     "beats": {
+      "nonna.watch": {
+       "day": 70,
+       "outcome": "passed"
+      }
+     }
+    }
+   },
+   "pendingEvents": [],
+   "flags": [
+    "protection.gusev_debt",
+    "medals_bought_real",
+    "protection.refused",
+    "protection.running",
+    "police.met",
+    "police.tea",
+    "volkova.source",
+    "medals_conman_known",
+    "collector.asked",
+    "protection.warned",
+    "volkova.rang",
+    "collector.passed",
+    "appraiser.on_staff",
+    "appraiser.hired",
+    "rolex_real_missed",
+    "klava_petition",
+    "prokhor_message",
+    "heart.volkova_recital",
+    "dilnoza_petition",
+    "flood.sandbags",
+    "snezhana_boat",
+    "heart.grisha_reference",
+    "flood.hit",
+    "flood.dry",
+    "heart.appraiser_kept",
+    "flood.hero_pump",
+    "heart.flood_pump",
+    "appraiser.debt_paid",
+    "flood.hero_storage",
+    "heart.flood_storage",
+    "flood.volkova_praised",
+    "appraiser.yuri_home",
+    "artur_alisa_slot",
+    "heart.brashpilevs",
+    "vitya_final",
+    "klava_hearing",
+    "flood.paper_hero",
+    "alyona_home",
+    "grisha_depot",
+    "kira_warned",
+    "elvira_earrings",
+    "klava_saved",
+    "zoya_ears",
+    "dilnoza_kiosk_stays",
+    "lera_manager",
+    "artur_weddings",
+    "ernest_inessa",
+    "zoya_sheep",
+    "kira_still_dealing",
+    "nonna_watch_chaplain"
+   ],
+   "boosts": []
+  },
+  "reputation": {
+   "general": -62,
+   "byGroup": {
+    "neighbourhood": 0.764,
+    "youth": 0.16,
+    "police": 0.11,
+    "mob": -0.1,
+    "specialists": 0
+   }
+  },
+  "stats": {
+   "customersSeen": 666,
+   "itemsBought": 42,
+   "itemsSold": 41,
+   "totalSpent": 160353,
+   "totalEarned": 316236,
+   "bestDeal": 28049,
+   "worstDeal": -1250,
+   "fakesBought": 3,
+   "itemsStolen": 1,
+   "peopleHelped": 24,
+   "peopleHurt": 0
+  },
+  "settings": {
+   "reduceMotion": false,
+   "textScale": 1
+  },
+  "narration": "Someone stops at the window, reads the sign, walks on."
+ },
+ "slot": 2
+}

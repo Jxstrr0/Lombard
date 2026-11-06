@@ -1,0 +1,524 @@
+{
+ "careerId": "career-4242",
+ "savedAt": 1793869960000,
+ "version": 2,
+ "state": {
+  "meta": {
+   "version": 2,
+   "seed": 4242,
+   "careerId": "career-4242",
+   "rng": 2036716834,
+   "nextId": 289
+  },
+  "calendar": {
+   "day": 12,
+   "date": "2014-03-14",
+   "weekday": 4,
+   "season": "spring"
+  },
+  "cash": 71802,
+  "shop": {
+   "slots": [],
+   "upgrades": [],
+   "security": 0
+  },
+  "inventory": [
+   {
+    "id": "iq",
+    "defId": "gold_band_583",
+    "condition": 89,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 11500,
+    "revealed": [
+     "@condition",
+     "hallmark",
+     "@weight",
+     "heft",
+     "@magnet",
+     "magnet_seam"
+    ],
+    "story": "Real gold, 583, Soviet. You can see the stamp.",
+    "weightGrams": 4.98
+   },
+   {
+    "id": "i65",
+    "defId": "watch_vostok_komandirskie",
+    "condition": 75,
+    "authenticity": "genuine",
+    "provenance": "heirloom",
+    "trueValue": 7100,
+    "revealed": [
+     "@condition",
+     "dial",
+     "lugs",
+     "@weight",
+     "heft",
+     "@magnet",
+     "magnet_crown"
+    ],
+    "story": "Issued to my father in the army. Officers only, those dials.",
+    "weightGrams": 59.45
+   },
+   {
+    "id": "i6t",
+    "defId": "phone_galaxia_stella4",
+    "condition": 50,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 7950,
+    "revealed": [
+     "@condition",
+     "screen",
+     "@weight",
+     "heft",
+     "@magnet",
+     "magnet_speaker"
+    ],
+    "story": "The screen was replaced once, but by a proper shop.",
+    "weightGrams": 130.96
+   },
+   {
+    "id": "i7h",
+    "defId": "phone_mangosteen_m5",
+    "condition": 74,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 11100,
+    "revealed": [
+     "@condition",
+     "logo",
+     "screws",
+     "@weight",
+     "heft",
+     "@magnet"
+    ],
+    "story": "It's the new one. Well, last year's new one.",
+    "weightGrams": 112.98
+   },
+   {
+    "id": "i7k",
+    "defId": "gold_earrings_583",
+    "condition": 66,
+    "authenticity": "genuine",
+    "provenance": "heirloom",
+    "trueValue": 9650,
+    "revealed": [
+     "@condition",
+     "@weight",
+     "heft",
+     "@magnet",
+     "magnet_locks"
+    ],
+    "story": "Gold with diamonds, I think. Or something like diamonds.",
+    "weightGrams": 4.56
+   }
+  ],
+  "paid": {
+   "iq": 6325,
+   "i65": 3905,
+   "i6t": 4372,
+   "i7h": 6105,
+   "i7k": 5307
+  },
+  "loans": [],
+  "customers": {},
+  "queue": [
+   {
+    "visitId": "v7r",
+    "customer": {
+     "id": "c7p",
+     "name": "Marina",
+     "archetype": "pensioner",
+     "temperament": "flexible",
+     "knowledge": 0.21,
+     "desperation": 0.74,
+     "portraitKey": "pensioner"
+    },
+    "item": {
+     "id": "i7q",
+     "defId": "gold_rope_chain_585",
+     "condition": 47,
+     "authenticity": "fake",
+     "provenance": "unknown",
+     "trueValue": 500,
+     "revealed": [],
+     "story": "It's been in a drawer since the nineties. Still shines, look.",
+     "fakeProfileId": "plated_brass",
+     "weightGrams": 6.63
+    },
+    "patience": 126
+   },
+   {
+    "visitId": "v7u",
+    "customer": {
+     "id": "c7s",
+     "name": "Alla",
+     "archetype": "sailor",
+     "temperament": "desperate",
+     "knowledge": 0.29,
+     "desperation": 0.28,
+     "portraitKey": "sailor"
+    },
+    "item": {
+     "id": "i7t",
+     "defId": "phone_galaxia_stella4",
+     "condition": 98,
+     "authenticity": "genuine",
+     "provenance": "unknown",
+     "trueValue": 10700,
+     "revealed": [],
+     "story": "The screen was replaced once, but by a proper shop.",
+     "weightGrams": 128.56
+    },
+    "patience": 201
+   },
+   {
+    "visitId": "v7x",
+    "customer": {
+     "id": "c7v",
+     "name": "Gennady",
+     "archetype": "student",
+     "temperament": "desperate",
+     "knowledge": 0.52,
+     "desperation": 0.74,
+     "portraitKey": "student"
+    },
+    "item": {
+     "id": "i7w",
+     "defId": "gold_earrings_583",
+     "condition": 97,
+     "authenticity": "frankenstein",
+     "provenance": "clean",
+     "trueValue": 5350,
+     "revealed": [],
+     "story": "Mama never took them off. I can't bear to look at them now.",
+     "fakeProfileId": "mismatched_pair",
+     "weightGrams": 3.59
+    },
+    "patience": 174
+   },
+   {
+    "visitId": "v80",
+    "customer": {
+     "id": "c7y",
+     "name": "Arkady",
+     "archetype": "hustler",
+     "temperament": "desperate",
+     "knowledge": 0.8,
+     "desperation": 0.37,
+     "portraitKey": "hustler"
+    },
+    "item": {
+     "id": "i7z",
+     "defId": "gold_earrings_583",
+     "condition": 70,
+     "authenticity": "genuine",
+     "provenance": "heirloom",
+     "trueValue": 8700,
+     "revealed": [],
+     "story": "From my first husband. The earrings were the best part of him.",
+     "weightGrams": 4.47
+    },
+    "patience": 259
+   }
+  ],
+  "current": {
+   "visitId": "v7o",
+   "customer": {
+    "id": "c7m",
+    "name": "Vera",
+    "archetype": "sailor",
+    "temperament": "flexible",
+    "knowledge": 0.58,
+    "desperation": 0.37,
+    "portraitKey": "sailor"
+   },
+   "item": {
+    "id": "i7n",
+    "defId": "gold_band_583",
+    "condition": 96,
+    "authenticity": "genuine",
+    "provenance": "unknown",
+    "trueValue": 10900,
+    "revealed": [
+     "@condition",
+     "hallmark",
+     "colour",
+     "@weight",
+     "heft",
+     "@magnet",
+     "magnet_seam"
+    ],
+    "story": "We got divorced in the spring. I don't want it in the house.",
+    "weightGrams": 4.84
+   },
+   "phase": "offer",
+   "line": "I was thinking more like 9,400 ₽.",
+   "elapsed": 28
+  },
+  "inspect": {
+   "findings": [
+    {
+     "id": "f1",
+     "tool": "loupe",
+     "text": "Bright polish, barely a hairline scratch.",
+     "tellId": "@condition",
+     "reveals": "condition",
+     "polarity": "positive"
+    },
+    {
+     "id": "f2",
+     "tool": "loupe",
+     "text": "Inside the band: a crisp 583 stamp beside a star assay mark, the edges sharp.",
+     "tellId": "hallmark",
+     "reveals": "authenticity",
+     "polarity": "positive",
+     "hotspot": "inner"
+    },
+    {
+     "id": "f3",
+     "tool": "loupe",
+     "text": "Warm, slightly reddish gold. The scratches show the same colour as the surface.",
+     "tellId": "colour",
+     "reveals": "authenticity",
+     "polarity": "positive"
+    },
+    {
+     "id": "f4",
+     "tool": "scale",
+     "text": "Reads 4.8 g. A solid band this size usually weighs 4.4–5.2 g.",
+     "reveals": "authenticity",
+     "polarity": "positive",
+     "tellId": "@weight"
+    },
+    {
+     "id": "f5",
+     "tool": "scale",
+     "text": "It settles into the pan with a dense little clink.",
+     "tellId": "heft",
+     "reveals": "authenticity",
+     "polarity": "positive"
+    },
+    {
+     "id": "f6",
+     "tool": "magnet",
+     "tellId": "@magnet",
+     "reveals": "authenticity",
+     "text": "No pull at all from the magnet.",
+     "polarity": "neutral"
+    },
+    {
+     "id": "f7",
+     "tool": "magnet",
+     "text": "Even the resizing seam ignores the magnet. No steel pin in that repair.",
+     "tellId": "magnet_seam",
+     "reveals": "authenticity",
+     "polarity": "neutral",
+     "hotspot": "shank"
+    }
+   ],
+   "toolUses": {
+    "loupe": 1,
+    "scale": 1,
+    "magnet": 1
+   },
+   "estimate": 9810
+  },
+  "haggle": {
+   "ask": 9400,
+   "floor": 6895,
+   "round": 1,
+   "maxRounds": 4,
+   "irritation": 0.07258196721311475,
+   "status": "open",
+   "history": [
+    {
+     "offer": 5995,
+     "approach": "straight",
+     "response": {
+      "kind": "counter",
+      "price": 9400,
+      "mood": "neutral",
+      "lineKey": "counter.flexible"
+     }
+    }
+   ]
+  },
+  "day": {
+   "phase": "open",
+   "clock": 118,
+   "served": 3,
+   "total": 8,
+   "openingCash": 83214,
+   "log": [
+    {
+     "kind": "pass",
+     "amount": 0,
+     "text": "Roman walked out with the Galaxia Stella 4",
+     "defId": "phone_galaxia_stella4"
+    },
+    {
+     "kind": "buy",
+     "amount": -6105,
+     "text": "Bought Mangosteen m5 from Polina",
+     "itemId": "i7h",
+     "defId": "phone_mangosteen_m5"
+    },
+    {
+     "kind": "buy",
+     "amount": -5307,
+     "text": "Bought 583 gold drop earrings (pair) from Dmitri",
+     "itemId": "i7k",
+     "defId": "gold_earrings_583"
+    }
+   ]
+  },
+  "history": [
+   {
+    "day": 1,
+    "openingCash": 80000,
+    "closingCash": 80000,
+    "bought": 0,
+    "spent": 0,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0
+   },
+   {
+    "day": 2,
+    "openingCash": 80000,
+    "closingCash": 73675,
+    "bought": 1,
+    "spent": 6325,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0
+   },
+   {
+    "day": 3,
+    "openingCash": 73675,
+    "closingCash": 58225,
+    "bought": 2,
+    "spent": 15450,
+    "sold": 0,
+    "earned": 0,
+    "walkouts": 0
+   },
+   {
+    "day": 4,
+    "openingCash": 58225,
+    "closingCash": 60585,
+    "bought": 2,
+    "spent": 14340,
+    "sold": 2,
+    "earned": 16700,
+    "walkouts": 0
+   },
+   {
+    "day": 5,
+    "openingCash": 60585,
+    "closingCash": 61245,
+    "bought": 1,
+    "spent": 6890,
+    "sold": 1,
+    "earned": 7550,
+    "walkouts": 0
+   },
+   {
+    "day": 6,
+    "openingCash": 61245,
+    "closingCash": 60285,
+    "bought": 2,
+    "spent": 21510,
+    "sold": 2,
+    "earned": 20550,
+    "walkouts": 0
+   },
+   {
+    "day": 7,
+    "openingCash": 60285,
+    "closingCash": 61898,
+    "bought": 2,
+    "spent": 9187,
+    "sold": 2,
+    "earned": 10800,
+    "walkouts": 0
+   },
+   {
+    "day": 8,
+    "openingCash": 61898,
+    "closingCash": 73223,
+    "bought": 2,
+    "spent": 11725,
+    "sold": 2,
+    "earned": 23050,
+    "walkouts": 0
+   },
+   {
+    "day": 9,
+    "openingCash": 73223,
+    "closingCash": 78986,
+    "bought": 1,
+    "spent": 2337,
+    "sold": 1,
+    "earned": 8100,
+    "walkouts": 0
+   },
+   {
+    "day": 10,
+    "openingCash": 78986,
+    "closingCash": 81231,
+    "bought": 1,
+    "spent": 3905,
+    "sold": 1,
+    "earned": 6150,
+    "walkouts": 0
+   },
+   {
+    "day": 11,
+    "openingCash": 81231,
+    "closingCash": 83214,
+    "bought": 2,
+    "spent": 10367,
+    "sold": 2,
+    "earned": 12350,
+    "walkouts": 0
+   }
+  ],
+  "crime": {
+   "heat": 0,
+   "pressure": 0,
+   "fenceTrust": 0,
+   "flags": []
+  },
+  "story": {
+   "arcs": {},
+   "pendingEvents": []
+  },
+  "reputation": {
+   "general": 0,
+   "byGroup": {
+    "neighbourhood": 0,
+    "police": 0,
+    "mob": 0,
+    "specialists": 0
+   }
+  },
+  "stats": {
+   "customersSeen": 92,
+   "itemsBought": 18,
+   "itemsSold": 13,
+   "totalSpent": 113448,
+   "totalEarned": 105250,
+   "bestDeal": 3240,
+   "worstDeal": -310,
+   "fakesBought": 0
+  },
+  "settings": {
+   "reduceMotion": false,
+   "textScale": 1
+  },
+  "narration": "5 waiting."
+ }
+}

@@ -112,11 +112,11 @@ interface GameState {
 
 ## Rendering
 
-- **Shop**: one `shop.glb` with the room, counter, cases, shelves, lamp, window, produced by the headless Blender bake (see `04-ASSETS.md` § Bake pipeline). Static lighting baked to a lightmap in Cycles on the mesh's second UV set (`uv1` in Three.js) and shipped as KTX2. Three.js `MeshStandardMaterial` with `lightMap` + `envMap`. Glass cases: `MeshPhysicalMaterial` with transmission off on phone (use a cheap transparent material with env reflection), transmission on for desktop high tier.
+- **Shop**: one `shop.glb` with the room, counter, cases, shelves, lamp, window, produced by the headless Blender bake (see `04-ASSETS.md` § Bake pipeline). Static lighting baked to a lightmap in Cycles on the mesh's second UV set (`uv1` in Three.js) and shipped as KTX2. Three.js `MeshStandardMaterial` with `lightMap` + `envMap`. Glass cases: a cheap transparent material with env reflection on every tier (no transmission: it costs an extra scene pass and the glass reads fine without it).
 - **Items**: loaded on demand with `GLTFLoader` + `DRACOLoader` + `KTX2Loader`. Cached per defId; disposed when not displayed or inspected for > 2 scene changes. Display-case items use a low LOD (same glb, or a `_lod.glb` if large).
 - **Customers**: see `04-ASSETS.md`. Plan A is a small set of rigged low-cost humanoid models with 6 poses and face variation via textures; Plan B (fallback) is a stylized silhouette with a painted portrait card. Decide at M3 after testing what CC0 gives us.
 - **Camera**: fixed counter camera with subtle idle sway (disabled by reduce-motion). Inspect camera is an `OrbitControls`-style controller on the item pivot with limits; tools raycast the item for hotspots.
-- **Quality tiers**: `low` (phone default), `mid`, `high` (desktop). Chosen by a 3-second benchmark on first run, overridable in settings. Tiers switch: shadow decals vs none, glass transmission, anisotropy, pixel ratio cap (1.5 on low).
+- **Quality tiers** (`render/perf.ts`): `low` (pixel ratio cap 1.25, no MSAA, anisotropy 2), `mid` (1.5, MSAA, 4), `high` (2, MSAA, 8). Settings → Graphics offers Auto / Low / Medium / High, kept per device in localStorage. Auto starts at `mid` on phones (`high` on desktops with 8+ cores) and, once the shop is drawing, steps down a tier whenever the median frame rate over a 4 s window is under 30 fps; it never steps back up by itself (vsync hides headroom) and remembers its result for the next visit. Pixel ratio applies at once; MSAA only on the next load (it is fixed when the WebGL context is made); anisotropy for textures loaded after the change. `?tier=` pins a tier for one visit; `npm run shots` pins `mid`. `?perf=1` shows fps, the tier, pixel ratio, draw calls, triangles and an estimate of decoded texture memory against the budget.
 
 ## Input
 
@@ -132,6 +132,11 @@ IndexedDB store `careers` keyed by careerId. Save = full `GameState` JSON plus `
 - Loading a code runs migrations, so a code from an older version still loads.
 - Target: under ~20 KB of text for a 200-day career. Add a test that generates a long simulated career and checks code size.
 - UI: copy uses the Clipboard API with a fallback text box for manual copy on older mobile browsers.
+
+**Save safety:** `src/persist/safety.ts` (all of Longlight's games share one GitHub Pages origin, so one storage quota the browser can clear at once)
+- After the first successful autosave of a session with a finished day behind it (and after a backup or restore), `navigator.storage.persist()` is asked once per page load (skipped when `persisted()` is already true; feature-detected, never throws). Settings shows "Storage: protected on this device" or a "may clear saves" warning, hidden where the API is missing.
+- Settings → Save code also has **Save backup file** (the same `LMB1.` code in `lombard-backup-YYYY-MM-DD.txt`, through the share sheet where files can be shared, otherwise a download) and **Load backup file** (a `.txt` picker feeding the normal load path, so the same checks and confirm step run).
+- The last backup time (code copied or file saved) is a device key, `lombard.lastBackup` in localStorage, next to the sound settings; not in the career or the save code. With a finished day and no backup yet, or one older than `tuning.save.backupReminderDays` (14), a dismissible banner over the ledger suggests one, at most once per session.
 
 ## Audio
 

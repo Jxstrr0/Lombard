@@ -31,9 +31,10 @@ import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
 import { bindKeyboard } from './input/keyboard'
 import { LookGestures } from './input/look'
-import { deleteCareer, loadLatestCareer, saveCareer } from './persist/autosave'
+import { deleteCareer, loadLatestCareer, onCareerSaved, saveCareer } from './persist/autosave'
+import { keepStorage } from './persist/safety'
 import { CameraRig } from './render/camera'
-import { PerfOverlay, TIER_SETTINGS, TierBenchmark, initialTier } from './render/perf'
+import { MIN_FPS, PerfOverlay, TIER_SETTINGS, TierGovernor, initialTier, saveAutoTier, saveChoice, setTextureAnisotropy, type GraphicsChoice, type QualityTier } from './render/perf'
 import { ShopScene } from './render/scene'
 import { ItemStage } from './render/stage'
 import { createItemLoader } from './render/loaders'
@@ -121,8 +122,9 @@ async function boot(): Promise<void> {
   const app = document.getElementById('app')!
   const canvasHost = document.getElementById('scene')!
   const envUrl = `${import.meta.env.BASE_URL}assets/env/lebombo_1k.hdr`
-  const tier = initialTier(params)
-  const tierSettings = TIER_SETTINGS[tier]
+  const tierStart = initialTier(params)
+  const tierSettings = TIER_SETTINGS[tierStart.tier]
+  setTextureAnisotropy(tierSettings.anisotropy)
 
   if (params.get('gallery') === '1') {
     const renderer = createRenderer(true, 2)
@@ -160,6 +162,11 @@ async function boot(): Promise<void> {
     }
   }
   const store = new Store(initial)
+  // Once a career with real progress (a finished day) is safely written, ask the
+  // browser to keep the storage. keepStorage asks at most once per page load.
+  onCareerSaved((s) => {
+    if (s.history.length > 0) void keepStorage()
+  })
   window.__lombardState = () => store.get()
 
   const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -187,6 +194,16 @@ async function boot(): Promise<void> {
   const renderer = createRenderer(tierSettings.antialias, tierSettings.pixelRatioCap)
   if (!renderer) return
   canvasHost.appendChild(renderer.domElement)
+
+  // Quality tier: Auto steps down under 30 fps (see render/perf.ts); ?tier= pins one.
+  let graphics: GraphicsChoice = tierStart.choice
+  const governor = new TierGovernor(tierStart.tier, graphics === 'auto' && !tierStart.pinned)
+  const applyTier = (t: QualityTier) => {
+    governor.reset(t)
+    setTextureAnisotropy(TIER_SETTINGS[t].anisotropy)
+    // setPixelRatio resizes the drawing buffer itself.
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, TIER_SETTINGS[t].pixelRatioCap))
+  }
 
   const shop = new ShopScene()
   const rig = new CameraRig()
@@ -228,11 +245,21 @@ async function boot(): Promise<void> {
       audio.apply(sound)
       audio.gesture()
     },
+    getGraphics: () => ({ choice: graphics, tier: governor.current, antialias: renderer.getContextAttributes()?.antialias ?? false, wantsAntialias: TIER_SETTINGS[governor.current].antialias }),
+    setGraphics: (choice) => {
+      graphics = choice
+      saveChoice(choice)
+      governor.enabled = choice === 'auto' && !tierStart.pinned
+      // Auto carries on from whatever is showing now, next visit included.
+      if (choice === 'auto') saveAutoTier(governor.current)
+      applyTier(choice === 'auto' ? governor.current : choice)
+    },
   })
 
   const resize = () => {
     const w = window.innerWidth
     const h = window.innerHeight
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, TIER_SETTINGS[governor.current].pixelRatioCap))
     renderer.setSize(w, h)
     const l = ui.layout()
     rig.resize({ width: w, height: h, ...l })
@@ -298,8 +325,7 @@ async function boot(): Promise<void> {
 
   // --- perf ------------------------------------------------------------------
   const perf = params.get('perf') === '1' ? new PerfOverlay() : null
-  void perf?.mount(tier)
-  const benchmark = new TierBenchmark()
+  void perf?.mount()
 
   // --- loop ------------------------------------------------------------------
   let envReady = false
@@ -323,7 +349,8 @@ async function boot(): Promise<void> {
   const clock = new THREE.Clock()
   let readyFrames = 0
   renderer.setAnimationLoop(() => {
-    const dt = Math.min(clock.getDelta(), 0.1)
+    const raw = clock.getDelta()
+    const dt = Math.min(raw, 0.1)
     perf?.begin()
     shop.update(dt)
     const customerState = shop.customerState
@@ -335,8 +362,15 @@ async function boot(): Promise<void> {
     const w = window.innerWidth
     const h = window.innerHeight
     ui.frame(rig.inspectBlend > 0.97 && stage.isInspecting ? stage.hotspotScreen(rig.camera, w, h) : [])
-    benchmark.sample(dt)
-    perf?.end(renderer, dt, benchmark)
+    if (window.__lombardReady) {
+      const down = governor.sample(raw)
+      if (down) {
+        console.info(`[perf] under ${MIN_FPS} fps, stepping down to "${down}"`)
+        saveAutoTier(down)
+        applyTier(down)
+      }
+    }
+    perf?.end(renderer, shop.scene, dt, `${governor.enabled ? 'auto ' : ''}${governor.current}`, governor.lastFps)
     if (envReady && !window.__lombardReady && ++readyFrames > 2) {
       window.__lombardReady = true
       document.body.classList.add('ready')

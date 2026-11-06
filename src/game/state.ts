@@ -25,7 +25,7 @@ import type {
 
 export type { ItemInstance } from './types'
 
-export const STATE_VERSION = 7
+export const STATE_VERSION = 8
 
 export type Season = 'winter' | 'spring' | 'summer' | 'autumn'
 export type ISODate = string
@@ -120,6 +120,93 @@ export interface CareerStats {
   fakesBought: number
   /** Items shoplifted off the open shelves (M4). */
   itemsStolen: number
+  /** M5 career summary: deals that helped someone who needed it, and ones that hurt them. */
+  peopleHelped: number
+  peopleHurt: number
+}
+
+/**
+ * M5 crime layer (v8). Empty shapes laid down by the foundation so the police,
+ * fence, pressure and endings work can land in any order without fighting over
+ * save versions; each sub-object belongs to one system.
+ */
+/** One line of the stolen-goods bulletin in the morning paper (police). */
+export interface BulletinEntry {
+  id: string
+  /** Day it was printed. */
+  day: number
+  defId: string
+  /** The instance it describes, when that exact piece is (or will be) in circulation. */
+  itemId?: string
+  text: string
+}
+
+/** Detective Volkova (police): her weekly visits and what she remembers. */
+export interface VolkovaState {
+  met: boolean
+  /** −1…1, her read of you. */
+  trust: number
+  /** Next day she is due at the counter (0 = not scheduled). */
+  nextDay: number
+  /** Lies told, lies she caught, bribes taken. */
+  lies: number
+  caught: number
+  bribes: number
+}
+
+/** The fence (fence relationship; `crime.fenceTrust` is the relationship itself). */
+export interface FenceState {
+  met: boolean
+  deals: number
+  /** Every time you said no; the fence remembers. */
+  refusals: number
+  /** Next day the fence calls or drops in (0 = not scheduled). */
+  nextDay: number
+}
+
+/** A scheduled crime event: vandalism, a raid, a call (kinds owned by the system that schedules them). */
+export interface CrimeEvent {
+  day: number
+  kind: string
+  data?: Record<string, string | number>
+}
+
+export interface CrimeState {
+  /** Police attention (GDD § 8). Rises with stolen goods, flagged sellers and a sloppy ledger. */
+  heat: number
+  /** Mob pressure (GDD § 8). */
+  pressure: number
+  fenceTrust: number
+  flags: string[]
+  bulletin: BulletinEntry[]
+  volkova: VolkovaState
+  fence: FenceState
+  events: CrimeEvent[]
+}
+
+/** How a career ended (GDD § 12). Forced endings are endings too. */
+export type CareerEndKind = 'retired' | 'evicted' | 'raided' | 'pushedOut'
+
+export interface CareerEnd {
+  kind: CareerEndKind
+  day: number
+  /** Ending title id, chosen by the endings system when the end is shown (absent until then). */
+  title?: string
+}
+
+/**
+ * The career's hidden ending axes (GDD § 12). Wealth and standing are read at the end from
+ * cash, stock and reputation; these two accumulate over the career through nudgeAxis
+ * (src/game/endings/axes.ts). Signed and unbounded: > 0 is clean / heart, < 0 dirty / hustle.
+ */
+export interface CareerAxes {
+  clean: number
+  heart: number
+}
+
+export interface CareerState {
+  axes: CareerAxes
+  end: CareerEnd | null
 }
 
 export interface Settings {
@@ -154,7 +241,9 @@ export interface GameState {
   haggle: HaggleState | null
   day: DayState
   history: DaySummary[]
-  crime: { heat: number; pressure: number; fenceTrust: number; flags: string[] }
+  crime: CrimeState
+  /** M5: the ending axes and, once it is over, how the career ended. */
+  career: CareerState
   /**
    * M4: arc progress and story flags (set by beats, read by their conditions).
    * boosts (v6): specialist warnings running ("plated chains turn up more for two weeks").
@@ -200,6 +289,19 @@ export function createSlots(): Slot[] {
   return slots
 }
 
+export function createCrimeState(): CrimeState {
+  return {
+    heat: 0,
+    pressure: 0,
+    fenceTrust: 0,
+    flags: [],
+    bulletin: [],
+    volkova: { met: false, trust: 0, nextDay: 0, lies: 0, caught: 0, bribes: 0 },
+    fence: { met: false, deals: 0, refusals: 0, nextDay: 0 },
+    events: [],
+  }
+}
+
 export function createInitialState(seed: number, careerId: string): GameState {
   const date = tuning.career.startDate
   return {
@@ -226,7 +328,8 @@ export function createInitialState(seed: number, careerId: string): GameState {
     haggle: null,
     day: { phase: 'closed', clock: 0, served: 0, total: 0, openingCash: tuning.career.startingCash, log: [], newsRead: true },
     history: [],
-    crime: { heat: 0, pressure: 0, fenceTrust: 0, flags: [] },
+    crime: createCrimeState(),
+    career: { axes: { clean: 0, heart: 0 }, end: null },
     story: { arcs: {}, pendingEvents: [], flags: [], boosts: [] },
     reputation: {
       general: 0,
@@ -242,6 +345,8 @@ export function createInitialState(seed: number, careerId: string): GameState {
       worstDeal: 0,
       fakesBought: 0,
       itemsStolen: 0,
+      peopleHelped: 0,
+      peopleHurt: 0,
     },
     settings: { reduceMotion: false, textScale: 1 },
     narration: placeholderIdleLine,

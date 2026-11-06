@@ -759,6 +759,30 @@ export const tuning = {
     rep: { accepted: 0.15, haggled: 0.05, refused: -0.1, gluePaid: 0.05, gluePolice: -0.15, glueRefused: -0.1 },
   },
 
+  /**
+   * M5 ending axes (src/game/endings/axes.ts, GDD § 12). Signed weights; the unit is one
+   * story choice. Clean ↔ dirty: stolen goods, bribes, the fence, protection. Heart ↔
+   * hustle: fair offers to people who needed them, loans, regulars helped or burned.
+   */
+  axes: {
+    /** A story choice stored as a heart.* flag. */
+    storyHeart: 1,
+    /** A story choice stored as a dirty.* flag (on the clean axis). */
+    storyDirty: -1,
+    /** A fair buy or loan for a vulnerable seller (the same test as the neighbourhood's, src/game/reputation.ts). */
+    fairDeal: 0.25,
+    /** Lowballing a vulnerable seller. */
+    lowball: -0.35,
+    /** Buying, or lending on, a piece that turns out to be stolen, known or not. */
+    stolenBought: -0.5,
+  },
+
+  /** M5 endings (src/game/endings/). */
+  endings: {
+    /** GDD § 12: the Retire option appears in the ledger from this day. */
+    retireDay: 90,
+  },
+
   save: {
     /** Day summaries kept in full; older days are folded into career stats. */
     historyDays: 60,

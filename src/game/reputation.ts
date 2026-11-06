@@ -82,13 +82,18 @@ export function isYouth(c: WalkIn): boolean {
 // --- resolution hooks ---------------------------------------------------------
 
 /** After you buy (or lend on) a seller's item for `price`. */
-export function repAfterDeal(state: GameState, customer: WalkIn, item: ItemInstance, price: number, kind: 'buy' | 'pawn'): GameState {
+/** Was a buy or loan fair, a lowball, or neither, judged on the item's real worth? (Also read by the ending axes.) */
+export function dealVerdict(item: ItemInstance, price: number, kind: 'buy' | 'pawn'): 'fair' | 'lowball' | null {
   const share = price / Math.max(1, item.trueValue)
   const fairAt = kind === 'buy' ? R.fairBuyShare : R.fairLoanShare
   const lowAt = kind === 'buy' ? R.lowballBuyShare : R.lowballLoanShare
   // A fake's real worth says nothing about how fairly you treated the seller.
   const judgeable = item.authenticity === 'genuine' || item.authenticity === 'restored'
-  const verdict = share < lowAt ? 'lowball' : judgeable && share >= fairAt ? 'fair' : null
+  return share < lowAt ? 'lowball' : judgeable && share >= fairAt ? 'fair' : null
+}
+
+export function repAfterDeal(state: GameState, customer: WalkIn, item: ItemInstance, price: number, kind: 'buy' | 'pawn'): GameState {
+  const verdict = dealVerdict(item, price, kind)
   if (!verdict) return state
   let s = state
   if (isVulnerable(customer)) s = adjustRep(s, 'neighbourhood', R.neighbourhood[verdict], verdict)

@@ -197,6 +197,18 @@ export const HINT_NEWS: Readonly<Record<string, { up: readonly NewsTemplate[]; d
     up: [{ id: 'hint_mil_up', headline: 'Militaria collectors circle the flea market', body: 'Men with magnifying glasses have been seen at dawn among the tables, asking quiet questions.' }],
     down: [{ id: 'hint_mil_down', headline: 'Collectors cautious after questions about awards', body: 'Nobody wants to be the one explaining where a medal came from, a dealer told us, and walked off.' }],
   },
+  vinyl: {
+    up: [{ id: 'hint_vinyl_up', headline: 'Record players back on the Sennaya stalls', body: 'Young men in thin scarves are buying their grandparents’ records back off the market, one Liraphon sleeve at a time.' }],
+    down: [{ id: 'hint_vinyl_down', headline: 'Flea market drowns in old records', body: 'Every flat on the embankment is being cleared at once, a trader sighs, and every flat had the same forty records.' }],
+  },
+  games: {
+    up: [{ id: 'hint_games_up', headline: 'Schoolboys queue for second-hand consoles', body: 'The ring-road market reports a run on game boxes. Parents report a run on excuses.' }],
+    down: [{ id: 'hint_games_down', headline: 'Game consoles gather dust on the stalls', body: 'A new model is coming, the traders say, and nobody wants last year’s, not even for the children.' }],
+  },
+  books: {
+    up: [{ id: 'hint_books_up', headline: 'Antiquarian booksellers report a lively month', body: 'Signed copies and good editions are changing hands, says the Liteyny book exchange. Its cat has been moved off the counter.' }],
+    down: [{ id: 'hint_books_down', headline: 'Encyclopaedias left out by the bins', body: 'Thirty volumes in the rain on Zatonnaya Street. Nobody took them. The internet, a neighbour explained, has all the letters now.' }],
+  },
   coins: {
     up: [{ id: 'hint_coin_up', headline: 'Coin collectors swap albums at the metro', body: 'Silver and gold coins are being traded hand to hand by people who all seem to know each other.' }],
     down: [{ id: 'hint_coin_down', headline: 'Coin dealers complain of a dull market', body: 'Collectors are sitting on their albums, says the numismatic society, and on their wallets.' }],
@@ -204,6 +216,7 @@ export const HINT_NEWS: Readonly<Record<string, { up: readonly NewsTemplate[]; d
 }
 
 export const HINT_ALIAS: Readonly<Record<string, string>> = {
+  retro: 'vinyl',
   jewelry: 'gold',
   luxury: 'watches',
   electronics: 'phones',

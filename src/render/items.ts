@@ -21,6 +21,11 @@
  *   plane (y −0.1175…−0.0915, keyboard up, front edge +Z at z ≈ 0.157), hinge at the back (z ≈ −0.072),
  *   lid 0.228 × 0.0075 open at 110°, screen facing +Z and a little up, lid top at y ≈ 0.122, z ≈ −0.15
  * - icon (M5): a painted panel 0.16 × 0.2 × 0.024 under a silver cover, face +Z, bare wood back −Z
+ * - box (M6): a rounded box of `model.size` centred on the origin, front +Z (tape decks, consoles, a car
+ *   stereo, a gold bar…; the scripted glb draws the real thing per id). Upright ones stand on −Y.
+ * - record (M6): an LP lying on its sleeve. Sleeve 0.314 square × 0.004 centred at (−0.05, 0.02), front +Z;
+ *   the disc r 0.15, 1.8 mm thick, on top of it at (0.07, −0.03), its face at z ≈ 0.0041; label r 0.045
+ * - book (M6): a closed hardback (or a stack) of `model.size` lying flat, cover +Z, spine at −X
  *
  * `model.scale` multiplies the whole model (kept for parity with glb models).
  * Models are cached by defId; ItemModels.evict disposes geometries, materials and textures.
@@ -45,6 +50,8 @@ export interface ModelSpec {
   ribbon?: readonly string[]
   /** Which relief a medal/coin draws. */
   emblem?: string
+  /** M6: overall size of a box or book, metres. */
+  size?: readonly [number, number, number]
 }
 
 /** The placeholder spec for an item def (stage and gallery build from the same thing). */
@@ -57,6 +64,7 @@ export function specOf(def: ItemDef): ModelSpec {
     hotspots: def.model.hotspots,
     ribbon: def.model.ribbon,
     emblem: def.model.emblem,
+    size: def.model.size,
   }
 }
 
@@ -110,6 +118,15 @@ export function buildPlaceholder(spec: ModelSpec): THREE.Group {
       break
     case 'icon':
       buildIcon(g, color)
+      break
+    case 'box':
+      buildBox(g, color, spec.size ?? [0.1, 0.05, 0.1])
+      break
+    case 'record':
+      buildRecord(g, color)
+      break
+    case 'book':
+      buildBook(g, color, spec.size ?? [0.15, 0.22, 0.03])
       break
   }
   const s = spec.scale ?? 1
@@ -492,10 +509,10 @@ function casebackTexture(caseColor: THREE.Color): THREE.CanvasTexture {
 }
 
 function buildWatch(g: THREE.Group, color: THREE.Color, brand?: string, hotspots?: ModelSpec['hotspots']): void {
-  // Case radius from the crown marker (+X), thickness from the caseback marker (−Z), within sane bounds.
+  // Case radius from the crown marker (+X), thickness from the caseback marker (−Z), within sane bounds (a ladies' watch can be as small as 10 mm).
   const crownX = hotspots?.find((h) => h.id === 'crown')?.position[0]
   const backZ = hotspots?.find((h) => h.id === 'caseback')?.position[2]
-  const R = crownX ? THREE.MathUtils.clamp(crownX - 0.0016, 0.016, 0.022) : 0.019
+  const R = crownX ? THREE.MathUtils.clamp(crownX - 0.0016, 0.01, 0.022) : 0.019
   const depth = backZ ? THREE.MathUtils.clamp(Math.abs(backZ) * 2 - 0.0006, 0.007, 0.014) : 0.009
   const caseMat = metal(color, 0.3)
   // Case: cylinder with axis along Z
@@ -1586,4 +1603,66 @@ function buildIcon(g: THREE.Group, color: THREE.Color): void {
   const panel = new THREE.Mesh(new THREE.BoxGeometry(w, h, t), [edge, edge, edge, edge, front, back])
   panel.name = 'panel'
   g.add(panel)
+}
+
+// --- M6: box, record, book --------------------------------------------------------------
+
+function buildBox(g: THREE.Group, color: THREE.Color, size: readonly [number, number, number]): void {
+  const [w, h, d] = size
+  const r = Math.min(w, h, d) * 0.12
+  const body = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, r), new THREE.MeshStandardMaterial({ color, metalness: 0.3, roughness: 0.5 }))
+  body.name = 'body'
+  g.add(body)
+  // a darker front panel so the front reads at a glance
+  const panel = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.86, h * 0.7), new THREE.MeshStandardMaterial({ color: '#1c1c1e', roughness: 0.4 }))
+  panel.position.z = d / 2 + 0.0002
+  g.add(panel)
+}
+
+const RECORD = { sleeve: 0.314, sleeveT: 0.004, sleeveAt: [-0.05, 0.02] as const, r: 0.15, t: 0.0018, at: [0.07, -0.03] as const, label: 0.045 }
+
+function buildRecord(g: THREE.Group, color: THREE.Color): void {
+  const { sleeve, sleeveT, sleeveAt, r, t, at, label } = RECORD
+  const art = canvasTexture(256, 256, (ctx) => {
+    ctx.fillStyle = shade(color, 1)
+    ctx.fillRect(0, 0, 256, 256)
+    ctx.fillStyle = shade(color, 0.55)
+    ctx.fillRect(24, 150, 208, 70)
+    ctx.strokeStyle = shade(color, 1.4)
+    ctx.lineWidth = 6
+    ctx.strokeRect(14, 14, 228, 228)
+  })
+  const card = new THREE.MeshStandardMaterial({ color: '#d8d0bd', roughness: 0.85 })
+  const sleeveMesh = new THREE.Mesh(new THREE.BoxGeometry(sleeve, sleeve, sleeveT), [card, card, card, card, new THREE.MeshStandardMaterial({ map: art, roughness: 0.8 }), card])
+  sleeveMesh.name = 'sleeve'
+  sleeveMesh.position.set(sleeveAt[0], sleeveAt[1], 0)
+  g.add(sleeveMesh)
+  const vinyl = new THREE.MeshStandardMaterial({ color: '#0b0b0c', roughness: 0.28 })
+  const labelTex = canvasTexture(128, 128, (ctx) => {
+    ctx.fillStyle = '#0b0b0c'
+    ctx.fillRect(0, 0, 128, 128)
+    ctx.fillStyle = shade(color, 0.9)
+    ctx.beginPath()
+    ctx.arc(64, 64, 64 * (label / r) * 1, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#0b0b0c'
+    ctx.beginPath()
+    ctx.arc(64, 64, 2, 0, Math.PI * 2)
+    ctx.fill()
+  })
+  const disc = new THREE.Mesh(new THREE.CylinderGeometry(r, r, t, 64), [vinyl, new THREE.MeshStandardMaterial({ map: labelTex, roughness: 0.4 }), vinyl])
+  disc.name = 'disc'
+  disc.rotation.x = Math.PI / 2
+  disc.position.set(at[0], at[1], sleeveT / 2 + t / 2 + 0.0002)
+  g.add(disc)
+}
+
+function buildBook(g: THREE.Group, color: THREE.Color, size: readonly [number, number, number]): void {
+  const [w, h, d] = size
+  const cloth = new THREE.MeshStandardMaterial({ color, roughness: 0.75 })
+  const pages = new THREE.MeshStandardMaterial({ color: '#e6dcc4', roughness: 0.9 })
+  // BoxGeometry groups: +X (fore-edge), −X (spine), +Y, −Y, +Z (cover), −Z (back board)
+  const block = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [pages, cloth, pages, pages, cloth, cloth])
+  block.name = 'book'
+  g.add(block)
 }

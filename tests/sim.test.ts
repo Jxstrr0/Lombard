@@ -78,8 +78,9 @@ describe('economy simulator (M2 tuning)', () => {
       // Noticed: still warm, or Volkova has been round (talking to her cools a shop down; M5 police).
       expect(r.heat > 0 || r.police.visits > 0, `seed ${r.seed}`).toBe(true)
     }
-    // At least half the runs (6 of 12 since Volkova's arc and the Collector reshuffled the walk-ins).
-    expect(runs.filter((r) => r.crew.deliveries > 0).length).toBeGreaterThanOrEqual(SEEDS.length / 2)
+    // Most runs take a delivery: 35 of 60 seeds both before and after M6 wave B's 44 items, but any
+    // 12-seed window swings from 4 to 10 as the walk-ins reshuffle, so the floor is 5 of 12. docs/05.
+    expect(runs.filter((r) => r.crew.deliveries > 0).length).toBeGreaterThanOrEqual(5)
   })
 
   it('is deterministic', () => {

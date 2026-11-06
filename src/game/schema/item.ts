@@ -12,6 +12,8 @@ export const CATEGORIES = [
   'militaria',
   'cameras',
   'electronics',
+  // M6 wave B: vinyl & media (LPs, tape decks, VHS, consoles, books)
+  'media',
   'instruments',
   'icons',
   'coins',
@@ -96,6 +98,11 @@ export const PLACEHOLDER_MODELS = [
   'laptop',
   // M5
   'icon',
+  // M6 wave B: `box` is any boxy thing sized by model.size (tape decks, consoles, a gold bar…;
+  // the scripted model is drawn per id); `record` an LP in its sleeve; `book` a hardback.
+  'box',
+  'record',
+  'book',
 ] as const
 
 const HexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/)
@@ -116,6 +123,8 @@ export const ItemModel = z.object({
   ribbon: z.array(HexColor).min(1).optional(),
   /** Which relief/print a medal or coin placeholder draws (free-form key, see src/render/items.ts). */
   emblem: z.string().optional(),
+  /** M6: overall size [x, y, z] in metres for the shapes that take it (box, record, book). */
+  size: z.tuple([z.number().positive(), z.number().positive(), z.number().positive()]).optional(),
   /** Camera distance in inspect mode, metres. */
   inspectDistance: z.number().positive(),
   hotspots: z.array(Hotspot).default([]),

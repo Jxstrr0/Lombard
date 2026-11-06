@@ -389,5 +389,257 @@
         { "id": "links", "label": "Weave", "position": [0, 0.025, 0] }
       ]
     }
+  },
+  {
+    "id": "gold_chain_anchor_585",
+    "category": "gold",
+    "name": "585 gold anchor chain",
+    "era": "2000s",
+    "baseValue": {"min": 11000, "max": 15500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 5.6, "tolerance": 0.35},
+    "magnetic": false,
+    "rarity": 3.0,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "clasp", "tool": "loupe", "finding": "On the clasp tag: 585 and a maker's mark, struck clean and deep.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "clasp"},
+        {"id": "links", "tool": "loupe", "finding": "Solid oval links, each turned at right angles to the next, the joins invisible.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "links"},
+        {"id": "wear", "tool": "loupe", "finding": "The links are worn bright where they rub, without a trace of another colour underneath.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.45, "hotspot": "links"},
+        {"id": "heft", "tool": "scale", "finding": "About right for a solid chain this length.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_chain", "tool": "magnet", "finding": "It hangs straight down past the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "clasp"},
+        {"id": "acid", "tool": "acid", "finding": "The 585 scratch holds under the acid.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_brass",
+          "kind": "fake",
+          "valueMultiplier": 0.03,
+          "weight": 2,
+          "weightFactor": 0.62,
+          "tells": [
+            {"id": "clasp", "tool": "loupe", "finding": "The 585 on the tag is soft-edged and shallow, as if pressed into a mould.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "clasp"},
+            {"id": "wear", "tool": "loupe", "finding": "On the most-worn links the yellow has rubbed through to pinkish metal.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "links"},
+            {"id": "heft", "tool": "scale", "finding": "Light for gold, by a good third.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25}
+          ]
+        },
+        {
+          "id": "hollow_links",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "weightFactor": 0.6,
+          "tells": [
+            {"id": "links", "tool": "loupe", "finding": "One link is dented flat like a squashed straw: the links are hollow tubes.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "links"},
+            {"id": "heft", "tool": "scale", "finding": "Light in the pan for a chain this thick.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        }
+    ],
+    "demandTags": ["gold", "jewelry"],
+    "claims": [
+      "A gold chain, five eight five. I wore it every day for ten years.",
+      "My husband's. He's on a diet now. From jewellery.",
+      "It's heavy gold, solid. Feel it. No, go on, feel it."
+    ],
+    "model": {
+      "glb": "gold_chain_anchor_585.glb",
+      "placeholder": "chain",
+      "color": "#d1a249",
+      "scale": 1,
+      "inspectDistance": 0.15,
+      "hotspots": [
+        {"id": "clasp", "label": "Clasp", "position": [0, -0.025, 0]},
+        {"id": "links", "label": "Links", "position": [0, 0.025, 0]}
+      ]
+    }
+  },
+  {
+    "id": "gold_ring_ruby_583",
+    "category": "gold",
+    "name": "583 gold ring with a red stone",
+    "era": "1970s",
+    "baseValue": {"min": 9000, "max": 13000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 4.6, "tolerance": 0.35},
+    "magnetic": false,
+    "rarity": 2.5,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "stone", "tool": "loupe", "finding": "A big oval red stone, perfectly clear inside: a lab-grown ruby, as Soviet jewellers set them.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "stone"},
+        {"id": "setting", "tool": "loupe", "finding": "The bezel round the stone is cut from the same rosy gold as the shank, its edge rubbed smooth.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "setting"},
+        {"id": "inner", "tool": "loupe", "finding": "Inside the shank: 583 and the five-pointed assay star, crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "inner"},
+        {"id": "heft", "tool": "scale", "finding": "Solid gold weight for a ring this size.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_ring", "tool": "magnet", "finding": "No pull from the magnet anywhere.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "inner"},
+        {"id": "acid", "tool": "acid", "finding": "The 583 scratch holds under the acid.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_brass",
+          "kind": "fake",
+          "valueMultiplier": 0.02,
+          "weight": 2,
+          "weightFactor": 0.62,
+          "tells": [
+            {"id": "inner", "tool": "loupe", "finding": "Inside, the 583 is shallow and the star is missing; the gold has rubbed off at the back.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "inner"},
+            {"id": "heft", "tool": "scale", "finding": "Too light for gold.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25}
+          ]
+        },
+        {
+          "id": "gilded_silver",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 1,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "inner", "tool": "loupe", "finding": "Inside the shank, 875 and a different star: silver under a gilt skin.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "inner"},
+            {"id": "setting", "tool": "loupe", "finding": "Where the bezel is worn, a white metal shows through the yellow.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "setting"},
+            {"id": "heft", "tool": "scale", "finding": "A touch light for gold.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        }
+    ],
+    "demandTags": ["gold", "jewelry"],
+    "claims": [
+      "A ruby ring, Soviet gold. My mother got it for her fortieth.",
+      "It's a real ruby. Well. Real-ish. They grew them in a factory, didn't they?",
+      "Look how red it is. Like the flag, my grandfather said."
+    ],
+    "model": {
+      "glb": "gold_ring_ruby_583.glb",
+      "placeholder": "signet",
+      "color": "#d39b4a",
+      "scale": 1,
+      "inspectDistance": 0.08,
+      "hotspots": [
+        {"id": "stone", "label": "Stone", "position": [0, 0.0128, 0]},
+        {"id": "setting", "label": "Setting", "position": [0, 0.0106, 0.0036]},
+        {"id": "inner", "label": "Inside of shank", "position": [0, -0.0085, 0]}
+      ]
+    }
+  },
+  {
+    "id": "gold_dental_crowns_900",
+    "category": "gold",
+    "name": "900 gold dental crowns (four)",
+    "era": "1980s",
+    "baseValue": {"min": 26000, "max": 36000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 10.2, "tolerance": 0.5},
+    "magnetic": false,
+    "rarity": 1.2,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "cusps", "tool": "loupe", "finding": "Biting surfaces worn smooth and a little flat, the way teeth wear.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "cusps"},
+        {"id": "inside", "tool": "loupe", "finding": "Inside each crown, grey cement and a dentist's scratched initials. No hallmark: dental work never has one.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "inside"},
+        {"id": "solder", "tool": "loupe", "finding": "Two of them are joined as a bridge, the solder seam the same warm colour as the rest.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "bridge"},
+        {"id": "heft", "tool": "scale", "finding": "Dense, much heavier than it looks.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_crowns", "tool": "magnet", "finding": "They lie still under the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "cusps"},
+        {"id": "acid", "tool": "acid", "finding": "The scratch holds under the acid, rich and yellow: high-carat gold.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "steel_crowns",
+          "kind": "fake",
+          "valueMultiplier": 0.01,
+          "weight": 2,
+          "weightFactor": 0.55,
+          "magnetic": true,
+          "tells": [
+            {"id": "inside", "tool": "loupe", "finding": "Inside, the crowns are grey steel: only the outside has a golden coating.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "inside"},
+            {"id": "heft", "tool": "scale", "finding": "Light for gold, very light.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25}
+          ]
+        },
+        {
+          "id": "low_gold_alloy",
+          "kind": "fake",
+          "valueMultiplier": 0.15,
+          "weight": 1,
+          "weightFactor": 0.86,
+          "tells": [
+            {"id": "solder", "tool": "loupe", "finding": "The solder seam on the bridge is a paler, brassier yellow than the crowns.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "bridge"},
+            {"id": "heft", "tool": "scale", "finding": "A little light for gold this fine.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35}
+          ]
+        }
+    ],
+    "demandTags": ["gold"],
+    "claims": [
+      "My late uncle's. He won't be needing them. He was very clear about that.",
+      "From my own mouth. I have implants now, like a minister.",
+      "Gold teeth, nine hundred. The dentist in Tver said so in 1984.",
+      "Don't make that face. Gold is gold."
+    ],
+    "model": {
+      "glb": "gold_dental_crowns_900.glb",
+      "placeholder": "box",
+      "color": "#d9ad55",
+      "scale": 1,
+      "size": [0.034, 0.022, 0.011],
+      "inspectDistance": 0.08,
+      "hotspots": [
+        {"id": "cusps", "label": "Biting surface", "position": [-0.01, 0.003, 0.0055]},
+        {"id": "inside", "label": "Inside", "position": [-0.01, 0.003, -0.0055]},
+        {"id": "bridge", "label": "Bridge joint", "position": [0.0075, 0, 0.0045]}
+      ]
+    }
+  },
+  {
+    "id": "gold_bar_5g_999",
+    "category": "gold",
+    "name": "5 g gold bar, 999.9, in its bank card",
+    "era": "2010s",
+    "baseValue": {"min": 18000, "max": 23000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 6.4, "tolerance": 0.25},
+    "magnetic": false,
+    "rarity": 1.2,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "bar", "tool": "loupe", "finding": "Through the blister: the bar's stamp reads 5 g, 999.9, a refinery mark and a serial, all crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "bar"},
+        {"id": "card", "tool": "loupe", "finding": "On the back of the card, the same serial as the bar, and the sealed blister unbroken.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "heft", "tool": "scale", "finding": "Bar and card together weigh just what they should.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_bar", "tool": "magnet", "finding": "The magnet doesn't move it in its card.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "bar"},
+        {"id": "acid", "tool": "acid", "finding": "A scratch on the bar's edge holds under the strongest acid.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_brass",
+          "kind": "fake",
+          "valueMultiplier": 0.02,
+          "weight": 2,
+          "weightFactor": 0.62,
+          "tells": [
+            {"id": "bar", "tool": "loupe", "finding": "The stamp on the bar is soft and a hair crooked, and the serial is in the wrong typeface.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "bar"},
+            {"id": "card", "tool": "loupe", "finding": "The serial on the card doesn't match the one on the bar.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "back"},
+            {"id": "heft", "tool": "scale", "finding": "Light, well under five grams of gold.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25}
+          ]
+        },
+        {
+          "id": "low_purity",
+          "kind": "fake",
+          "valueMultiplier": 0.15,
+          "weight": 1,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "card", "tool": "loupe", "finding": "The blister has been slit along one edge and glued shut: a thin shiny line of glue.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "back"},
+            {"id": "heft", "tool": "scale", "finding": "A little light for what the card promises.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        }
+    ],
+    "demandTags": ["gold"],
+    "claims": [
+      "From the bank, sealed. I never opened it. Look, still sealed.",
+      "I bought it when the rouble fell. Now the rouble has fallen further. Ha.",
+      "Five grams, nine nine nine nine. The purest gold there is."
+    ],
+    "model": {
+      "glb": "gold_bar_5g_999.glb",
+      "placeholder": "box",
+      "color": "#e3b655",
+      "scale": 1,
+      "size": [0.054, 0.085, 0.004],
+      "inspectDistance": 0.18,
+      "hotspots": [
+        {"id": "bar", "label": "Bar", "position": [0, 0.012, 0.002]},
+        {"id": "back", "label": "Back of card", "position": [0, -0.015, -0.002]}
+      ]
+    }
   }
 ]

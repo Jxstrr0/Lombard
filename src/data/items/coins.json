@@ -269,5 +269,391 @@
         { "id": "edge", "label": "Edge", "position": [0.0125, 0, 0] }
       ]
     }
+  },
+  {
+    "id": "coin_gold_5r_1898",
+    "category": "coins",
+    "name": "Imperial gold 5 roubles, 1898",
+    "era": "1890s",
+    "baseValue": {"min": 15000, "max": 20000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 4.3, "tolerance": 0.15},
+    "magnetic": false,
+    "rarity": 0.9,
+    "fakeChance": 0.45,
+    "tells": [
+        {"id": "relief", "tool": "loupe", "finding": "The profile is crisp to the last curl of hair; the legend round it evenly struck.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "eagle", "tool": "loupe", "finding": "The double eagle's feathers are fine and separate, the date 1898 sharp beneath it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "edge", "tool": "loupe", "finding": "The edge is reeded, fine and even, with no seam.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge"},
+        {"id": "heft", "tool": "scale", "finding": "A small coin that drops in the pan like a lead shot.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_coin", "tool": "magnet", "finding": "Gold through and through: the magnet finds nothing.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse"},
+        {"id": "acid", "tool": "acid", "finding": "The streak shrugs off even the strongest acid in the kit.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_brass",
+          "kind": "fake",
+          "valueMultiplier": 0.02,
+          "weight": 2,
+          "weightFactor": 0.6,
+          "tells": [
+            {"id": "relief", "tool": "loupe", "finding": "The profile is soft and rounded, and the field is pitted with tiny bubbles.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"},
+            {"id": "edge", "tool": "loupe", "finding": "The reeding is worn through to pale yellow metal along one side.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "edge"},
+            {"id": "heft", "tool": "scale", "finding": "Far too light in the pan for gold.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25},
+            {"id": "acid", "tool": "acid", "finding": "The first drop turns the streak green and eats it away.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1}
+          ]
+        },
+        {
+          "id": "modern_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 1,
+          "weightFactor": 0.92,
+          "tells": [
+            {"id": "eagle", "tool": "loupe", "finding": "The eagle's feathers merge into flat blobs, and the date's 9 has the wrong tail.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "reverse"},
+            {"id": "heft", "tool": "scale", "finding": "A touch light in the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35},
+            {"id": "acid", "tool": "acid", "finding": "Survives the weak acid, dulls under the strong one: gold, but not nine hundred of it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.2}
+          ]
+        }
+    ],
+    "demandTags": ["coins", "gold"],
+    "claims": [
+      "Tsarist gold. My great-grandmother sewed it into her coat in 1918.",
+      "A five-rouble piece. Small but serious. Gold doesn't lie.",
+      "There was a whole jar of them once. This is the last one. Don't tell my brother."
+    ],
+    "model": {
+      "glb": "coin_gold_5r_1898.glb",
+      "placeholder": "coin",
+      "color": "#dcae4e",
+      "scale": 0.74,
+      "inspectDistance": 0.07,
+      "emblem": "imperial5",
+      "hotspots": [
+        {"id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011]},
+        {"id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011]},
+        {"id": "edge", "label": "Edge", "position": [0.0125, 0, 0]}
+      ]
+    }
+  },
+  {
+    "id": "coin_gold_10r_1899",
+    "category": "coins",
+    "name": "Imperial gold 10 roubles, 1899",
+    "era": "1890s",
+    "baseValue": {"min": 30000, "max": 38000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 8.6, "tolerance": 0.3},
+    "magnetic": false,
+    "rarity": 0.6,
+    "fakeChance": 0.5,
+    "tells": [
+        {"id": "relief", "tool": "loupe", "finding": "The profile is crisp, the beard and collar finely cut, the legend evenly spaced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "eagle", "tool": "loupe", "finding": "A sharp double eagle over '10 РУБЛЕЙ 1899', the mint initials clear below.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "edge", "tool": "loupe", "finding": "A fine reeded edge, even all the way round.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge"},
+        {"id": "heft", "tool": "scale", "finding": "Dense, much heavier than it looks.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_coin", "tool": "magnet", "finding": "The magnet slides off it without a flicker.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse"},
+        {"id": "acid", "tool": "acid", "finding": "The streak holds under the strongest acid in the kit.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_brass",
+          "kind": "fake",
+          "valueMultiplier": 0.02,
+          "weight": 2,
+          "weightFactor": 0.6,
+          "tells": [
+            {"id": "relief", "tool": "loupe", "finding": "The relief is soft and porous, as if cast in sand.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"},
+            {"id": "heft", "tool": "scale", "finding": "Light for gold, much too light.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25},
+            {"id": "acid", "tool": "acid", "finding": "The streak fizzes green at the first drop.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1}
+          ]
+        },
+        {
+          "id": "gilded_silver",
+          "kind": "fake",
+          "valueMultiplier": 0.1,
+          "weight": 1,
+          "weightFactor": 0.78,
+          "tells": [
+            {"id": "edge", "tool": "loupe", "finding": "On the edge, where the reeding is worn, the yellow gives way to white metal.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "edge"},
+            {"id": "heft", "tool": "scale", "finding": "Noticeably light in the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3},
+            {"id": "acid", "tool": "acid", "finding": "The yellow skin dissolves and the white metal under it clouds.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15}
+          ]
+        }
+    ],
+    "demandTags": ["coins", "gold"],
+    "claims": [
+      "Ten roubles in gold. A month's pay for a factory foreman, back then.",
+      "My grandfather found it under the floorboards when they renovated the flat.",
+      "It's been in the family two hundred years. Or a hundred. A long time."
+    ],
+    "model": {
+      "glb": "coin_gold_10r_1899.glb",
+      "placeholder": "coin",
+      "color": "#d9aa4b",
+      "scale": 0.9,
+      "inspectDistance": 0.08,
+      "emblem": "imperial10",
+      "hotspots": [
+        {"id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011]},
+        {"id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011]},
+        {"id": "edge", "label": "Edge", "position": [0.0125, 0, 0]}
+      ]
+    }
+  },
+  {
+    "id": "coin_silver_rouble_1924",
+    "category": "coins",
+    "name": "Soviet silver rouble, 1924",
+    "era": "1920s",
+    "baseValue": {"min": 3500, "max": 5500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 20, "tolerance": 0.7},
+    "magnetic": false,
+    "rarity": 0.6,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "relief", "tool": "loupe", "finding": "The worker points the peasant towards the rising sun; the factory chimneys behind are sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "emblem", "tool": "loupe", "finding": "The emblem's wheat ears show fine grains, worn flat only at the highest points.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "edge", "tool": "loupe", "finding": "Edge lettering naming eighteen grams of pure silver, crisp and evenly spaced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge"},
+        {"id": "heft", "tool": "scale", "finding": "A big silver coin, just as heavy as it should be.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_coin", "tool": "magnet", "finding": "Not the slightest tug from the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse"},
+        {"id": "acid", "tool": "acid", "finding": "The silver test turns the scratch a deep blood red.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "cast_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.05,
+          "weight": 2,
+          "weightFactor": 0.88,
+          "tells": [
+            {"id": "relief", "tool": "loupe", "finding": "The figures are soft and grainy, poured rather than struck.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"},
+            {"id": "edge", "tool": "loupe", "finding": "The edge lettering is smudged and runs into itself.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "edge"},
+            {"id": "heft", "tool": "scale", "finding": "A shade light in the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3},
+            {"id": "acid", "tool": "acid", "finding": "The test drop turns the scratch a muddy green.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15}
+          ]
+        },
+        {
+          "id": "steel_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.02,
+          "weight": 1,
+          "weightFactor": 0.82,
+          "magnetic": true,
+          "tells": [
+            {"id": "relief", "tool": "loupe", "finding": "The relief is sharp but flat, with no depth to the figures at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "obverse"},
+            {"id": "acid", "tool": "acid", "finding": "The plating lifts at the first drop; the scratch under it stays grey.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15}
+          ]
+        }
+    ],
+    "demandTags": ["coins", "silver", "soviet"],
+    "claims": [
+      "A Soviet silver rouble. The big one with the workers on it.",
+      "Grandad kept it in his medals box. I don't know why. He never said.",
+      "Silver, from 1924. They only made them for a few years, you know."
+    ],
+    "model": {
+      "glb": "coin_silver_rouble_1924.glb",
+      "placeholder": "coin",
+      "color": "#d0d1cd",
+      "scale": 1.35,
+      "inspectDistance": 0.11,
+      "emblem": "workers",
+      "hotspots": [
+        {"id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011]},
+        {"id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011]},
+        {"id": "edge", "label": "Edge", "position": [0.0125, 0, 0]}
+      ]
+    }
+  },
+  {
+    "id": "coin_gold_50r_george",
+    "category": "coins",
+    "name": "Gold 50 roubles \"St George\", investment coin",
+    "era": "2010s",
+    "baseValue": {"min": 15000, "max": 19000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 8.64, "tolerance": 0.3},
+    "magnetic": false,
+    "rarity": 0.9,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "relief", "tool": "loupe", "finding": "St George on horseback spears the dragon; the horse's mane and the dragon's scales are crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "eagle", "tool": "loupe", "finding": "A clean double eagle over '50 РУБЛЕЙ', the fineness 999 and the weight in fine print.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "edge", "tool": "loupe", "finding": "A tight, even reeded edge.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge"},
+        {"id": "heft", "tool": "scale", "finding": "Dense as a coin can be.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_coin", "tool": "magnet", "finding": "The magnet finds nothing at all.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse"},
+        {"id": "acid", "tool": "acid", "finding": "The streak ignores the strongest acid in the kit.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_brass",
+          "kind": "fake",
+          "valueMultiplier": 0.02,
+          "weight": 2,
+          "weightFactor": 0.62,
+          "tells": [
+            {"id": "relief", "tool": "loupe", "finding": "The horseman is soft and the dragon a blur; tiny pits in the field.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"},
+            {"id": "heft", "tool": "scale", "finding": "Light in the pan, far too light.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.25},
+            {"id": "acid", "tool": "acid", "finding": "The streak turns green and fizzes away.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.1}
+          ]
+        },
+        {
+          "id": "gilded_silver",
+          "kind": "fake",
+          "valueMultiplier": 0.08,
+          "weight": 1,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "eagle", "tool": "loupe", "finding": "The fine print under the eagle is thick and a little blurred, as if copied from a photo.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "reverse"},
+            {"id": "heft", "tool": "scale", "finding": "A little light in the pan.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3},
+            {"id": "acid", "tool": "acid", "finding": "The thin gold skin dissolves and the metal under it clouds milky.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15}
+          ]
+        }
+    ],
+    "demandTags": ["coins", "gold"],
+    "claims": [
+      "Investment gold. I bought it at the bank as savings. Now I need the savings.",
+      "Ninety-nine point nine. Purer than anything. Purer than me.",
+      "The bank wants to give me less than they sold it for. That's banks."
+    ],
+    "model": {
+      "glb": "coin_gold_50r_george.glb",
+      "placeholder": "coin",
+      "color": "#e0b552",
+      "scale": 0.9,
+      "inspectDistance": 0.08,
+      "emblem": "george50",
+      "hotspots": [
+        {"id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011]},
+        {"id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011]},
+        {"id": "edge", "label": "Edge", "position": [0.0125, 0, 0]}
+      ]
+    }
+  },
+  {
+    "id": "coin_silver_3r_george",
+    "category": "coins",
+    "name": "Silver 3 roubles \"St George\", investment coin",
+    "era": "2010s",
+    "baseValue": {"min": 1300, "max": 2000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 31.1, "tolerance": 0.9},
+    "magnetic": false,
+    "rarity": 0.45,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "relief", "tool": "loupe", "finding": "St George and the dragon, crisp, the lance a clean straight line.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "eagle", "tool": "loupe", "finding": "A clean double eagle over '3 РУБЛЯ', '999' and '31,1' in the fine print.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "edge", "tool": "loupe", "finding": "A fine reeded edge without a seam.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge"},
+        {"id": "heft", "tool": "scale", "finding": "A full ounce of silver: it sits heavy in the palm.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_coin", "tool": "magnet", "finding": "The magnet slides off without a tug.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse"},
+        {"id": "acid", "tool": "acid", "finding": "The test drop turns the scratch a deep red.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_brass",
+          "kind": "fake",
+          "valueMultiplier": 0.03,
+          "weight": 2,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "edge", "tool": "loupe", "finding": "Along the edge, brassy yellow shows through the silver.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "edge"},
+            {"id": "heft", "tool": "scale", "finding": "Light for a full ounce.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3},
+            {"id": "acid", "tool": "acid", "finding": "The scratch turns green under the drop.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15}
+          ]
+        },
+        {
+          "id": "polished",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "relief", "tool": "loupe", "finding": "The field is bright and covered in fine swirling hairlines: someone polished it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"}
+          ]
+        }
+    ],
+    "demandTags": ["coins", "silver"],
+    "claims": [
+      "An ounce of silver. You can't eat it, but you can sell it to you.",
+      "From the bank. I have the little plastic capsule somewhere.",
+      "Silver goes up. Everyone says. It's going up now, I can feel it."
+    ],
+    "model": {
+      "glb": "coin_silver_3r_george.glb",
+      "placeholder": "coin",
+      "color": "#d6d7d3",
+      "scale": 1.56,
+      "inspectDistance": 0.12,
+      "emblem": "george3",
+      "hotspots": [
+        {"id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011]},
+        {"id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011]},
+        {"id": "edge", "label": "Edge", "position": [0.0125, 0, 0]}
+      ]
+    }
+  },
+  {
+    "id": "coin_silver_mostograd_300",
+    "category": "coins",
+    "name": "Silver 3 roubles \"Mostograd 300 Years\", 1993",
+    "era": "1990s",
+    "baseValue": {"min": 2500, "max": 4000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 34.6, "tolerance": 1.0},
+    "magnetic": false,
+    "rarity": 0.54,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "relief", "tool": "loupe", "finding": "The drawbridge stands open over frosted waves, mirror field around it, not a hairline.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
+        {"id": "eagle", "tool": "loupe", "finding": "The double eagle side reads '3 РУБЛЯ 1993', the mint mark crisp under the claw.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "edge", "tool": "loupe", "finding": "The reeded edge is fine and even, proof-sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "edge"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy and cold, the full weight of a proof crown.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_coin", "tool": "magnet", "finding": "The magnet ignores it completely.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "obverse"},
+        {"id": "acid", "tool": "acid", "finding": "The silver test turns the scratch a creamy red.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.2}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "plated_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.04,
+          "weight": 2,
+          "weightFactor": 0.82,
+          "tells": [
+            {"id": "relief", "tool": "loupe", "finding": "The waves are flat, the mirror field cloudy, the bridge's cables merged.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"},
+            {"id": "heft", "tool": "scale", "finding": "Light for silver of this size.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3},
+            {"id": "acid", "tool": "acid", "finding": "The drop turns the scratch green.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.15}
+          ]
+        },
+        {
+          "id": "cleaned",
+          "kind": "restored",
+          "valueMultiplier": 0.4,
+          "weight": 1,
+          "tells": [
+            {"id": "relief", "tool": "loupe", "finding": "The mirror field is scrubbed dull with fine scratches: a proof somebody cleaned with toothpaste.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "obverse"}
+          ]
+        }
+    ],
+    "demandTags": ["coins", "silver"],
+    "claims": [
+      "The jubilee coin, 1993. The whole city got drunk that summer. I was there.",
+      "Proof silver. In 1993 nobody had money for these. My father did, somehow.",
+      "It came in a blue box with a certificate. The box, I don't know. The coin, here."
+    ],
+    "model": {
+      "glb": "coin_silver_mostograd_300.glb",
+      "placeholder": "coin",
+      "color": "#d8d9d5",
+      "scale": 1.56,
+      "inspectDistance": 0.12,
+      "emblem": "bridge",
+      "hotspots": [
+        {"id": "obverse", "label": "Obverse", "position": [0, 0, 0.0011]},
+        {"id": "reverse", "label": "Reverse", "position": [0, 0, -0.0011]},
+        {"id": "edge", "label": "Edge", "position": [0.0125, 0, 0]}
+      ]
+    }
   }
 ]

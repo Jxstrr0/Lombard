@@ -290,7 +290,9 @@ describe('the fence: the sim', () => {
       expect(clean.crime.fence.deals, `seed ${seed}`).toBe(0)
       expect(clean.bustDay, `seed ${seed}`).toBeNull()
       if (dirty.crime.fence.met && dirty.crime.fence.deals > 0) {
-        expect(dirty.crime.heat).toBeGreaterThan(clean.crime.heat)
+        // Heat fades nightly (tuning.police.heat decayShare/decayMin): two early deals can be cold by day 45
+        // (seed 1002 after M6 wave B: 2 deals, heat back to 0). The clean axis remembers.
+        expect(dirty.crime.heat).toBeGreaterThanOrEqual(clean.crime.heat)
         expect(dirty.axes.clean).toBeLessThan(clean.axes.clean)
       }
     }

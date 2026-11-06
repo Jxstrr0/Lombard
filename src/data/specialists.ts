@@ -144,7 +144,7 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
     name: 'Zhenya Kroshkina',
     short: 'Zhenya',
     role: 'Repair kiosk, Rechnaya underpass',
-    categories: ['phones', 'cameras', 'electronics'],
+    categories: ['phones', 'cameras', 'electronics', 'media'],
     blurb: 'Twenty-three, fixes phones in a kiosk the size of a wardrobe and answers on the first ring, mouth full. Cheap and fast. Sometimes a little too fast.',
     hello: '“Eight calls, yeah, fine. Just tell me the model, I’ll know.”',
     lines: {

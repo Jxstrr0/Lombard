@@ -249,5 +249,315 @@
         { "id": "back", "label": "Back", "position": [0, -0.004, -0.0205] }
       ]
     }
+  },
+  {
+    "id": "camera_zenit_ttl",
+    "category": "cameras",
+    "name": "Zenit-TTL 35 mm SLR",
+    "brand": "Zenit",
+    "era": "1980s",
+    "baseValue": {"min": 3000, "max": 5000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 1010, "tolerance": 40},
+    "magnetic": true,
+    "rarity": 0.78,
+    "fakeChance": 0.2,
+    "tells": [
+        {"id": "lens", "tool": "loupe", "finding": "The kit Helios lens: clean glass, the aperture blades snapping crisp and dry.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "lens"},
+        {"id": "prism", "tool": "loupe", "finding": "ЗЕНИТ-TTL on the prism, the letters cast in and painted, not stuck on.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "prism"},
+        {"id": "top", "tool": "loupe", "finding": "The meter needle swings when you point it at the window; the frame counter clicks round.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "top"},
+        {"id": "back", "tool": "loupe", "finding": "Inside the back: light seals intact, the pressure plate smooth, a serial stamped on the rail.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy as a house brick, all of it metal.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_body", "tool": "magnet", "finding": "The magnet catches on the steel body plates.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "top"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "lens_swap",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.6,
+          "weight": 2,
+          "tells": [
+            {"id": "lens", "tool": "loupe", "finding": "The lens is a cheaper Industar pancake that someone has dressed up in a Helios hood.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "lens"},
+            {"id": "lens_mount", "tool": "loupe", "finding": "Scratches all round the mount where a lens has been screwed in and out many times.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "lens"}
+          ]
+        },
+        {
+          "id": "reskinned",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "skin", "tool": "loupe", "finding": "The leatherette is brand new, too black, with a shiny glue line along every edge.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "back"}
+          ]
+        }
+    ],
+    "demandTags": ["cameras", "soviet"],
+    "claims": [
+      "Zenit, the TTL. It has a light meter inside, it's the clever one.",
+      "Grandfather photographed the whole family on it. Weddings, funerals, all of it.",
+      "Indestructible. You could knock a nail in with it. I don't recommend it."
+    ],
+    "model": {
+      "glb": "camera_zenit_ttl.glb",
+      "placeholder": "camera",
+      "color": "#b5b5b0",
+      "scale": 1,
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {"id": "lens", "label": "Lens", "position": [0, -0.006, 0.066]},
+        {"id": "prism", "label": "Prism nameplate", "position": [0, 0.06, 0.012]},
+        {"id": "top", "label": "Top plate", "position": [0.043, 0.0425, 0.004]},
+        {"id": "back", "label": "Film door", "position": [0, -0.004, -0.0205]}
+      ]
+    }
+  },
+  {
+    "id": "camera_nevka_8m",
+    "category": "cameras",
+    "name": "Nevka-8M viewfinder camera",
+    "brand": "Nevka",
+    "era": "1970s",
+    "baseValue": {"min": 500, "max": 900},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 280, "tolerance": 12},
+    "magnetic": false,
+    "rarity": 0.42,
+    "fakeChance": 0.15,
+    "tells": [
+        {"id": "lens", "tool": "loupe", "finding": "The lens ring reads T-43 4/40, the scale engraved into the plastic, the glass without haze.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "lens"},
+        {"id": "top", "tool": "loupe", "finding": "NEVKA-8M moulded into the top, the cocking lever and frame counter turning stiffly together.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "top"},
+        {"id": "back", "tool": "loupe", "finding": "The back slides off on its rails; the pressure plate inside is bright, not pitted.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "heft", "tool": "scale", "finding": "Light: plastic all round, a little metal in the shutter.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_body", "tool": "magnet", "finding": "The plastic body ignores the magnet; only a screw by the lens twitches.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "lens"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "lens_glued",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "lens", "tool": "loupe", "finding": "A different lens has been glued into the front: a ring of dried glue round the barrel.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "lens"}
+          ]
+        },
+        {
+          "id": "polished",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "top", "tool": "loupe", "finding": "The plastic has been rubbed with something greasy to hide the scratches; it smears.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "top"}
+          ]
+        }
+    ],
+    "demandTags": ["cameras", "soviet"],
+    "claims": [
+      "My first camera. Everyone's first camera, in those days.",
+      "It still works. Probably. Nobody sells film for it any more. Do they?",
+      "Fifteen roubles in 1978. Now it's an antique. I'm an antique."
+    ],
+    "model": {
+      "glb": "camera_nevka_8m.glb",
+      "placeholder": "box",
+      "color": "#2b2a28",
+      "scale": 1,
+      "size": [0.112, 0.068, 0.064],
+      "inspectDistance": 0.32,
+      "hotspots": [
+        {"id": "lens", "label": "Lens", "position": [0, -0.004, 0.032]},
+        {"id": "top", "label": "Top", "position": [0.025, 0.034, -0.012]},
+        {"id": "back", "label": "Back", "position": [0, 0, -0.032]}
+      ]
+    }
+  },
+  {
+    "id": "camera_kanon_powerpix",
+    "category": "cameras",
+    "name": "Kanon PowerPix A560 compact camera",
+    "brand": "Kanon",
+    "era": "2008",
+    "baseValue": {"min": 1500, "max": 2600},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 190, "tolerance": 8},
+    "magnetic": true,
+    "rarity": 0.78,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "lens", "tool": "loupe", "finding": "The zoom lens slides out and back in smoothly; the front glass is clean.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "lens"},
+        {"id": "logo", "tool": "loupe", "finding": "KANON in raised silver letters, POWERPIX printed sharp underneath.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "logo"},
+        {"id": "screen", "tool": "loupe", "finding": "The screen on the back lights up without dead spots; the buttons around it click.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "screen"},
+        {"id": "base", "tool": "loupe", "finding": "Underneath: a printed serial plate and a tripod socket with a steel thread.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "base"},
+        {"id": "heft", "tool": "scale", "finding": "Hefty for a small camera: two AA batteries in the grip.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_body", "tool": "magnet", "finding": "The magnet catches at the tripod socket and the battery springs.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "base"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.08,
+          "weight": 2,
+          "weightFactor": 0.7,
+          "tells": [
+            {"id": "logo", "tool": "loupe", "finding": "The logo reads KANAN, and POWERPICS is printed a little crooked.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3, "hotspot": "logo"},
+            {"id": "screen", "tool": "loupe", "finding": "The menus are in a font that wobbles, and half of them are in no language at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen"},
+            {"id": "heft", "tool": "scale", "finding": "Light and hollow, with no batteries in the grip.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "shell_swap",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.6,
+          "weight": 1,
+          "tells": [
+            {"id": "base", "tool": "loupe", "finding": "The serial plate underneath has been peeled off and stuck back on with tape.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "base"}
+          ]
+        }
+    ],
+    "demandTags": ["cameras"],
+    "claims": [
+      "Nothing wrong with it, we just take pictures on the phone now.",
+      "Kanon, the good make. Takes AA batteries, you can buy those anywhere.",
+      "Holiday camera. Turkey, Egypt, Turkey again. It's seen the world."
+    ],
+    "model": {
+      "glb": "camera_kanon_powerpix.glb",
+      "placeholder": "box",
+      "color": "#9fa3a8",
+      "scale": 1,
+      "size": [0.098, 0.064, 0.042],
+      "inspectDistance": 0.28,
+      "hotspots": [
+        {"id": "lens", "label": "Lens", "position": [0.016, 0.004, 0.021]},
+        {"id": "logo", "label": "Logo", "position": [-0.03, 0.02, 0.021]},
+        {"id": "screen", "label": "Screen", "position": [-0.008, 0, -0.021]},
+        {"id": "base", "label": "Base plate", "position": [0.005, -0.032, 0]}
+      ]
+    }
+  },
+  {
+    "id": "camera_kanon_d450",
+    "category": "cameras",
+    "name": "Kanon D450 digital SLR with kit zoom",
+    "brand": "Kanon",
+    "era": "2010",
+    "baseValue": {"min": 12000, "max": 17000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 720, "tolerance": 25},
+    "magnetic": true,
+    "rarity": 1.0,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "lens", "tool": "loupe", "finding": "The kit zoom has its stabiliser switch, the front element clean, the zoom ring even.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "lens"},
+        {"id": "top", "tool": "loupe", "finding": "The mode dial clicks round firmly; KANON and D450 are crisp on the prism.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "top"},
+        {"id": "screen", "tool": "loupe", "finding": "The rear screen is unscratched, and the rubber eyecup is still soft.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.35, "hotspot": "screen"},
+        {"id": "base", "tool": "loupe", "finding": "The base plate's serial matches the card in the box; the screws beside it are untouched.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "base"},
+        {"id": "heft", "tool": "scale", "finding": "About right for the body, the kit lens and a battery.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_body", "tool": "magnet", "finding": "The magnet catches at the lens mount screws and the tripod socket.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "base"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "lens_swap",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.65,
+          "weight": 2,
+          "tells": [
+            {"id": "lens", "tool": "loupe", "finding": "The kit lens is the cheaper one with no stabiliser switch, though the box it came in says otherwise.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "lens"}
+          ]
+        },
+        {
+          "id": "opened",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "base", "tool": "loupe", "finding": "The base plate screws are chewed and one is missing: someone has been inside.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "base"},
+            {"id": "screen", "tool": "loupe", "finding": "The rear screen sits a hair proud of the body on one side.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "screen"}
+          ]
+        }
+    ],
+    "demandTags": ["cameras", "electronics"],
+    "claims": [
+      "I was going to be a photographer. Then I got a job.",
+      "Hardly used. Two weddings and a christening. Not mine.",
+      "Kanon, the D450. It has the stabiliser, the lens, the bag, everything."
+    ],
+    "model": {
+      "glb": "camera_kanon_d450.glb",
+      "placeholder": "box",
+      "color": "#1d1d1e",
+      "scale": 1,
+      "size": [0.13, 0.1, 0.15],
+      "inspectDistance": 0.45,
+      "hotspots": [
+        {"id": "lens", "label": "Lens", "position": [0, -0.008, 0.075]},
+        {"id": "top", "label": "Top plate", "position": [0.038, 0.05, -0.05]},
+        {"id": "screen", "label": "Rear screen", "position": [-0.01, -0.008, -0.075]},
+        {"id": "base", "label": "Base plate", "position": [0.02, -0.05, -0.04]}
+      ]
+    }
+  },
+  {
+    "id": "lens_kanon_zoom",
+    "category": "cameras",
+    "name": "Kanon 75–300 mm zoom lens",
+    "brand": "Kanon",
+    "era": "2000s",
+    "baseValue": {"min": 2500, "max": 4500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 480, "tolerance": 18},
+    "magnetic": false,
+    "rarity": 0.6,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "front", "tool": "loupe", "finding": "Clean glass front and back; a torch through it shows only a speck or two of dust.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "front"},
+        {"id": "zoom", "tool": "loupe", "finding": "The zoom ring turns smoothly from 75 to 300 with no creep, the scale printed sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "zoom"},
+        {"id": "switch", "tool": "loupe", "finding": "The focus switch clicks firmly between AF and MF; KANON LENS is printed beside it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "switch"},
+        {"id": "mount", "tool": "loupe", "finding": "The metal mount is bright with honest wear, its contacts clean and unbent.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "mount"},
+        {"id": "heft", "tool": "scale", "finding": "Light for its length: plastic barrel, glass inside.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_lens", "tool": "magnet", "finding": "The barrel ignores the magnet; only the mount screws tug faintly.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "mount"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "fungus",
+          "kind": "restored",
+          "valueMultiplier": 0.4,
+          "weight": 2,
+          "tells": [
+            {"id": "front", "tool": "loupe", "finding": "A torch through it shows grey threads of fungus spreading across an inner element.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "front"},
+            {"id": "mount", "tool": "loupe", "finding": "Fresh tool marks on the mount screws: someone opened it to clean it and gave up.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.5, "hotspot": "mount"}
+          ]
+        },
+        {
+          "id": "third_party",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "switch", "tool": "loupe", "finding": "The switch is in the wrong place and the name beside it has been scraped off and painted over.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "switch"},
+            {"id": "heft", "tool": "scale", "finding": "Lighter than it should be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        }
+    ],
+    "demandTags": ["cameras"],
+    "claims": [
+      "A long lens. For birds. Or for neighbours, if you're that sort.",
+      "It goes with the Kanon. I sold the camera already, the lens is spare.",
+      "Three hundred millimetres. You can see the bridge keeper's newspaper from the embankment."
+    ],
+    "model": {
+      "glb": "lens_kanon_zoom.glb",
+      "placeholder": "box",
+      "color": "#1c1c1d",
+      "scale": 1,
+      "size": [0.072, 0.072, 0.122],
+      "inspectDistance": 0.32,
+      "hotspots": [
+        {"id": "front", "label": "Front element", "position": [0, 0.012, 0.061]},
+        {"id": "zoom", "label": "Zoom ring", "position": [0, 0.036, 0.018]},
+        {"id": "switch", "label": "AF/MF switch", "position": [-0.036, 0, -0.032]},
+        {"id": "mount", "label": "Mount", "position": [0, 0.018, -0.061]}
+      ]
+    }
   }
 ]

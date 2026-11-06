@@ -24,6 +24,17 @@ const ALLOWED_BRANDS = new Set([
   'Kanon',
   'Weissler',
   'Tosaki',
+  // M6 wave B (invented)
+  'Mostochas',
+  'Nevka',
+  'Vertex',
+  'Nakashima',
+  'Rubezh',
+  'Liraphon',
+  'Nimbus',
+  'Kosmo',
+  'Mostizdat',
+  'Kanal',
 ])
 /** Categories whose items carry no maker's brand (struck by a state mint or a jeweller). */
 const UNBRANDED = new Set(['gold', 'militaria', 'coins', 'icons'])
@@ -52,6 +63,17 @@ const HALF_EXTENTS: Record<ItemDef['model']['placeholder'], [number, number, num
   coin: [0.013, 0.013, 0.0015],
   laptop: [0.169, 0.123, 0.158],
   icon: [0.08, 0.1, 0.012],
+  // M6 wave B: box and book take model.size (see halfExtents); record is sleeve + disc
+  box: [0, 0, 0],
+  book: [0, 0, 0],
+  record: [0.22, 0.18, 0.0042],
+}
+
+/** Half-extents for a def: sized placeholders (box, book) use model.size. */
+function halfExtents(def: ItemDef): [number, number, number] {
+  const s = def.model.size
+  if (s && (def.model.placeholder === 'box' || def.model.placeholder === 'book')) return [s[0] / 2, s[1] / 2, s[2] / 2]
+  return HALF_EXTENTS[def.model.placeholder]
 }
 
 describe('item definitions', () => {
@@ -62,18 +84,19 @@ describe('item definitions', () => {
     }
   })
 
-  it('ships 32 defs across 8 categories with unique ids', () => {
-    expect(ITEM_DEFS).toHaveLength(32)
+  it('ships 76 defs across 9 categories with unique ids', () => {
+    expect(ITEM_DEFS).toHaveLength(76)
     const count = (c: string) => ITEM_DEFS.filter((d) => d.category === c).length
-    expect(count('gold')).toBe(6)
-    expect(count('watches')).toBe(6)
-    expect(count('phones')).toBe(5)
-    expect(count('cameras')).toBe(4)
-    expect(count('militaria')).toBe(5)
-    expect(count('coins')).toBe(4)
-    expect(count('electronics')).toBe(1)
+    expect(count('gold')).toBe(10)
+    expect(count('watches')).toBe(11)
+    expect(count('phones')).toBe(9)
+    expect(count('cameras')).toBe(9)
+    expect(count('militaria')).toBe(10)
+    expect(count('coins')).toBe(10)
+    expect(count('electronics')).toBe(5)
     expect(count('icons')).toBe(1) // M5: the Collector's, story-only
-    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(32)
+    expect(count('media')).toBe(11) // M6 wave B
+    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(76)
     expect(getItemDef('gold_band_583').category).toBe('gold')
   })
 
@@ -155,7 +178,7 @@ describe('item definitions', () => {
 
   it('hotspots sit on the placeholder model (metres, centred at the origin)', () => {
     for (const def of ITEM_DEFS) {
-      const ext = HALF_EXTENTS[def.model.placeholder]
+      const ext = halfExtents(def)
       for (const h of def.model.hotspots) {
         h.position.forEach((v, i) => expect(Math.abs(v), `${def.id}/${h.id}[${i}]`).toBeLessThanOrEqual(ext[i]!))
       }

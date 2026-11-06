@@ -5,6 +5,11 @@ export const firstNames = [
   'Polina', 'Raisa', 'Sveta', 'Tanya', 'Vera', 'Zina',
 ] as const
 
+/** The women's names in `firstNames` (so a walk-in's 3D look matches their name). */
+export const femaleFirstNames: ReadonlySet<string> = new Set([
+  'Alla', 'Galina', 'Inna', 'Katya', 'Lida', 'Marina', 'Nadia', 'Olga', 'Polina', 'Raisa', 'Sveta', 'Tanya', 'Vera', 'Zina',
+])
+
 export interface ArchetypeDef {
   id: string
   label: string

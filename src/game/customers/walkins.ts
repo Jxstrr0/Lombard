@@ -4,25 +4,29 @@ import { ITEM_DEFS } from '../../data/items'
 import { tuning } from '../../data/tuning'
 import { generateItem, pickItemDef } from '../items/generate'
 import { pawnChance, pawnOpeningLine } from '../loans/loans'
+import { pickLook } from './look'
 import type { Rng } from '../rng'
 import type { QueuedVisit, Temperament, WalkIn } from '../types'
 
 const TEMPERAMENTS: readonly Temperament[] = ['stubborn', 'flexible', 'desperate', 'proud']
 
-export function generateWalkIn(rng: Rng, id: string): WalkIn {
+/** `avoidLook`: the previous customer's cast id, so the same person doesn't come in twice running. */
+export function generateWalkIn(rng: Rng, id: string, avoidLook?: string): WalkIn {
   const arch = rng.weighted(archetypes.map((a) => ({ item: a, weight: a.weight })))
   const w = tuning.customers.temperamentWeights
   let temperament = rng.weighted(TEMPERAMENTS.map((t) => ({ item: t, weight: w[t] })))
   const desperation = round2(rng.range(arch.desperation[0], arch.desperation[1]))
   if (desperation > 0.85 && rng.chance(0.5)) temperament = 'desperate'
+  const name = rng.pick(firstNames)
   return {
     id,
-    name: rng.pick(firstNames),
+    name,
     archetype: arch.id,
     temperament,
     knowledge: round2(rng.range(arch.knowledge[0], arch.knowledge[1])),
     desperation,
-    portraitKey: arch.id,
+    // A forked stream, so the 3D look doesn't shift any other draw.
+    portraitKey: pickLook(rng.fork(`look:${id}`), { name, archetype: arch.id }, avoidLook),
   }
 }
 
@@ -31,7 +35,7 @@ export function generateDayQueue(rng: Rng, count: number, nextId: (prefix: strin
   const queue: QueuedVisit[] = []
   const [pMin, pMax] = tuning.day.queuePatience
   for (let i = 0; i < count; i++) {
-    const customer = generateWalkIn(rng, nextId('c'))
+    const customer = generateWalkIn(rng, nextId('c'), queue[queue.length - 1]?.customer.portraitKey)
     const def = pickItemDef(ITEM_DEFS, rng)
     const item = generateItem(def, rng, nextId('i'))
     // People further back in the line have waited less when you reach them; give them more patience.

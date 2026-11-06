@@ -37,7 +37,7 @@ import { PerfOverlay, TIER_SETTINGS, TierBenchmark, initialTier } from './render
 import { ShopScene } from './render/scene'
 import { ItemStage } from './render/stage'
 import { createItemLoader } from './render/loaders'
-import { customerTestName, loadCustomerModel } from './render/customerModel'
+import { CustomerCast, castOverride } from './render/customerModel'
 import { Ui, screenFor, type ScreenId } from './ui/bind'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
@@ -194,6 +194,10 @@ async function boot(): Promise<void> {
   if (look) rig.setHeadOffset(look.yaw, look.pitch)
   // ?noglb=1 keeps every item on its procedural placeholder (for comparing against the scripted models).
   const itemLoader = params.get('noglb') === '1' ? null : createItemLoader(renderer, import.meta.env.BASE_URL, __BUILD_SHA__)
+  // Customers are 3D cast members (Rocketbox); ?nocast=1 (or ?noglb=1) keeps the old silhouette, ?customer=<id> casts one person as everyone.
+  if (itemLoader && params.get('nocast') !== '1') {
+    shop.setCast(new CustomerCast(itemLoader.gltf, import.meta.env.BASE_URL, __BUILD_SHA__), castOverride(params))
+  }
   const stage = new ItemStage(shop.scene, shop.matPoint, itemLoader?.load)
 
   // --- UI --------------------------------------------------------------------
@@ -310,16 +314,6 @@ async function boot(): Promise<void> {
           if (m) ui.setBakeInfo(`bake ${m.quality}${m.commit ? ` ${m.commit}` : ''}`)
           return m
         })
-  // M3 customer test: ?customer=<name> stands a rigged test model at the counter.
-  const customerName = customerTestName(params)
-  if (customerName) {
-    loadCustomerModel(import.meta.env.BASE_URL, customerName, __BUILD_SHA__)
-      .then((model) => {
-        shop.setCustomerModel(model)
-        console.info(`[customer] ${customerName}: ${Math.round(model.triangles)} triangles, ${model.materials.length} materials${model.mixer ? ', idle clip' : ''}`)
-      })
-      .catch((err) => console.warn('[customer] test model failed to load, keeping the silhouette', err))
-  }
   // The canal outside the window comes after the shop; ?nobackdrop=1 keeps the old canvas card.
   const backdropLoad = params.get('nobackdrop') === '1' ? Promise.resolve(false) : bakeLoad.then(() => shop.loadBackdrop(renderer, import.meta.env.BASE_URL))
   void Promise.all([envLoad, bakeLoad, backdropLoad]).finally(() => {
@@ -332,6 +326,8 @@ async function boot(): Promise<void> {
     const dt = Math.min(clock.getDelta(), 0.1)
     perf?.begin()
     shop.update(dt)
+    const customerState = shop.customerState
+    if (document.body.dataset.customer !== customerState) document.body.dataset.customer = customerState
     stage.update(dt, rig)
     rig.update(dt)
     shop.setInspectBlend(rig.inspectBlend)

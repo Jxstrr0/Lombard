@@ -141,7 +141,9 @@ async function playPortrait(page, h) {
   await h.screen('counter')
   await h.shot('counter-open', 'shop open, nobody at the counter, Next customer')
   await h.click('next-customer')
-  await page.waitForTimeout(900)
+  // The cast model loads, then fades in (slowly in headless at desktop size).
+  await page.waitForFunction(() => document.body.dataset.customer === 'in', null, { timeout: 30_000 }).catch(() => console.warn('customer never settled'))
+  await page.waitForTimeout(300)
   await h.shot('counter-customer', 'customer presents an item: name, archetype, item tag, line; Inspect / Pass')
   await h.click('inspect')
   await h.screen('inspect')
@@ -359,7 +361,9 @@ async function playShort(page, h) {
   await h.open(page.viewportSize()?.height < 500)
   await h.screen('counter')
   await h.click('next-customer')
-  await page.waitForTimeout(900)
+  // The cast model loads, then fades in (slowly in headless at desktop size).
+  await page.waitForFunction(() => document.body.dataset.customer === 'in', null, { timeout: 30_000 }).catch(() => console.warn('customer never settled'))
+  await page.waitForTimeout(300)
   await h.shot('counter-customer', 'customer at the counter')
   await h.click('inspect')
   await h.screen('inspect')

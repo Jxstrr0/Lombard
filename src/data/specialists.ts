@@ -2,8 +2,13 @@
  * Specialists on retainer (GDD § 2b), validated at import time. Fictional
  * people. M2: jeweler, watchmaker. M4: militaria collector, antiques dealer,
  * electronics tech. Fees, call allowances, accuracy and honesty live in
- * tuning.specialists.roster[id]; their small arcs are design notes in GDD § 2b
- * until the story engine carries them.
+ * tuning.specialists.roster[id]; their small arcs are src/data/stories/<first name>.ts
+ * (GDD § 2b). `look` is the cast member who plays them at the counter (Gennady only
+ * ever phones, so he has none). No regular wears it. The regular-only looks ran out
+ * with the fifteen regulars (the last four are reserved for arc characters:
+ * business_male_05 Edik, male_adult_06 Fedya, male_adult_20 Eduard, male_adult_11
+ * Zhora), so every specialist borrows a walk-in look (marking more looks `regular`
+ * would reshuffle every walk-in's derived look).
  *
  * Roster order matters: specialistFor() picks the first retained one covering
  * a category, so keep the categories disjoint.
@@ -15,6 +20,7 @@ import { SpecialistDef } from '../game/schema/economy'
 export const SPECIALISTS: readonly SpecialistDef[] = [
   {
     id: 'jeweler',
+    look: 'business_female_02',
     name: 'Faina Gelfand',
     short: 'Faina',
     role: 'Jeweler, Sennaya arcade',
@@ -44,6 +50,7 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
   },
   {
     id: 'watchmaker',
+    look: 'male_adult_03',
     name: 'Ilya Semyonovich Brodsky',
     short: 'Ilya',
     role: 'Watchmaker, Kanal Street',
@@ -102,6 +109,7 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
   },
   {
     id: 'antiquary',
+    look: 'business_male_07',
     name: 'Stanislav Edgarovich Lyubimov',
     short: 'Stanislav',
     role: 'Antiques dealer, Dvoryanskaya embankment',
@@ -132,6 +140,7 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
   },
   {
     id: 'technician',
+    look: 'female_adult_04',
     name: 'Zhenya Kroshkina',
     short: 'Zhenya',
     role: 'Repair kiosk, Rechnaya underpass',

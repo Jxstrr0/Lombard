@@ -13,7 +13,7 @@ import { tuning } from '../../data/tuning'
 import { UPGRADES } from '../../data/upgrades'
 import type { Action } from '../../game/actions'
 import { monthName, upcomingBills } from '../../game/economy/expenses'
-import { callsLeft, retainCost } from '../../game/economy/specialists'
+import { callsLeft, monthlyCalls, retainCost } from '../../game/economy/specialists'
 import { canRestockAcid, hasUpgrade, protectedAreas, upgradeStatus } from '../../game/economy/upgrades'
 import { addDays, type GameState } from '../../game/state'
 import { createButton, el, setText } from '../components/button'
@@ -227,8 +227,11 @@ export class OfficeSheet {
       const covers = def.categories.map((c) => CATEGORY_LABEL[c] ?? c).join(', ')
       li.append(top, el('p', 'office-role', `${def.role} · ${covers}`), el('p', 'office-blurb', def.blurb))
       if (!def.categories.some((c) => STOCKED.has(c))) li.append(el('p', 'office-quiet', 'Nothing in this line has come through the door yet.'))
-      const terms = `${roster.calls} calls a month · extra calls ${rub(roster.perCall)}`
-      if (retained) {
+      const terms = `${monthlyCalls(state, def.id)} calls a month · extra calls ${rub(roster.perCall)}`
+      if (sp?.retired) {
+        // M4 arcs: gone for good (Faina gave up her bench, Ilya retired).
+        li.append(el('p', 'office-quiet', 'Retired. No longer taking calls.'))
+      } else if (retained) {
         li.append(el('p', 'office-terms', `${terms}. ${callsLeft(state, def.id)} call${callsLeft(state, def.id) === 1 ? '' : 's'} left this month.`))
         li.append(el('p', 'office-quote', getSpecialist(def.id)?.hello ?? ''))
         const confirming = this.confirmRelease === def.id

@@ -65,11 +65,23 @@ export function chargeExpenses(state: GameState): GameState {
       specialists[id] = { ...sp, callsUsed: 0 }
       continue
     }
-    const paidInFull = cash >= roster.fee
-    cash -= roster.fee
-    entries.push({ kind: 'expense', amount: -roster.fee, text: `Retainer: ${def.name}, ${next}` })
+    // M4 arcs: a free month (Zhenya's apology) counts as paid in full.
+    const free = (sp.mods.freeMonths ?? 0) > 0
+    const paidInFull = free || cash >= roster.fee
+    if (free) {
+      entries.push({ kind: 'expense', amount: 0, text: `Retainer: ${def.name}, ${next} (on the house)` })
+    } else {
+      cash -= roster.fee
+      entries.push({ kind: 'expense', amount: -roster.fee, text: `Retainer: ${def.name}, ${next}` })
+    }
     const relationship = paidInFull ? Math.min(1, sp.relationship + t.relationshipPerMonth) : sp.relationship
-    specialists[id] = { ...sp, callsUsed: 0, relationship }
+    specialists[id] = { ...sp, callsUsed: 0, relationship, ...specialistMonthEnd(sp, paidInFull, free, roster.accuracy) }
+    // M4 arcs: Zhenya's repair desk pays rent while she's on retainer.
+    const rent = sp.mods.rentIn ?? 0
+    if (rent > 0) {
+      cash += rent
+      entries.push({ kind: 'story', amount: rent, text: `Rent from ${def.short}’s repair desk, ${next}` })
+    }
   }
   return {
     ...state,
@@ -77,6 +89,17 @@ export function chargeExpenses(state: GameState): GameState {
     specialists,
     day: { ...state.day, log: [...state.day.log, ...entries] },
   }
+}
+
+/** M4 arcs at a month end on retainer: months paid in full, accuracy drift, a free month used up. */
+function specialistMonthEnd(sp: SpecialistState, paidInFull: boolean, free: boolean, rosterAccuracy: number): Pick<SpecialistState, 'months' | 'mods'> {
+  const mods = { ...sp.mods }
+  if (free) mods.freeMonths = (mods.freeMonths ?? 0) - 1
+  if (mods.driftPerMonth) {
+    const floor = tuning.specialistArcs.minAccuracy - rosterAccuracy
+    mods.accuracy = Math.round(Math.max(floor, (mods.accuracy ?? 0) + mods.driftPerMonth) * 1000) / 1000
+  }
+  return { months: sp.months + (paidInFull ? 1 : 0), mods }
 }
 
 export function upcomingBills(state: GameState): UpcomingBill[] {
@@ -88,7 +111,7 @@ export function upcomingBills(state: GameState): UpcomingBill[] {
   for (const [id, sp] of Object.entries(state.specialists)) {
     const roster = tuning.specialists.roster[id]
     const def = getSpecialist(id)
-    if (sp.retained && roster && def) bills.push({ label: `Retainer: ${def.short}`, amount: roster.fee, inDays })
+    if (sp.retained && roster && def) bills.push({ label: `Retainer: ${def.short}`, amount: (sp.mods.freeMonths ?? 0) > 0 ? 0 : roster.fee, inDays })
   }
   return bills
 }

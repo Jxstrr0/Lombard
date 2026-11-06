@@ -10,7 +10,8 @@
  */
 import { z } from 'zod'
 import { tuning } from '../../data/tuning'
-import { addDays, createSlots, STATE_VERSION, type GameState } from '../state'
+import { flagAxis } from '../endings/axes'
+import { addDays, createCrimeState, createSlots, STATE_VERSION, type GameState } from '../state'
 
 export const CURRENT_VERSION = STATE_VERSION
 
@@ -215,8 +216,44 @@ const v6ToV7: Migration = {
   },
 }
 
+/**
+ * v7 → v8 (M5 foundation): the crime state gets the bulletin, Volkova, the fence and
+ * scheduled events (heat, pressure, fenceTrust and flags kept); `career` arrives with
+ * the ending axes, seeded from the heart.* / dirty.* story choices already made (deals
+ * before v8 were not counted), and no ending; the stats get people helped and hurt.
+ */
+const v7ToV8: Migration = {
+  from: 7,
+  to: 8,
+  up(raw) {
+    const crime = isRecord(raw.crime) ? raw.crime : {}
+    const fresh = createCrimeState()
+    const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0)
+    const story = isRecord(raw.story) ? raw.story : {}
+    const flags = Array.isArray(story.flags) ? story.flags.filter((f): f is string => typeof f === 'string') : []
+    const axes = { clean: 0, heart: 0 }
+    for (const f of flags) {
+      const move = flagAxis(f)
+      if (move) axes[move.axis] += move.delta
+    }
+    const stats = isRecord(raw.stats) ? raw.stats : {}
+    return {
+      ...raw,
+      crime: {
+        ...fresh,
+        heat: n(crime.heat),
+        pressure: n(crime.pressure),
+        fenceTrust: n(crime.fenceTrust),
+        flags: Array.isArray(crime.flags) ? crime.flags : [],
+      },
+      career: { axes, end: null },
+      stats: { ...stats, peopleHelped: 0, peopleHurt: 0 },
+    }
+  },
+}
+
 /** Ordered, contiguous chain. Append new steps at the end. */
-export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5, v5ToV6, v6ToV7]
+export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4ToV5, v5ToV6, v6ToV7, v7ToV8]
 
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())
@@ -254,7 +291,8 @@ const GameStateShape = z.looseObject({
   haggle: z.looseObject({ ask: num, floor: num }).nullable(),
   day: z.looseObject({ phase: z.enum(['open', 'closed']), clock: num, openingCash: num, log: z.array(z.unknown()) }),
   history: z.array(z.unknown()),
-  crime: rec,
+  crime: z.looseObject({ heat: num, pressure: num, bulletin: z.array(z.unknown()), volkova: rec, fence: rec, events: z.array(z.unknown()) }),
+  career: z.looseObject({ axes: z.looseObject({ clean: num, heart: num }), end: rec.nullable() }),
   story: rec,
   reputation: rec,
   stats: z.looseObject({ customersSeen: num }),

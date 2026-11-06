@@ -11,7 +11,8 @@
  * ## Who comes in (planBuyers)
  * Each displayed item with a tag rolls once per day:
  *   chance = baseChance × priceFactor(tag / trueValue) × visibility[area] × visibilityBonus(area)
- *            × demandMultiplier(def.demandTags) × reputationFactor, capped at maxChance.
+ *            × demandMultiplier(def.demandTags) × reputationFactor × buyerRepFactor (neighbourhood, M4),
+ *            capped at maxChance.
  * priceFactor > 1 under value (up to maxUnderBoost), decays exponentially over value. At most
  * maxBuyersPerDay buyers come (a seeded shuffle picks which). Items without a tag, or in the
  * safe, are not for sale.
@@ -45,6 +46,7 @@ import { claimedValue } from '../appraise/value'
 import { generateWalkIn } from '../customers/walkins'
 import { demandMultiplier } from '../economy/demand'
 import { visibilityBonus } from '../economy/upgrades'
+import { buyerRepFactor } from '../reputation'
 import type { Rng } from '../rng'
 import { displayed, type DisplayedItem } from '../shop/display'
 import type { GameState, SlotArea } from '../state'
@@ -79,7 +81,7 @@ export function sellChance(state: GameState, item: ItemInstance, area: SlotArea,
   const visibility = tuning.shop.visibility[area] * visibilityBonus(state, area)
   const demand = demandMultiplier(state, def.demandTags)
   const rep = clamp(1 + state.reputation.general * S.repPerPoint, S.repClamp[0], S.repClamp[1])
-  return clamp(S.baseChance * price * visibility * demand * rep, 0, S.maxChance)
+  return clamp(S.baseChance * price * visibility * demand * rep * buyerRepFactor(state), 0, S.maxChance)
 }
 
 export function planBuyers(state: GameState, rng: Rng, nextId: (prefix: string) => string): QueuedVisit[] {

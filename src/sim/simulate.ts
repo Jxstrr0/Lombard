@@ -93,6 +93,8 @@ export interface Summary {
   medianBustDay: number | null
   medianFinalWorth: number
   avgFakesBought: number
+  /** Items shoplifted per run (M4). */
+  avgStolen: number
   /** Runs whose closing cash ever went below zero. */
   cashDips: number
 }
@@ -114,6 +116,7 @@ export function summarize(results: RunResult[], startWorth: number): Summary {
     medianBustDay: busts.length ? median(busts) : null,
     medianFinalWorth: median(results.map((r) => r.finalWorth)),
     avgFakesBought: results.reduce((a, r) => a + r.stats.fakesBought, 0) / Math.max(1, results.length),
+    avgStolen: results.reduce((a, r) => a + (r.stats.itemsStolen ?? 0), 0) / Math.max(1, results.length),
     cashDips: results.filter((r) => r.minCash < 0).length,
   }
 }

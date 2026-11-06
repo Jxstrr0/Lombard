@@ -1,4 +1,5 @@
 /** Apply story effects (src/game/schema/story.ts) to the state. Pure. */
+import { adjustRep } from '../reputation'
 import type { Effect } from '../schema/story'
 import type { GameState } from '../state'
 import { adjustTrust, endArc } from './progress'
@@ -11,10 +12,9 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
       return { ...state, story: { ...state.story, flags: state.story.flags.filter((f) => f !== e.flag) } }
     case 'trust':
       return adjustTrust(state, e.who, e.delta)
-    case 'rep': {
-      const byGroup = { ...state.reputation.byGroup, [e.group]: (state.reputation.byGroup[e.group] ?? 0) + e.delta }
-      return { ...state, reputation: { ...state.reputation, byGroup } }
-    }
+    case 'rep':
+      // Through the reputation module: clamped to −1…1 and counted in today's change (ledger trend lines).
+      return adjustRep(state, e.group, e.delta, `story:${arc}`)
     case 'cash':
       return {
         ...state,

@@ -24,6 +24,7 @@ TypeScript 5, Vite (current stable, pinned), Three.js (pin a current stable rele
       rng.ts                # seeded PRNG (mulberry32 or sfc32)
       state.ts              # GameState type + initial state
       actions.ts            # action types and reducer(s)
+      reputation.ts         # reputation by group: adjustRep, readers, ledger lines (M4)
       schema/               # zod schemas for data files
       items/                # item instance generation, authenticity, tells
       inspect/              # tool application → findings

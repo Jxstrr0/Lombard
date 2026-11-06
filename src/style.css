@@ -1592,6 +1592,36 @@ html {
   color: var(--ink-red);
 }
 
+.log-theft .log-kind {
+  color: var(--ink-red);
+}
+
+.log-theft .log-text {
+  font-weight: 600;
+}
+
+.receipt-standing {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.receipt-standing li {
+  position: relative;
+  padding: 4px 0 4px 1.1em;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.receipt-standing li::before {
+  content: '·';
+  position: absolute;
+  left: 0.3em;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
 .receipt-empty {
   padding: 4px 0;
   color: var(--ink-soft);

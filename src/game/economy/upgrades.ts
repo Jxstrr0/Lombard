@@ -8,6 +8,7 @@
  * hasUpgrade(state, id) for other modules.
  * visibilityBonus(state, area) → multiplier on an area's buyer visibility from case upgrades
  *   (read by the shop worker's buyer planning; 1 = no upgrade).
+ * protectedAreas(state) → areas thieves can't reach; recordsEvidence(state) → a camera is installed (M4).
  * refTier(state) → reference book tier, max(1, best owned) (tier 1 is everyone's basic book).
  */
 import { getUpgrade, UPGRADES } from '../../data/upgrades'
@@ -28,6 +29,16 @@ function owned(state: GameState): UpgradeDef[] {
 
 export function visibilityBonus(state: GameState, area: SlotArea): number {
   return owned(state).reduce((m, u) => m * (u.effects.visibility?.[area] ?? 1), 1)
+}
+
+/** Display areas thieves can't reach (M4: the lockable wall case protects the wall). */
+export function protectedAreas(state: GameState): Set<SlotArea> {
+  return new Set(owned(state).flatMap((u) => u.effects.protects ?? []))
+}
+
+/** True once something in the shop records what happens (the camera): evidence for M5. */
+export function recordsEvidence(state: GameState): boolean {
+  return owned(state).some((u) => u.effects.records === true)
 }
 
 export function refTier(state: GameState): number {

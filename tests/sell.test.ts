@@ -90,7 +90,7 @@ describe('buyer planning', () => {
       expect(buyers.length).toBeLessThanOrEqual(tuning.sell.maxBuyersPerDay)
       for (const b of buyers) {
         expect(b.kind).toBe('buyer')
-        expect(s.shop.prices[b.item.id]).toBeGreaterThan(0)
+        expect(s.shop.prices[b.item!.id]).toBeGreaterThan(0)
         expect(b.line && b.line.length > 3).toBe(true)
         expect(b.line).not.toContain('{')
         expect(b.patience).toBeGreaterThan(0)
@@ -233,7 +233,7 @@ describe('selling through the reducer', () => {
     const s = findBuyer()
     const c = s.current!
     expect(c.sale?.status).toBe('open')
-    const id = c.item.id
+    const id = c.item!.id
     const offer = c.sale!.offer
     const paid = s.paid[id]!
     const after = run(s, { type: 'sale/accept' })
@@ -257,22 +257,22 @@ describe('selling through the reducer', () => {
     expect(s.current?.phase).toBe('resolved')
     expect(['sold', 'walked']).toContain(s.current?.outcome)
     if (s.current?.outcome === 'sold') expect(s.cash).toBeGreaterThan(s0.cash)
-    else expect(s.inventory.some((i) => i.id === s0.current!.item.id)).toBe(true)
+    else expect(s.inventory.some((i) => i.id === s0.current!.item!.id)).toBe(true)
   })
 
   it('refusing keeps the item', () => {
     const s = findBuyer()
     const after = run(s, { type: 'counter/pass' })
     expect(after.current?.outcome).toBe('passed')
-    expect(after.inventory.some((i) => i.id === s.current!.item.id)).toBe(true)
+    expect(after.inventory.some((i) => i.id === s.current!.item!.id)).toBe(true)
     expect(after.cash).toBe(s.cash)
   })
 
   it('a buyer whose item has sold out leaves', () => {
     const s = findBuyer()
-    const id = s.current!.item.id
+    const id = s.current!.item!.id
     // Put the buyer back in the queue, sell the item to them first, then send a second buyer for it.
-    const visit = { visitId: 'vx', kind: 'buyer' as const, customer: { ...s.current!.customer, id: 'cx' }, item: s.current!.item, patience: 500 }
+    const visit = { visitId: 'vx', kind: 'buyer' as const, customer: { ...s.current!.customer, id: 'cx' }, item: s.current!.item!, patience: 500 }
     let after = run(s, { type: 'sale/accept' })
     after = { ...after, queue: [visit, ...after.queue] }
     after = run(after, { type: 'counter/dismiss' }, { type: 'counter/next' })

@@ -120,8 +120,25 @@ const v2ToV3: Migration = {
   },
 }
 
+/**
+ * v3 (M3) → v4 (M4 story): regulars' memory and arc progress get real shapes.
+ * Nothing wrote either before, so both start empty; story flags appear.
+ */
+const v3ToV4Story: Migration = {
+  from: 3,
+  to: 4,
+  up(raw) {
+    const story = isRecord(raw.story) ? raw.story : {}
+    return {
+      ...raw,
+      customers: {},
+      story: { arcs: {}, pendingEvents: Array.isArray(story.pendingEvents) ? story.pendingEvents : [], flags: [] },
+    }
+  },
+}
+
 /** Ordered, contiguous chain. Append new steps at the end. */
-export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3]
+export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story]
 
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())

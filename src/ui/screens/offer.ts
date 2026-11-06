@@ -195,7 +195,7 @@ export class OfferScreen {
     }
     // Estimate row
     this.estimateRow.hidden = estimating || countered
-    const name = itemNameOf(s.current.item.defId, 'item')
+    const name = itemNameOf(s.current.item?.defId ?? '', 'item')
     setText(this.estimateText, `You think the ${name} is worth ${rub(est)}`)
 
     // Price tag
@@ -288,7 +288,7 @@ export class OfferScreen {
     this.pickerList.replaceChildren()
     const def = (() => {
       try {
-        return s.current ? getItemDef(s.current.item.defId) : null
+        return s.current?.item ? getItemDef(s.current.item.defId) : null
       } catch {
         return null
       }

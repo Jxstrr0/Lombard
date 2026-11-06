@@ -6,7 +6,7 @@ Goal: as realistic as free-and-open content allows, on a phone. The strategy is 
 
 - Preferred: CC0 (no attribution required, but we attribute anyway).
 - Acceptable: CC BY 4.0 (attribution required, in `ATTRIBUTION.md` and the in-game credits screen).
-- Accepted for one library: MIT for the Microsoft Rocketbox avatars and animations (Colby, Nov 5, 2026). Like CC BY, it needs attribution plus the licence notice, which `ATTRIBUTION.md` carries in full.
+- Accepted for one library: MIT for the Microsoft Rocketbox avatars and animations (Kelbo, Nov 5, 2026). Like CC BY, it needs attribution plus the licence notice, which `ATTRIBUTION.md` carries in full.
 - Not acceptable: CC BY-NC (we may sell this later), CC BY-SA (viral), anything "free for personal use", Sketchfab "Standard" license, anything scraped from games.
 - Every asset gets a line in `ATTRIBUTION.md`: name, author, source URL, license, what we changed.
 - When unsure of a license, do not use the asset. Ask.
@@ -36,7 +36,7 @@ Built in Blender (free) by script, never by hand, exported to `shop.glb`:
 - Lighting baked in Cycles to a single 2048 lightmap (4096 on desktop high tier) covering the static room. Dynamic items get lit by the env map plus the counter lamp.
 - Export: glTF with Draco; textures to KTX2 via `gltf-transform`. Target under 8 MB total for the shop.
 
-**Fallback only** (if the bake pipeline hits a wall): kitbash from CC0 props plus Poly Haven textures on primitives, lit by a strong HDRI and contact-shadow decals. About 70% as good. Do not switch to this without asking Colby.
+**Fallback only** (if the bake pipeline hits a wall): kitbash from CC0 props plus Poly Haven textures on primitives, lit by a strong HDRI and contact-shadow decals. About 70% as good. Do not switch to this without asking Kelbo.
 
 ## Bake pipeline (decided Nov 2026, built in M3 task 1)
 
@@ -126,7 +126,7 @@ A survey of CC0 / CC BY sources found almost nothing for our items: no Soviet wa
   - Relief that sits on a surface leaves out its base face (`base=False`).
   - Keep an item under 60k triangles (aim for 20–30k) and every hotspot within 1.5 mm of the surface. `--strict` fails the build otherwise.
 - `scripts/items-pack.mjs` writes `public/assets/items/<id>.glb`: Draco geometry, plus textures as KTX2 (ETC1S for the AO/colour, UASTC for any data map). A coin is ~230 KB.
-- A def opts in with `"glb": "<id>.glb"` in its `model`. The game shows the placeholder at once and swaps the glb in when it loads. The hidden placeholder stays as the cheap raycast proxy for hotspot occlusion. `?noglb=1` forces placeholders. `?gallery=1&item=<id>` shows one model large, front and back, which is how Colby reviews a model on the phone.
+- A def opts in with `"glb": "<id>.glb"` in its `model`. The game shows the placeholder at once and swaps the glb in when it loads. The hidden placeholder stays as the cheap raycast proxy for hotspot occlusion. `?noglb=1` forces placeholders. `?gallery=1&item=<id>` shows one model large, front and back, which is how Kelbo reviews a model on the phone.
 - `tests/itemModels.test.ts` checks that defs and packed files agree.
 - **Laptop (M4, `art/items/kinds/laptop.py`)**, the Tosaki Orbita C40 for The Student's Laptop: a 14-inch 2013 machine, 336 × 236 × 26 mm base, lid open at 110°. It is built in two local frames, one for the base and one for the lid, each turned into three.js item coordinates. Keyboard with Latin and red Cyrillic legends (a few keys in gloss for the worn shine), palm-rest spec sticker, ports on both sides, battery bay with its label, service hatch, rating sticker with serial and barcode, and a metal wordmark on the lid. 33.9k triangles, 11 draw calls, AO 1024 px, ~240 KB packed.
   - Printed things (key legends, sticker text, the screen) stand **60 µm** proud. Draco quantizes positions to about 21 µm over the laptop's 34 cm, so 10 µm print collapses into its surface and disappears.
@@ -167,16 +167,17 @@ Limits: the water reads as a band seen through the railing. The window sill hide
 
 ## Customers
 
-**Decided (Nov 5, 2026): Plan A with the Microsoft Rocketbox library (MIT, accepted for this library only).** A 1-day test put a MakeHuman (CC0, via MPFB 2) and a Rocketbox man in the shop; on the phone Colby couldn't tell them apart, and Rocketbox won on practical grounds: a breathing idle comes with it, it's 2.5× lighter, and ~115 ready-made everyday people cover a cast without per-person work. (A survey first found no fetchable CC0 / CC BY realistic everyday adults: Quaternius's free characters are superhero bodies under an unclear licence, OpenGameArt's are fantasy-styled, Mixamo needs an account, Sketchfab CC0 scans aren't rigged.) Portrait cards (Plan B) aren't built.
+**Decided (Nov 5, 2026): Plan A with the Microsoft Rocketbox library (MIT, accepted for this library only).** A 1-day test put a MakeHuman (CC0, via MPFB 2) and a Rocketbox man in the shop; on the phone Kelbo couldn't tell them apart, and Rocketbox won on practical grounds: a breathing idle comes with it, it's 2.5× lighter, and ~115 ready-made everyday people cover a cast without per-person work. (A survey first found no fetchable CC0 / CC BY realistic everyday adults: Quaternius's free characters are superhero bodies under an unclear licence, OpenGameArt's are fantasy-styled, Mixamo needs an account, Sketchfab CC0 scans aren't rigged.) Portrait cards (Plan B) aren't built.
 
 **The cast.** 25 avatars in `src/data/customers/cast.json`, at least one man and one woman per walk-in archetype (pensioner, student, tradesman, office worker, hustler, sailor on leave; the sailors wear the white uniform shirt and cap). `art/customers/build.py` (headless Blender; usage in its header) builds `public/assets/customers/<id>.glb` from a blob-less clone of the Rocketbox repo, pinned to commit 0943055, byte-for-byte reproducibly:
 - the men's or women's breathing idle (`m_/f_idle_breathe_01`, ~2.7 s loop) retargeted bone for bone, first frame made the rest pose; feet on the floor, facing glTF +Z (the game turns it by π);
+- a second clip, `walk` (glb clip order: `idle`, then `walk`): one stride of the men's or women's neutral walk (`m_/f_walk_neutral_01`, 1.2 s loop) from the XY-root-motion set (the static set has no walks), retargeted the same way, the stride's travel taken off so it walks in place, soles on the idle's floor (within about 1 cm; the women's clip is a heeled walk). Its ground speed is `walkSpeed` in `cast.json` (1.012 m/s men, 1.214 m/s women; every Rocketbox avatar has the clip rig's leg length, so it is one value per gender): move a walking customer at that speed, or scale the clip's time by speed / walkSpeed, and the planted foot stays put;
 - 6.4k–9.3k triangles, 2–3 materials (body, head, hair or hat), no normal maps (they showed a forehead seam);
 - textures: head JPEG 1024, body JPEG 768, hair PNG8 512 alpha-tested (an A/B against 1024 showed no difference at the phone framing). Decoded with mipmaps that's ~10 MB per person (11 MB at most); the game keeps two resident (the current customer and the next in line), so ~20 MB at worst;
-- Draco geometry: 10.6 MB for all 25 (≈420 KB each), loaded one at a time and never on first load;
+- Draco geometry: 10.2 MB for all 25 with both clips (≈410 KB each; bone channels that never leave the rest pose are left out of the glb, which more than pays for the walk), loaded one at a time and never on first load;
 - `PAINT_OUT` in the script blanks text, logos and real insignia before resizing: the crown over the anchor on both cap badges, a monogram-pattern tee, shoe-sole and label text, stitched pocket letters.
 
-**In the game.** A walk-in's look is picked when they're generated (`src/game/customers/look.ts`): same archetype and the gender of their first name, never the previous customer's look, from a forked RNG stream so no other draw moves; it's stored in `portraitKey` (older saves fall back to a stable pick from the customer id). `src/render/customerModel.ts` loads and caches models through the shared Draco loader; the scene holds a customer back until their model is in, swaps only while nobody's at the counter, fetches the next person in line during the current visit, and shows the old silhouette if a model fails. Review flags: `?customer=<id>` makes everyone that cast member, `?nocast=1` keeps the silhouette.
+**In the game.** A walk-in's look is picked when they're generated (`src/game/customers/look.ts`): same archetype and the gender of their first name, never the previous customer's look, from a forked RNG stream so no other draw moves; it's stored in `portraitKey` (older saves fall back to a stable pick from the customer id). `src/render/customerModel.ts` loads and caches models through the shared Draco loader; the scene holds a customer back until their model is in, swaps only while nobody's at the counter, fetches the next person in line during the current visit, and shows the old silhouette if a model fails. Customers walk in from the street door and out again (`render/scene.ts` § WALK), crossfading the glb's `idle` and `walk` clips and moving at the walk clip's ground speed from `cast.json`. Review flags: `?walk=0` puts them straight at the counter, `?customer=<id>` makes everyone that cast member, `?nocast=1` keeps the silhouette.
 
 Limits: Rocketbox has no truly elderly women, so the female pensioners read as about fifty. Poses beyond the idle (nervous, proud, angry, from the same library) are not built yet.
 

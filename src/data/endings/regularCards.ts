@@ -232,14 +232,14 @@ export const REGULAR_CARDS: Raw[] = [
     ],
   },
   {
-    id: 'larisa',
-    name: 'Larisa Kovrigina',
+    id: 'lera',
+    name: 'Lera Kovrigina',
     role: 'Alisa’s twin, accounting',
-    show: [...known('larisa')],
+    show: [...known('lera')],
     variants: [
-      { when: [flag('larisa_manager')], text: 'Larisa manages her sister now, with a forty-page plan and a spreadsheet of venues. Alisa plays; Larisa counts the door. Neither of them has pawned anything in a year, which Larisa has, of course, written down.' },
-      { when: [warm('larisa')], text: 'Larisa’s course paper on informal credit got a five. Your shop is footnote eleven: “numbers add up”. From her, that’s a love letter.' },
-      { when: [], text: 'Larisa qualified, works for a tax office, and is a terror to everyone she audits. She still checks your interest arithmetic when she passes. It is still right.' },
+      { when: [flag('lera_manager')], text: 'Lera manages her sister now, with a forty-page plan and a spreadsheet of venues. Alisa plays; Lera counts the door. Neither of them has pawned anything in a year, which Lera has, of course, written down.' },
+      { when: [warm('lera')], text: 'Lera’s course paper on informal credit got a five. Your shop is footnote eleven: “numbers add up”. From her, that’s a love letter.' },
+      { when: [], text: 'Lera qualified, works for a tax office, and is a terror to everyone she audits. She still checks your interest arithmetic when she passes. It is still right.' },
     ],
   },
 ]

@@ -5,7 +5,7 @@
  */
 import { artur, bakhtiyor, dilnoza, jamshid, patimat } from './people1'
 import { alyona, grisha, kira, snezhana, vitya } from './people2'
-import { elvira, ernest, klava, larisa, nonna, prokhor, styopa, zakhar, zhanna, zoya } from './people3'
+import { elvira, ernest, klava, lera, nonna, prokhor, styopa, zakhar, zhanna, zoya } from './people3'
 
 export const THREADS = [
   artur,
@@ -27,5 +27,5 @@ export const THREADS = [
   zhanna,
   nonna,
   zoya,
-  larisa,
+  lera,
 ] as const

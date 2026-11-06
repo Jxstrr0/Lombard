@@ -3,7 +3,7 @@
  * Zakhar Svirelin (Gleb's), Ernest Ramonovich (Mikhail's), Styopa Ryabov (Fedya's; reads the
  * laptop arc), Klava Bortnik (Ulyana's sister, Valentin's pupil), Elvira Venchikova (Inessa's),
  * Zhanna Kuzovkina (Rimma's cousin), Nonna Karavaeva (Lyusya's), Zoya Chernykh (Yana's; reads
- * Protection), Larisa Kovrigina (Alisa's twin; renews Alisa's loan).
+ * Protection), Lera Kovrigina (Alisa's twin; renews Alisa's loan).
  */
 import { tuning } from '../../tuning'
 
@@ -95,7 +95,7 @@ export const zakhar = {
               reply: 'Mate in twenty-three. You resigned with dignity on move nineteen, which is the right move. Thank you. That’s my rent and a lesson in the Sicilian.',
               effects: [{ do: 'cash', amount: -T.cash.zakharStake, text: 'Lost a game of blitz to Zakhar Svirelin' }, { do: 'flag', flag: 'zakhar_played' }, { do: 'trust', who: 'zakhar', delta: T.trust.warm }],
             },
-            { id: 'decline', label: 'I don’t gamble at the counter', reply: 'Chess isn’t gambling. Gambling is when you don’t know who’ll win.', effects: [{ do: 'trust', who: 'zakhar', delta: T.trust.cool }] },
+            { id: 'no_thanks', label: 'I don’t gamble at the counter', reply: 'Chess isn’t gambling. Gambling is when you don’t know who’ll win.', effects: [{ do: 'trust', who: 'zakhar', delta: T.trust.cool }] },
           ],
         },
       },
@@ -323,7 +323,7 @@ export const elvira = {
               reply: 'Thank you. I’ll tell the headmistress it came from the parents’ fund, and the parents’ fund will be you. Don’t tell Inessa; she’ll want to do a speech.',
               effects: [{ do: 'cash', amount: -T.cash.elviraTrip, text: 'School No. 41 class trip' }, { do: 'flag', flag: 'heart.elvira_trip' }, { do: 'trust', who: 'elvira', delta: T.trust.big }],
             },
-            { id: 'decline', label: 'Not this time, I’m afraid', reply: 'Of course. I’ll sell my good earrings. They were too good for a teacher anyway.', effects: [{ do: 'trust', who: 'elvira', delta: T.trust.nod }] },
+            { id: 'no_thanks', label: 'Not this time, I’m afraid', reply: 'Of course. I’ll sell my good earrings. They were too good for a teacher anyway.', effects: [{ do: 'trust', who: 'elvira', delta: T.trust.nod }] },
           ],
         },
       },
@@ -347,7 +347,7 @@ export const elvira = {
     },
     {
       id: 'elvira.earrings',
-      when: [after('elvira.trip', 9, ['decline'])],
+      when: [after('elvira.trip', 9, ['no_thanks'])],
       chance: 0.4,
       final: true,
       visit: {
@@ -537,16 +537,16 @@ export const zoya = {
   ],
 }
 
-export const larisa = {
-  id: 'larisa',
-  title: 'Larisa Kovrigina',
+export const lera = {
+  id: 'lera',
+  title: 'Lera Kovrigina',
   beats: [
     {
-      id: 'larisa.rates',
-      when: [visits('larisa', 1)],
+      id: 'lera.rates',
+      when: [visits('lera', 1)],
       chance: 0.4,
       visit: {
-        who: 'larisa',
+        who: 'lera',
         kind: 'scene',
         scene: {
           lines: [
@@ -554,18 +554,18 @@ export const larisa = {
             'Most places on Sennaya tell me “it depends on your face”. I’d like it not to depend on my face.',
           ],
           choices: [
-            { id: 'show', label: 'Simple, monthly. Here, the sheet', reply: 'A sheet. In writing. You may be the first honest footnote in my paper.', effects: [{ do: 'trust', who: 'larisa', delta: T.trust.warm }] },
-            { id: 'depends', label: 'It depends on the item', reply: 'That’s “it depends on your face” in a suit. I’ll write it down anyway.', effects: [{ do: 'trust', who: 'larisa', delta: T.trust.cool }] },
+            { id: 'show', label: 'Simple, monthly. Here, the sheet', reply: 'A sheet. In writing. You may be the first honest footnote in my paper.', effects: [{ do: 'trust', who: 'lera', delta: T.trust.warm }] },
+            { id: 'depends', label: 'It depends on the item', reply: 'That’s “it depends on your face” in a suit. I’ll write it down anyway.', effects: [{ do: 'trust', who: 'lera', delta: T.trust.cool }] },
           ],
         },
       },
     },
     {
-      id: 'larisa.alisa',
-      when: [after('larisa.rates', 3), { if: 'loan', who: 'alisa' }],
+      id: 'lera.alisa',
+      when: [after('lera.rates', 3), { if: 'loan', who: 'alisa' }],
       chance: 0.5,
       visit: {
-        who: 'larisa',
+        who: 'lera',
         kind: 'scene',
         scene: {
           lines: [
@@ -573,19 +573,19 @@ export const larisa = {
             'I’ve brought the interest. Mine, from the tax booth. Put it on her ticket so the clock starts again. Don’t tell her it was me. Tell her it was the universe. She believes in the universe.',
           ],
           choices: [
-            { id: 'take', label: 'I’ll put it on her ticket', reply: 'Thank you. Here, counted twice. Write me a receipt. Not for her. For me. I keep a file.', effects: [{ do: 'renew', who: 'alisa', charge: true }, { do: 'trust', who: 'larisa', delta: T.trust.warm }, { do: 'trust', who: 'alisa', delta: T.trust.nod }] },
-            { id: 'her_business', label: 'That’s between me and Alisa', reply: 'It’s between you and Alisa and me, because I’ll be paying for it either way. But fine. Correct, even. Annoyingly.', effects: [{ do: 'trust', who: 'larisa', delta: T.trust.nod }] },
+            { id: 'take', label: 'I’ll put it on her ticket', reply: 'Thank you. Here, counted twice. Write me a receipt. Not for her. For me. I keep a file.', effects: [{ do: 'renew', who: 'alisa', charge: true }, { do: 'trust', who: 'lera', delta: T.trust.warm }, { do: 'trust', who: 'alisa', delta: T.trust.nod }] },
+            { id: 'her_business', label: 'That’s between me and Alisa', reply: 'It’s between you and Alisa and me, because I’ll be paying for it either way. But fine. Correct, even. Annoyingly.', effects: [{ do: 'trust', who: 'lera', delta: T.trust.nod }] },
           ],
         },
       },
     },
     {
-      id: 'larisa.twins',
-      when: [visits('larisa', 3), after('larisa.rates', 15), visits('alisa', 3), { if: 'day', gte: 50 }],
+      id: 'lera.twins',
+      when: [visits('lera', 3), after('lera.rates', 15), visits('alisa', 3), { if: 'day', gte: 50 }],
       chance: 0.35,
       final: true,
       visit: {
-        who: 'larisa',
+        who: 'lera',
         kind: 'scene',
         scene: {
           lines: [
@@ -593,7 +593,7 @@ export const larisa = {
             'She’s good. She doesn’t need a spreadsheet; she needs a manager. I’ve done her a business plan. Forty pages. She cried. I think in a good way. I’m not sure; she was wearing headphones.',
           ],
         },
-        after: { talked: { effects: [{ do: 'flag', flag: 'larisa_manager' }, { do: 'trust', who: 'larisa', delta: T.trust.nod }] } },
+        after: { talked: { effects: [{ do: 'flag', flag: 'lera_manager' }, { do: 'trust', who: 'lera', delta: T.trust.nod }] } },
       },
     },
   ],

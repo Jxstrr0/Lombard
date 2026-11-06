@@ -192,7 +192,7 @@ describe('epilogue', () => {
     expect(new Set(EPILOGUE_CARDS.map((c) => c.id)).size).toBe(EPILOGUE_CARDS.length)
     // M6: each of the twenty new regulars has a card (shown once you've got to know them).
     const ids = new Set(EPILOGUE_CARDS.map((c) => c.id))
-    for (const id of ['artur', 'bakhtiyor', 'dilnoza', 'jamshid', 'patimat', 'snezhana', 'kira', 'alyona', 'grisha', 'vitya', 'prokhor', 'zakhar', 'ernest', 'styopa', 'klava', 'elvira', 'zhanna', 'nonna', 'zoya', 'larisa']) {
+    for (const id of ['artur', 'bakhtiyor', 'dilnoza', 'jamshid', 'patimat', 'snezhana', 'kira', 'alyona', 'grisha', 'vitya', 'prokhor', 'zakhar', 'ernest', 'styopa', 'klava', 'elvira', 'zhanna', 'nonna', 'zoya', 'lera']) {
       expect(ids.has(id), id).toBe(true)
     }
   })

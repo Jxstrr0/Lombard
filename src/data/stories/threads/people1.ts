@@ -291,7 +291,7 @@ export const patimat = {
               reply: 'A gift! For my son, from the pawn shop in Mostograd. He will put it on the table with the others and tell everyone the story. He tells stories badly. I will tell it for him.',
               effects: [{ do: 'cash', amount: -T.cash.patimatGift, text: 'Wedding present, Patimat Aliyeva’s son' }, { do: 'flag', flag: 'heart.patimat_gift' }, { do: 'trust', who: 'patimat', delta: T.trust.big }],
             },
-            { id: 'decline', label: 'Thank you. I’m honoured', reply: 'Honoured is enough. Not everyone is honoured. Some people just ask how many courses.', effects: [{ do: 'trust', who: 'patimat', delta: T.trust.nod }] },
+            { id: 'no_thanks', label: 'Thank you. I’m honoured', reply: 'Honoured is enough. Not everyone is honoured. Some people just ask how many courses.', effects: [{ do: 'trust', who: 'patimat', delta: T.trust.nod }] },
           ],
         },
       },

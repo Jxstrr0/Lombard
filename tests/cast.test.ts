@@ -173,7 +173,7 @@ describe('looks', () => {
  * every one-off stranger an arc sends in.
  */
 describe('M6 looks', () => {
-  const M6 = ['artur', 'bakhtiyor', 'dilnoza', 'jamshid', 'patimat', 'snezhana', 'kira', 'alyona', 'grisha', 'vitya', 'prokhor', 'zakhar', 'ernest', 'styopa', 'klava', 'elvira', 'zhanna', 'nonna', 'zoya', 'larisa']
+  const M6 = ['artur', 'bakhtiyor', 'dilnoza', 'jamshid', 'patimat', 'snezhana', 'kira', 'alyona', 'grisha', 'vitya', 'prokhor', 'zakhar', 'ernest', 'styopa', 'klava', 'elvira', 'zhanna', 'nonna', 'zoya', 'lera']
   const byId = new Map(CAST.map((c) => [c.id, c]))
 
   it('has forty regulars, the twenty new ones in Adults avatars only', () => {

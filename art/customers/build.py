@@ -273,7 +273,7 @@ VARIANTS: dict[str, dict[str, list[dict]]] = {
                                      (600, 0, 1420, 780), (600, 780, 900, 2048), (1120, 780, 1420, 2048), (900, 1000, 1120, 2048), sat=(0.08, 1))},
     # Zoya Chernykh (Yana's older sister, tattooist): black tee, dyed oxblood hair.
     'female_adult_08_b': _merge({'body': _dye((34, 34, 37), (600, 0, 1420, 1650), noskin=True)}, _hair((112, 34, 40), extra=_LONG_HAIR)),
-    # Larisa Kovrigina (Alisa's twin, the sensible one): a camel hoodie, the trim navy, no headphones print.
+    # Lera Kovrigina (Alisa's twin, the sensible one): a camel hoodie, the trim navy, no headphones print.
     'female_adult_12_b': {'body': [
         *_dye((150, 120, 88), (0, 0, 2048, 2048), lum=(0, 70), noskin=True, contrast=0.7),
         *_dye((40, 50, 86), (0, 0, 2048, 2048), hue=(90, 170), sat=(0.3, 1)),

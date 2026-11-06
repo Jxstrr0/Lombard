@@ -48,7 +48,7 @@ import elvira from './elvira'
 import zhanna from './zhanna'
 import nonna from './nonna'
 import zoya from './zoya'
-import larisa from './larisa'
+import lera from './lera'
 
 export const REGULARS: readonly RegularDef[] = [
   zinaida,
@@ -95,7 +95,7 @@ export const REGULARS: readonly RegularDef[] = [
   zhanna,
   nonna,
   zoya,
-  larisa,
+  lera,
 ].map((raw) => RegularDef.parse(raw))
 
 const byId = new Map(REGULARS.map((r) => [r.id, r]))

@@ -1,12 +1,12 @@
 /**
- * Larisa Kovrigina: Alisa's twin (the same look in a camel hoodie), second year in accounting
+ * Lera Kovrigina: Alisa's twin (the same look in a camel hoodie), second year in accounting
  * at the Economics College, the sensible one, who disapproves of the DJing and of pawning in
  * general and checks your interest maths. Thread: Alisa's phone (src/data/stories/threads),
  * which reads Alisa's loans. M6.
  */
 export default {
-  id: 'larisa',
-  name: 'Larisa Kovrigina',
+  id: 'lera',
+  name: 'Lera Kovrigina',
   archetype: 'student',
   look: 'female_adult_12_b',
   temperament: 'stubborn',
@@ -21,7 +21,7 @@ export default {
     { defId: 'coin_olympiad_10r', weight: 1, provenance: 'heirloom', story: ['Dad’s Olympiad coin. He said invest it. I’m investing it. In a laptop with a working Excel.'] },
   ],
   lines: {
-    first: ['Hello. Larisa Kovrigina. Yes, the twin. I’m the older one. I’d like to see your rates in writing before we start. Alisa never asks for anything in writing.'],
+    first: ['Hello. Lera Kovrigina. Yes, the twin. I’m the older one. I’d like to see your rates in writing before we start. Alisa never asks for anything in writing.'],
     again: ['Hello. I recalculated your interest from last time. It was correct. I was a little disappointed.', 'Hello. Alisa played a gig last night. Sixteen people came. Twelve were friends. I counted.'],
     warm: ['Hello. You’re the only business on this canal whose numbers add up. I mean that as the highest praise I have.', 'Hello. I made a spreadsheet of Alisa’s pawns. You’re in it. You come out well.'],
     cold: ['Hello. I’ve written down the figure you offered last time. In pen.', 'Hello. Let’s keep this transactional.'],

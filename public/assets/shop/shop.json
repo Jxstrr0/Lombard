@@ -2,12 +2,12 @@
   "version": 2,
   "quality": "preview",
   "lightmapSize": 512,
-  "lightmapScale": 1,
+  "lightmapScale": 1.25,
   "samples": 96,
   "blender": "4.5.15 LTS",
-  "inputHash": "749cb4c590924024",
+  "inputHash": "b1eea115777e1ca0",
   "baked": true,
-  "commit": "399b243",
+  "commit": "7802bed",
   "files": {
     "glb": "shop.glb",
     "lightmap": "shop_lightmap.ktx2"

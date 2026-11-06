@@ -28,6 +28,7 @@ import { FENCE_ID, fenceCustomer } from '../crime/fence'
 import { volkovaCustomer } from '../crime/volkova'
 import { VOLKOVA } from '../../data/police'
 import { COLLECTOR_ID, collectorCustomer } from '../crime/collector'
+import { APPRAISER_ID, appraiserCustomer } from '../staff/appraiser'
 import { allHold } from './conditions'
 import { beatRecord, memoryOf, warmthOf } from './progress'
 import { scriptedItem } from './scripted'
@@ -128,6 +129,7 @@ function beatCustomer(beat: Beat): WalkIn | null {
   if (v.who === FENCE_ID) return fenceCustomer()
   if (v.who === VOLKOVA.id) return volkovaCustomer()
   if (v.who === COLLECTOR_ID) return collectorCustomer()
+  if (v.who === APPRAISER_ID) return appraiserCustomer()
   const regular = REGULARS.find((r) => r.id === v.who)
   return regular ? regularCustomer(regular) : specialistCustomer(v.who)
 }

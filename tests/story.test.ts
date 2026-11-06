@@ -21,6 +21,16 @@ const run = (s: GameState, ...actions: Action[]) => actions.reduce(reducer, s)
 const onDay = (s: GameState, day: number): GameState => ({ ...s, calendar: { ...s.calendar, day } })
 const zina = () => getRegular('zinaida')!
 
+/**
+ * Only Zinaida is due: everyone else's next visit is pushed far off (a fresh
+ * career jumped to a late day would have every regular due at once).
+ */
+function onlyZinaida(s: GameState): GameState {
+  const customers = { ...s.customers }
+  for (const r of REGULARS) if (r.id !== 'zinaida') customers[r.id] = { ...memoryOf(s, r.id), nextDay: 10_000 }
+  return { ...s, customers }
+}
+
 /** An open day with this story visit first in line. */
 function withVisit(s: GameState, visit: Partial<QueuedVisit> & { beatId?: string }): GameState {
   const open = reducer(s, { type: 'day/open' })
@@ -174,7 +184,7 @@ describe('planning', () => {
   it('a regular comes in on schedule with one of their items, then not again for a while', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    let s = onDay(startedState(5, 'c1'), day)
+    let s = onlyZinaida(onDay(startedState(5, 'c1'), day))
     // Keep the medals arc out of the way.
     s = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
     let id = 0
@@ -194,7 +204,7 @@ describe('planning', () => {
   it('a regular holding a pledge does not come in to sell', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    let s = onDay(startedState(5, 'c1'), day)
+    let s = onlyZinaida(onDay(startedState(5, 'c1'), day))
     s = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
     const fake = { customer: regularCustomer(def) } as unknown as GameState['loans'][number]
     s = { ...s, loans: [fake] }
@@ -263,7 +273,7 @@ describe('at the counter', () => {
   it('trust softens the regular’s opening ask', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    const base = onDay(startedState(9, 'c1'), day)
+    const base = onlyZinaida(onDay(startedState(9, 'c1'), day))
     const quiet = { ...base, story: { ...base.story, arcs: { medals: { beats: {}, ended: true } } } }
     const askWith = (trust: number) => {
       let s = setMemory(quiet, 'zinaida', { trust })

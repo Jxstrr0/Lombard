@@ -53,13 +53,13 @@
 | Nov 5, 2026 | **Audio (M3):** plain WebAudio, no library. Sounds are CC0 from OpenGameArt (Freesound and kenney.nl were blocked from the build container; Kenney's packs came from his OpenGameArt uploads), built by `art/audio/build.py` into mono MP3s, ~387 KB for 13 files; the scale beep and phone keypad are generated tones. Cues come from state changes (`src/audio/cues.ts`, pure), not calls in game logic. Nothing loads before the first tap; the context is suspended while the page is hidden. See 04-ASSETS § Audio. |
 | Nov 5, 2026 | **Sound settings are per device:** Sound on/off and an ambience level (Off / Low / Normal / High) in Settings, kept in localStorage like the reduce-motion override, not in the career or the save code. Default on, Normal. |
 | Nov 5, 2026 | **Ambience is one 54 s loop** (street through the window, canal water, fridge hum), played as overlapping crossfaded passes so MP3 padding can't click at the seam. Seasonal layers (rain, winter wind) and trams are not built yet (no CC0 tram recording found on OpenGameArt). |
+| Nov 5, 2026 | **Customers are 3D: the Microsoft Rocketbox cast (Plan A).** After the 1-day test Colby couldn't tell MakeHuman and Rocketbox apart on the phone and picked Rocketbox: it ships a breathing idle, is 2.5× lighter (7k vs 19k triangles) and has ~115 ready-made everyday people. MIT is accepted for this library (attribution plus the licence notice in `ATTRIBUTION.md`, like CC BY). The cast is 25 avatars across the six walk-in archetypes, men and women (`src/data/customers/cast.json`, built by `art/customers/build.py`); each walk-in's look is picked when they're generated (matched on archetype and the gender of their first name, never the previous customer's look) and stored in `portraitKey`. Models load lazily, one per person (Draco, ≈420 KB; head 1024, body 768, hair 512 px textures, chosen after an A/B against 1024), and the next person in line is fetched while the current one talks. The MakeHuman test model is removed. Portrait cards (Plan B) aren't built. |
 
 ## Open, decide at the milestone listed
 
 | Item | Default until decided | Decide at |
 |---|---|---|
-| Customers in 3D (Plan A) vs portrait cards (Plan B) | portrait card in dialogue strip; 3D silhouette optional | M3, after a 1-day test. **Test is up (Nov 5):** `?customer=mpfb_middleaged_man` (MakeHuman CC0) and `?customer=rocketbox_male_adult_03` (Rocketbox MIT) against the silhouette; Colby judges on the phone (see 04 § Customers). A roaming employee (below) needs 3D people, which favours Plan A |
-| Hired employee who walks around the shop (Colby, Nov 5): the GDD's one appraiser hire becomes a visible person who moves between the back room, behind the counter and the shop floor | not built; layout keeps the walkways clear | build with The Appraiser hire (M6); depends on the Plan A/B decision |
+| Hired employee who walks around the shop (Colby, Nov 5): the GDD's one appraiser hire becomes a visible person who moves between the back room, behind the counter and the shop floor | not built; layout keeps the walkways clear | build with The Appraiser hire (M6); Plan A was picked (Rocketbox cast), so the employee can be a cast member |
 | Retirement unlock day | day 90 | M5, after playtesting career pacing |
 | Lighting mood (sky strength, pendant/lamp power and warmth) | overcast sky 0.35, pendants 12 W 2700 K, counter lamp 22 W 3000 K | M3 lighting pass on preview bakes |
 | Preview render tone mapping: Cycles previews use AgX (+0.74 EV), the game uses three's ACES; midtones read darker in the previews than in game | game screenshots are the reference | M3 lighting pass |
@@ -68,6 +68,7 @@ When an open item is decided, move it to the Decided table with the date.
 
 ## Parked (do not build without a decision)
 
+- Customer body language: Rocketbox also has nervous, angry, impatient and look-around idles. Play one per temperament or mood as the GDD's posture tells (haggling, M4 people pass); each clip adds ~100 KB per cast member unless shared as a separate animation file.
 - Prop texture atlas (all prop base-colour maps in one texture, one material): cuts ~60 draw calls to 1 if the quality-tiers measurement asks for it.
 - Phone landscape: the dialogue strip covers most of the counter. Revisit in the M6 desktop/landscape layout pass.
 - Loan extensions/renewals (pay interest only), reputation effects of forfeits and lowballing pawners, regulars who re-pawn the same item (M4 Student's Laptop).

@@ -6,6 +6,7 @@ Goal: as realistic as free-and-open content allows, on a phone. The strategy is 
 
 - Preferred: CC0 (no attribution required, but we attribute anyway).
 - Acceptable: CC BY 4.0 (attribution required, in `ATTRIBUTION.md` and the in-game credits screen).
+- Accepted for one library: MIT for the Microsoft Rocketbox avatars and animations (Colby, Nov 5, 2026). Like CC BY, it needs attribution plus the licence notice, which `ATTRIBUTION.md` carries in full.
 - Not acceptable: CC BY-NC (we may sell this later), CC BY-SA (viral), anything "free for personal use", Sketchfab "Standard" license, anything scraped from games.
 - Every asset gets a line in `ATTRIBUTION.md`: name, author, source URL, license, what we changed.
 - When unsure of a license, do not use the asset. Ask.
@@ -162,15 +163,18 @@ Limits: the water reads as a band seen through the railing. The window sill hide
 
 ## Customers
 
-Plan A: 2–3 rigged CC0 humanoid bases (check Quaternius "Universal Base Characters" and Sketchfab CC0 rigged scans), 6 outfit texture variants each, 6 upper-body poses (neutral, nervous, proud, impatient, pleased, angry) baked as animation clips. Faces: a portrait card in the dialogue strip carries the identity; the 3D model only needs silhouette and posture. Target under 15k tris per character.
+**Decided (Nov 5, 2026): Plan A with the Microsoft Rocketbox library (MIT, accepted for this library only).** A 1-day test put a MakeHuman (CC0, via MPFB 2) and a Rocketbox man in the shop; on the phone Colby couldn't tell them apart, and Rocketbox won on practical grounds: a breathing idle comes with it, it's 2.5× lighter, and ~115 ready-made everyday people cover a cast without per-person work. (A survey first found no fetchable CC0 / CC BY realistic everyday adults: Quaternius's free characters are superhero bodies under an unclear licence, OpenGameArt's are fantasy-styled, Mixamo needs an account, Sketchfab CC0 scans aren't rigged.) Portrait cards (Plan B) aren't built.
 
-Plan B (fallback if Plan A looks cheap on phone): no 3D customer; a hand-painted or AI-free illustrated portrait card in the dialogue strip, item appears on the counter from the right. Many successful shop games do this. Decide at M3 after a one-day test.
+**The cast.** 25 avatars in `src/data/customers/cast.json`, at least one man and one woman per walk-in archetype (pensioner, student, tradesman, office worker, hustler, sailor on leave; the sailors wear the white uniform shirt and cap). `art/customers/build.py` (headless Blender; usage in its header) builds `public/assets/customers/<id>.glb` from a blob-less clone of the Rocketbox repo, pinned to commit 0943055, byte-for-byte reproducibly:
+- the men's or women's breathing idle (`m_/f_idle_breathe_01`, ~2.7 s loop) retargeted bone for bone, first frame made the rest pose; feet on the floor, facing glTF +Z (the game turns it by π);
+- 6.4k–9.3k triangles, 2–3 materials (body, head, hair or hat), no normal maps (they showed a forehead seam);
+- textures: head JPEG 1024, body JPEG 768, hair PNG8 512 alpha-tested (an A/B against 1024 showed no difference at the phone framing). Decoded with mipmaps that's ~10 MB per person (11 MB at most); the game keeps two resident (the current customer and the next in line), so ~20 MB at worst;
+- Draco geometry: 10.6 MB for all 25 (≈420 KB each), loaded one at a time and never on first load;
+- `PAINT_OUT` in the script blanks text, logos and real insignia before resizing: the crown over the anchor on both cap badges, a monogram-pattern tee, shoe-sole and label text, stitched pocket letters.
 
-**The 1-day test (Nov 5, 2026).** A survey found no fetchable CC0 / CC BY realistic everyday adults: Quaternius's free characters are superhero bodies under an unclear licence, OpenGameArt's are fantasy-styled, Mixamo needs an account, Sketchfab CC0 scans aren't rigged. Two sources were good enough to test, both built headless in Blender and dropped into the shop with `?customer=<name>` (review only; the glbs live in `public/assets/customer-test/` and load lazily, only with the flag):
-- `mpfb_middleaged_man`: MakeHuman system assets (CC0) assembled by the MPFB 2 add-on. 18.9k tris, 3 materials, 1.1 MB, no animation (posed arms-down). Only the CC0 system pack is used (the CC-BY packs are skipped). Two MakeHuman suits print the MakeHuman logo on the shirt, so they're avoided, and the suit used carries a tiny CC0/makehuman.org mark at the edge of its texture that isn't visible. MakeHuman took its asset repository offline in Oct 2026; the static pack site still works and local copies are kept. MPFB can generate any body, age and outfit from its parameters, so it scales to a cast.
-- `rocketbox_male_adult_03`: the Microsoft Rocketbox library (115 rigged avatars, MIT). 7.2k tris, 3 materials, 1.0 MB, a looping breathing idle. MIT isn't in the licence list above. It's permissive (attribution plus the notice, like CC BY), so Colby accepted it for the test; using it for real means adding it to the list.
+**In the game.** A walk-in's look is picked when they're generated (`src/game/customers/look.ts`): same archetype and the gender of their first name, never the previous customer's look, from a forked RNG stream so no other draw moves; it's stored in `portraitKey` (older saves fall back to a stable pick from the customer id). `src/render/customerModel.ts` loads and caches models through the shared Draco loader; the scene holds a customer back until their model is in, swaps only while nobody's at the counter, fetches the next person in line during the current visit, and shows the old silhouette if a model fails. Review flags: `?customer=<id>` makes everyone that cast member, `?nocast=1` keeps the silhouette.
 
-The silhouette stays the default without the flag. Hair cards use alpha test; `src/render/customerModel.ts` keeps their blend mode through the fade-in. See 05 for the decision.
+Limits: Rocketbox has no truly elderly women, so the female pensioners read as about fifty. Poses beyond the idle (nervous, proud, angry, from the same library) are not built yet.
 
 ## Audio
 

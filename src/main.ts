@@ -27,6 +27,8 @@
  * the icon in stock and him first in line with the hatbox (sell / return / police).
  * M5 Volkova's arc: ?scenario=volkova-intro (her courtesy call), and beats first in line (BEAT_SCENARIOS): volkova-father,
  * volkova-source, volkova-stakeout, volkova-short, volkova-personal, volkova-inform, volkova-leak, volkova-icon, stanislav-icon.
+ * M6 the twenty new regulars' threads: ?scenario=<regular id> (artur, bakhtiyor, … lera; src/data/stories/threads) opens
+ * day 1 with that thread's first beat first in line.
  * M6 the appraiser: ?scenario=appraiser opens day 1 with Lev on staff, serving a walk-in at the second counter while
  * you have the line; appraiser-start (his first morning), and one per beat of his arc first in line (APPRAISER_SCENARIOS):
  * appraiser-zhora, -confide, -tin, -yuri, -zhora-back, -vanish (a voicemail), -zhora-vanished; appraiser-paper (the morning paper).
@@ -59,6 +61,7 @@ import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
 import { beatVisit, regularCustomer, regularVisit } from './game/story/plan'
+import { THREADS } from './data/stories/threads'
 import { recordBeat, setMemory } from './game/story/progress'
 import { specialistCustomer } from './game/story/specialists'
 import { fenceGoods } from './game/crime/fence'
@@ -155,6 +158,8 @@ const BEAT_SCENARIOS: Record<string, string> = {
   'volkova-leak': 'volkova.leak',
   'volkova-icon': 'volkova.icon',
   'stanislav-icon': 'stanislav.icon',
+  // M6: each new regular's thread opens with its first beat (?scenario=grisha, ?scenario=alyona, …).
+  ...Object.fromEntries(THREADS.map((a) => [a.id, a.beats[0]!.id])),
 }
 
 /** Dev-only (?scenario=collector): his wish first, then Seryozha with the icon. */

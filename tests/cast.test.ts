@@ -1,8 +1,17 @@
 /** M3 customer cast: data shape and who plays whom. */
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { APPRAISER } from '../src/data/appraiser'
+import { COLLECTOR, ROOFER } from '../src/data/collector'
 import { CAST } from '../src/data/customers/cast'
 import { archetypes, femaleFirstNames, firstNames } from '../src/data/customers/walkins'
+import { FENCE } from '../src/data/fence'
+import { FLOOD_PEOPLE, FLOOD_PERSON } from '../src/data/flood'
+import { VOLKOVA } from '../src/data/police'
 import { REGULARS } from '../src/data/regulars'
+import { SPECIALISTS } from '../src/data/specialists'
+import { ARCS } from '../src/data/stories'
 import { castPool, genderOf, lookFor, pickLook, regularCast, walkInCast } from '../src/game/customers/look'
 import { generateDayQueue } from '../src/game/customers/walkins'
 import { Rng } from '../src/game/rng'
@@ -155,5 +164,72 @@ describe('looks', () => {
     const look = lookFor(old)
     expect(look).toBe(lookFor(old))
     expect(CAST.find((c) => c.id === look)).toMatchObject({ gender: 'f', archetype: 'pensioner' })
+  })
+})
+
+/**
+ * M6: forty regulars. The twenty new ones wear Rocketbox Adults avatars nobody else wears, or a
+ * recoloured variant of a regular's own avatar (`<base>_b`, cast as that regular's relative). No
+ * Business_* or profession avatar is used for them (another M6 task needs those). And nobody with
+ * a name shares a face: regulars, specialists, the fence, Volkova, the Collector, his roofer and
+ * every one-off stranger an arc sends in.
+ */
+describe('M6 looks', () => {
+  const M6 = ['artur', 'bakhtiyor', 'dilnoza', 'jamshid', 'patimat', 'snezhana', 'kira', 'alyona', 'grisha', 'vitya', 'prokhor', 'zakhar', 'ernest', 'styopa', 'klava', 'elvira', 'zhanna', 'nonna', 'zoya', 'lera']
+  const byId = new Map(CAST.map((c) => [c.id, c]))
+
+  it('has forty regulars, the twenty new ones in Adults avatars only', () => {
+    expect(REGULARS).toHaveLength(40)
+    for (const id of M6) {
+      const r = REGULARS.find((x) => x.id === id)
+      expect(r, id).toBeDefined()
+      const look = byId.get(r!.look)!
+      expect(look.source, id).toMatch(/^Assets\/Avatars\/Adults\//)
+      expect(look.source, id).not.toMatch(/Business|Professions/)
+    }
+  })
+
+  it('recolours every variant look, and casts it as a relative of the base look’s regular', () => {
+    const build = readFileSync(path.join(path.resolve(__dirname, '..'), 'art', 'customers', 'build.py'), 'utf8')
+    const variants = CAST.filter((c) => /_b$/.test(c.id))
+    expect(variants.length).toBeGreaterThan(0)
+    for (const v of variants) {
+      const base = byId.get(v.id.slice(0, -2))
+      expect(base, v.id).toBeDefined()
+      expect(v.source, v.id).toBe(base!.source)
+      expect(v.regular, v.id).toBe(true)
+      expect(build.includes(`'${v.id}':`), `${v.id} has a PAINT_OUT recolour in build.py`).toBe(true)
+      // The base is a regular's own look, so the family resemblance is with someone you know.
+      expect(REGULARS.some((r) => r.look === base!.id), `${v.id}: base worn by a regular`).toBe(true)
+      expect(v.note, v.id).toMatch(/relative/)
+    }
+  })
+
+  it('gives everyone with a name a face of their own', () => {
+    const people: [string, string][] = [
+      ...REGULARS.map((r): [string, string] => [`regular ${r.id}`, r.look]),
+      // (Gennady Pavlovich has no look: you only ever reach him by phone.)
+      ...SPECIALISTS.flatMap((s): [string, string][] => (s.look ? [[`specialist ${s.id}`, s.look]] : [])),
+      ['the fence', FENCE.look],
+      ['Volkova', VOLKOVA.look],
+      ['the Collector', COLLECTOR.look],
+      ['Kuzmich (the Flood)', FLOOD_PERSON.look],
+      ['Lev, the appraiser', APPRAISER.look],
+    ]
+    // One-off strangers, by name (Seryozha the roofer is one, and comes in more than once).
+    const strangers = new Map<string, string>([[ROOFER.name, ROOFER.look]])
+    for (const arc of ARCS) for (const b of arc.beats) if (b.visit.as) strangers.set(b.visit.as.name, b.visit.as.look)
+    for (const p of Object.values(FLOOD_PEOPLE)) strangers.set(p.name, p.look)
+    // Volkova off duty comes in under her own name (her arc's `as`): the same person.
+    strangers.delete('Alla Volkova')
+    for (const [name, look] of strangers) people.push([`stranger ${name}`, look])
+    const seen = new Map<string, string>()
+    const clashes: string[] = []
+    for (const [who, look] of people) {
+      expect(byId.has(look), `${who}: ${look} is in the cast`).toBe(true)
+      if (seen.has(look)) clashes.push(`${who} and ${seen.get(look)} both wear ${look}`)
+      seen.set(look, who)
+    }
+    expect(clashes).toEqual([])
   })
 })

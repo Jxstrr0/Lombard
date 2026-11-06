@@ -6,6 +6,7 @@ import { EndingTitle, EpilogueCard, PaperSection } from '../../game/schema/endin
 import type { TitleId } from '../../game/endings/title'
 import { CARDS } from './cards'
 import { PAPER_SECTIONS } from './paper'
+import { REGULAR_CARDS } from './regularCards'
 import { TITLES } from './titles'
 
 export const ENDING_TITLES: Readonly<Record<TitleId, EndingTitle>> = Object.fromEntries(
@@ -14,4 +15,5 @@ export const ENDING_TITLES: Readonly<Record<TitleId, EndingTitle>> = Object.from
 
 export const EPILOGUE_PAPER: readonly PaperSection[] = PAPER_SECTIONS.map((s) => PaperSection.parse(s))
 
-export const EPILOGUE_CARDS: readonly EpilogueCard[] = CARDS.map((c) => EpilogueCard.parse(c))
+// M6: the twenty new regulars' cards come after the M5 ones.
+export const EPILOGUE_CARDS: readonly EpilogueCard[] = [...CARDS, ...REGULAR_CARDS].map((c) => EpilogueCard.parse(c))

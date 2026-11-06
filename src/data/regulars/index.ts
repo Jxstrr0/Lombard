@@ -1,5 +1,5 @@
 /**
- * M4 regulars: authored recurring customers (GDD §5), validated at import.
+ * M4 regulars (M6: forty): authored recurring customers (GDD §5), validated at import.
  * One file per person; their memory of you is GameState.customers[id].
  * Fictional people. Their arcs, if any, live in src/data/stories.
  *
@@ -28,6 +28,27 @@ import yana from './yana'
 import yevstafy from './yevstafy'
 import zhora from './zhora'
 import zinaida from './zinaida'
+// M6: twenty more, each with a small thread (src/data/stories/threads).
+import artur from './artur'
+import bakhtiyor from './bakhtiyor'
+import dilnoza from './dilnoza'
+import jamshid from './jamshid'
+import patimat from './patimat'
+import snezhana from './snezhana'
+import kira from './kira'
+import alyona from './alyona'
+import grisha from './grisha'
+import vitya from './vitya'
+import prokhor from './prokhor'
+import zakhar from './zakhar'
+import ernest from './ernest'
+import styopa from './styopa'
+import klava from './klava'
+import elvira from './elvira'
+import zhanna from './zhanna'
+import nonna from './nonna'
+import zoya from './zoya'
+import lera from './lera'
 
 export const REGULARS: readonly RegularDef[] = [
   zinaida,
@@ -53,6 +74,28 @@ export const REGULARS: readonly RegularDef[] = [
   // Arc-only (Protection): no ordinary visits.
   eduard,
   zhora,
+  // M6: twenty more regulars, each with a small thread (src/data/stories/threads). They start
+  // later (day 11 to 40) and come less often, so the first month still belongs to the first twenty.
+  artur,
+  bakhtiyor,
+  dilnoza,
+  jamshid,
+  patimat,
+  snezhana,
+  kira,
+  alyona,
+  grisha,
+  vitya,
+  prokhor,
+  zakhar,
+  ernest,
+  styopa,
+  klava,
+  elvira,
+  zhanna,
+  nonna,
+  zoya,
+  lera,
 ].map((raw) => RegularDef.parse(raw))
 
 const byId = new Map(REGULARS.map((r) => [r.id, r]))

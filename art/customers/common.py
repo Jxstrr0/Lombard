@@ -158,6 +158,26 @@ def _lum(a):
     return 0.2126 * a[..., 0] + 0.7152 * a[..., 1] + 0.0722 * a[..., 2]
 
 
+def _hsv(a):
+    """Hue (degrees), saturation and value (0..1) of an RGB float array."""
+    mx = a.max(axis=-1)
+    mn = a.min(axis=-1)
+    d = mx - mn
+    s = np.where(mx > 1e-6, d / np.maximum(mx, 1e-6), 0)
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    dd = np.maximum(d, 1e-6)
+    h = np.where(mx == r, ((g - b) / dd) % 6, np.where(mx == g, (b - r) / dd + 2, (r - g) / dd + 4)) * 60
+    return np.where(d > 1e-6, h, 0), s, mx
+
+
+def _skin(a):
+    """Rough skin mask (0..1) for keeping bare arms and necklines out of a clothes recolour:
+    warm hue, moderate saturation, not dark."""
+    h, s, v = _hsv(a)
+    warm = (h <= 40) | (h >= 350)
+    return (warm & (s >= 0.16) & (s <= 0.72) & (v >= 0.3)).astype(np.float32)
+
+
 def _blur1d(a, r, axis):
     """Box blur of radius r along an axis (edge-padded)."""
     if r <= 0:
@@ -194,7 +214,7 @@ def paint(arr, op):
     """Paint one rectangle out of a texture, in place. arr: float (h, w, >=3), top row first,
     values 0..1. Coordinates are pixels of the ORIGINAL texture (as in an image editor).
 
-    op = dict(box=(x0, y0, x1, y1), mode='fill' | 'clone' | 'heal' | 'grey', feather=px,
+    op = dict(box=(x0, y0, x1, y1), mode='fill' | 'clone' | 'heal' | 'grey' | 'tone', feather=px,
               sample=(x0, y0, x1, y1)  # fill: median colour of this area (default: a ring round box)
               color=(r, g, b)          # fill: explicit 0..255 colour instead
               dx=, dy=                 # clone: copy from box shifted by (dx, dy); heal: take only the
@@ -208,6 +228,11 @@ def paint(arr, op):
                                        # amount (1 = all of it)
               soft=(lo, hi))           # grey: full strength below 0..255 luminance lo, fading to
                                        # none at hi (hair into skin without a hard edge)
+              color=, contrast=        # tone: dye to color (0..255) at the masked pixels' median
+                                       # luminance, shading kept (luminance ratio ** contrast)
+              hue=(lo, hi), sat=(lo, hi), noskin=True  # any mode: only pixels of this hue (degrees,
+                                       # may wrap) / saturation (0..1), and not skin-coloured (M6
+                                       # recoloured variants: a shirt, not the arms inside it)
     """
     box = op['box']
     feather = op.get('feather', 3)
@@ -221,6 +246,16 @@ def paint(arr, op):
         lo, hi = op['lum']
         L = _lum(sub) * 255
         m = m * ((L >= lo) & (L <= hi))
+    if op.get('hue') or op.get('sat') or op.get('noskin'):  # M6 variants: pick pixels by colour
+        hh, ss, _ = _hsv(sub)
+        if op.get('hue'):
+            lo, hi = op['hue']
+            m = m * (((hh >= lo) & (hh <= hi)) if lo <= hi else ((hh >= lo) | (hh <= hi)))
+        if op.get('sat'):
+            lo, hi = op['sat']
+            m = m * ((ss >= lo) & (ss <= hi))
+        if op.get('noskin'):
+            m = m * (1 - _skin(sub))
     if op.get('side'):  # keep to the left of the line a->b (image coords, y down)
         (ax, ay), (bx, by) = op['side']
         ys = np.arange(Y0, Y1)[:, None] + 0.5
@@ -247,6 +282,13 @@ def paint(arr, op):
         tint = np.array(op.get('tint', (255, 255, 255)), np.float32) / 255
         a = op.get('amount', 1.0)
         src = np.clip(sub * (1 - a) + g[..., None] * tint * a, 0, 1)
+    elif mode == 'tone':  # M6: dye cloth `color`, keeping its shading (median luminance -> color)
+        L = _lum(sub)
+        sel = (m > 0.5) & (L > 0.03)  # empty (black) texture space doesn't count
+        L0 = float(np.median(L[sel])) if sel.any() else 0.5
+        shade = np.clip(L / max(L0, 1e-3), 0, 4) ** op.get('contrast', 1.0)
+        c = np.array(op['color'], np.float32) / 255
+        src = np.clip(shade[..., None] * c, 0, 1)
     else:
         if 'color' in op:
             c = np.array(op['color'], np.float32) / 255

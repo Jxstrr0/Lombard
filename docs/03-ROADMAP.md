@@ -89,6 +89,7 @@ Done when: a clean run, a mob-friendly run, and a fence-heavy run all play diffe
 ## M6 — Launch polish (status: not started)
 
 - 120 items, 40 regulars, 8 arcs, 3 seasons of news.
+  - Items wave B (done, Nov 6): +44 defs in the existing categories plus the new vinyl & media category (32 → 76 with wave B alone), every one with a scripted model. See 05.
 - The Flood event, The Appraiser hire (a visible employee who walks between the back room, the counter and the floor; see 05).
 - Desktop layout pass (landscape, mouse hotspots, keyboard shortcuts).
 - Save migrations tested across all milestone versions.

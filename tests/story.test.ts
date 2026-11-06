@@ -7,6 +7,7 @@ import { ITEM_DEFS, getItemDef } from '../src/data/items'
 import { CAST } from '../src/data/customers/cast'
 import { archetypes } from '../src/data/customers/walkins'
 import { SPECIALISTS } from '../src/data/specialists'
+import { FENCE } from '../src/data/fence'
 import { REGULARS, getRegular } from '../src/data/regulars'
 import { ARCS, getBeat } from '../src/data/stories'
 import { holds } from '../src/game/story/conditions'
@@ -74,7 +75,8 @@ describe('story content', () => {
       for (const beat of arc.beats) {
         const v = beat.visit
         // M4: a regular, or a specialist (their own arcs); `as` someone they sent.
-        expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who), `${beat.id} who`).toBeDefined()
+        // M5: or the fence (his own arc).
+        expect(getRegular(v.who) ?? SPECIALISTS.find((s) => s.id === v.who) ?? (v.who === FENCE.id ? FENCE : undefined), `${beat.id} who`).toBeDefined()
         if (v.as) expect(looks.has(v.as.look), `${beat.id} as.look`).toBe(true)
         if (v.item) {
           expect(items.has(v.item.defId), `${beat.id} item`).toBe(true)

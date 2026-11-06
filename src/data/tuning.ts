@@ -775,6 +775,83 @@ export const tuning = {
     lowball: -0.35,
     /** Buying, or lending on, a piece that turns out to be stolen, known or not. */
     stolenBought: -0.5,
+    /** Any deal with the fence, either way (src/game/crime/fence.ts); on top of stolenBought for a stolen piece. */
+    fenceDeal: -0.3,
+  },
+
+  /**
+   * M5 the fence (src/game/crime/fence.ts, src/data/fence.ts, the arc src/data/stories/fence.ts;
+   * GDD § 8): Venya Mostovoy sells you suspicious goods cheap and buys your problem pieces.
+   * Contacts are planned from the career seed (never the game Rng). fenceTrust is −1…1.
+   */
+  fence: {
+    /** The meeting beat (fence.meet): from this day, this chance per morning. */
+    meetDay: 12,
+    meetChance: 0.35,
+    /** Days from one contact to the next [min, max] (seeded). */
+    every: [6, 10] as [number, number],
+    /** Each refusal on record stretches that gap by this share, up to maxStretch ×. */
+    refusalStretch: 0.3,
+    maxStretch: 3,
+    /** Trust above 0 shortens it: × (1 − trustShorten × trust). */
+    trustShorten: 0.3,
+    /** A contact is a phone call to buy one of your problem pieces with this chance, when you hold one. */
+    buyCallChance: 0.6,
+    /**
+     * Selling to you: his price as a share of what the piece would fetch if genuine (appraise
+     * claimedValue), + perRefusal per refusal on record, + perTrust × trust, clamped. Tidied.
+     */
+    ask: { base: 0.35, perRefusal: 0.04, perTrust: -0.1, min: 0.25, max: 0.6 },
+    /** His floor as a share of his price (he barely moves), and haggle rounds before his answer is final. */
+    floorShare: 0.9,
+    rounds: 2,
+    /** Buying from you: his offer as a share of the piece's real worth, same shape. */
+    offer: { base: 0.35, perRefusal: -0.03, perTrust: 0.1, min: 0.15, max: 0.5 },
+    /** What he brings (by weight): portable, mid-value pieces. */
+    goods: [
+      { defId: 'gold_band_583', weight: 2 },
+      { defId: 'gold_signet_583', weight: 2 },
+      { defId: 'gold_rope_chain_585', weight: 2 },
+      { defId: 'gold_bracelet_585', weight: 1 },
+      { defId: 'gold_earrings_583', weight: 1 },
+      { defId: 'camera_kanon_ae2', weight: 2 },
+      { defId: 'phone_mangosteen_m5', weight: 2 },
+      { defId: 'phone_galaxia_nota3', weight: 2 },
+      { defId: 'laptop_tosaki_orbita_c40', weight: 1 },
+      { defId: 'watch_vostok_komandirskie', weight: 1 },
+      { defId: 'watch_poljot_strela', weight: 1 },
+      { defId: 'watch_pobeda_gold', weight: 0.5 },
+      { defId: 'coin_chervonets_sower', weight: 1 },
+    ],
+    /** Provenance of his goods: stolen with this chance, otherwise unknown. */
+    stolenChance: 0.7,
+    /** He slips you a fake or a mixed-up piece with this chance, more often the more you've refused him. */
+    fakeChance: { base: 0.04, perRefusal: 0.04, max: 0.25 },
+    condition: [55, 92] as [number, number],
+    /** fenceTrust per deal and per refusal. */
+    trust: { deal: 0.08, refusal: -0.05 },
+    /** Heat per deal (addHeat; what heat does is the police's). */
+    heat: { bought: 0.06, sold: 0.03 },
+    /** Mob standing per deal: the crew notices who trades in what. */
+    mobRep: { deal: 0.01 },
+    /** Lines: warm from this trust; sore once refusals reach soreAt and outnumber deals. */
+    warmAt: 0.3,
+    soreAt: 3,
+    /** Story beats: the notebook call after this many refusals; the standing offer after these deals and trust. */
+    notebookAt: 3,
+    standing: { deals: 4, trust: 0.3, heat: 0.03, mobRep: 0.03 },
+    /**
+     * Named changes the fence arc's choices make (story effect { do: 'fence' }): met, a trust
+     * delta, a refusal on record, and the next contact in [min, max] days.
+     */
+    changes: {
+      meet_yes: { met: true, trust: 0.1 },
+      meet_no: { met: true, refusal: true },
+      notebook_yes: { trust: 0.1, nextIn: [2, 4] },
+      notebook_no: { refusal: true, nextIn: [30, 40] },
+      standing: { trust: 0.15 },
+      casual: { trust: -0.05 },
+    } as Record<string, { met?: boolean; trust?: number; refusal?: boolean; nextIn?: [number, number] }>,
   },
 
   /** M5 endings (src/game/endings/). */

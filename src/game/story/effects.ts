@@ -1,5 +1,6 @@
 /** Apply story effects (src/game/schema/story.ts) to the state. Pure. */
 import { addHeat, addPressure } from '../crime/dials'
+import { applyFenceChange } from '../crime/fence'
 import { flagAxis, nudgeAxis } from '../endings/axes'
 import { adjustRep } from '../reputation'
 import type { Effect } from '../schema/story'
@@ -48,6 +49,9 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
     // --- M4 story pledges (The Student's Laptop) ---
     case 'renew':
       return renewPledge(state, e.who, e.charge, e.redeem)
+    // --- M5 the fence ---
+    case 'fence':
+      return applyFenceChange(state, e.change)
   }
 }
 

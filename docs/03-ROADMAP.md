@@ -76,7 +76,7 @@ Done when: a 30-day playthrough has recurring characters the tester can name.
 
 - Heat and Volkova visits, stolen bulletin, cooperate / lie / bribe branches.
 - Pressure and the full Protection arc, vandalism events, mob fenced goods.
-- Fence character and relationship.
+- Fence character and relationship. ✅ (Nov 6): Venya Mostovoy, the night man on the Kupetsky drawbridge, who bought from Gusev on Tuesdays. Meets you from day 12, then rings to buy your stolen pieces and drops in with cheap goods of his own every 6–10 days; deals feed heat, dirty the shop and nudge mob standing, and every no goes in his notebook (dearer goods, meaner offers, rarer calls, a sore voice; a notebook call and a standing offer). A fence-heavy sim policy grows faster and runs hotter than the careful one, which says no without a bust. `?scenario=fence`. See 05.
 - Endings system: the four hidden axes, forced endings (eviction, raid, mob), Retire option from day 90, ending titles, newspaper epilogue, per-character epilogue cards; career summary screen.
 - The Collector and Volkova arcs.
 

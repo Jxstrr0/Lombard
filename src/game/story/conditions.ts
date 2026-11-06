@@ -68,6 +68,12 @@ export function holds(c: Condition, state: GameState): boolean {
       const md = state.calendar.date.slice(5)
       return c.from <= c.to ? md >= c.from && md <= c.to : md >= c.from || md <= c.to
     }
+    // --- M5 the fence ---
+    case 'fence': {
+      const f = state.crime.fence
+      if (c.met !== undefined && f.met !== c.met) return false
+      return (!c.deals || within(f.deals, c.deals)) && (!c.refusals || within(f.refusals, c.refusals)) && (!c.trust || within(state.crime.fenceTrust, c.trust))
+    }
     case 'any':
       return c.of.some((x) => holds(x, state))
   }

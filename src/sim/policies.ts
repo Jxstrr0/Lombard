@@ -9,6 +9,7 @@
 import { getItemDef } from '../data/items'
 import type { Action } from '../game/actions'
 import { claimedValue } from '../game/appraise/value'
+import { fenceAsk, isFence } from '../game/crime/fence'
 import { upcomingBills } from '../game/economy/expenses'
 import { availableTools } from '../game/inspect/available'
 import type { ToolId } from '../game/schema/item'
@@ -62,6 +63,12 @@ export interface PolicyParams {
   reserveDays: number
   /** Story choices (by id) to take when a scene offers one of them; otherwise the first choice. */
   prefer?: readonly string[]
+  /**
+   * M5 the fence's calls and drop-ins: refuse every one, or deal (pay his price for what he brings
+   * unless a check says it's not genuine, take his offer for your problem pieces). Unset: treat him
+   * like anyone else at the counter.
+   */
+  fence?: 'refuse' | 'deal'
 }
 
 /** Cash the policy is willing to spend right now. */
@@ -115,6 +122,15 @@ export function makePolicy(p: PolicyParams): Policy {
       }
       if (c.kind === 'scene') return { type: 'scene/next' }
       if (c.kind === 'redeem') return { type: 'loan/return' }
+      if (p.fence && isFence(c.customer)) {
+        if (p.fence === 'refuse') return { type: 'counter/pass' }
+        if (c.kind === 'buyer') return { type: 'sale/accept' }
+        if (c.phase === 'offer') {
+          const ask = fenceAsk(state, c.item)
+          const red = p.passOnRedFlags && (state.inspect?.findings ?? []).some(isRedFlag)
+          return red || ask > spendable(state, p) ? { type: 'counter/pass' } : { type: 'offer/make', amount: ask, approach: 'straight' }
+        }
+      }
       if (c.kind === 'buyer') {
         const sale = c.sale
         if (!sale || sale.status !== 'open') return { type: 'counter/pass' }
@@ -190,7 +206,7 @@ function closedStep(state: GameState, ctx: PolicyContext, p: PolicyParams): Acti
   return { type: 'day/open' }
 }
 
-export const careful = makePolicy({
+const CAREFUL: PolicyParams = {
   name: 'careful',
   tools: ['scale', 'loupe', 'magnet', 'loupe', 'acid', 'reference'],
   passOnRedFlags: true,
@@ -209,7 +225,17 @@ export const careful = makePolicy({
   // Runs a clean shop: turns down the crew's "insurance" (Protection arc). Paying costs a careful
   // shop about 2 points of monthly growth (docs/05, Nov 6); the bands measure the trade, not that choice.
   prefer: ['refuse'],
-})
+  // A clean shop says no to the fence too (M5).
+  fence: 'refuse',
+}
+
+export const careful = makePolicy(CAREFUL)
+
+/**
+ * M5 "done when": a fence-heavy run. The careful player, except that it keeps the fence's Tuesdays,
+ * buys what he brings at his price (unless a check flags it) and sells him its problem pieces.
+ */
+export const fenceFriend = makePolicy({ ...CAREFUL, name: 'fence', fence: 'deal', prefer: ['fence_yes', 'refuse'] })
 
 export const careless = makePolicy({
   name: 'careless',

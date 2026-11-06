@@ -416,7 +416,7 @@ async function sendAway(h) {
 
 /**
  * Economy (portrait, ?seed=1): day 1 passed → ledger → Office (buy the acid kit,
- * retain both specialists) → day 2 → the first gold or watch seller → acid,
+ * retain four of the five specialists) → day 2 → the first gold or watch seller → acid,
  * reference book and a specialist call.
  */
 async function playEconomy(page, h) {
@@ -431,13 +431,20 @@ async function playEconomy(page, h) {
   await h.screen('ledger')
   await h.click('open-office')
   await page.waitForTimeout(200)
-  for (const id of ['buy-acid_kit', 'retain-jeweler', 'retain-watchmaker']) if (await h.enabled(id)) await h.click(id)
+  // Four of the five specialists: the electronics tech stays unretained to show the Retain button.
+  for (const id of ['buy-acid_kit', 'retain-jeweler', 'retain-watchmaker', 'retain-collector', 'retain-antiquary']) if (await h.enabled(id)) await h.click(id)
   await page.evaluate(() => document.querySelector('[data-id="office"]')?.scrollTo(0, 0))
   await page.waitForTimeout(150)
   await h.shot('office', 'office sheet: bills due, upgrades (acid kit owned), cash')
   await page.evaluate(() => document.querySelector('[data-id="office-specialists"]')?.scrollIntoView({ block: 'start' }))
   await page.waitForTimeout(150)
-  await h.shot('office-specialists', 'office sheet: both specialists retained, calls left, release')
+  await h.shot('office-specialists', 'office sheet: specialists retained, calls left, release')
+  await page.evaluate(() => {
+    const sheet = document.querySelector('[data-id="office"]')
+    sheet?.scrollTo(0, sheet.scrollHeight)
+  })
+  await page.waitForTimeout(150)
+  await h.shot('office-specialists-end', 'office sheet: the last specialists (antiques dealer retained, electronics tech not)')
   await h.click('office-close')
   await h.open()
   await h.screen('counter')

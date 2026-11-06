@@ -2021,6 +2021,12 @@ html {
   font-style: italic;
 }
 
+.office-quiet {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
 .office-owned {
   display: inline-flex;
   align-items: center;

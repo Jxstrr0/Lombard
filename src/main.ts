@@ -14,7 +14,8 @@
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
  * ?scenario=rolex / ?scenario=laptop / ?scenario=protection open day 1 with a beat of that arc first in line (BEAT_SCENARIOS;
  * protection: Eduard Lvovich's "insurance" offer; fence: Venya Mostovoy's first visit, a choice, then him again with
- * something to sell, M5);
+ * something to sell, M5; delivery: Zhora with the crew's stolen phones, opening at half, M5);
+ * ?scenario=brick opens on the morning after a brick through the stocked counter case (M5 Protection);
  * ?scenario=specialist opens day 1 with Gennady's first-refusal phone call, then Ilya at the counter with the widow's watch (M4 specialists' arcs).
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
@@ -41,9 +42,11 @@ import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
 import { beatVisit, regularCustomer, regularVisit } from './game/story/plan'
-import { setMemory } from './game/story/progress'
+import { recordBeat, setMemory } from './game/story/progress'
 import { specialistCustomer } from './game/story/specialists'
 import { fenceGoods } from './game/crime/fence'
+import { BRICK } from './game/crime/vandalism'
+import { placeItem } from './game/shop/display'
 import type { QueuedVisit } from './game/types'
 import { getRegular } from './data/regulars'
 import { getBeat } from './data/stories'
@@ -109,7 +112,13 @@ function storyScenario(s0: GameState): GameState {
 }
 
 /** Dev-only (?scenario=<key>): the beat each arc scenario puts first in line on day 1. */
-const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent', protection: 'protection.offer', fence: 'fence.meet' }
+const BEAT_SCENARIOS: Record<string, string> = {
+  rolex: 'rolex.omeca',
+  laptop: 'laptop.rent',
+  protection: 'protection.offer',
+  fence: 'fence.meet',
+  delivery: 'protection.delivery_phones',
+}
 
 function beatScenario(s0: GameState, beatId: string): GameState {
   let s = reducer(s0, { type: 'career/begin', shopName: '' })
@@ -126,6 +135,20 @@ function fenceGoodsSecond(s: GameState): GameState {
   const met = { ...s, crime: { ...s.crime, fence: { ...s.crime.fence, met: true } } }
   const goods = fenceGoods(met, (prefix, who) => `${prefix}-dev-${who}`)
   return { ...s, queue: [...s.queue.slice(0, 1), goods, ...s.queue.slice(1)], day: { ...s.day, total: s.day.total + 1 } }
+}
+
+/**
+ * Dev-only (?seed=N&scenario=brick): the morning after the brick. The counter case was stocked, you told
+ * Eduard Lvovich no when he "asked properly" yesterday, and the shop opens on the glass (M5 Protection).
+ */
+function brickScenario(s0: GameState): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  const slots = s.shop.slots.filter((x) => x.area === 'counter')
+  s.inventory.slice(0, slots.length).forEach((item, i) => (s = placeItem(s, item.id, slots[i]!.id)))
+  const night = s.calendar.day - 1
+  s = recordBeat(s, 'protection.properly', { day: night, outcome: 'talked', choice: 'refuse' })
+  s = { ...s, crime: { ...s.crime, events: [...s.crime.events, { day: night, kind: BRICK }] } }
+  return reducer(s, { type: 'day/open' })
 }
 
 /** Dev-only (?seed=N&scenario=specialist): a specialist's phone call (a choice), then a specialist at the counter (a choice). */
@@ -277,6 +300,7 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
     if (params.get('scenario') === 'story') initial = storyScenario(initial)
     if (params.get('scenario') === 'specialist') initial = specialistScenario(initial)
+    if (params.get('scenario') === 'brick') initial = brickScenario(initial)
     const beatId = BEAT_SCENARIOS[params.get('scenario') ?? '']
     if (beatId) initial = beatScenario(initial, beatId)
     if (params.get('scenario') === 'fence') initial = fenceGoodsSecond(initial)

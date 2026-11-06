@@ -410,7 +410,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 20, "tolerance": 0.7},
     "magnetic": false,
-    "rarity": 0.6,
+    "rarity": 0.3,
     "fakeChance": 0.35,
     "tells": [
         {"id": "relief", "tool": "loupe", "finding": "The worker points the peasant towards the rising sun; the factory chimneys behind are sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
@@ -541,7 +541,7 @@
     "valueCurve": "linear",
     "weightGrams": {"expected": 31.1, "tolerance": 0.9},
     "magnetic": false,
-    "rarity": 0.45,
+    "rarity": 0.23,
     "fakeChance": 0.3,
     "tells": [
         {"id": "relief", "tool": "loupe", "finding": "St George and the dragon, crisp, the lance a clean straight line.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
@@ -603,7 +603,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 34.6, "tolerance": 1.0},
     "magnetic": false,
-    "rarity": 0.54,
+    "rarity": 0.27,
     "fakeChance": 0.3,
     "tells": [
         {"id": "relief", "tool": "loupe", "finding": "The drawbridge stands open over frosted waves, mirror field around it, not a hairline.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},

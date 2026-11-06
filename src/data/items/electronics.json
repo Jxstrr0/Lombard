@@ -164,7 +164,7 @@
     "valueCurve": "linear",
     "weightGrams": {"expected": 140, "tolerance": 6},
     "magnetic": true,
-    "rarity": 0.6,
+    "rarity": 0.3,
     "fakeChance": 0.3,
     "tells": [
         {"id": "wheel", "tool": "loupe", "finding": "The click wheel spins smooth and silent; the centre button clicks with a soft, even press.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "wheel"},
@@ -229,7 +229,7 @@
     "valueCurve": "linear",
     "weightGrams": {"expected": 1250, "tolerance": 45},
     "magnetic": true,
-    "rarity": 0.39,
+    "rarity": 0.2,
     "fakeChance": 0.2,
     "tells": [
         {"id": "panel", "tool": "loupe", "finding": "The detachable panel clicks off and back on firmly; its pins and the chassis contacts are clean.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "panel"},
@@ -293,7 +293,7 @@
     "valueCurve": "linear",
     "weightGrams": {"expected": 86, "tolerance": 3},
     "magnetic": true,
-    "rarity": 0.39,
+    "rarity": 0.2,
     "fakeChance": 0.25,
     "tells": [
         {"id": "lens", "tool": "loupe", "finding": "The lens is glass, wide and clean, ringed with 'Severin DOZOR HD 1080'.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "lens"},

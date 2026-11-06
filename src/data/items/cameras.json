@@ -260,7 +260,7 @@
     "valueCurve": "linear",
     "weightGrams": {"expected": 1010, "tolerance": 40},
     "magnetic": true,
-    "rarity": 0.78,
+    "rarity": 0.39,
     "fakeChance": 0.2,
     "tells": [
         {"id": "lens", "tool": "loupe", "finding": "The kit Helios lens: clean glass, the aperture blades snapping crisp and dry.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "lens"},
@@ -321,7 +321,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 280, "tolerance": 12},
     "magnetic": false,
-    "rarity": 0.42,
+    "rarity": 0.21,
     "fakeChance": 0.15,
     "tells": [
         {"id": "lens", "tool": "loupe", "finding": "The lens ring reads T-43 4/40, the scale engraved into the plastic, the glass without haze.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "lens"},
@@ -380,7 +380,7 @@
     "valueCurve": "linear",
     "weightGrams": {"expected": 190, "tolerance": 8},
     "magnetic": true,
-    "rarity": 0.78,
+    "rarity": 0.39,
     "fakeChance": 0.25,
     "tells": [
         {"id": "lens", "tool": "loupe", "finding": "The zoom lens slides out and back in smoothly; the front glass is clean.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "lens"},
@@ -506,7 +506,7 @@
     "valueCurve": "linear",
     "weightGrams": {"expected": 480, "tolerance": 18},
     "magnetic": false,
-    "rarity": 0.6,
+    "rarity": 0.3,
     "fakeChance": 0.25,
     "tells": [
         {"id": "front", "tool": "loupe", "finding": "Clean glass front and back; a torch through it shows only a speck or two of dust.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "front"},

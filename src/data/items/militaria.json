@@ -363,7 +363,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 26, "tolerance": 1.4},
     "magnetic": false,
-    "rarity": 0.72,
+    "rarity": 0.36,
     "fakeChance": 0.35,
     "tells": [
         {"id": "face", "tool": "loupe", "finding": "ЗА ТРУДОВУЮ ДОБЛЕСТЬ in crisp relief, the red enamel СССР below without a chip or bubble.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
@@ -428,7 +428,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 18, "tolerance": 1},
     "magnetic": false,
-    "rarity": 0.66,
+    "rarity": 0.33,
     "fakeChance": 0.35,
     "tells": [
         {"id": "face", "tool": "loupe", "finding": "ЗА ОСВОБОЖДЕНИЕ ПРАГИ round a star and a rising sun, the rays sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
@@ -493,7 +493,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 18, "tolerance": 1},
     "magnetic": false,
-    "rarity": 0.48,
+    "rarity": 0.24,
     "fakeChance": 0.4,
     "tells": [
         {"id": "face", "tool": "loupe", "finding": "ЗА ВЗЯТИЕ КЁНИГСБЕРГА in sharp letters round a star, the dots over the Ё crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "obverse"},
@@ -558,7 +558,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 21, "tolerance": 1.2},
     "magnetic": false,
-    "rarity": 0.56,
+    "rarity": 0.28,
     "fakeChance": 0.1,
     "tells": [
         {"id": "face", "tool": "loupe", "finding": "A soldier against the eternal flame and 1945–1985, the relief crisp but shallow.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse"},
@@ -610,7 +610,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 31, "tolerance": 1.6},
     "magnetic": false,
-    "rarity": 0.66,
+    "rarity": 0.33,
     "fakeChance": 0.35,
     "tells": [
         {"id": "center", "tool": "loupe", "finding": "The hammer and sickle in the centre medallion stand crisp, ОТЕЧЕСТВЕННАЯ ВОЙНА on the white band.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "center"},

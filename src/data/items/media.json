@@ -9,7 +9,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 230, "tolerance": 14},
     "magnetic": false,
-    "rarity": 0.56,
+    "rarity": 0.28,
     "fakeChance": 0.15,
     "tells": [
         {"id": "label", "tool": "loupe", "finding": "A blue Liraphon label with the factory's name, the catalogue number and the side, centred true.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "label"},
@@ -61,7 +61,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 225, "tolerance": 14},
     "magnetic": false,
-    "rarity": 0.54,
+    "rarity": 0.27,
     "fakeChance": 0.4,
     "tells": [
         {"id": "label", "tool": "loupe", "finding": "A white Liraphon label from the Mostograd plant: side A, 1987, the track list in a neat column.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "label"},
@@ -190,7 +190,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 6500, "tolerance": 260},
     "magnetic": true,
-    "rarity": 0.72,
+    "rarity": 0.36,
     "fakeChance": 0.25,
     "tells": [
         {"id": "badge", "tool": "loupe", "finding": "РУБЕЖ М-302 in raised silver letters, the factory quality mark beside it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "front"},
@@ -318,7 +318,7 @@
     "valueCurve": "linear",
     "weightGrams": {"expected": 4200, "tolerance": 180},
     "magnetic": true,
-    "rarity": 0.42,
+    "rarity": 0.21,
     "fakeChance": 0.25,
     "tells": [
         {"id": "badge", "tool": "loupe", "finding": "TOSAKI and 'VR-80 HQ' printed crisp and level on the front.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "front"},
@@ -444,7 +444,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 640, "tolerance": 40},
     "magnetic": false,
-    "rarity": 0.52,
+    "rarity": 0.26,
     "fakeChance": 0.2,
     "tells": [
         {"id": "badge", "tool": "loupe", "finding": "КОСМО JUNIOR moulded into the lid, a little rocket over the O.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "top"},
@@ -497,7 +497,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 9500, "tolerance": 380},
     "magnetic": true,
-    "rarity": 0.54,
+    "rarity": 0.27,
     "fakeChance": 0.25,
     "tells": [
         {"id": "plate", "tool": "loupe", "finding": "On the back, a riveted plate: РУБЕЖ ЭП-101, the serial, 1983 and the price, 260 руб.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "back"},
@@ -559,7 +559,7 @@
     "valueCurve": "collector",
     "weightGrams": {"expected": 42000, "tolerance": 1600},
     "magnetic": false,
-    "rarity": 0.35,
+    "rarity": 0.17,
     "fakeChance": 0.3,
     "tells": [
         {"id": "spines", "tool": "loupe", "finding": "Thirty red spines with gilt numbers, volume 1 to volume 30, the gilt rubbed but every number readable.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "spine"},

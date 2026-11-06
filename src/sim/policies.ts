@@ -107,6 +107,8 @@ function spendable(state: GameState, p: PolicyParams): number {
   return state.cash - due
 }
 
+/** Policy, not game tuning: a waiting piece displaces one on show only when worth this many times more (no shuffling between near-equals). */
+const SWAP_FOR = 1.5
 const isRedFlag = (f: Finding) => f.polarity === 'negative' && f.reveals === 'authenticity'
 const isShady = (f: Finding) => f.polarity === 'negative' && f.reveals === 'provenance'
 
@@ -232,15 +234,22 @@ function arrangeStep(state: GameState, ctx: PolicyContext, p: PolicyParams): Act
     }
   }
   const placed = new Set(state.shop.slots.filter((s) => s.itemId).map((s) => s.itemId!))
+  const est = (id: string) => ctx.estimate[id] ?? estimateOf(state, id, p)
   for (const it of state.inventory) {
-    const est = ctx.estimate[it.id] ?? estimateOf(state, it.id, p)
-    if (state.shop.prices[it.id] === undefined) return { type: 'shop/price', itemId: it.id, price: Math.round(est * p.markup) }
-    if (!placed.has(it.id)) {
-      // Best slots for the most valuable stock: counter, then wall, then back.
-      const free = state.shop.slots.find((s) => s.itemId === null && !(avoidCase && s.area === 'counter'))
-      if (free) return { type: 'shop/place', itemId: it.id, slotId: free.id }
-    }
+    if (state.shop.prices[it.id] === undefined) return { type: 'shop/price', itemId: it.id, price: Math.round(est(it.id) * p.markup) }
   }
+  // Best slots for the most valuable stock: the dearest unshown piece goes out first (slots run
+  // counter, then wall, then back), and when the room is full it takes the place of a much cheaper
+  // piece on show. Every displayed piece draws buyers at the same daily rate whatever it's worth
+  // (sell/buyer.ts), so a slot spent on a 500 ₽ medal is a slot not spent on a watch.
+  const waiting = state.inventory.filter((i) => !placed.has(i.id)).sort((a, b) => est(b.id) - est(a.id))[0]
+  if (!waiting) return null
+  const free = state.shop.slots.find((s) => s.itemId === null && !(avoidCase && s.area === 'counter'))
+  if (free) return { type: 'shop/place', itemId: waiting.id, slotId: free.id }
+  if (avoidCase) return null
+  const shown = state.shop.slots.filter((s) => s.itemId).map((s) => s.itemId!)
+  const cheapest = shown.sort((a, b) => est(a) - est(b))[0]
+  if (cheapest && est(waiting.id) > est(cheapest) * SWAP_FOR) return { type: 'shop/place', itemId: cheapest, slotId: null }
   return null
 }
 

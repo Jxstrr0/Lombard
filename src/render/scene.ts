@@ -97,6 +97,7 @@ export class ShopScene {
   private backdropCard: THREE.Mesh | null = null
   private backdrop: CanalBackdrop | null = null
   private backdropState = { clock: 0, reduceMotion: false }
+  private clockOverride: number | null = null
   readonly matPoint = MAT_POINT.clone()
 
   constructor() {
@@ -166,10 +167,16 @@ export class ShopScene {
     }
   }
 
+  /** ?time=HH:MM (review): the room shows this shop time (day.clock seconds) instead of the game's. */
+  setClockOverride(seconds: number | null): void {
+    this.clockOverride = seconds
+  }
+
   /** Sync render-owned objects to game state. Never mutates state. */
   sync(state: GameState): void {
-    this.backdropState = { clock: state.day.clock, reduceMotion: state.settings.reduceMotion }
-    this.backdrop?.setState(state.day.clock, state.settings.reduceMotion)
+    const clock = this.clockOverride ?? state.day.clock
+    this.backdropState = { clock, reduceMotion: state.settings.reduceMotion }
+    this.backdrop?.setState(clock, state.settings.reduceMotion)
     // Dim the customer while inspecting so they don't fight the item.
     this.customerTarget = !state.current ? 0 : state.current.phase === 'inspect' ? INSPECT_CUSTOMER_OPACITY : 1
     const look = state.current ? this.lookOf(state.current.customer) : null

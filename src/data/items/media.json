@@ -43,9 +43,9 @@
       "scale": 1,
       "inspectDistance": 0.75,
       "hotspots": [
-        {"id": "label", "label": "Label", "position": [0.07, -0.03, 0.0041]},
+        {"id": "label", "label": "Label", "position": [0.07, 0.0, 0.0041]},
         {"id": "runout", "label": "Run-out groove", "position": [0.122, -0.03, 0.0041]},
-        {"id": "grooves", "label": "Grooves", "position": [0.17, -0.03, 0.0041]},
+        {"id": "grooves", "label": "Grooves", "position": [0.07, -0.13, 0.0042]},
         {"id": "sleeve", "label": "Sleeve front", "position": [-0.17, 0.14, 0.002]},
         {"id": "back", "label": "Sleeve back", "position": [-0.05, 0.02, -0.002]}
       ]
@@ -108,11 +108,11 @@
       "scale": 1,
       "inspectDistance": 0.75,
       "hotspots": [
-        {"id": "label", "label": "Label", "position": [0.07, -0.03, 0.0041]},
+        {"id": "label", "label": "Label", "position": [0.07, 0.0, 0.0041]},
         {"id": "runout", "label": "Run-out groove", "position": [0.122, -0.03, 0.0041]},
         {"id": "sleeve", "label": "Sleeve front", "position": [-0.17, 0.14, 0.002]},
         {"id": "back", "label": "Sleeve back", "position": [-0.05, 0.02, -0.002]},
-        {"id": "grooves", "label": "Grooves", "position": [0.17, -0.03, 0.0041]}
+        {"id": "grooves", "label": "Grooves", "position": [0.07, -0.13, 0.0042]}
       ]
     }
   },
@@ -173,8 +173,8 @@
       "scale": 0.58,
       "inspectDistance": 0.45,
       "hotspots": [
-        {"id": "label", "label": "Label", "position": [0.07, -0.03, 0.0041]},
-        {"id": "grooves", "label": "Grooves", "position": [0.17, -0.03, 0.0041]},
+        {"id": "label", "label": "Label", "position": [0.07, 0.0, 0.0041]},
+        {"id": "grooves", "label": "Grooves", "position": [0.07, -0.13, 0.0042]},
         {"id": "sleeve", "label": "Sleeve front", "position": [-0.17, 0.14, 0.002]},
         {"id": "back", "label": "Sleeve back", "position": [-0.05, 0.02, -0.002]}
       ]

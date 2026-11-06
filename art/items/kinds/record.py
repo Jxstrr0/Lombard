@@ -37,6 +37,8 @@ F, slab, rr, circle, disc = P.F, P.slab, P.rr, P.circle, P.disc
 
 # Print must stand a few Draco steps proud (14-bit positions over ~0.37 m: ~23 µm).
 PRINT = 0.00007
+# Track bands stand 0.2 mm proud: a broad band only 70 µm over the face z-fights at counter distance.
+BAND = 0.0002
 
 
 def poly_on(m: Matrix, pts, depth: float, mat, *, z: float = 0.0, bevel: float = 0.0):
@@ -80,12 +82,12 @@ def vinyl_disc(it: lib.Item, tracks: list[float], *, label_mat, vinyl, grooves, 
     edges = [0.0605] + tracks + [0.1455]
     for a, b in zip(edges, edges[1:]):
         a2, b2 = a + 0.0007, b - 0.0007
-        band = lib.lathe(P._name("band"), [(a2, FACE - 0.0001), (a2, FACE - 0.0001 + PRINT), (b2, FACE - 0.0001 + PRINT), (b2, FACE - 0.0001)], grooves, segments=128, axis="z", cap=False)
+        band = lib.lathe(P._name("band"), [(a2, FACE - 0.0001), (a2, FACE - 0.0001 + BAND), (b2, FACE - 0.0001 + BAND), (b2, FACE - 0.0001)], grooves, segments=128, axis="z", cap=False)
         lib.auto_smooth(band, 30)
         P.place(band, fm)
         for k in range(1, 3):
             rr_ = a2 + (b2 - a2) * k / 3
-            ring(fm, rr_, 0.00025, FACE - 0.0001 + PRINT, sheen)
+            ring(fm, rr_, 0.00025, FACE - 0.0001 + BAND, sheen)
     # paper label
     disc(fm, LABEL, FACE - 0.00025, FACE - 0.0002, label_mat, n=96)
     disc(fm, 0.0038, FACE - 0.0003, FACE - 0.00018, lib.material(it, "hole", "#050505", rough=0.6), n=24)

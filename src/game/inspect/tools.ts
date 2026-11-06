@@ -175,7 +175,13 @@ export function useTool(input: UseToolInput): UseToolResult {
   if (findings.length === 0) {
     add({ text: NOTHING_NEW[tool] ?? 'Nothing new.', polarity: 'neutral', ...(hotspot ? { hotspot } : {}) })
   }
-  return { findings, seconds: tuning.inspect.toolSeconds[tool] }
+  const seconds = tool === 'specialist' && input.extras?.specialist ? specialistCallSeconds(input.extras.specialist.id) : tuning.inspect.toolSeconds[tool]
+  return { findings, seconds }
+}
+
+/** How long a call to this specialist takes: their own callSeconds, else the tool default. */
+export function specialistCallSeconds(id: string): number {
+  return tuning.specialists.roster[id]?.callSeconds ?? tuning.inspect.toolSeconds.specialist
 }
 
 // --- text ---------------------------------------------------------------------

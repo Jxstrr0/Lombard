@@ -32,6 +32,8 @@ export interface RunResult {
   finalCash: number
   finalWorth: number
   stats: GameState['stats']
+  /** Regulars' memory at the end (M4): visits and trust per regular met. */
+  customers: GameState['customers']
   /** Actions dispatched (sanity: guards against a stuck policy). */
   steps: number
 }
@@ -75,7 +77,7 @@ export function simulate(seed: number, policy: Policy, days: number): RunResult 
     if (bustDay === null && worth < 0) bustDay = day
   }
   const minCash = Math.min(...points.map((p) => p.cash))
-  return { seed, policy: policy.name, days: points, bustDay, minCash, finalCash: s.cash, finalWorth: worthOf(s), stats: s.stats, steps }
+  return { seed, policy: policy.name, days: points, bustDay, minCash, finalCash: s.cash, finalWorth: worthOf(s), stats: s.stats, customers: s.customers, steps }
 }
 
 /** Compound growth per 30 days of `worth`, from the start of the run to its end. */

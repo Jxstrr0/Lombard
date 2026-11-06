@@ -21,6 +21,21 @@ const run = (s: GameState, ...actions: Action[]) => actions.reduce(reducer, s)
 const onDay = (s: GameState, day: number): GameState => ({ ...s, calendar: { ...s.calendar, day } })
 const zina = () => getRegular('zinaida')!
 
+/**
+ * Only Zinaida is due: everyone else's next visit is pushed far off (a fresh
+ * career jumped to a late day would have every regular due at once).
+ */
+function onlyZinaida(s: GameState): GameState {
+  const customers = { ...s.customers }
+  for (const r of REGULARS) if (r.id !== 'zinaida') customers[r.id] = { ...memoryOf(s, r.id), nextDay: 10_000 }
+  return { ...s, customers }
+}
+
+/** Every arc ended, so no story beat (of any arc) changes the day. */
+function noArcs(s: GameState): GameState {
+  return { ...s, story: { ...s.story, arcs: Object.fromEntries(ARCS.map((a) => [a.id, { beats: {}, ended: true }])) } }
+}
+
 /** An open day with this story visit first in line. */
 function withVisit(s: GameState, visit: Partial<QueuedVisit> & { beatId?: string }): GameState {
   const open = reducer(s, { type: 'day/open' })
@@ -174,9 +189,8 @@ describe('planning', () => {
   it('a regular comes in on schedule with one of their items, then not again for a while', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    let s = onDay(startedState(5, 'c1'), day)
-    // Keep the medals arc out of the way.
-    s = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
+    // Keep every arc out of the way.
+    const s = noArcs(onlyZinaida(onDay(startedState(5, 'c1'), day)))
     let id = 0
     const plan = planStory(s, (p) => `${p}${id++}`)
     const visit = plan.visits.find((v) => v.visit.customer.regularId === 'zinaida')
@@ -194,13 +208,11 @@ describe('planning', () => {
   it('a regular holding a pledge does not come in to sell', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    let s = onDay(startedState(5, 'c1'), day)
-    s = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
+    let s = noArcs(onlyZinaida(onDay(startedState(5, 'c1'), day)))
     const fake = { customer: regularCustomer(def) } as unknown as GameState['loans'][number]
     s = { ...s, loans: [fake] }
     let id = 0
-    // (Other arcs' beats may still come in; Zinaida doesn't.)
-    expect(planStory(s, (p) => `${p}${id++}`).visits.filter((v) => v.visit.customer.regularId === 'zinaida')).toEqual([])
+    expect(planStory(s, (p) => `${p}${id++}`).visits).toEqual([])
   })
 })
 
@@ -264,9 +276,8 @@ describe('at the counter', () => {
   it('trust softens the regular’s opening ask', () => {
     const def = zina()
     const day = def.schedule!.from + tuning.regulars.firstVisitJitter[1]
-    const base = onDay(startedState(9, 'c1'), day)
-    // Every arc ended, so only Zinaida's ordinary visit changes the day.
-    const quiet = { ...base, story: { ...base.story, arcs: Object.fromEntries(ARCS.map((a) => [a.id, { beats: {}, ended: true }])) } }
+    // Only Zinaida's ordinary visit changes the day: no other regular due, every arc ended.
+    const quiet = noArcs(onlyZinaida(onDay(startedState(9, 'c1'), day)))
     const askWith = (trust: number) => {
       let s = setMemory(quiet, 'zinaida', { trust })
       s = reducer(s, { type: 'day/open' })

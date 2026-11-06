@@ -30,4 +30,8 @@ for (const policy of [policies.careful, policies.careless]) {
   // Worth curve of the median run, every 10 days.
   const mid = runs.slice().sort((a, b) => a.finalWorth - b.finalWorth)[Math.floor(runs.length / 2)]
   console.log('          worth by day: ' + mid.days.filter((d) => d.day % 10 === 0).map((d) => `${d.day}:${Math.round(d.worth / 1000)}k`).join('  '))
+  // Regulars (M4): visits per regular over the whole run, averaged across seeds.
+  const ids = [...new Set(runs.flatMap((r) => Object.keys(r.customers)))].sort()
+  const avg = (id) => runs.reduce((a, r) => a + (r.customers[id]?.visits ?? 0), 0) / runs.length
+  console.log(`          regular visits in ${days} days: ` + ids.map((id) => `${id} ${avg(id).toFixed(1)}`).join('  '))
 }

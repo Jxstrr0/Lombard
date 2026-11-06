@@ -121,7 +121,8 @@ function nextVisitDay(state: GameState, def: RegularDef, m: CustomerState): numb
   return state.calendar.day + Math.round(storyRng(state, `next:${def.id}`).int(a, b) * scale)
 }
 
-function regularVisit(state: GameState, def: RegularDef, nextId: (prefix: string) => string): QueuedVisit {
+/** One of a regular's ordinary visits (their greeting by warmth, one of their items). Exported for the dev ?regular= scenario. */
+export function regularVisit(state: GameState, def: RegularDef, nextId: (prefix: string) => string): QueuedVisit {
   const rng = storyRng(state, `visit:${def.id}`)
   const m = memoryOf(state, def.id)
   const entry = rng.weighted(def.items.map((e) => ({ item: e, weight: e.weight })))
@@ -129,14 +130,19 @@ function regularVisit(state: GameState, def: RegularDef, nextId: (prefix: string
   const id = nextId('i')
   const story = entry.story ? rng.pick(entry.story) : undefined
   let item = entry.authenticity
-    ? scriptedItem(itemDef, { authenticity: entry.authenticity, provenance: entry.provenance ?? 'unknown', story: story ?? rng.pick(itemDef.claims) }, rng, id)
+    ? scriptedItem(
+        itemDef,
+        { authenticity: entry.authenticity, provenance: entry.provenance ?? 'unknown', story: story ?? rng.pick(itemDef.claims), ...(entry.condition ? { condition: entry.condition } : {}) },
+        rng,
+        id,
+      )
     : generateItem(itemDef, rng, id)
   if (!entry.authenticity && (story || entry.provenance)) item = { ...item, story: story ?? item.story, provenance: entry.provenance ?? item.provenance }
   const customer = regularCustomer(def)
   const hello = rng.pick(def.lines[warmthOf(m)])
   const visitId = nextId('v')
   const [pMin, pMax] = tuning.day.queuePatience
-  const patience = Math.round(rng.range(pMin, pMax) + 60)
+  const patience = Math.round(rng.range(pMin, pMax) + tuning.regulars.extraPatience)
   if (rng.chance(def.pawn)) {
     return { visitId, kind: 'seller', wants: 'pawn', customer, item, patience, line: `${hello} ${pawnOpeningLine(customer, item, rng)}` }
   }

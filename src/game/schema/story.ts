@@ -34,9 +34,11 @@ export const RegularItem = z.object({
   /** Leave out for the item's own odds of being fake. */
   authenticity: AuthenticitySchema.optional(),
   provenance: ProvenanceSchema.optional(),
+  /** Condition range [min, max] (0–100), e.g. suspiciously new. Only with `authenticity`; default: the usual range. */
+  condition: range.optional(),
   /** Their claim about it; default: one of the item def's claims. */
   story: lines.optional(),
-})
+}).refine((e) => e.condition === undefined || e.authenticity !== undefined, 'condition needs authenticity')
 
 export const RegularDef = z.object({
   id,

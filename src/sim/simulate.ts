@@ -72,6 +72,11 @@ export interface SimOptions {
    * unchanged. The M2 trading band (tests/sim.test.ts) measures the trade with it off.
    */
   protectionLadder?: boolean
+  /**
+   * Play on from this state instead of a fresh career (a loaded or migrated save: tests/saveFixtures.test.ts).
+   * The run starts wherever the state is, mid-day included.
+   */
+  from?: GameState
 }
 
 /** The ladder's first rung, recorded as past before day 1 (see SimOptions.protectionLadder). */
@@ -88,7 +93,7 @@ export function worthOf(s: GameState): number {
 }
 
 export function simulate(seed: number, policy: Policy, days: number, options: SimOptions = {}): RunResult {
-  let s = reducer(createInitialState(seed, `sim-${seed}`), { type: 'career/begin', shopName: '' })
+  let s = options.from ?? reducer(createInitialState(seed, `sim-${seed}`), { type: 'career/begin', shopName: '' })
   if (options.protectionLadder === false) s = holdOffLadder(s)
   const crew = { bricks: 0, glaziers: 0, insurance: 0, deliveries: 0 }
   const flood = { damaged: 0, bill: 0 }

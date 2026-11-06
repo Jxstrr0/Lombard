@@ -123,7 +123,8 @@ def png8_mask(path, cutoff):
         return path
     tmp = path + '.tmp.png'
     subprocess.run([exe, path, '-channel', 'A', '-threshold', '%d%%' % int(cutoff * 100), '+channel',
-                    '-colors', '255', 'PNG8:' + tmp], check=True)
+                    '-colors', '255', '-strip', '-define', 'png:exclude-chunk=date,time,text,ztxt,itxt,chrm,phys', 'PNG8:' + tmp],
+                   check=True, env={**os.environ, 'MAGICK_THREAD_LIMIT': '1'})  # threaded quantising isn't reproducible
     os.replace(tmp, path)
     return path
 
@@ -157,15 +158,50 @@ def _lum(a):
     return 0.2126 * a[..., 0] + 0.7152 * a[..., 1] + 0.0722 * a[..., 2]
 
 
+def _blur1d(a, r, axis):
+    """Box blur of radius r along an axis (edge-padded)."""
+    if r <= 0:
+        return a
+    pad = [(0, 0)] * a.ndim
+    pad[axis] = (r + 1, r)
+    c = np.cumsum(np.pad(a, pad, mode='edge'), axis=axis, dtype=np.float64)
+    n = a.shape[axis]
+    hi = np.take(c, np.arange(2 * r + 1, 2 * r + 1 + n), axis=axis)
+    lo = np.take(c, np.arange(0, n), axis=axis)
+    return ((hi - lo) / (2 * r + 1)).astype(np.float32)
+
+
+def _blur(a, r):
+    return _blur1d(_blur1d(a, r, 0), r, 1)
+
+
+def _coons(arr, box, depth=4, smooth=6):
+    """Smooth fill of box interpolated from the pixels just outside its four edges."""
+    x0, y0, x1, y1 = box
+    L = _blur1d(arr[y0:y1, x0 - depth:x0, :3].mean(1), smooth, 0)  # (h, 3)
+    R = _blur1d(arr[y0:y1, x1:x1 + depth, :3].mean(1), smooth, 0)
+    T = _blur1d(arr[y0 - depth:y0, x0:x1, :3].mean(0), smooth, 0)  # (w, 3)
+    B = _blur1d(arr[y1:y1 + depth, x0:x1, :3].mean(0), smooth, 0)
+    h, w = y1 - y0, x1 - x0
+    u = ((np.arange(w) + 0.5) / w)[None, :, None]
+    v = ((np.arange(h) + 0.5) / h)[:, None, None]
+    TL, TR, BL, BR = (L[0] + T[0]) / 2, (R[0] + T[-1]) / 2, (L[-1] + B[0]) / 2, (R[-1] + B[-1]) / 2
+    return ((1 - u) * L[:, None] + u * R[:, None] + (1 - v) * T[None] + v * B[None]
+            - ((1 - u) * (1 - v) * TL + u * (1 - v) * TR + (1 - u) * v * BL + u * v * BR))
+
+
 def paint(arr, op):
     """Paint one rectangle out of a texture, in place. arr: float (h, w, >=3), top row first,
     values 0..1. Coordinates are pixels of the ORIGINAL texture (as in an image editor).
 
-    op = dict(box=(x0, y0, x1, y1), mode='fill' | 'clone', feather=px,
+    op = dict(box=(x0, y0, x1, y1), mode='fill' | 'clone' | 'heal', feather=px,
               sample=(x0, y0, x1, y1)  # fill: median colour of this area (default: a ring round box)
               color=(r, g, b)          # fill: explicit 0..255 colour instead
-              dx=, dy=                 # clone: copy from box shifted by (dx, dy)
-              lum=(lo, hi))            # only touch pixels whose 0..255 luminance is in [lo, hi]
+              dx=, dy=                 # clone: copy from box shifted by (dx, dy); heal: take only the
+                                       # fine grain from there, shading from the box's surroundings
+              lum=(lo, hi))            # only touch pixels whose 0..255 luminance is in [lo, hi];
+                                       # fill colour then defaults to the box's other pixels
+              side=((ax, ay), (bx, by)))  # only touch pixels left of the line a->b
     """
     box = op['box']
     feather = op.get('feather', 3)
@@ -179,16 +215,33 @@ def paint(arr, op):
         lo, hi = op['lum']
         L = _lum(sub) * 255
         m = m * ((L >= lo) & (L <= hi))
-    if op.get('mode', 'fill') == 'clone':
+    if op.get('side'):  # keep to the left of the line a->b (image coords, y down)
+        (ax, ay), (bx, by) = op['side']
+        ys = np.arange(Y0, Y1)[:, None] + 0.5
+        xs = np.arange(X0, X1)[None, :] + 0.5
+        m = m * (((bx - ax) * (ys - ay) - (by - ay) * (xs - ax)) > 0)
+    mode = op.get('mode', 'fill')
+    if mode == 'clone':
         dx, dy = op['dx'], op['dy']
         src = arr[Y0 + dy:Y1 + dy, X0 + dx:X1 + dx, :3].copy()
         assert src.shape == sub.shape, ('clone source out of the texture', op)
+    elif mode == 'heal':  # shading from the box's surroundings, cloth grain from (dx, dy)
+        dx, dy = op['dx'], op['dy']
+        r = op.get('grain', 12)
+        grain = arr[Y0 + dy - r:Y1 + dy + r, X0 + dx - r:X1 + dx + r, :3]
+        assert grain.shape[:2] == (Y1 - Y0 + 2 * r, X1 - X0 + 2 * r), ('heal source out of the texture', op)
+        detail = (grain - _blur(grain, r))[r:-r, r:-r]
+        src = np.clip(_coons(arr, (X0, Y0, X1, Y1)) + detail, 0, 1)
     else:
         if 'color' in op:
             c = np.array(op['color'], np.float32) / 255
         elif 'sample' in op:
             sx0, sy0, sx1, sy1 = op['sample']
             c = np.median(arr[sy0:sy1, sx0:sx1, :3].reshape(-1, 3), axis=0)
+        elif op.get('lum'):  # the pixels left alone inside the box are the background
+            Lb = _lum(arr[y0:y1, x0:x1, :3]) * 255
+            out = (Lb < lo) | (Lb > hi)
+            c = np.median(arr[y0:y1, x0:x1, :3][out], axis=0)
         else:
             c = ring_median(arr[..., :3], box, width=max(3, f + 2))
         src = np.broadcast_to(c, sub.shape)

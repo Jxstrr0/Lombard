@@ -17,7 +17,7 @@ export const UPGRADES: readonly UpgradeDef[] = [
     name: 'Acid test kit',
     blurb: 'Touchstone, needle and nitric acid. Tells gold from plate, scratch by scratch.',
     cost: u.cost.acid_kit,
-    effects: { unlockTool: 'acid', toolCategories: ['gold', 'coins'], acidCharges: u.acidKitCharges },
+    effects: { unlockTool: 'acid', toolCategories: ['gold', 'coins', 'silver'], acidCharges: u.acidKitCharges },
   },
   {
     id: 'reference_2',

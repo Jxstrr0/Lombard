@@ -19,6 +19,8 @@ export const CATEGORIES = [
   'sports',
   'antiques',
   'luxury',
+  // M6 wave A
+  'silver',
 ] as const
 export const Category = z.enum(CATEGORIES)
 export type Category = z.infer<typeof Category>
@@ -96,6 +98,31 @@ export const PLACEHOLDER_MODELS = [
   'laptop',
   // M5
   'icon',
+  // M6 wave A: code-drawn instruments, tools, silver and antiques (src/render/itemsWaveA.ts)
+  'accordion',
+  'balalaika',
+  'guitar',
+  'eguitar',
+  'violin',
+  'trumpet',
+  'saxophone',
+  'grinder',
+  'perforator',
+  'chainsaw',
+  'socketset',
+  'sewing',
+  'spoons',
+  'glassholder',
+  'cups',
+  'beads',
+  'brooch',
+  'cabochon',
+  'samovar',
+  'figurine',
+  'vase',
+  'gramophone',
+  /** A box of `model.size`, shown while a CC0 glb loads (art/items/cc0.json); the glb is its own raycast proxy. */
+  'block',
 ] as const
 
 const HexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/)
@@ -116,6 +143,8 @@ export const ItemModel = z.object({
   ribbon: z.array(HexColor).min(1).optional(),
   /** Which relief/print a medal or coin placeholder draws (free-form key, see src/render/items.ts). */
   emblem: z.string().optional(),
+  /** M6: the `block` placeholder's size, metres (x, y, z in item coordinates). */
+  size: z.tuple([z.number().positive(), z.number().positive(), z.number().positive()]).optional(),
   /** Camera distance in inspect mode, metres. */
   inspectDistance: z.number().positive(),
   hotspots: z.array(Hotspot).default([]),

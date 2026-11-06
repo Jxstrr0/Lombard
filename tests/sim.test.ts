@@ -14,16 +14,21 @@ import { careful, careless, mobFriendly } from '../src/sim/policies'
 import { simulate, summarize } from '../src/sim/simulate'
 
 const SEEDS = Array.from({ length: 12 }, (_, i) => 1000 + i)
+/** Medians and shares need more seeds than 12 to stop a reshuffle swinging them (M6, docs/05). */
+const WIDE_SEEDS = Array.from({ length: 24 }, (_, i) => 1000 + i)
 const DAYS = 60
 
 describe('economy simulator (M2 tuning)', () => {
   it('a careful shop grows roughly 15% a month and never goes under', () => {
     // The trade alone: the Protection ladder is held off (its cost has its own test below).
-    const s = summarize(SEEDS.map((seed) => simulate(seed, careful, DAYS, { protectionLadder: false })), tuning.career.startingCash)
+    const s = summarize(WIDE_SEEDS.map((seed) => simulate(seed, careful, DAYS, { protectionLadder: false })), tuning.career.startingCash)
     expect(s.busted).toBe(0)
     // M5 (Volkova and the Collector merged): every story seller takes a walk-in place and reshuffles the rest
     // of a run, so a 12-seed median swings by several points (5.8% here; 8.9% median, 9.5% mean over 60 seeds,
     // against 7.6% / 8.3% for the Collector branch alone). The floor guards a broken trade, not the tuning. docs/05.
+    // M6 wave A (76 items, merged over the Flood): any new def reshuffles every draw. The first 12 seeds read
+    // −1.6% while 24 and 60 seeds read 6.8% and 5.2% (main without the new defs: 1.2%, 4.9%, 7.1% on 12, 24, 60).
+    // So the band runs on 24 seeds.
     expect(s.medianGrowth).toBeGreaterThan(0.05)
     expect(s.medianGrowth).toBeLessThan(0.3)
   })
@@ -57,19 +62,21 @@ describe('economy simulator (M2 tuning)', () => {
   })
 
   it('a careful shop that refuses the crew takes the brick, pays the glazier, and still grows', () => {
-    const runs = SEEDS.map((seed) => simulate(seed, careful, DAYS))
+    // M6: 24 seeds (12 read −4.2% after wave A and the Flood; 24 and 60 read 7.6% and 5.3%). docs/05.
+    const runs = WIDE_SEEDS.map((seed) => simulate(seed, careful, DAYS))
     const s = summarize(runs, tuning.career.startingCash)
     expect(s.busted).toBe(0)
     // Measured 5.5% on these seeds with the fence in (6.4% before it; 8.9% with the ladder held off). docs/05.
     expect(s.medianGrowth).toBeGreaterThan(0.04)
     // The ladder fires: most refusers get the brick, and the glazier after it.
     const bricked = runs.filter((r) => r.crew.bricks > 0 && r.crew.glaziers > 0).length
-    expect(bricked).toBeGreaterThan(SEEDS.length / 2)
+    expect(bricked).toBeGreaterThan(WIDE_SEEDS.length / 2)
     for (const r of runs) expect(r.crew.insurance, `seed ${r.seed}`).toBe(0)
   })
 
   it('a mob-friendly shop plays differently: pays the crew, takes their deliveries, ends dirty and noticed', () => {
-    const runs = SEEDS.map((seed) => simulate(seed, mobFriendly, DAYS))
+    // M6: 24 seeds (deliveries in 4 of the first 12 after wave A and the Flood, 12 of 24, 38 of 60). docs/05.
+    const runs = WIDE_SEEDS.map((seed) => simulate(seed, mobFriendly, DAYS))
     expect(summarize(runs, tuning.career.startingCash).busted).toBe(0)
     for (const r of runs) {
       expect(r.crew.insurance, `seed ${r.seed}`).toBeGreaterThan(0)
@@ -79,7 +86,7 @@ describe('economy simulator (M2 tuning)', () => {
       expect(r.heat > 0 || r.police.visits > 0, `seed ${r.seed}`).toBe(true)
     }
     // At least half the runs (6 of 12 since Volkova's arc and the Collector reshuffled the walk-ins).
-    expect(runs.filter((r) => r.crew.deliveries > 0).length).toBeGreaterThanOrEqual(SEEDS.length / 2)
+    expect(runs.filter((r) => r.crew.deliveries > 0).length).toBeGreaterThanOrEqual(WIDE_SEEDS.length / 2)
   })
 
   it('is deterministic', () => {

@@ -1,0 +1,1802 @@
+[
+  {
+    "id": "accordion_brunnhofer",
+    "category": "instruments",
+    "name": "Brunnhofer 120-bass accordion",
+    "brand": "Brunnhofer",
+    "era": "1970s–1980s, GDR",
+    "baseValue": {
+      "min": 45000,
+      "max": 75000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 10500,
+      "tolerance": 420.0
+    },
+    "magnetic": true,
+    "rarity": 0.25,
+    "fakeChance": 0.35,
+    "tells": [
+      {
+        "id": "badge",
+        "tool": "loupe",
+        "finding": "The BRUNNHOFER letters are separate metal pieces, pinned through the grille, each edge crisp.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.25,
+        "hotspot": "grille"
+      },
+      {
+        "id": "reeds",
+        "tool": "loupe",
+        "finding": "Through the grille: hand-filed steel reeds, each stamped with a tiny crown and a pitch letter.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "grille"
+      },
+      {
+        "id": "keys",
+        "tool": "loupe",
+        "finding": "The keys are yellowed evenly, one or two with a chip at the front edge. Years of honest playing.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "keys"
+      },
+      {
+        "id": "bellows",
+        "tool": "loupe",
+        "finding": "The bellows corners are worn soft but the tape holds; no light shows through the folds.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "bellows"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "The scale groans. Over ten kilos of wood, steel and celluloid.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_reeds",
+        "tool": "magnet",
+        "finding": "The magnet tugs through the grille at the reed blocks. Steel reeds, as there should be.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "grille"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "chinese_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 3,
+        "tells": [
+          {
+            "id": "badge",
+            "tool": "loupe",
+            "finding": "The badge is one stamped plate painted to look like letters. The second N is a little narrower.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "grille"
+          },
+          {
+            "id": "reeds",
+            "tool": "loupe",
+            "finding": "Through the grille: machine-punched reeds on plastic-looking blocks, no stamps at all.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "grille"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Lighter than it looks. The scale barely complains.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          },
+          {
+            "id": "bass",
+            "tool": "loupe",
+            "finding": "Tiny moulded characters under one bass button, the plastic shiny where it should be worn.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.55,
+            "hotspot": "bass"
+          }
+        ],
+        "weightFactor": 0.82
+      },
+      {
+        "id": "recelluloided",
+        "kind": "restored",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "keys",
+            "tool": "loupe",
+            "finding": "The keys are white and flawless, far whiter than the yellowed buttons on the bass side.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "keys"
+          },
+          {
+            "id": "shell",
+            "tool": "loupe",
+            "finding": "The shell gleams like new, but the grille screws are old and burred from many openings.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.5,
+            "hotspot": "grille"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "German, proper German, from the GDR. My father played it at every wedding in the district.",
+      "A Brunnhofer, a hundred and twenty basses. You won’t find a better one in Mostograd.",
+      "The music school wanted it, but they can’t pay. You can.",
+      "I bought it for my son. He wants a computer now."
+    ],
+    "model": {
+      "placeholder": "accordion",
+      "color": "#7a1f2b",
+      "scale": 1,
+      "rest": "flat",
+      "emblem": "piano",
+      "inspectDistance": 1.0,
+      "hotspots": [
+        {
+          "id": "grille",
+          "label": "Treble grille and badge",
+          "position": [
+            -0.105,
+            0.08,
+            0.093
+          ]
+        },
+        {
+          "id": "keys",
+          "label": "Keyboard",
+          "position": [
+            -0.165,
+            -0.05,
+            0.1
+          ]
+        },
+        {
+          "id": "bellows",
+          "label": "Bellows",
+          "position": [
+            -0.03,
+            0.0,
+            0.088
+          ]
+        },
+        {
+          "id": "bass",
+          "label": "Bass buttons",
+          "position": [
+            0.14,
+            0.0,
+            0.091
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "bayan_prizyv",
+    "category": "instruments",
+    "name": "Prizyv concert bayan",
+    "brand": "Prizyv",
+    "era": "1980s",
+    "baseValue": {
+      "min": 25000,
+      "max": 40000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 9500,
+      "tolerance": 380.0
+    },
+    "magnetic": true,
+    "rarity": 0.3,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "badge",
+        "tool": "loupe",
+        "finding": "The PRIZYV badge is cast and screwed on, the factory’s star worn smooth by a thumb.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.25,
+        "hotspot": "grille"
+      },
+      {
+        "id": "buttons",
+        "tool": "loupe",
+        "finding": "Five rows of buttons, polished by fingers in the middle rows, matt at the edges.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "buttons"
+      },
+      {
+        "id": "stamp",
+        "tool": "loupe",
+        "finding": "Inside the strap, an ink stamp: the factory, a quality-control number and a price in Soviet roubles.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "strap"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Heavy, solid, a working instrument. Nine and a half kilos or so.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_reeds",
+        "tool": "magnet",
+        "finding": "The magnet clings at the reed blocks behind the grille. Steel reeds inside.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "grille"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "dead_reeds",
+        "kind": "restored",
+        "valueMultiplier": 0.55,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "stamp",
+            "tool": "loupe",
+            "finding": "The strap is new leather, and the old factory stamp is gone. Somebody has been inside.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "strap"
+          },
+          {
+            "id": "bellows",
+            "tool": "loupe",
+            "finding": "Fresh glue at the bellows frame, and the wax on the reed blocks looks a few months old.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "bellows"
+          }
+        ]
+      },
+      {
+        "id": "garmon_parts",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "badge",
+            "tool": "loupe",
+            "finding": "The badge sits over two older screw holes. It was moved here from another case.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "grille"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Lighter than a concert bayan ought to be. Fewer reeds inside, perhaps.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35
+          }
+        ],
+        "weightFactor": 0.85
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "Concert bayan, Tula work. It played on the radio once, my grandfather swore.",
+      "Grandad led the factory choir with this. Nobody plays it now.",
+      "All the buttons work. I checked them all this morning."
+    ],
+    "model": {
+      "placeholder": "accordion",
+      "color": "#1d1d22",
+      "scale": 1.05,
+      "rest": "flat",
+      "inspectDistance": 1.0,
+      "hotspots": [
+        {
+          "id": "grille",
+          "label": "Treble grille and badge",
+          "position": [
+            -0.105,
+            0.08,
+            0.093
+          ]
+        },
+        {
+          "id": "buttons",
+          "label": "Treble buttons",
+          "position": [
+            -0.17,
+            -0.04,
+            0.098
+          ]
+        },
+        {
+          "id": "bellows",
+          "label": "Bellows",
+          "position": [
+            -0.03,
+            0.0,
+            0.088
+          ]
+        },
+        {
+          "id": "strap",
+          "label": "Back and strap",
+          "position": [
+            0.15,
+            0.0,
+            -0.09
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "garmon_tulyak",
+    "category": "instruments",
+    "name": "Tulyak garmon",
+    "brand": "Tulyak",
+    "era": "1970s",
+    "baseValue": {
+      "min": 6000,
+      "max": 10000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 4200,
+      "tolerance": 168.0
+    },
+    "magnetic": true,
+    "rarity": 0.3,
+    "fakeChance": 0.2,
+    "tells": [
+      {
+        "id": "badge",
+        "tool": "loupe",
+        "finding": "A small TULYAK plate, the paint in the letters faded but all there.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.25,
+        "hotspot": "grille"
+      },
+      {
+        "id": "bellows",
+        "tool": "loupe",
+        "finding": "Red paper bellows with flowers, rubbed pale at the corners. It has seen many dances.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "bellows"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Around four kilos. Light enough to play standing on a table, as intended.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_reeds",
+        "tool": "magnet",
+        "finding": "The magnet clings faintly at the grille. Steel reeds inside.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "grille"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "souvenir",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "badge",
+            "tool": "loupe",
+            "finding": "The plate is a sticker with a printed shine. It lifts at one corner.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "grille"
+          },
+          {
+            "id": "buttons",
+            "tool": "loupe",
+            "finding": "The buttons are hollow plastic, glued on. Two of them wobble.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "buttons"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light. Too light for a working garmon.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.7
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "A garmon from the village. Grandad played it at every wedding till the vodka ran out.",
+      "Tulyak, the proper one. You can play it at a dacha party, it’s loud.",
+      "My uncle left it to me. I can’t play a note."
+    ],
+    "model": {
+      "placeholder": "accordion",
+      "color": "#2a3f2a",
+      "scale": 0.72,
+      "rest": "flat",
+      "inspectDistance": 0.78,
+      "hotspots": [
+        {
+          "id": "grille",
+          "label": "Badge and grille",
+          "position": [
+            -0.105,
+            0.08,
+            0.093
+          ]
+        },
+        {
+          "id": "buttons",
+          "label": "Buttons",
+          "position": [
+            -0.17,
+            -0.04,
+            0.098
+          ]
+        },
+        {
+          "id": "bellows",
+          "label": "Bellows",
+          "position": [
+            -0.03,
+            0.0,
+            0.088
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "balalaika_lukomorye",
+    "category": "instruments",
+    "name": "Lukomorye prima balalaika",
+    "brand": "Lukomorye",
+    "era": "1960s–1980s",
+    "baseValue": {
+      "min": 3500,
+      "max": 6000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 850,
+      "tolerance": 34.0
+    },
+    "magnetic": true,
+    "rarity": 0.4,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "Through the hole, a paper label: LUKOMORYE, a factory number and a pencilled grade.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "rosette"
+      },
+      {
+        "id": "staves",
+        "tool": "loupe",
+        "finding": "The back is seven staves of maple, the joints tight under the varnish.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "back"
+      },
+      {
+        "id": "frets",
+        "tool": "loupe",
+        "finding": "Brass frets, the first five worn into little dips. Somebody played it a lot.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "frets"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Light and lively in the pan, under a kilo.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_strings",
+        "tool": "magnet",
+        "finding": "The magnet catches the strings and the tuning pegs, nothing else.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "frets"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "souvenir",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "No label inside. Just raw plywood and a drip of glue.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "rosette"
+          },
+          {
+            "id": "staves",
+            "tool": "loupe",
+            "finding": "The back is one piece of moulded plywood, the stave lines painted on.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "back"
+          },
+          {
+            "id": "bridge",
+            "tool": "loupe",
+            "finding": "The bridge is glued to the top. It can’t even be moved to tune.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.5,
+            "hotspot": "bridge"
+          }
+        ],
+        "weightFactor": 1.15
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "A proper balalaika, concert grade. My mother played in the folk orchestra.",
+      "Lukomorye, Soviet factory. Not the tourist rubbish they sell on the embankment.",
+      "My daughter took lessons for a year. Then she found boys."
+    ],
+    "model": {
+      "placeholder": "balalaika",
+      "color": "#c9893e",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 1.4,
+      "hotspots": [
+        {
+          "id": "rosette",
+          "label": "Sound hole",
+          "position": [
+            0,
+            -0.165,
+            0.0125
+          ]
+        },
+        {
+          "id": "frets",
+          "label": "Frets and neck",
+          "position": [
+            0,
+            0.1,
+            0.0095
+          ]
+        },
+        {
+          "id": "bridge",
+          "label": "Bridge",
+          "position": [
+            0,
+            -0.29,
+            0.016
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Staved back",
+          "position": [
+            0,
+            -0.2,
+            -0.045
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "guitar_strunovo_7",
+    "category": "instruments",
+    "name": "Strunovo seven-string guitar",
+    "brand": "Strunovo",
+    "era": "1980s",
+    "baseValue": {
+      "min": 2500,
+      "max": 4500
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 1900,
+      "tolerance": 76.0
+    },
+    "magnetic": true,
+    "rarity": 0.5,
+    "fakeChance": 0.15,
+    "tells": [
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "Inside: a Strunovo label with a price of 26 roubles printed in the corner.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "soundhole"
+      },
+      {
+        "id": "neck",
+        "tool": "loupe",
+        "finding": "The neck has a slight bow. The action is high, but it plays.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "neck"
+      },
+      {
+        "id": "bridge",
+        "tool": "loupe",
+        "finding": "A tie bridge with seven holes, original, the varnish under it unbroken.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "bridge"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Not quite two kilos. A plain Soviet spruce top.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_strings",
+        "tool": "magnet",
+        "finding": "The magnet catches the strings and the frets. Steel strings, as on all of these.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "neck"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cracked_top",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "top",
+            "tool": "loupe",
+            "finding": "A long crack beside the hole, glued and filled. The filler is a shade darker than the spruce.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "soundhole"
+          },
+          {
+            "id": "bridge",
+            "tool": "loupe",
+            "finding": "The bridge has been reglued, a smear of glue still at its edge.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.5,
+            "hotspot": "bridge"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "A seven-string, the old Russian kind. For romances by the fire.",
+      "My father sang bard songs on this in the kitchen. Every single one.",
+      "It just needs new strings. And maybe someone who can play."
+    ],
+    "model": {
+      "placeholder": "guitar",
+      "color": "#b0703a",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 2.0,
+      "hotspots": [
+        {
+          "id": "soundhole",
+          "label": "Sound hole",
+          "position": [
+            0,
+            -0.17,
+            0.0505
+          ]
+        },
+        {
+          "id": "bridge",
+          "label": "Bridge",
+          "position": [
+            0,
+            -0.39,
+            0.054
+          ]
+        },
+        {
+          "id": "neck",
+          "label": "Neck",
+          "position": [
+            0,
+            0.16,
+            0.045
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Back",
+          "position": [
+            0,
+            -0.25,
+            -0.05
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "guitar_zvezdny_e",
+    "category": "instruments",
+    "name": "Zvezdny Tornado electric guitar",
+    "brand": "Zvezdny",
+    "era": "1990s",
+    "baseValue": {
+      "min": 9000,
+      "max": 16000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 3600,
+      "tolerance": 144.0
+    },
+    "magnetic": true,
+    "rarity": 0.3,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "serial",
+        "tool": "loupe",
+        "finding": "The neck plate is stamped with a serial and the Zvezdny star, the screws factory-black.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "neckplate"
+      },
+      {
+        "id": "pickups",
+        "tool": "loupe",
+        "finding": "Two pickups with the same logo, their covers worn the same matt grey.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "pickups"
+      },
+      {
+        "id": "head",
+        "tool": "loupe",
+        "finding": "The headstock logo is a decal under the clear coat, a little dinged at the tip.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "head"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "A solid body. Over three and a half kilos.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_pickups",
+        "tool": "magnet",
+        "finding": "The magnet snaps to the pickups, as it would on any electric guitar.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "pickups"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "pickup_swap",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.6,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "pickups",
+            "tool": "loupe",
+            "finding": "One pickup is shiny and new, unbranded. The other is the old matt one.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "pickups"
+          },
+          {
+            "id": "controls",
+            "tool": "loupe",
+            "finding": "Fresh solder under the knobs, and one pot of a different make.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.55,
+            "hotspot": "controls"
+          }
+        ]
+      },
+      {
+        "id": "copy_neck",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "serial",
+            "tool": "loupe",
+            "finding": "The neck plate is blank. Where the star should be, a smear of chrome.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "neckplate"
+          },
+          {
+            "id": "head",
+            "tool": "loupe",
+            "finding": "The headstock logo sits on top of the clear coat, and a corner is lifting.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "head"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for a solid body. Plywood, probably.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35
+          }
+        ],
+        "weightFactor": 0.8
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "Played in a band in the nineties. We opened for somebody famous once.",
+      "Zvezdny Tornado, everyone wanted one back then. Plug it in, it screams.",
+      "My son’s. He moved to Petersburg and left it under the bed."
+    ],
+    "model": {
+      "placeholder": "eguitar",
+      "color": "#b5231e",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 2.0,
+      "hotspots": [
+        {
+          "id": "pickups",
+          "label": "Pickups",
+          "position": [
+            0,
+            -0.17,
+            0.029
+          ]
+        },
+        {
+          "id": "controls",
+          "label": "Knobs",
+          "position": [
+            0.07,
+            -0.33,
+            0.034
+          ]
+        },
+        {
+          "id": "head",
+          "label": "Headstock",
+          "position": [
+            0,
+            0.43,
+            0.0135
+          ]
+        },
+        {
+          "id": "neckplate",
+          "label": "Neck plate",
+          "position": [
+            0,
+            -0.08,
+            -0.0225
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "violin_guarnaccia",
+    "category": "instruments",
+    "name": "Old German violin, “Guarnaccia” label",
+    "brand": "Guarnaccia",
+    "era": "c. 1900, Saxony",
+    "baseValue": {
+      "min": 25000,
+      "max": 45000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 450,
+      "tolerance": 18.0
+    },
+    "magnetic": false,
+    "rarity": 0.25,
+    "fakeChance": 0.4,
+    "tells": [
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "Through the f-hole: “Guarnaccia, Cremona” on browned paper. The kind of label a whole town of workshops used.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "fholes"
+      },
+      {
+        "id": "varnish",
+        "tool": "loupe",
+        "finding": "Deep amber varnish, worn through to the wood where a chin rested for a century.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "chinrest"
+      },
+      {
+        "id": "back",
+        "tool": "loupe",
+        "finding": "A two-piece maple back with a strong flame, and old wear on the edges and corners.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "back"
+      },
+      {
+        "id": "scroll",
+        "tool": "loupe",
+        "finding": "The scroll is carved deep and slightly crooked, by hand, not by machine.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.5,
+        "hotspot": "scroll"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Feather-light, as an old violin should be.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Nothing pulls but the fine tuner on the tailpiece.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "chinrest"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "modern_aged",
+        "kind": "fake",
+        "valueMultiplier": 0.15,
+        "weight": 3,
+        "tells": [
+          {
+            "id": "varnish",
+            "tool": "loupe",
+            "finding": "The wear is sanded on: even scratches, all one direction, and fresh wood under the dirt.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "chinrest"
+          },
+          {
+            "id": "scroll",
+            "tool": "loupe",
+            "finding": "The scroll is perfectly symmetrical, with fine machine-cut ridges in the turns.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.5,
+            "hotspot": "scroll"
+          },
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "The label’s paper is stained with tea, but the print is laser-sharp.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "fholes"
+          }
+        ],
+        "weightFactor": 1.15
+      },
+      {
+        "id": "cracked_regraduated",
+        "kind": "restored",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "back",
+            "tool": "loupe",
+            "finding": "A soundpost crack on the back, cleated and touched up. Good work, but it is there.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "back"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "An Italian violin, look at the label: Cremona. It came from my great-grandmother.",
+      "My grandfather played it in the theatre orchestra before the war.",
+      "A man at the conservatory said it could be very valuable. He didn’t say how valuable."
+    ],
+    "model": {
+      "placeholder": "violin",
+      "color": "#8a3e18",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.75,
+      "hotspots": [
+        {
+          "id": "fholes",
+          "label": "F-holes and label",
+          "position": [
+            0.036,
+            -0.13,
+            0.0325
+          ]
+        },
+        {
+          "id": "scroll",
+          "label": "Scroll",
+          "position": [
+            0,
+            0.28,
+            0.0
+          ]
+        },
+        {
+          "id": "chinrest",
+          "label": "Chinrest",
+          "position": [
+            0.03,
+            -0.29,
+            0.03
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Back",
+          "position": [
+            0,
+            -0.1,
+            -0.032
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "violin_mostinstrument",
+    "category": "instruments",
+    "name": "Mostinstrument student violin, 3/4",
+    "brand": "Mostinstrument",
+    "era": "1980s",
+    "baseValue": {
+      "min": 2000,
+      "max": 4000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 380,
+      "tolerance": 15.0
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.1,
+    "tells": [
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "Inside: a printed MOSTINSTRUMENT label, size 3/4, and a factory stamp.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "fholes"
+      },
+      {
+        "id": "varnish",
+        "tool": "loupe",
+        "finding": "Thick orange varnish with rosin dust baked into it under the strings.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "chinrest"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Very light. A child’s instrument.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Only the fine tuners pull at the magnet.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "chinrest"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "cracked",
+        "kind": "restored",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "top",
+            "tool": "loupe",
+            "finding": "A crack runs from the f-hole, glued shut and varnished over in a darker orange.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "fholes"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "My granddaughter outgrew it. Three years of music school, then ballet.",
+      "Mostinstrument, a factory one. Good for learning, the teacher said."
+    ],
+    "model": {
+      "placeholder": "violin",
+      "color": "#b5531c",
+      "scale": 0.93,
+      "rest": "flat",
+      "inspectDistance": 0.7,
+      "hotspots": [
+        {
+          "id": "fholes",
+          "label": "F-holes and label",
+          "position": [
+            0.036,
+            -0.13,
+            0.0325
+          ]
+        },
+        {
+          "id": "scroll",
+          "label": "Scroll",
+          "position": [
+            0,
+            0.28,
+            0.0
+          ]
+        },
+        {
+          "id": "chinrest",
+          "label": "Chinrest",
+          "position": [
+            0.03,
+            -0.29,
+            0.03
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Back",
+          "position": [
+            0,
+            -0.1,
+            -0.032
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "trumpet_fanfara",
+    "category": "instruments",
+    "name": "Fanfara B-flat trumpet",
+    "brand": "Fanfara",
+    "era": "1980s",
+    "baseValue": {
+      "min": 4000,
+      "max": 7000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 1050,
+      "tolerance": 42.0
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.2,
+    "tells": [
+      {
+        "id": "engraving",
+        "tool": "loupe",
+        "finding": "On the bell, FANFARA engraved by hand among some scrolls, and a serial underneath.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "bell"
+      },
+      {
+        "id": "valves",
+        "tool": "loupe",
+        "finding": "The valves are worn bright where fingers rubbed. They still move when pressed.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.45,
+        "hotspot": "valves"
+      },
+      {
+        "id": "lacquer",
+        "tool": "loupe",
+        "finding": "The lacquer is gone in patches; the brass beneath is brown and spotted.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "buttons"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Around a kilo. Brass all through.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_brass",
+        "tool": "magnet",
+        "finding": "The magnet slides off everywhere. Brass, as it should be.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "valves"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "stuck_dented",
+        "kind": "restored",
+        "valueMultiplier": 0.5,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "bell",
+            "tool": "loupe",
+            "finding": "The bell has been beaten out from a dent; ripples still show in the light.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "bell"
+          },
+          {
+            "id": "valves",
+            "tool": "loupe",
+            "finding": "The second valve sticks halfway down. Somebody tried to free it with pliers.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "valves"
+          }
+        ]
+      },
+      {
+        "id": "steel_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "engraving",
+            "tool": "loupe",
+            "finding": "The engraving is stamped, flat and shallow. No serial at all.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "bell"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Heavier than brass should make it.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 1.2,
+        "magnetic": true
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "From the army band. I played at parades, then at funerals. More funerals.",
+      "Fanfara, Soviet brass. The sound is still there, believe me.",
+      "My son was going to be a jazzman. He’s an accountant now."
+    ],
+    "model": {
+      "placeholder": "trumpet",
+      "color": "#d6b062",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 1.05,
+      "hotspots": [
+        {
+          "id": "bell",
+          "label": "Bell",
+          "position": [
+            0.228,
+            0.03,
+            0.0
+          ]
+        },
+        {
+          "id": "valves",
+          "label": "Valves",
+          "position": [
+            -0.006,
+            0.01,
+            0.009
+          ]
+        },
+        {
+          "id": "buttons",
+          "label": "Valve buttons",
+          "position": [
+            -0.006,
+            0.075,
+            0.0
+          ]
+        },
+        {
+          "id": "mouthpiece",
+          "label": "Mouthpiece",
+          "position": [
+            -0.23,
+            0.0,
+            0.008
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "saxophone_marcellin",
+    "category": "instruments",
+    "name": "Marcellin alto saxophone",
+    "brand": "Marcellin",
+    "era": "1970s, France",
+    "baseValue": {
+      "min": 70000,
+      "max": 120000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 2400,
+      "tolerance": 96.0
+    },
+    "magnetic": false,
+    "rarity": 0.15,
+    "fakeChance": 0.55,
+    "tells": [
+      {
+        "id": "engraving",
+        "tool": "loupe",
+        "finding": "Deep hand engraving on the bell: flowers, the Marcellin name, “Paris”, and a six-digit serial.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "bell"
+      },
+      {
+        "id": "pads",
+        "tool": "loupe",
+        "finding": "The pads are old leather, dark and hardened, a few with resonators missing.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.45,
+        "hotspot": "keys"
+      },
+      {
+        "id": "keys",
+        "tool": "loupe",
+        "finding": "Mother-of-pearl key touches with their own wear, each cupped by a fingertip.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "keys"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Around two and a half kilos. Dense brass.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_brass",
+        "tool": "magnet",
+        "finding": "The magnet finds only the tiny springs under the keys.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "keys"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "chinese_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.1,
+        "weight": 3,
+        "tells": [
+          {
+            "id": "engraving",
+            "tool": "loupe",
+            "finding": "The engraving is machine-cut and shallow, the same flower repeated. No serial at all.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "bell"
+          },
+          {
+            "id": "keys",
+            "tool": "loupe",
+            "finding": "The key touches are white plastic, and the lacquer is flawless gold everywhere.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "keys"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for an alto. Thinner brass than it ought to be.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35
+          }
+        ],
+        "weightFactor": 0.82
+      },
+      {
+        "id": "relacquered",
+        "kind": "restored",
+        "valueMultiplier": 0.55,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "engraving",
+            "tool": "loupe",
+            "finding": "The engraving is softened under a thick new lacquer, the edges rounded by buffing.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "bell"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "French, a Marcellin. Jazz people would kill for one. Not literally, I hope.",
+      "My father bought it from a Cuban sailor in the port in seventy-nine.",
+      "It played in the Golubka restaurant for twenty years."
+    ],
+    "model": {
+      "placeholder": "saxophone",
+      "color": "#c8a24e",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 1.5,
+      "hotspots": [
+        {
+          "id": "neck",
+          "label": "Neck and mouthpiece",
+          "position": [
+            -0.08,
+            0.34,
+            0.007
+          ]
+        },
+        {
+          "id": "keys",
+          "label": "Keys",
+          "position": [
+            0,
+            0.065,
+            0.026
+          ]
+        },
+        {
+          "id": "bell",
+          "label": "Bell",
+          "position": [
+            0.1,
+            -0.07,
+            0.06
+          ]
+        },
+        {
+          "id": "bow",
+          "label": "Bottom bow",
+          "position": [
+            0.04,
+            -0.3,
+            0.03
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "ukulele_pinaka",
+    "category": "instruments",
+    "name": "Kolo soprano ukulele",
+    "brand": "Kolo",
+    "era": "2010s",
+    "baseValue": {
+      "min": 2000,
+      "max": 3500
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 500,
+      "tolerance": 20.0
+    },
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.25,
+    "tells": [
+      {
+        "id": "logo",
+        "tool": "loupe",
+        "finding": "The KOLO logo is a neat inlay on the headstock, flush with the wood.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "headstock"
+      },
+      {
+        "id": "top",
+        "tool": "loupe",
+        "finding": "A solid mahogany top: the grain runs straight through at the edge of the hole.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "soundhole"
+      },
+      {
+        "id": "bridge",
+        "tool": "loupe",
+        "finding": "The bridge is clean, the saddle bone. Nylon strings, a little stretched.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.35,
+        "hotspot": "bridge"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Half a kilo. Light as a toy, but tight.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Only the tuner gears pull at the magnet.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "headstock"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "toy_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "logo",
+            "tool": "loupe",
+            "finding": "The logo is a printed sticker under the varnish, slightly crooked.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "headstock"
+          },
+          {
+            "id": "top",
+            "tool": "loupe",
+            "finding": "At the edge of the hole you can see layers: plywood with a photo veneer.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "soundhole"
+          }
+        ],
+        "weightFactor": 0.9
+      }
+    ],
+    "demandTags": [
+      "instruments"
+    ],
+    "claims": [
+      "I bought it to learn songs from the internet. I learned one.",
+      "Kolo, a good make. It was a birthday present, still nearly new.",
+      "My girlfriend’s. Ex-girlfriend’s."
+    ],
+    "model": {
+      "glb": "ukulele_pinaka.glb",
+      "placeholder": "block",
+      "color": "#9a5a2a",
+      "scale": 1,
+      "rest": "flat",
+      "size": [
+        0.1779,
+        0.527,
+        0.0509
+      ],
+      "inspectDistance": 1.16,
+      "hotspots": [
+        {
+          "id": "headstock",
+          "label": "Headstock",
+          "position": [
+            -0.0024,
+            0.2344,
+            0.0033
+          ]
+        },
+        {
+          "id": "neck",
+          "label": "Neck",
+          "position": [
+            -0.0024,
+            0.1136,
+            0.0209
+          ]
+        },
+        {
+          "id": "soundhole",
+          "label": "Sound hole",
+          "position": [
+            -0.0024,
+            -0.0971,
+            0.018
+          ]
+        },
+        {
+          "id": "bridge",
+          "label": "Bridge",
+          "position": [
+            -0.0024,
+            -0.2036,
+            0.0191
+          ]
+        }
+      ]
+    }
+  }
+]

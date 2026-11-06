@@ -24,7 +24,7 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
     name: 'Faina Gelfand',
     short: 'Faina',
     role: 'Jeweler, Sennaya arcade',
-    categories: ['gold', 'coins'],
+    categories: ['gold', 'coins', 'silver'],
     blurb: 'Forty years at the bench and quick as a knife. She always seems to know a buyer for the good pieces.',
     hello: '“Six calls a month. Don’t ring me after nine.”',
     lines: {
@@ -144,7 +144,7 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
     name: 'Zhenya Kroshkina',
     short: 'Zhenya',
     role: 'Repair kiosk, Rechnaya underpass',
-    categories: ['phones', 'cameras', 'electronics'],
+    categories: ['phones', 'cameras', 'electronics', 'tools'],
     blurb: 'Twenty-three, fixes phones in a kiosk the size of a wardrobe and answers on the first ring, mouth full. Cheap and fast. Sometimes a little too fast.',
     hello: '“Eight calls, yeah, fine. Just tell me the model, I’ll know.”',
     lines: {
@@ -166,6 +166,21 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
       lowball: [
         'Zhenya: “Last year’s model, nobody wants it. {lo}–{hi}. I’d take it for parts, honestly.”',
       ],
+    },
+    categoryLines: {
+      tools: {
+        sound: [
+          'Zhenya: “My dad has the same one. Proper motor, proper gears. {lo}–{hi}.”',
+          'Zhenya, over a drill whining somewhere: “Sounds like the proper one to me. {lo}–{hi}.”',
+        ],
+        redone: ['Zhenya: “Somebody rewound it or swapped the brushes. Runs, though. {lo}–{hi}.”'],
+        mixed: ['Zhenya: “Body’s one thing, battery’s another. Made of two. {lo}–{hi}.”'],
+        doubt: [
+          'Zhenya laughs: “That’s a market copy. Badge is right, the plastic isn’t. {lo}–{hi}, tops.”',
+          'Zhenya: “Nah. Wrong weight, wrong sticker. Don’t pay for the name. {lo}–{hi}.”',
+        ],
+        lowball: ['Zhenya: “Old model, builders don’t want those. {lo}–{hi}. My cousin might take it.”'],
+      },
     },
   },
 ].map((raw) => SpecialistDef.parse(raw))

@@ -40,6 +40,8 @@ const CATEGORY_LABEL: Record<string, string> = {
   phones: 'phones',
   cameras: 'cameras',
   electronics: 'electronics',
+  silver: 'silver & amber',
+  tools: 'tools',
 }
 
 /** Categories some item def belongs to (a specialist whose line never walks in yet says so). */

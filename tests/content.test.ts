@@ -40,9 +40,9 @@ const militariaTags = getItemDef('medal_for_courage').demandTags
 const goldTags = getItemDef('gold_earrings_583').demandTags
 
 describe('item defs (M2)', () => {
-  it('all 32 raw defs validate against the schema', () => {
+  it('all 76 raw defs validate against the schema', () => {
     const raw = Object.values(RAW_ITEM_FILES).flat()
-    expect(raw).toHaveLength(32)
+    expect(raw).toHaveLength(76)
     for (const r of raw) {
       const res = ItemDef.safeParse(r)
       expect(res.success, `${(r as { id: string }).id}: ${res.success ? '' : res.error.message}`).toBe(true)
@@ -80,7 +80,15 @@ describe('item defs (M2)', () => {
   it('medal and coin ribbons/emblems are only set on the shapes that draw them', () => {
     for (const def of ITEM_DEFS) {
       if (def.model.ribbon) expect(def.model.placeholder, def.id).toBe('medal')
-      if (def.model.emblem) expect(['medal', 'coin'], def.id).toContain(def.model.placeholder)
+      // M6: the accordion's keyboard, pearls on the beads, the electric samovar
+      if (def.model.emblem) expect(['medal', 'coin', 'accordion', 'beads', 'samovar'], def.id).toContain(def.model.placeholder)
+    }
+  })
+
+  it('a block placeholder (CC0 glb) carries its size and a glb; nothing else sets a size', () => {
+    for (const def of ITEM_DEFS) {
+      expect(Boolean(def.model.size), def.id).toBe(def.model.placeholder === 'block')
+      if (def.model.placeholder === 'block') expect(def.model.glb, def.id).toBe(`${def.id}.glb`)
     }
   })
 })

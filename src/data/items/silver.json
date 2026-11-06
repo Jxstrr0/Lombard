@@ -1,0 +1,1637 @@
+[
+  {
+    "id": "silver_spoons_875",
+    "category": "silver",
+    "name": "Six 875 silver teaspoons in a case",
+    "era": "1960s–1980s",
+    "baseValue": {
+      "min": 5000,
+      "max": 8000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 156,
+      "tolerance": 6.0
+    },
+    "magnetic": false,
+    "rarity": 0.8,
+    "fakeChance": 0.35,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "On each handle: 875 and a star assay mark, struck deep, with a tiny maker’s code.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "handle"
+      },
+      {
+        "id": "bowl",
+        "tool": "loupe",
+        "finding": "The bowls are worn thin at the tip by decades of stirring. A soft grey patina in the corners.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "bowl"
+      },
+      {
+        "id": "tip",
+        "tool": "loupe",
+        "finding": "The handle tips are engraved with a little ear of wheat, by hand: no two exactly alike.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "tip"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "About a hundred and fifty grams for the six. Dense, cool metal.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "The spoons ignore the magnet completely.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "handle"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_melchior",
+        "kind": "fake",
+        "valueMultiplier": 0.08,
+        "weight": 3,
+        "tells": [
+          {
+            "id": "hallmark",
+            "tool": "loupe",
+            "finding": "The handles say STERLING in Latin letters, then 875 below. No assay mark at all.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "handle"
+          },
+          {
+            "id": "bowl",
+            "tool": "loupe",
+            "finding": "At the tip of one bowl the silver has worn through to a yellowish metal.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "bowl"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "A touch light for six silver spoons.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.85
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "soviet"
+    ],
+    "claims": [
+      "Real silver, my mother kept them for guests. There weren’t any guests.",
+      "A christening present, six spoons. Look at the stamp.",
+      "They came from my grandmother’s sideboard. It’s my sideboard now, and I need the money."
+    ],
+    "model": {
+      "placeholder": "spoons",
+      "color": "#d4d6d8",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.3,
+      "hotspots": [
+        {
+          "id": "handle",
+          "label": "Handle and hallmark",
+          "position": [
+            0.0125,
+            0.03,
+            0.0025
+          ]
+        },
+        {
+          "id": "bowl",
+          "label": "Bowl",
+          "position": [
+            0.0125,
+            -0.045,
+            0.004
+          ]
+        },
+        {
+          "id": "tip",
+          "label": "Handle tip",
+          "position": [
+            -0.0375,
+            0.058,
+            0.0026
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "silver_glass_holder_875",
+    "category": "silver",
+    "name": "875 silver tea glass holder",
+    "era": "1950s",
+    "baseValue": {
+      "min": 6000,
+      "max": 10000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 110,
+      "tolerance": 4.0
+    },
+    "magnetic": false,
+    "rarity": 0.6,
+    "fakeChance": 0.35,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "Under the base: 875, a star and the assay office letter, crisp in the corner.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "base"
+      },
+      {
+        "id": "medallion",
+        "tool": "loupe",
+        "finding": "The medallion shows a river bridge and a steamer in relief, chased by hand, the rivets sharp.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "medallion"
+      },
+      {
+        "id": "rim",
+        "tool": "loupe",
+        "finding": "The rim has a small dent and old polish lines, the silver gone soft and warm with use.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "rim"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Over a hundred grams without the glass. Solid.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Nothing. Not even the handle rivet pulls.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "handle"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_melchior",
+        "kind": "fake",
+        "valueMultiplier": 0.1,
+        "weight": 3,
+        "tells": [
+          {
+            "id": "hallmark",
+            "tool": "loupe",
+            "finding": "Under the base, a cast “875” with no assay letter, and MNTs in tiny letters beside it.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "base"
+          },
+          {
+            "id": "rim",
+            "tool": "loupe",
+            "finding": "Where the rim is worn, the white skin has gone, and the metal underneath is yellowish.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "rim"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "A little light for silver this size.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.85
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "soviet"
+    ],
+    "claims": [
+      "From the trains, the old sleeper cars. My father was a conductor.",
+      "Silver, 875. My grandad drank tea from it every morning for forty years.",
+      "A retirement present from the factory. He never retired. He just stopped."
+    ],
+    "model": {
+      "placeholder": "glassholder",
+      "color": "#d4d6d8",
+      "scale": 1,
+      "rest": "upright",
+      "inspectDistance": 0.3,
+      "hotspots": [
+        {
+          "id": "medallion",
+          "label": "Medallion",
+          "position": [
+            0.0,
+            -0.005,
+            0.0355
+          ]
+        },
+        {
+          "id": "handle",
+          "label": "Handle",
+          "position": [
+            0.058,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "id": "base",
+          "label": "Underside",
+          "position": [
+            0.0,
+            -0.05,
+            0.0
+          ]
+        },
+        {
+          "id": "rim",
+          "label": "Rim",
+          "position": [
+            0.0,
+            0.031,
+            0.034
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "cigarette_case_silver_875",
+    "category": "silver",
+    "name": "875 silver cigarette case",
+    "era": "1950s",
+    "baseValue": {
+      "min": 10000,
+      "max": 16000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 160,
+      "tolerance": 6.0
+    },
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.35,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "Inside the lid by the clasp: 875 and a star, with the maker’s initials beside it.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "clasp"
+      },
+      {
+        "id": "engraving",
+        "tool": "loupe",
+        "finding": "Fine engine-turned lines across the lid, crisp even under years of pocket wear.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "engraving"
+      },
+      {
+        "id": "cartouche",
+        "tool": "loupe",
+        "finding": "A small cartouche engraved “To dear Kolya, 1957”. Gift pieces sell a little slower.",
+        "reveals": "provenance",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "cartouche"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Around a hundred and sixty grams. Solid silver, heavy in the hand.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Not even the hinge pin pulls at the magnet.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "clasp"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.08,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "hallmark",
+            "tool": "loupe",
+            "finding": "The 875 inside is cast, soft at the edges. The star beside it has five blunt points.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "clasp"
+          },
+          {
+            "id": "back",
+            "tool": "loupe",
+            "finding": "At the corners of the back the white has worn off to a yellow, brassy metal.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "back"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for its size. It flaps open too easily.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.82
+      },
+      {
+        "id": "regilt_inside",
+        "kind": "restored",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "inside",
+            "tool": "loupe",
+            "finding": "The inside gilding is fresh and very even. It has been redone recently.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "clasp"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "soviet"
+    ],
+    "claims": [
+      "Grandad’s cigarette case, from the war. Well, after the war.",
+      "Solid silver. He carried it every day and never once smoked in the house.",
+      "Look at the engraving. They don’t make work like that any more."
+    ],
+    "model": {
+      "glb": "cigarette_case_silver_875.glb",
+      "placeholder": "block",
+      "color": "#d4d6d8",
+      "scale": 1,
+      "rest": "flat",
+      "size": [
+        0.0829,
+        0.1004,
+        0.0245
+      ],
+      "inspectDistance": 0.24,
+      "hotspots": [
+        {
+          "id": "engraving",
+          "label": "Engraving",
+          "position": [
+            -0.0005,
+            0.0081,
+            0.012
+          ]
+        },
+        {
+          "id": "cartouche",
+          "label": "Cartouche",
+          "position": [
+            -0.0005,
+            -0.0325,
+            0.012
+          ]
+        },
+        {
+          "id": "clasp",
+          "label": "Clasp and hallmark",
+          "position": [
+            0.0388,
+            0.0,
+            0.0105
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Back",
+          "position": [
+            -0.0005,
+            0.0,
+            -0.012
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "silver_cups_875",
+    "category": "silver",
+    "name": "Six 875 silver vodka cups in a case",
+    "era": "1970s",
+    "baseValue": {
+      "min": 12000,
+      "max": 18000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 260,
+      "tolerance": 10.0
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.35,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "Under each foot: 875, a star and an assay office letter, crisp and well struck.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "foot"
+      },
+      {
+        "id": "gilt",
+        "tool": "loupe",
+        "finding": "The insides are gilded, rubbed pale where lips touched. The gilt rims match.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "rim"
+      },
+      {
+        "id": "body",
+        "tool": "loupe",
+        "finding": "Niello flowers on the sides, one cup with a small dent.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "body"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "A good quarter of a kilo with the case. Dense little cups.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "The cups ignore the magnet.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.25,
+        "hotspot": "body"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_melchior",
+        "kind": "fake",
+        "valueMultiplier": 0.1,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "hallmark",
+            "tool": "loupe",
+            "finding": "Under the feet, the stamp reads “MN 875”, the letters crooked. No assay letter.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "foot"
+          },
+          {
+            "id": "gilt",
+            "tool": "loupe",
+            "finding": "The gilt inside has gone, and the metal beneath is a yellowish white, not silver.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "rim"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Lighter than six silver cups should weigh.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.85
+      },
+      {
+        "id": "odd_cup",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.6,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "body",
+            "tool": "loupe",
+            "finding": "One cup’s flowers are a different pattern, and its hallmark another assay office.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "body"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "soviet"
+    ],
+    "claims": [
+      "For special occasions. In our family that was every Saturday.",
+      "Six silver cups, a full set. From my father’s retirement.",
+      "Real silver. We only drank from them twice: weddings and funerals."
+    ],
+    "model": {
+      "placeholder": "cups",
+      "color": "#d4d6d8",
+      "scale": 1,
+      "rest": "upright",
+      "inspectDistance": 0.4,
+      "hotspots": [
+        {
+          "id": "rim",
+          "label": "Gilt rim",
+          "position": [
+            0.0,
+            0.024,
+            0.0475
+          ]
+        },
+        {
+          "id": "body",
+          "label": "Cup body",
+          "position": [
+            -0.055,
+            0.006,
+            0.043
+          ]
+        },
+        {
+          "id": "foot",
+          "label": "Foot and hallmark",
+          "position": [
+            0.055,
+            -0.016,
+            0.042
+          ]
+        },
+        {
+          "id": "case",
+          "label": "Case",
+          "position": [
+            0.0,
+            -0.03,
+            0.06
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "silver_signet_875",
+    "category": "silver",
+    "name": "875 silver signet ring",
+    "era": "1990s",
+    "baseValue": {
+      "min": 2000,
+      "max": 3500
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 7.5,
+      "tolerance": 0.3
+    },
+    "magnetic": false,
+    "rarity": 0.6,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "Inside the band: 875 and an assay mark, the edges sharp.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "inner"
+      },
+      {
+        "id": "face",
+        "tool": "loupe",
+        "finding": "The face is engraved with initials, worn soft by years on a hand.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "face"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "A satisfying little weight for a silver signet.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_band",
+        "tool": "magnet",
+        "finding": "The ring ignores the magnet.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "inner"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "silvered_steel",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "hallmark",
+            "tool": "loupe",
+            "finding": "The 875 is etched flat and perfectly even, with no assay mark.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "inner"
+          },
+          {
+            "id": "face",
+            "tool": "loupe",
+            "finding": "A grey edge peeks out of a deep scratch on the face.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "face"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Lighter than it looks.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          },
+          {
+            "id": "magnet_band",
+            "tool": "magnet",
+            "finding": "The whole ring jumps to the magnet.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.1,
+            "hotspot": "inner"
+          }
+        ],
+        "weightFactor": 0.76,
+        "magnetic": true
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "jewelry"
+    ],
+    "claims": [
+      "My brother’s ring. He won’t be needing it for a few years.",
+      "Silver, 875, the initials are mine. Well, they could be.",
+      "I found it on the beach at the Zaton. Honestly."
+    ],
+    "model": {
+      "placeholder": "signet",
+      "color": "#c9ccce",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.08,
+      "hotspots": [
+        {
+          "id": "face",
+          "label": "Signet face",
+          "position": [
+            0,
+            0.0118,
+            0
+          ]
+        },
+        {
+          "id": "inner",
+          "label": "Inside of band",
+          "position": [
+            0,
+            -0.0085,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "silver_chain_925",
+    "category": "silver",
+    "name": "925 silver curb chain",
+    "era": "2000s",
+    "baseValue": {
+      "min": 2000,
+      "max": 3500
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 12,
+      "tolerance": 0.48
+    },
+    "magnetic": false,
+    "rarity": 0.8,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "On the clasp tag: 925 and an assay mark, small but crisp.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "clasp"
+      },
+      {
+        "id": "links",
+        "tool": "loupe",
+        "finding": "The links are soldered shut, each one, and the colour is even all through.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "links"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Around twelve grams. Pours like water into the pan.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_clasp",
+        "tool": "magnet",
+        "finding": "Only the clasp spring twitches toward the magnet.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "clasp"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.03,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "hallmark",
+            "tool": "loupe",
+            "finding": "The 925 on the tag is soft and shallow, as if cast.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "clasp"
+          },
+          {
+            "id": "links",
+            "tool": "loupe",
+            "finding": "On the inside of the links, the silver has worn away to yellow.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "links"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for a chain this thick.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.8
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "jewelry"
+    ],
+    "claims": [
+      "Silver, 925. I wore it every day, never turned black.",
+      "A present from an ex. I’d like to turn him into money.",
+      "Bought it in Turkey on holiday. Proper silver, the man promised."
+    ],
+    "model": {
+      "placeholder": "chain",
+      "color": "#cdd0d2",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.09,
+      "hotspots": [
+        {
+          "id": "clasp",
+          "label": "Clasp",
+          "position": [
+            0,
+            -0.025,
+            0
+          ]
+        },
+        {
+          "id": "links",
+          "label": "Links",
+          "position": [
+            0,
+            0.025,
+            0
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "silver_earrings_925",
+    "category": "silver",
+    "name": "925 silver earrings with garnets",
+    "era": "1980s",
+    "baseValue": {
+      "min": 2500,
+      "max": 4000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 5.2,
+      "tolerance": 0.21
+    },
+    "magnetic": false,
+    "rarity": 0.6,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "On the lock: 925 and the assay mark, tiny but sharp.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "lock_left"
+      },
+      {
+        "id": "stones",
+        "tool": "loupe",
+        "finding": "Dark red stones with little needle-like inclusions inside. Garnets, by the look.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "stones"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Five grams for the pair, about right.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_lock",
+        "tool": "magnet",
+        "finding": "Only the lock springs twitch.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "lock_right"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plated_brass",
+        "kind": "fake",
+        "valueMultiplier": 0.05,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "hallmark",
+            "tool": "loupe",
+            "finding": "The stamp on the lock is a blurry 925 with no assay mark.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "lock_left"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for the pair.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.8
+      },
+      {
+        "id": "paste_stones",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.45,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "stones",
+            "tool": "loupe",
+            "finding": "The red stones are perfectly clean inside, with a tiny round bubble in one.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "stones"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "jewelry"
+    ],
+    "claims": [
+      "Garnets in silver. My mother wore them to the theatre.",
+      "I don’t have pierced ears any more. Long story."
+    ],
+    "model": {
+      "placeholder": "earrings",
+      "color": "#cdd0d2",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.15,
+      "hotspots": [
+        {
+          "id": "lock_left",
+          "label": "Left lock",
+          "position": [
+            -0.009,
+            0.012,
+            0
+          ]
+        },
+        {
+          "id": "lock_right",
+          "label": "Right lock",
+          "position": [
+            0.009,
+            0.012,
+            0
+          ]
+        },
+        {
+          "id": "stones",
+          "label": "Stones",
+          "position": [
+            -0.009,
+            -0.008,
+            0.002
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "amber_pendant_925",
+    "category": "silver",
+    "name": "Amber pendant in 925 silver",
+    "era": "1990s",
+    "baseValue": {
+      "min": 3000,
+      "max": 5500
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 8,
+      "tolerance": 0.32
+    },
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.4,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "On the back of the setting: 925 and an assay mark.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "back"
+      },
+      {
+        "id": "amber",
+        "tool": "loupe",
+        "finding": "Inside the amber: a few tiny bubbles and a fleck of something dark, a leaf or a bit of bark.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "front"
+      },
+      {
+        "id": "warmth",
+        "tool": "loupe",
+        "finding": "It feels warm to the touch, not cold like glass.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "front"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Eight grams or so. Amber is lighter than it looks.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "The magnet finds nothing to hold.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "bail"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plastic_amber",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "amber",
+            "tool": "loupe",
+            "finding": "Inside, a perfect little insect, too perfect, and the bubbles all exactly round.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "front"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Heavier than amber that size should be.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 1.12
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "jewelry"
+    ],
+    "claims": [
+      "Baltic amber, from Kaliningrad. My aunt brought it back in the nineties.",
+      "There’s something inside, see? A real piece of the ancient forest.",
+      "It brings good health. Not to me, apparently."
+    ],
+    "model": {
+      "placeholder": "cabochon",
+      "color": "#d58a22",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.1,
+      "hotspots": [
+        {
+          "id": "bail",
+          "label": "Bail",
+          "position": [
+            0,
+            0.0168,
+            0
+          ]
+        },
+        {
+          "id": "front",
+          "label": "Amber",
+          "position": [
+            0,
+            0,
+            0.003
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Back of setting",
+          "position": [
+            0,
+            0.004,
+            -0.0011
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "amber_beads",
+    "category": "silver",
+    "name": "Baltic amber beads",
+    "era": "1960s–1970s",
+    "baseValue": {
+      "min": 8000,
+      "max": 15000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 45,
+      "tolerance": 1.8
+    },
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.4,
+    "tells": [
+      {
+        "id": "amber",
+        "tool": "loupe",
+        "finding": "Each bead is cloudy in its own way, butterscotch to honey, some with tiny cracks of age.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "beads"
+      },
+      {
+        "id": "drill",
+        "tool": "loupe",
+        "finding": "The drill holes are uneven, slightly off-centre. Strung by hand, knotted between beads.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "top"
+      },
+      {
+        "id": "clasp",
+        "tool": "loupe",
+        "finding": "A simple old screw clasp, the gilt worn to brass.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "clasp"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Light for its size: amber barely weighs anything.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Nothing pulls but the tiny clasp spring.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "clasp"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "plastic_beads",
+        "kind": "fake",
+        "valueMultiplier": 0.05,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "amber",
+            "tool": "loupe",
+            "finding": "Every bead the same shade of honey, and a faint mould seam round the middle of each.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "beads"
+          },
+          {
+            "id": "drill",
+            "tool": "loupe",
+            "finding": "The holes are perfectly centred and glossy inside, as if moulded with the bead.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "top"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Heavier than amber should be.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 1.18
+      },
+      {
+        "id": "pressed_amber",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.3,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "amber",
+            "tool": "loupe",
+            "finding": "Swirls of flow lines in the beads, and grainy edges where small pieces were pressed together.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "beads"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "jewelry",
+      "soviet"
+    ],
+    "claims": [
+      "Real amber, from the Baltic. My grandmother wore them to every May Day.",
+      "You can rub them and they pick up paper. Try it.",
+      "They’re very old. Older than the dinosaurs, the beads, I mean."
+    ],
+    "model": {
+      "placeholder": "beads",
+      "color": "#d8921c",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.38,
+      "hotspots": [
+        {
+          "id": "beads",
+          "label": "Beads",
+          "position": [
+            0.055,
+            0.005,
+            0.006
+          ]
+        },
+        {
+          "id": "top",
+          "label": "Top beads",
+          "position": [
+            0.0,
+            0.065,
+            0.004
+          ]
+        },
+        {
+          "id": "clasp",
+          "label": "Clasp",
+          "position": [
+            0.0,
+            -0.058,
+            0.002
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "pearl_necklace",
+    "category": "silver",
+    "name": "Cultured pearl necklace",
+    "era": "1980s",
+    "baseValue": {
+      "min": 6000,
+      "max": 11000
+    },
+    "valueCurve": "linear",
+    "weightGrams": {
+      "expected": 38,
+      "tolerance": 1.52
+    },
+    "magnetic": false,
+    "rarity": 0.4,
+    "fakeChance": 0.4,
+    "tells": [
+      {
+        "id": "nacre",
+        "tool": "loupe",
+        "finding": "Each pearl has a slightly different lustre and small surface ripples under the light.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "beads"
+      },
+      {
+        "id": "drill",
+        "tool": "loupe",
+        "finding": "Knots between every pearl, the silk greying with age.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "top"
+      },
+      {
+        "id": "clasp",
+        "tool": "loupe",
+        "finding": "A small silver box clasp, tight and safe.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "clasp"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Under forty grams. Pearls are light.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "The magnet ignores the strand.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "clasp"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "glass_pearls",
+        "kind": "fake",
+        "valueMultiplier": 0.04,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "nacre",
+            "tool": "loupe",
+            "finding": "Every pearl perfectly round, identically glossy, and at the drill hole the coating flakes off glass.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "top"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Heavier than a pearl strand ought to be.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 1.3
+      }
+    ],
+    "demandTags": [
+      "jewelry"
+    ],
+    "claims": [
+      "Pearls from Japan. My father brought them from a voyage.",
+      "For my wedding. That was a long time ago and a different husband.",
+      "Rub them on your teeth. Real ones feel gritty, see?"
+    ],
+    "model": {
+      "placeholder": "beads",
+      "color": "#efe8dc",
+      "scale": 1,
+      "rest": "flat",
+      "emblem": "pearl",
+      "inspectDistance": 0.38,
+      "hotspots": [
+        {
+          "id": "beads",
+          "label": "Beads",
+          "position": [
+            0.055,
+            0.005,
+            0.006
+          ]
+        },
+        {
+          "id": "top",
+          "label": "Top beads",
+          "position": [
+            0.0,
+            0.065,
+            0.004
+          ]
+        },
+        {
+          "id": "clasp",
+          "label": "Clasp",
+          "position": [
+            0.0,
+            -0.058,
+            0.002
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "cameo_brooch_875",
+    "category": "silver",
+    "name": "Shell cameo brooch, 875 silver frame",
+    "era": "1950s",
+    "baseValue": {
+      "min": 6000,
+      "max": 10000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 11,
+      "tolerance": 0.44
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.4,
+    "tells": [
+      {
+        "id": "hallmark",
+        "tool": "loupe",
+        "finding": "Beside the pin: 875 and an old assay mark.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3,
+        "hotspot": "pin"
+      },
+      {
+        "id": "carving",
+        "tool": "loupe",
+        "finding": "The profile is carved, tool marks visible in the hair, the white layer thinner at the edges.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "face"
+      },
+      {
+        "id": "frame",
+        "tool": "loupe",
+        "finding": "The frame has a little rope border, worn soft on one side.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.4,
+        "hotspot": "frame"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "About eleven grams, shell and silver.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "Only the steel pin tip moves toward the magnet.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "pin"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "resin_cameo",
+        "kind": "fake",
+        "valueMultiplier": 0.1,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "carving",
+            "tool": "loupe",
+            "finding": "The profile is moulded, every hair smooth, and a tiny bubble sits in the cheek.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "face"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light for a shell cameo in silver.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ],
+        "weightFactor": 0.8
+      }
+    ],
+    "demandTags": [
+      "silver",
+      "jewelry"
+    ],
+    "claims": [
+      "An Italian cameo. My grandmother had it from her grandmother.",
+      "Carved from a shell, by hand. Look at the hair.",
+      "I wore it to my exams for luck. I passed them all."
+    ],
+    "model": {
+      "placeholder": "brooch",
+      "color": "#cdd0d2",
+      "scale": 1,
+      "rest": "flat",
+      "inspectDistance": 0.12,
+      "hotspots": [
+        {
+          "id": "face",
+          "label": "Carved face",
+          "position": [
+            0.0,
+            0.0,
+            0.0025
+          ]
+        },
+        {
+          "id": "frame",
+          "label": "Frame",
+          "position": [
+            0.022,
+            0.0,
+            0.002
+          ]
+        },
+        {
+          "id": "pin",
+          "label": "Pin and hallmark",
+          "position": [
+            0.0,
+            0.004,
+            -0.004
+          ]
+        }
+      ]
+    }
+  }
+]

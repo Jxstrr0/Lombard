@@ -2,7 +2,8 @@
  * Save migrations: an ordered list, one step per schema-changing version.
  *
  * RULE: every commit that changes the shape of GameState must bump
- * STATE_VERSION in state.ts AND append a `{ from, to, up }` step here.
+ * STATE_VERSION in state.ts, append a `{ from, to, up }` step here AND add a
+ * fixture save for the new version in tests/fixtures/saves (docs/02-ARCHITECTURE.md § Save).
  * Saves and save codes from any older version must keep loading.
  *
  * Steps work on untyped data (`Raw`), never on GameState, because the old
@@ -270,9 +271,12 @@ export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4Story, v4
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())
 const itemLike = z.looseObject({ id: z.string(), defId: z.string() })
+/** Every visit brings an item except a story scene (M4, v4+), which brings none. */
+const missingItem = { message: 'Invalid input: a visit needs its item', path: ['item'] }
+const hasItemUnlessScene = (v: { kind: string; item?: unknown }) => v.kind === 'scene' || v.item !== undefined
 
 /** Light structural check of the current shape: top-level keys and meta, not every leaf. */
-const GameStateShape = z.looseObject({
+export const GameStateShape = z.looseObject({
   meta: z.looseObject({
     version: z.literal(CURRENT_VERSION),
     seed: num,
@@ -297,8 +301,11 @@ const GameStateShape = z.looseObject({
   specialists: rec,
   market: z.looseObject({ drift: rec, news: z.array(z.unknown()) }),
   customers: rec,
-  queue: z.array(z.looseObject({ visitId: z.string(), kind: z.string(), item: itemLike })),
-  current: z.looseObject({ visitId: z.string(), kind: z.string(), phase: z.string(), item: itemLike }).nullable(),
+  queue: z.array(z.looseObject({ visitId: z.string(), kind: z.string(), item: itemLike.optional() }).refine(hasItemUnlessScene, missingItem)),
+  current: z
+    .looseObject({ visitId: z.string(), kind: z.string(), phase: z.string(), item: itemLike.optional() })
+    .refine(hasItemUnlessScene, missingItem)
+    .nullable(),
   inspect: z.looseObject({ findings: z.array(z.unknown()) }).nullable(),
   haggle: z.looseObject({ ask: num, floor: num }).nullable(),
   day: z.looseObject({ phase: z.enum(['open', 'closed']), clock: num, openingCash: num, log: z.array(z.unknown()) }),

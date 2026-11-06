@@ -236,6 +236,11 @@ export class StreetLife {
 
   // ---------------------------------------------------------------------------
 
+  /** Today's weather, for the shop's window light (rain and snow hide the sun). */
+  get todaysWeather(): Weather {
+    return this.weather
+  }
+
   private mood() {
     return { weather: this.weather.kind, dark: this.dark, ice: this.ice, busy: this.flags.busy }
   }

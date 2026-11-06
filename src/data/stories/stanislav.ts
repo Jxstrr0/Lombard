@@ -2,15 +2,21 @@
  * Stanislav Edgarovich Lyubimov, antiques dealer (GDD § 2b): never wrong,
  * rarely honest, friends with the crew. Leaves a card (seeds Protection);
  * sends round a seller with "family silver"; offers to have a word with the
- * crew while Protection runs. His fourth beat (an icon through your books)
- * needs Volkova and The Collector, so it waits for M5 (docs/05 § Parked).
+ * crew while Protection runs; and (M5) asks you to put one of his icons through
+ * your books as an unredeemed pawn, to give it a past (stanislav.icon). That
+ * icon is his own client's business, not The Collector's church icon: its own
+ * flags (stanislav.icon_*), and Volkova's arc asks about it (volkova.icon).
  *
  * Flags other arcs read: protection.stanislav_card (he left his card),
  * stanislav_owed and protection.stanislav_word (you let him have a word: no
  * pressure for a month from that beat's day: the Protection ladder's rungs wait
- * tuning.protection.ladder.wordDays, and pressure drops). Reads protection.running.
+ * tuning.protection.ladder.wordDays, and pressure drops), stanislav.icon_booked
+ * (the icon went through your books), stanislav.icon_told (you told the police;
+ * he's gone abroad and off your retainer). Reads protection.running, crime.volkova.
  */
 import { tuning } from '../tuning'
+
+const I = tuning.volkovaArc.stanislavIcon
 
 export default {
   id: 'stanislav',
@@ -100,6 +106,65 @@ export default {
               id: 'decline',
               label: 'I’ll manage',
               reply: 'How brave. How tiring. Well, the offer stands until it doesn’t.',
+            },
+          ],
+        },
+      },
+    },
+    {
+      // GDD § 2b beat 4: you owe him one, or the police know your shop. Do it, refuse, or tell Volkova.
+      id: 'stanislav.icon',
+      when: [
+        { if: 'beat', beat: 'stanislav.card' },
+        { if: 'retainedMonths', id: 'antiquary', gte: I.months },
+        { if: 'any', of: [{ if: 'flag', flag: 'stanislav_owed' }, { if: 'volkova', met: true }] },
+      ],
+      chance: 0.4,
+      final: true,
+      visit: {
+        who: 'antiquary',
+        kind: 'scene',
+        scene: {
+          lines: [
+            'My dear. A small kindness, as promised. An icon: Saint Nicholas, northern school, very sad eyes. A client of mine adores it, and a client of mine is buying it.',
+            'The trouble is it has no past. Things without a past make customs officers curious. So: it sits in your book as a pledge from last spring, nobody comes back for it, and you sell it to me. Paper, that’s all.',
+            'There’s a fee, naturally. I’m not a barbarian.',
+          ],
+          choices: [
+            {
+              id: 'book',
+              label: 'Put it in my book',
+              reply: 'You’re a treasure. A pledge from last April; a widow, I think, with a cough. Her name will come to me.',
+              effects: [
+                { do: 'flag', flag: 'stanislav.icon_booked' },
+                { do: 'flag', flag: 'dirty.stanislav_icon' },
+                { do: 'cash', amount: I.fee, text: 'Stanislav Edgarovich: for the paperwork' },
+                { do: 'heat', delta: I.bookedHeat },
+                { do: 'rep', group: 'mob', delta: I.bookedRep },
+              ],
+            },
+            {
+              id: 'refuse',
+              label: 'Not in my book',
+              reply: 'Pity. I’d so hoped we were friends. Our friends with the clean cars will be sorry to hear we aren’t.',
+              effects: [
+                { do: 'flag', flag: 'stanislav.icon_refused' },
+                { do: 'specialist', id: 'antiquary', change: 'stanislav.turned_away' },
+                { do: 'rep', group: 'mob', delta: I.refusedRep },
+                { do: 'pressure', delta: I.refusedPressure },
+              ],
+            },
+            {
+              id: 'tell',
+              label: 'I’ll mention it to the police',
+              reply: 'Will you. Well. My doctor has been begging me to take the waters somewhere far away. I think I’ll listen to him at last.',
+              effects: [
+                { do: 'flag', flag: 'stanislav.icon_told' },
+                { do: 'specialist', id: 'antiquary', change: 'stanislav.vanishes' },
+                { do: 'heat', delta: I.toldHeat },
+                { do: 'pressure', delta: I.toldPressure },
+                { do: 'volkova', trust: tuning.volkovaArc.trust.iconTruth },
+              ],
             },
           ],
         },

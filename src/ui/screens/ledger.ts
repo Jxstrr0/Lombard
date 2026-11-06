@@ -3,8 +3,15 @@
  * summary, today's log with signed amounts, the word on the street (reputation
  * by group as vague lines, never numbers), stock with what you paid and a
  * "Sell to dealer" button per item, then "Open shop — Day N".
+ *
+ * M5: while the landlord's final notice stands, a line under the summary says so. From
+ * tuning.endings.retireDay a "Hand back the keys" section closes the receipt: Retire asks
+ * for confirmation (a Longlight sheet), then dispatches career/retire.
  */
 import type { Action } from '../../game/actions'
+import { canRetire, daysRun } from '../../game/endings/end'
+import { hasNotice } from '../../game/endings/eviction'
+import { LANDLORD } from '../../data/endings/landlord'
 import { standingLines } from '../../game/reputation'
 import { heatWords } from '../../data/police'
 import { tuning } from '../../data/tuning'
@@ -45,8 +52,14 @@ export class LedgerScreen {
   /** M5: the word on heat and the bulletin lines still in force (crime/bulletin.ts). */
   private police: HTMLElement
   private open: HTMLButtonElement
+  private notice: HTMLElement
+  private retire: HTMLElement
+  private retireText: HTMLElement
+  private confirmRoot: HTMLElement
+  private confirmText: HTMLElement
   private loans = new LedgerLoans()
   private key = ''
+  private shopNameText = ''
 
   constructor(
     private readonly dispatch: (a: Action) => void,
@@ -75,11 +88,25 @@ export class LedgerScreen {
     this.standing.dataset.id = 'ledger-standing'
     this.stock = el('ul', 'receipt-stock')
     this.stock.dataset.id = 'ledger-stock'
+    this.notice = el('p', 'receipt-notice', LANDLORD.standing)
+    this.notice.dataset.id = 'ledger-notice'
+    this.notice.hidden = true
+    // M5: retiring, from tuning.endings.retireDay.
+    this.retire = el('section', 'receipt-retire')
+    this.retire.dataset.id = 'ledger-retire'
+    this.retire.hidden = true
+    this.retireText = el('p', 'receipt-retire-text')
+    this.retire.append(
+      el('h3', 'receipt-h', 'Hand back the keys'),
+      this.retireText,
+      createButton({ id: 'retire', label: 'Retire', className: 'btn-sell btn-retire', onPress: () => this.openConfirm() }),
+    )
     this.police = el('ul', 'receipt-police')
     this.police.dataset.id = 'ledger-police'
     receipt.append(
       head,
       this.summary,
+      this.notice,
       el('h3', 'receipt-h', 'Today'),
       this.log,
       el('h3', 'receipt-h', 'Word on the street'),
@@ -90,9 +117,40 @@ export class LedgerScreen {
       this.loans.root,
       el('h3', 'receipt-h', 'In stock'),
       this.stock,
+      this.retire,
       el('div', 'receipt-foot', 'Thank you · Спасибо'),
     )
     scroll.append(receipt)
+
+    // Retire confirmation: a menu sheet (Longlight palette), because it ends the career.
+    this.confirmRoot = el('div', 'overlay retire-overlay')
+    this.confirmRoot.hidden = true
+    this.confirmRoot.addEventListener('click', (e) => {
+      if (e.target === this.confirmRoot) this.closeConfirm()
+    })
+    const sheet = el('section', 'sheet menu settings retire-sheet')
+    sheet.dataset.id = 'retire-sheet'
+    sheet.setAttribute('role', 'dialog')
+    sheet.setAttribute('aria-modal', 'true')
+    sheet.setAttribute('aria-label', 'Retire')
+    const sec = el('div', 'settings-section')
+    this.confirmText = el('p', 'settings-text')
+    const acts = el('div', 'actions')
+    acts.append(
+      createButton({ id: 'retire-cancel', label: 'Not yet', onPress: () => this.closeConfirm() }),
+      createButton({
+        id: 'retire-confirm',
+        label: 'Retire',
+        variant: 'danger',
+        onPress: () => {
+          this.closeConfirm()
+          dispatch({ type: 'career/retire' })
+        },
+      }),
+    )
+    sec.append(el('h2', 'retire-h', 'Retire?'), this.confirmText, acts)
+    sheet.append(sec)
+    this.confirmRoot.append(sheet)
 
     const footer = el('footer', 'ledger-actions actions')
     this.open = createButton({ id: 'open-shop', label: 'Open shop', variant: 'primary', icon: 'door', onPress: () => dispatch({ type: 'day/open' }) })
@@ -100,14 +158,34 @@ export class LedgerScreen {
     if (shopButton) footer.append(shopButton)
     if (openOffice) footer.append(createButton({ id: 'open-office', label: 'Office', icon: 'briefcase', className: 'btn-office', onPress: openOffice }))
     footer.append(this.open)
-    root.append(scroll, footer)
+    root.append(scroll, footer, this.confirmRoot)
     this.root = root
+  }
+
+  get confirmOpen(): boolean {
+    return !this.confirmRoot.hidden
+  }
+
+  private openConfirm(): void {
+    this.confirmText.textContent = `Close ${this.shopNameText} for good? The career ends tonight: the morning paper, what became of everyone, and your summary. You can’t play on afterwards.`
+    this.confirmRoot.hidden = false
+    this.confirmRoot.querySelector<HTMLButtonElement>('[data-id="retire-cancel"]')?.focus()
+  }
+
+  closeConfirm(): void {
+    this.confirmRoot.hidden = true
   }
 
   render(state: GameState): void {
     setButtonLabel(this.open, `Open shop — Day ${state.calendar.day}`, 'door')
     this.loans.render(state)
     setText(this.shopName, state.shop.name.toUpperCase())
+    this.shopNameText = state.shop.name
+    this.notice.hidden = !hasNotice(state)
+    const retire = canRetire(state)
+    this.retire.hidden = !retire
+    if (retire) setText(this.retireText, `${daysRun(state)} days behind the counter. Whenever you like, you can retire: the career ends, and the canal gets its say.`)
+    else this.closeConfirm()
     const last = state.history[state.history.length - 1]
     const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last, state.reputation.byGroup, state.crime.heat, state.crime.bulletin.map((b) => b.id)])
     if (key === this.key) return

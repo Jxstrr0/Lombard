@@ -1081,6 +1081,53 @@ export const tuning = {
   endings: {
     /** GDD § 12: the Retire option appears in the ledger from this day. */
     retireDay: 90,
+    /**
+     * Eviction (a forced ending; src/game/endings/eviction.ts). On rent night (the last day of a
+     * month, after the bills), closing cash under `line` brings the landlord's final notice. At the
+     * next rent night the notice is withdrawn if cash is back above the line; the keys go back only
+     * if cash plus what the stock would fetch from the dealer (`stockShare` × true value, the
+     * dealer's rate without the noise) is still under it: a shop that could sell up and pay is not
+     * thrown out. In between, the notice stands.
+     */
+    eviction: { line: 0, stockShare: 0.58 },
+    /**
+     * Ending title bands (src/game/endings/title.ts). Wealth = cash + what the stock is really
+     * worth + principal lent out (₽). Clean and heart are the career axes (unit: one story choice;
+     * a fair deal for someone in need is +0.25 heart). Standing is reputation by group (−1…1).
+     */
+    bands: {
+      wealth: {
+        /** Under this you ran the shop to stand still (about the starting cash). */
+        modest: 80_000,
+        /** Money enough to show for it. */
+        comfortable: 150_000,
+        rich: 300_000,
+      },
+      clean: {
+        /** At or above: a clean shop (a stolen piece or two you didn't spot is forgiven). */
+        clean: -1,
+        /** At or below: a dirty one (three dirty choices' worth, or six stolen pieces). */
+        dirty: -3,
+      },
+      heart: {
+        /** At or above: warm (about thirty fair deals for people who needed one, or fewer and some kind choices). */
+        warm: 8,
+        /** At or below: cold (about six lowballed pensioners). */
+        cold: -2,
+      },
+      standing: {
+        /** Neighbourhood at or above: everyone knows your name. */
+        loved: 0.6,
+        /** Neighbourhood under: they cross the canal to avoid you. */
+        shunned: 0,
+        /** Mob standing at or above (while paying them): the crew owns the shop in all but name. */
+        owned: 0.4,
+      },
+      /** Heat at or under: the police have stopped looking (Got Out Clean); over it, still watched. */
+      coolHeat: 0.5,
+      /** Deals with the fence at or above: still in the trade. */
+      fenceDeals: 3,
+    },
   },
 
   save: {

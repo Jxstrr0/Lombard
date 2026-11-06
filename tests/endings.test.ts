@@ -77,14 +77,14 @@ describe('endCareer', () => {
     expect(canRetire(atDay(s, tuning.endings.retireDay - 1))).toBe(false)
     expect(endCareer(atDay(s, 10), 'retired')).toEqual(atDay(s, 10))
     const done = endCareer(atDay(s, tuning.endings.retireDay), 'retired')
-    expect(done.career.end).toEqual({ kind: 'retired', day: tuning.endings.retireDay })
+    expect(done.career.end).toMatchObject({ kind: 'retired', day: tuning.endings.retireDay })
     expect(isOver(done)).toBe(true)
     expect(canRetire(done)).toBe(false)
   })
 
   it('a forced ending can come any day, and the first ending wins', () => {
     const s = endCareer(atDay(startedState(1, 'c'), 12), 'raided')
-    expect(s.career.end).toEqual({ kind: 'raided', day: 12 })
+    expect(s.career.end).toMatchObject({ kind: 'raided', day: 12 })
     expect(endCareer(s, 'pushedOut')).toBe(s)
   })
 })

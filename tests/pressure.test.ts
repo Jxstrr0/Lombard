@@ -224,7 +224,7 @@ describe('Protection ladder: the window, the ultimatum, the end', () => {
     expect(eligible(atDay(s, SETTLED), 'protection.out')).toBe(true)
     // Up to two beats a morning: on a busy one the paper waits a day or two.
     const out = mornings(s, SETTLED).find((m) => m.career.end)!
-    expect(out.career.end).toEqual({ kind: 'pushedOut', day: out.calendar.day })
+    expect(out.career.end).toMatchObject({ kind: 'pushedOut', day: out.calendar.day })
     expect(out.calendar.day - SETTLED).toBeLessThanOrEqual(3)
     expect(flags(out)).toContain(F.pushedOut)
     expect(out.story.arcs.protection?.ended).toBe(true)

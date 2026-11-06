@@ -39,12 +39,14 @@ export class CustomerCast {
     private gltf: GLTFLoader,
     private base: string,
     private version: string,
+    /** The canvas has MSAA: soften alpha-cut cards (hair) with alpha-to-coverage. */
+    private smoothCutouts = false,
   ) {}
 
   get(id: string): Promise<CustomerModel> {
     let p = this.models.get(id)
     if (!p) {
-      p = loadCustomerModel(this.gltf, this.base, id, this.version)
+      p = loadCustomerModel(this.gltf, this.base, id, this.version, this.smoothCutouts)
       p.then(
         (m) => console.info(`[customer] ${id}: ${Math.round(m.triangles)} triangles, ${m.materials.length} materials${m.clips.length ? `, clips: ${m.clips.join(' + ')}` : ''}`),
         (err) => {
@@ -73,7 +75,7 @@ export class CustomerCast {
   }
 }
 
-async function loadCustomerModel(loader: GLTFLoader, base: string, id: string, version: string): Promise<CustomerModel> {
+async function loadCustomerModel(loader: GLTFLoader, base: string, id: string, version: string, smoothCutouts: boolean): Promise<CustomerModel> {
   const gltf = await loader.loadAsync(`${base}assets/customers/${id}.glb?v=${version}`)
   const root = gltf.scene
   const materials: THREE.Material[] = []
@@ -88,6 +90,9 @@ async function loadCustomerModel(loader: GLTFLoader, base: string, id: string, v
     for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
       // Cards that blend for real keep blending once the scene has faded them in.
       m.userData.blend = m.transparent
+      // Hair cards are alpha-cut (glTF MASK): a hard stair-step outline without this.
+      // Only with MSAA; without it the coverage alpha is ignored and the cards fatten.
+      if (smoothCutouts && m.alphaTest > 0) m.alphaToCoverage = true
       m.transparent = true
       m.opacity = 0
       materials.push(m)

@@ -1,9 +1,11 @@
 /**
  * Ledger (day closed, after at least one day): the day's receipt with a
- * summary, today's log with signed amounts, stock with what you paid and a
+ * summary, today's log with signed amounts, the word on the street (reputation
+ * by group as vague lines, never numbers), stock with what you paid and a
  * "Sell to dealer" button per item, then "Open shop — Day N".
  */
 import type { Action } from '../../game/actions'
+import { standingLines } from '../../game/reputation'
 import type { GameState } from '../../game/state'
 import type { LedgerEntry } from '../../game/types'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
@@ -23,6 +25,8 @@ const KIND_LABEL: Record<LedgerEntry['kind'], string> = {
   loan: 'LOAN',
   redeem: 'REDEEM',
   forfeit: 'KEPT',
+  theft: 'GONE',
+  deterred: 'SEEN',
 }
 
 
@@ -33,6 +37,7 @@ export class LedgerScreen {
   private date: HTMLElement
   private summary: HTMLElement
   private log: HTMLElement
+  private standing: HTMLElement
   private stock: HTMLElement
   private open: HTMLButtonElement
   private loans = new LedgerLoans()
@@ -61,6 +66,8 @@ export class LedgerScreen {
     this.summary.dataset.id = 'ledger-summary'
     this.log = el('ul', 'receipt-log')
     this.log.dataset.id = 'ledger-log'
+    this.standing = el('ul', 'receipt-standing')
+    this.standing.dataset.id = 'ledger-standing'
     this.stock = el('ul', 'receipt-stock')
     this.stock.dataset.id = 'ledger-stock'
     receipt.append(
@@ -68,6 +75,8 @@ export class LedgerScreen {
       this.summary,
       el('h3', 'receipt-h', 'Today'),
       this.log,
+      el('h3', 'receipt-h', 'Word on the street'),
+      this.standing,
       el('h3', 'receipt-h', 'Pawn loans'),
       this.loans.root,
       el('h3', 'receipt-h', 'In stock'),
@@ -91,7 +100,7 @@ export class LedgerScreen {
     this.loans.render(state)
     setText(this.shopName, state.shop.name.toUpperCase())
     const last = state.history[state.history.length - 1]
-    const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last])
+    const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last, state.reputation.byGroup])
     if (key === this.key) return
     this.key = key
     if (!last) return
@@ -108,6 +117,7 @@ export class LedgerScreen {
       [`Bought (${last.bought})`, last.spent > 0 ? signedRub(-last.spent) : rub(0)],
       [`Sold (${last.sold})`, last.earned > 0 ? signedRub(last.earned) : rub(0)],
       ['Walkouts', String(last.walkouts)],
+      ...(last.stolen ? [['Stolen', String(last.stolen)] as [string, string]] : []),
       ...(last.loaned > 0 ? [['Lent on pawns', signedRub(-last.loaned)] as [string, string]] : []),
       ...(last.redeemed > 0 ? [['Repaid', signedRub(last.redeemed)] as [string, string]] : []),
       ...(last.expenses > 0 ? [['Expenses', signedRub(-last.expenses)] as [string, string]] : []),
@@ -126,6 +136,13 @@ export class LedgerScreen {
       const li = el('li', `log-${e.kind}`)
       li.append(el('span', 'log-kind', KIND_LABEL[e.kind]), el('span', 'log-text', e.text), el('span', 'log-amt', e.amount === 0 ? '—' : signedRub(e.amount)))
       this.log.append(li)
+    }
+
+    this.standing.replaceChildren()
+    for (const line of standingLines(state)) {
+      const li = el('li', `standing-${line.group}`, line.text)
+      li.dataset.id = `standing-${line.group}`
+      this.standing.append(li)
     }
 
     this.stock.replaceChildren()

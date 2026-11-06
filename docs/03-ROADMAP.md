@@ -59,12 +59,12 @@ Done when: the simulator shows a careful policy growing ~15%/month and a careles
 
 Done when: screenshots look like a real shop and the phone still holds 30 fps.
 
-## M4 — People and story (status: not started)
+## M4 — People and story (status: in progress)
 
 - 20 regulars with schedules, memory, and dialogue.
 - Remaining 3 specialists (militaria, antiques, electronics) with their small arcs.
 - Story engine and 4 arcs: Grandmother's Medals, Dubai Rolex Guy, The Student's Laptop, Protection (first half).
-- Reputation by group. Shoplifting and security upgrades.
+- Reputation by group. Shoplifting and security upgrades. ✅ Done: five groups (neighbourhood, youth, police, mob, specialists) in `src/game/reputation.ts`, shown in the ledger as vague lines; shoplifting off open shelves from day 8; door chime, convex mirror, lockable wall case and security camera in the Office (see 05).
 - Title screen, career slots, settings (motion, text size), Longlight-branded menu.
 - Add to Kelbo.Website hub.
 

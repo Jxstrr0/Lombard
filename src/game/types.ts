@@ -204,7 +204,8 @@ export interface InspectState {
   estimate: number | null
 }
 
-export type LedgerKind = 'buy' | 'sell' | 'walkout' | 'pass' | 'expense' | 'loan' | 'redeem' | 'forfeit'
+/** theft: shoplifted off an open shelf (M4). deterred: security stopped one (a note, no cash). */
+export type LedgerKind = 'buy' | 'sell' | 'walkout' | 'pass' | 'expense' | 'loan' | 'redeem' | 'forfeit' | 'theft' | 'deterred'
 
 export interface LedgerEntry {
   kind: LedgerKind
@@ -225,6 +226,8 @@ export interface DayState {
   log: LedgerEntry[]
   /** False while today's paper is still unread (the news screen shows first). */
   newsRead: boolean
+  /** Net reputation change per group today (M4; absent until something moves). Drives the ledger's trend lines. */
+  repDelta?: Record<string, number>
 }
 
 /** Compact record of a finished day (kept in saves; full logs are not). */
@@ -243,4 +246,6 @@ export interface DaySummary {
   loaned: number
   /** M2+: cash repaid by redeeming pawners today. */
   redeemed: number
+  /** M4+: items shoplifted tonight (absent in older saves = 0). */
+  stolen?: number
 }

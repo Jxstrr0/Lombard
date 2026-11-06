@@ -409,7 +409,7 @@ async function sendAway(h) {
 
 /**
  * Economy (portrait, ?seed=1): day 1 passed → ledger → Office (buy the acid kit,
- * retain both specialists) → day 2 → the first gold or watch seller → acid,
+ * retain both specialists, buy the door chime and mirror) → word on the street → day 2 → the first gold or watch seller → acid,
  * reference book and a specialist call.
  */
 async function playEconomy(page, h) {
@@ -431,7 +431,14 @@ async function playEconomy(page, h) {
   await page.evaluate(() => document.querySelector('[data-id="office-specialists"]')?.scrollIntoView({ block: 'start' }))
   await page.waitForTimeout(150)
   await h.shot('office-specialists', 'office sheet: both specialists retained, calls left, release')
+  for (const id of ['buy-door_chime', 'buy-convex_mirror']) if (await h.enabled(id)) await h.click(id)
+  await page.evaluate(() => document.querySelector('[data-id="office-exposure"]')?.scrollIntoView({ block: 'center' }))
+  await page.waitForTimeout(150)
+  await h.shot('office-security', 'office sheet: cases and security (chime and mirror owned), things on open shelves')
   await h.click('office-close')
+  await page.evaluate(() => document.querySelector('[data-id="ledger-standing"]')?.scrollIntoView({ block: 'center' }))
+  await page.waitForTimeout(150)
+  await h.shot('ledger-standing', 'ledger: word on the street (reputation by group as vague lines)')
   await h.open()
   await h.screen('counter')
   while (await h.visible('next-customer')) {

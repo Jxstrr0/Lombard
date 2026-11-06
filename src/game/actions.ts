@@ -9,7 +9,7 @@
  *             → offer/make… (haggle; buy or pawn) → [bought | pawned | walked] or counter/pass
  *     buyer:  sale/counter… or sale/accept → [sold | walked] or counter/pass
  *     redeem: loan/return → redeemed
- *   → counter/dismiss → … → day/close (expenses, ledger) → ledger/sell… / shop/* / upgrade/* → day/open
+ *   → counter/dismiss → … → day/close (shoplifting, expenses, ledger) → ledger/sell… / shop/* / upgrade/* → day/open
  *
  * Between customers (and while closed) the player can arrange the display: shop/place, shop/price.
  */
@@ -27,10 +27,12 @@ import { haggleRound, startHaggle, type HaggleContext } from './haggle/machine'
 import { payForTool, toolExtras } from './inspect/available'
 import { useTool } from './inspect/tools'
 import { amountDue, createLoan, forfeitOverdue, pawnClaim, planRedemptions } from './loans/loans'
+import { patienceRepFactor, repAfterDeal, repAfterInsult, repAfterRedeem, repAfterSale, repAfterWalkout, syncSpecialistsRep } from './reputation'
 import { Rng } from './rng'
 import type { ToolId } from './schema/item'
 import { planBuyers, saleRound, startSale } from './sell/buyer'
 import { clearItem, placeItem, setPrice } from './shop/display'
+import { rollShoplifting } from './shop/theft'
 import { addDays, createInitialState, seasonOf, weekdayOf, type GameState, type Settings } from './state'
 import type { Approach, DaySummary, LedgerEntry, QueuedVisit, VisitOutcome } from './types'
 
@@ -156,9 +158,9 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'acid/restock':
       return state.day.phase === 'closed' ? restockAcid(state) : state
     case 'specialist/retain':
-      return state.day.phase === 'closed' ? retainSpecialist(state, action.id) : state
+      return state.day.phase === 'closed' ? syncSpecialistsRep(retainSpecialist(state, action.id)) : state
     case 'specialist/release':
-      return state.day.phase === 'closed' ? releaseSpecialist(state, action.id) : state
+      return state.day.phase === 'closed' ? syncSpecialistsRep(releaseSpecialist(state, action.id)) : state
     case 'career/begin':
       return beginCareer(state, action.shopName)
     case 'counter/dismiss': {
@@ -267,7 +269,9 @@ function openDay(state: GameState): GameState {
     const sellers = generateDayQueue(rng, tuning.day.customersPerDay, ids.next)
     const buyers = planBuyers(s, rng, ids.next)
     const redeemers = planRedemptions(s, ids.next)
-    const queue = mergeQueue(sellers, [...buyers, ...redeemers], rng)
+    // Neighbourhood standing stretches (or shortens) how long people wait. No draws.
+    const patience = patienceRepFactor(s)
+    const queue = mergeQueue(sellers, [...buyers, ...redeemers], rng).map((v) => (patience === 1 ? v : { ...v, patience: Math.round(v.patience * patience) }))
     return {
       ...s,
       meta: { ...s.meta, nextId: ids.nextId() },
@@ -283,7 +287,8 @@ function openDay(state: GameState): GameState {
 
 function closeDay(state0: GameState): GameState {
   if (state0.day.phase !== 'open' || state0.current || state0.queue.length > 0) return state0
-  const state = chargeExpenses(state0)
+  const theft = rollShoplifting(state0)
+  const state = syncSpecialistsRep(chargeExpenses(theft.state))
   const log = state.day.log
   const sum = (kind: LedgerEntry['kind']) => log.filter((e) => e.kind === kind).reduce((a, e) => a + e.amount, 0)
   const summary: DaySummary = {
@@ -298,6 +303,7 @@ function closeDay(state0: GameState): GameState {
     expenses: -sum('expense') || 0,
     loaned: -sum('loan') || 0,
     redeemed: sum('redeem'),
+    stolen: theft.stolen.length,
   }
   const history = [...state.history, summary].slice(-tuning.save.historyDays)
   const date = addDays(state.calendar.date, 1)
@@ -306,7 +312,7 @@ function closeDay(state0: GameState): GameState {
     history,
     calendar: { day: state.calendar.day + 1, date, weekday: weekdayOf(date), season: seasonOf(date) },
     day: { ...state.day, phase: 'closed' },
-    narration: 'Closed for the night. Rain on the canal.',
+    narration: theft.stolen.length > 0 ? `Closed for the night. ${log.find((e) => e.kind === 'theft')?.text ?? ''}`.trim() : 'Closed for the night. Rain on the canal.',
   }
 }
 
@@ -388,6 +394,7 @@ function makeOffer(state: GameState, amount: number, approach: Approach, evidenc
     const lineKey = c.wants === 'pawn' && response.kind === 'accept' ? `pawn.${response.lineKey}` : response.lineKey
     const line = pickLine(lineKey, rng, { price: rub(response.price), name: c.customer.name })
     let next: GameState = { ...s, haggle: h, current: { ...c, line } }
+    if (response.mood === 'insulted') next = repAfterInsult(next, c.customer)
     next = advanceTime(next, tuning.day.haggleRoundSeconds)
     if (!next.current) return next // they gave up during the round (cannot happen at the counter, but stay safe)
     if (response.kind === 'accept') return c.wants === 'pawn' ? pawn(next, response.price, line) : buy(next, response.price, line)
@@ -420,7 +427,7 @@ function buy(state: GameState, price: number, line?: string): GameState {
       fakesBought: state.stats.fakesBought + (fake ? 1 : 0),
     },
   }
-  return resolve(next, 'bought', line ?? visitLines.thanks[0], {
+  return resolve(repAfterDeal(next, c.customer, c.item, price, 'buy'), 'bought', line ?? visitLines.thanks[0], {
     kind: 'buy',
     amount: -price,
     text: `Bought ${def.name} from ${c.customer.name}`,
@@ -443,7 +450,7 @@ function pawn(state: GameState, principal: number, line?: string): GameState {
       cash: s.cash - principal,
       loans: [...s.loans, loan],
     }
-    return resolve(next, 'pawned', line ?? pickLine('pawn.thanks', rng, { name: c.customer.name, item: def.name }), {
+    return resolve(repAfterDeal(next, c.customer, c.item, principal, 'pawn'), 'pawned', line ?? pickLine('pawn.thanks', rng, { name: c.customer.name, item: def.name }), {
       kind: 'loan',
       amount: -principal,
       text: `Lent ${rub(principal)} on ${def.name} to ${c.customer.name}`,
@@ -462,7 +469,7 @@ function redeemLoan(state: GameState): GameState {
   const def = getItemDef(loan.item.defId)
   return withRng(state, (s, rng) =>
     resolve(
-      { ...s, cash: s.cash + due, loans: s.loans.filter((l) => l.id !== loan.id) },
+      repAfterRedeem({ ...s, cash: s.cash + due, loans: s.loans.filter((l) => l.id !== loan.id) }),
       'redeemed',
       pickLine('redeem.thanks', rng, { name: c.customer.name, item: def.name, price: rub(due) }),
       { kind: 'redeem', amount: due, text: `${c.customer.name} redeemed the ${def.name}`, itemId: loan.item.id, defId: def.id },
@@ -497,7 +504,7 @@ function sellToBuyer(state: GameState, price: number, line?: string): GameState 
   const next = removeSold(state, c.item.id, price)
   return withRng(next, (s, rng) =>
     resolve(
-      { ...s, current: { ...s.current!, sale: { ...c.sale!, status: 'sold' } } },
+      repAfterSale({ ...s, current: { ...s.current!, sale: { ...c.sale!, status: 'sold' } } }, c.customer),
       'sold',
       line ?? pickLine('sale.thanks.flexible', rng, { name: c.customer.name, item: def.name }),
       { kind: 'sell', amount: price, text: `Sold the ${def.name} to ${c.customer.name}`, itemId: c.item.id, defId: def.id },
@@ -556,10 +563,10 @@ function advanceTime(state: GameState, seconds: number): GameState {
       text: `${v.customer.name} got tired of waiting and left`,
       defId: v.item.defId,
     })
-    next = {
-      ...next,
-      reputation: { ...next.reputation, general: next.reputation.general - tuning.day.walkoutRepPenalty },
-    }
+    next = repAfterWalkout(
+      { ...next, reputation: { ...next.reputation, general: next.reputation.general - tuning.day.walkoutRepPenalty } },
+      v.customer,
+    )
   }
   return next
 }

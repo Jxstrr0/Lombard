@@ -120,8 +120,41 @@ const v2ToV3: Migration = {
   },
 }
 
+/**
+ * v3 → v4 (M4 reputation by group, shoplifting): a `youth` reputation group (the
+ * local kids and students) starting at 0, and a career count of stolen items.
+ * Other groups and the day's records are kept as they are; day summaries and
+ * the day's rep tally gained optional fields only.
+ */
+const v3ToV4: Migration = {
+  from: 3,
+  to: 4,
+  up(raw) {
+    const reputation = isRecord(raw.reputation) ? raw.reputation : {}
+    const byGroup = isRecord(reputation.byGroup) ? reputation.byGroup : {}
+    const stats = isRecord(raw.stats) ? raw.stats : {}
+    const group = (k: string) => (typeof byGroup[k] === 'number' ? byGroup[k] : 0)
+    return {
+      ...raw,
+      reputation: {
+        ...reputation,
+        general: typeof reputation.general === 'number' ? reputation.general : 0,
+        byGroup: {
+          ...byGroup,
+          neighbourhood: group('neighbourhood'),
+          youth: group('youth'),
+          police: group('police'),
+          mob: group('mob'),
+          specialists: group('specialists'),
+        },
+      },
+      stats: { ...stats, itemsStolen: typeof stats.itemsStolen === 'number' ? stats.itemsStolen : 0 },
+    }
+  },
+}
+
 /** Ordered, contiguous chain. Append new steps at the end. */
-export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3]
+export const MIGRATIONS: readonly Migration[] = [v1ToV2, v2ToV3, v3ToV4]
 
 const num = z.number().finite()
 const rec = z.record(z.string(), z.unknown())

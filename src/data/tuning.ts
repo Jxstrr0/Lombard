@@ -337,7 +337,17 @@ export const tuning = {
       reference_2: 6_000,
       reference_3: 15_000,
       case_counter: 18_000,
+      // M4 security (theft numbers in tuning.theft): a mirror is a week of small margin,
+      // the wall case and the camera are month-two purchases like the counter case.
+      door_chime: 1_200,
+      convex_mirror: 2_500,
+      wall_case: 14_000,
+      camera: 22_000,
     },
+    /** Security points (see tuning.theft.perSecurity): chime 0.5 (×0.85 theft), mirror 1 (×0.74), camera 3 (×0.49). */
+    security: { door_chime: 0.5, convex_mirror: 1, camera: 3 },
+    /** Lockable wall case: thieves can't reach the wall; buyers have to ask, so wall visibility × this. */
+    wallCaseVisibility: 0.9,
     /** Tests in a new acid kit. */
     acidKitCharges: 10,
     /** Restock: price and tests per bottle; charges never exceed acidMaxCharges. */
@@ -461,6 +471,89 @@ export const tuning = {
     genuineMinCondition: 60,
     /** Attempts at rolling a forced fake/genuine before taking what came. */
     maxRolls: 30,
+  },
+
+  /**
+   * M4 reputation by group (owner: reputation worker; rules in src/game/reputation.ts).
+   * Every group sits in −1…1 (0 = nobody has an opinion yet). Deltas are small so a
+   * reputation is built over weeks: ~25 fair deals with desperate people take the
+   * neighbourhood from 0 to "warm" (0.5).
+   */
+  reputation: {
+    min: -1,
+    max: 1,
+    /** "Fair" and "lowball" are judged on what the deal paid against the item's real worth (trueValue). */
+    fairBuyShare: 0.5,
+    fairLoanShare: 0.3,
+    /** GDD § 3: under ~25% of value is a lowball. */
+    lowballBuyShare: 0.25,
+    lowballLoanShare: 0.12,
+    /** Who counts as vulnerable: desperation at or above this, or one of these archetypes. */
+    vulnerableDesperation: 0.65,
+    vulnerableArchetypes: ['pensioner'] as readonly string[],
+    /** Archetypes the local kids and students hear about. */
+    youthArchetypes: ['student'] as readonly string[],
+    neighbourhood: {
+      /** A fair buy or loan for a vulnerable seller (genuine or restored items only: a fake's worth says nothing about fairness). */
+      fair: 0.02,
+      /** Lowballing a vulnerable seller. */
+      lowball: -0.03,
+      /** Any offer that insults (haggle mood 'insulted'). */
+      insult: -0.02,
+      /**
+       * Someone gave up waiting in the queue. Small: a slow counter loses two or three people
+       * a day, which alone drifts the street to "cool" (−0.15…−0.5) over a couple of months.
+       */
+      walkout: -0.004,
+      /** A pawner got their thing back. */
+      redeem: 0.01,
+    },
+    youth: {
+      /** A fair buy or loan for a student. */
+      fair: 0.04,
+      /** Lowballing or insulting a student. */
+      lowball: -0.05,
+      /** A student gave up waiting. */
+      walkout: -0.02,
+      /** Sold something to a student. */
+      sale: 0.01,
+    },
+    effects: {
+      /** Buyer chance × (1 + neighbourhood × this). */
+      buyerPerNeighbourhood: 0.15,
+      /** Queue patience × (1 + neighbourhood × this). */
+      patiencePerNeighbourhood: 0.2,
+      /** Shoplifting chance × (1 − youth × this). */
+      theftPerYouth: 0.6,
+    },
+    /** Ledger lines: band edges (cold | cool | neutral | warm | close) and a day's change that reads as a trend. */
+    bands: [-0.5, -0.15, 0.15, 0.5] as readonly number[],
+    trendDelta: 0.03,
+  },
+
+  /**
+   * M4 shoplifting (owner: reputation worker; rules in src/game/shop/theft.ts). Rolled once
+   * per open day at closing, per displayed item:
+   *   chance = base × exposure[area] × cheapness(value) × traffic × youth factor × security factor
+   * Tuned with `npm run sim` and tests/theft.test.ts: a shop with ~8 cheap things on open
+   * shelves and no security loses one every 1–2 weeks; mirror + camera + wall case, rarely.
+   */
+  theft: {
+    /** Nobody has cased a new shop yet: no thefts on days before this (the first week is for learning the counter). */
+    fromDay: 8,
+    base: 0.016,
+    /** How exposed each area is: the counter case is behind glass, the back shelf is out of the way. */
+    exposure: { counter: 0, wall: 1, back: 0.6 },
+    /** Cheapness: 1 at or under cheapFull ₽ of real worth, fading linearly to 0 at cheapMax. */
+    cheapFull: 4_000,
+    cheapMax: 15_000,
+    /** Foot traffic = people through the door today / trafficBaseline, clamped. */
+    trafficBaseline: 10,
+    traffic: [0.5, 1.5] as [number, number],
+    /** Security factor = 1 / (1 + shop.security × perSecurity). */
+    perSecurity: 0.35,
+    /** No item is ever more likely than this to go in one night. */
+    maxChance: 0.25,
   },
 
   save: {

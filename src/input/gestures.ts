@@ -1,8 +1,16 @@
 /**
  * Orbit / zoom gestures from Pointer Events (touch, mouse and pen share one path).
  * One pointer drags = orbit; two pointers pinch = zoom; the mouse wheel zooms.
+ * Desktop keys (M6) arrive as KEY_ORBIT / KEY_ZOOM custom events on the same element
+ * (ui/bind.ts sends them for held arrow keys, A/D and + −), so they turn the item the
+ * same way a drag does.
  * Knows nothing about Three.js or game state: it only reports deltas.
  */
+
+/** Custom event on the gesture element: `detail` { dx, dy } in drag pixels. */
+export const KEY_ORBIT = 'lombard:key-orbit'
+/** Custom event on the gesture element: `detail` { factor }, > 1 = zoom in. */
+export const KEY_ZOOM = 'lombard:key-zoom'
 export interface GestureHandlers {
   /** Drag delta in CSS pixels. */
   orbit(dx: number, dy: number): void
@@ -29,6 +37,8 @@ export class OrbitGestures {
     el.addEventListener('pointercancel', this.onUp, opts)
     el.addEventListener('lostpointercapture', this.onUp, opts)
     el.addEventListener('wheel', this.onWheel, { signal: this.abort.signal, passive: false })
+    el.addEventListener(KEY_ORBIT, this.onKeyOrbit, opts)
+    el.addEventListener(KEY_ZOOM, this.onKeyZoom, opts)
   }
 
   dispose(): void {
@@ -69,6 +79,16 @@ export class OrbitGestures {
     e.preventDefault()
     const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
     this.handlers.zoom(Math.exp(-delta * 0.0015))
+  }
+
+  private onKeyOrbit = (e: Event) => {
+    const d = (e as CustomEvent<{ dx: number; dy: number }>).detail
+    if (d && (d.dx || d.dy)) this.handlers.orbit(d.dx, d.dy)
+  }
+
+  private onKeyZoom = (e: Event) => {
+    const d = (e as CustomEvent<{ factor: number }>).detail
+    if (d && d.factor > 0) this.handlers.zoom(d.factor)
   }
 
   private distance(): number {

@@ -29,6 +29,13 @@ const LOOK_PORTRAIT = new THREE.Vector3(0, 0.62, -0.9)
 const PORTRAIT_MIN_LOOK_Y = 0.38
 // Landscape/desktop: the strip is docked bottom-left, so frame counter and customer together.
 const LOOK_LANDSCAPE = new THREE.Vector3(0, 1.0, -0.9)
+/**
+ * Landscape: half the width (as a share of the screen height) the customer and the counter mat
+ * need left of a side column. The mat is about 0.47 h wide at the landscape lens.
+ */
+const LANDSCAPE_SUBJECT_HALF = 0.32
+/** How fast the landscape view slides when the side column changes width, 1/s. */
+const LENS_SLIDE_RATE = 5
 // Offer view (portrait): the number pad covers most of the screen, so look up at the customer.
 const LOOK_OFFER = new THREE.Vector3(0, 1.35, -0.9)
 
@@ -59,6 +66,12 @@ export interface ViewLayout {
   height: number
   /** Pixels covered by UI at the bottom in the counter view. */
   counterBottom: number
+  /**
+   * Landscape / desktop (M6): pixels covered by the side column on the right in the counter,
+   * sale, redeem and offer views. The counter view's centre slides left so the customer and
+   * the mat stay clear of it.
+   */
+  counterRight?: number
   /** Free band for the inspected item, px from the top. */
   inspectTop: number
   inspectBottom: number
@@ -91,6 +104,8 @@ export class CameraRig {
   private offerTarget = 0
   private portrait = true
   private counterLens: Lens = { f: 1, cx: 0, cy: 0 }
+  /** Where counterLens.cx is heading (landscape: away from the side column); null = snap on the next resize. */
+  private counterCxTarget: number | null = null
   private inspectLens: Lens = { f: 1, cx: 0, cy: 0 }
   private counterLook = LOOK_PORTRAIT
   /** Camera distance from INSPECT_POINT, metres (set by the stage: inspectDistance × zoom). */
@@ -238,6 +253,8 @@ export class CameraRig {
   }
 
   resize(layout: ViewLayout): void {
+    const widthBefore = this.layout.width
+    const portraitBefore = this.portrait
     this.layout = layout
     const { width: w, height: h } = layout
     const portrait = h > w
@@ -250,7 +267,11 @@ export class CameraRig {
       // leaves the top of the screen: past this point the strip covers the counter instead.
       this.counterLens = { f: w / 2 / Math.tan(THREE.MathUtils.degToRad(18)), cx: w / 2, cy: Math.max(free * 0.6, h * PORTRAIT_MIN_LOOK_Y) }
     } else {
-      this.counterLens = { f: h / 2 / Math.tan(THREE.MathUtils.degToRad(25)), cx: w / 2, cy: h / 2 }
+      const target = Math.min(w / 2, Math.max(h * LANDSCAPE_SUBJECT_HALF, w - (layout.counterRight ?? 0) - h * LANDSCAPE_SUBJECT_HALF))
+      // Slide (not jump) when the column changes between screens; snap on the first layout or a new size.
+      const snap = this.counterCxTarget === null || this.portrait !== portraitBefore || w !== widthBefore
+      this.counterCxTarget = target
+      this.counterLens = { f: h / 2 / Math.tan(THREE.MathUtils.degToRad(25)), cx: snap || this.reduceMotion ? target : this.counterLens.cx, cy: h / 2 }
     }
     const top = layout.inspectTop
     const bottom = Math.max(top + 120, layout.inspectBottom)
@@ -277,6 +298,12 @@ export class CameraRig {
     else if (this.offer < this.offerTarget) this.offer = Math.min(this.offerTarget, this.offer + ostep)
     else if (this.offer > this.offerTarget) this.offer = Math.max(this.offerTarget, this.offer - ostep)
     const o = this.portrait ? ease(this.offer) : 0
+    const cxTarget = this.counterCxTarget
+    if (!this.portrait && cxTarget !== null && this.counterLens.cx !== cxTarget) {
+      const k = this.reduceMotion ? 1 : Math.min(1, dt * LENS_SLIDE_RATE)
+      const cx = this.counterLens.cx + (cxTarget - this.counterLens.cx) * k
+      this.counterLens.cx = Math.abs(cx - cxTarget) < 0.5 ? cxTarget : cx
+    }
 
     // Counter pose (with idle sway unless reduce-motion)
     let sx = 0

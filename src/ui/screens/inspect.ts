@@ -84,7 +84,9 @@ export class InspectScreen {
     this.fx.setAttribute('aria-hidden', 'true')
 
     const panel = el('div', 'inspect-panel')
-    const hint = el('p', 'inspect-hint', 'Drag to turn · pinch to zoom · tap a marker to look closely')
+    const hint = el('p', 'inspect-hint inspect-hint-touch', 'Drag to turn · pinch to zoom · tap a marker to look closely')
+    // Shown instead of the touch hint with a mouse (ui/desktop.css).
+    const mouseHint = el('p', 'inspect-hint inspect-hint-mouse', 'Drag or ← → to turn · scroll to zoom · click a marker to look closely')
     const toolbar = el('div', 'toolbar')
     toolbar.setAttribute('role', 'toolbar')
     toolbar.setAttribute('aria-label', 'Tools')
@@ -99,7 +101,7 @@ export class InspectScreen {
         onPress: () => dispatch({ type: 'inspect/done' }),
       }),
     )
-    panel.append(hint, toolbar, actions)
+    panel.append(hint, mouseHint, toolbar, actions)
     this.panel = panel
 
     root.append(this.gestureLayer, this.header, this.hotspotLayer, this.fx, this.findings.root, panel)

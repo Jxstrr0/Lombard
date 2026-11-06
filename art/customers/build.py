@@ -32,8 +32,9 @@ head JPEG 1024, body JPEG BODY_PX, hair (alpha) PNG8 at HAIR_PX alpha-tested
 (MASK). PAINT_OUT blanks text, logos and real insignia per avatar before the
 resize (rectangles in source texture pixels, top-left origin). Needs
 ImageMagick (`convert`) for the PNG8 step; without it hair stays RGBA PNG.
-Output is byte-for-byte reproducible. --draco shrinks each glb by about a third
-but needs a DRACOLoader on the game's GLTFLoader.
+Output is byte-for-byte reproducible. Geometry is Draco-compressed (about a
+third smaller; the game's shared loader in src/render/loaders.ts decodes it);
+--no-draco skips that for debugging.
 """
 
 from __future__ import annotations
@@ -149,7 +150,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument('--preview', action='store_true', help='also render <id>_waist.png and <id>_full.png')
     p.add_argument('--body-px', type=int, help='override BODY_PX (and TEX_PX) for every avatar, for comparisons')
     p.add_argument('--hair-px', type=int, help='override HAIR_PX (and TEX_PX) for every avatar, for comparisons')
-    p.add_argument('--draco', action='store_true', help='Draco-compress the geometry (the loader must set a DRACOLoader)')
+    p.add_argument('--no-draco', dest='draco', action='store_false', help='skip Draco compression (the game loads Draco glbs; this is for debugging)')
     return p.parse_args(argv)
 
 

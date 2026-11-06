@@ -189,13 +189,15 @@ async function boot(): Promise<void> {
   canvasHost.appendChild(renderer.domElement)
 
   const shop = new ShopScene()
-  // Customers are 3D cast members (Rocketbox); ?nocast=1 keeps the old silhouette, ?customer=<id> casts one person as everyone.
-  if (params.get('nocast') !== '1') shop.setCast(new CustomerCast(import.meta.env.BASE_URL, __BUILD_SHA__), castOverride(params))
   const rig = new CameraRig()
   const look = lookParam(params)
   if (look) rig.setHeadOffset(look.yaw, look.pitch)
   // ?noglb=1 keeps every item on its procedural placeholder (for comparing against the scripted models).
   const itemLoader = params.get('noglb') === '1' ? null : createItemLoader(renderer, import.meta.env.BASE_URL, __BUILD_SHA__)
+  // Customers are 3D cast members (Rocketbox); ?nocast=1 (or ?noglb=1) keeps the old silhouette, ?customer=<id> casts one person as everyone.
+  if (itemLoader && params.get('nocast') !== '1') {
+    shop.setCast(new CustomerCast(itemLoader.gltf, import.meta.env.BASE_URL, __BUILD_SHA__), castOverride(params))
+  }
   const stage = new ItemStage(shop.scene, shop.matPoint, itemLoader?.load)
 
   // --- UI --------------------------------------------------------------------
@@ -324,6 +326,8 @@ async function boot(): Promise<void> {
     const dt = Math.min(clock.getDelta(), 0.1)
     perf?.begin()
     shop.update(dt)
+    const customerState = shop.customerState
+    if (document.body.dataset.customer !== customerState) document.body.dataset.customer = customerState
     stage.update(dt, rig)
     rig.update(dt)
     shop.setInspectBlend(rig.inspectBlend)

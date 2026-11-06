@@ -6,7 +6,7 @@
  * `?customer=<id>` makes every customer that cast member, for review.
  */
 import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import type { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { CAST } from '../data/customers/cast'
 
 export interface CustomerModel {
@@ -28,7 +28,9 @@ export function castOverride(params: URLSearchParams): string | null {
 export class CustomerCast {
   private models = new Map<string, Promise<CustomerModel>>()
 
+  /** `gltf` must have a DRACOLoader (the cast glbs are Draco-compressed); see loaders.ts. */
   constructor(
+    private gltf: GLTFLoader,
     private base: string,
     private version: string,
   ) {}
@@ -36,7 +38,7 @@ export class CustomerCast {
   get(id: string): Promise<CustomerModel> {
     let p = this.models.get(id)
     if (!p) {
-      p = loadCustomerModel(this.base, id, this.version)
+      p = loadCustomerModel(this.gltf, this.base, id, this.version)
       p.then(
         (m) => console.info(`[customer] ${id}: ${Math.round(m.triangles)} triangles, ${m.materials.length} materials${m.mixer ? ', idle clip' : ''}`),
         (err) => {
@@ -65,8 +67,8 @@ export class CustomerCast {
   }
 }
 
-async function loadCustomerModel(base: string, id: string, version: string): Promise<CustomerModel> {
-  const gltf = await new GLTFLoader().loadAsync(`${base}assets/customers/${id}.glb?v=${version}`)
+async function loadCustomerModel(loader: GLTFLoader, base: string, id: string, version: string): Promise<CustomerModel> {
+  const gltf = await loader.loadAsync(`${base}assets/customers/${id}.glb?v=${version}`)
   const root = gltf.scene
   const materials: THREE.Material[] = []
   let triangles = 0

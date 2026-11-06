@@ -158,6 +158,13 @@ export class ShopScene {
     this.cast?.retain([this.shownLook, this.wantLook, this.nextLook])
   }
 
+  /** 'in' once the current customer has faded fully in (screenshots wait for it); 'away' with nobody there. */
+  get customerState(): 'away' | 'arriving' | 'in' {
+    if (this.wantLook === null || this.customerTarget === 0) return 'away'
+    const ready = this.shownLook === this.wantLook && Math.abs(this.customerFade - this.customerTarget) < 0.01
+    return ready ? 'in' : 'arriving'
+  }
+
   /** Play customers with the 3D cast (otherwise the silhouette stands in). `override`: everyone is that cast id. */
   setCast(cast: CustomerCast, override: string | null = null): void {
     this.cast = cast

@@ -43,7 +43,8 @@ jobs:
   bake:
     # Standard runner only: larger runners are always billed.
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # A full bake runs about 2 h (lightmap ~85 min, props, two preview renders).
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v7
 

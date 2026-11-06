@@ -45,7 +45,7 @@ from materials import MATERIALS, hex_to_linear, validate  # noqa: E402
 QUALITY = {
     # lightmap px, bake samples, island margin px, preview samples, prop vertex-bake samples (no denoiser there)
     "preview": {"size": 512, "samples": 96, "margin": 3, "preview_samples": 48, "prop_samples": 256},
-    "full": {"size": 2048, "samples": 768, "margin": 6, "preview_samples": 192, "prop_samples": 1024},
+    "full": {"size": 2048, "samples": 768, "margin": 6, "preview_samples": 64, "prop_samples": 1024},
 }
 
 # three.js (x, y, z) -> Blender (x, -z, y)

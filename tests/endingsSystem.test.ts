@@ -190,6 +190,11 @@ describe('epilogue', () => {
     for (const c of EPILOGUE_CARDS) expect(c.variants[c.variants.length - 1]!.when).toEqual([])
     for (const s of EPILOGUE_PAPER) expect(s.stories[s.stories.length - 1]!.when).toEqual([])
     expect(new Set(EPILOGUE_CARDS.map((c) => c.id)).size).toBe(EPILOGUE_CARDS.length)
+    // M6: each of the twenty new regulars has a card (shown once you've got to know them).
+    const ids = new Set(EPILOGUE_CARDS.map((c) => c.id))
+    for (const id of ['artur', 'bakhtiyor', 'dilnoza', 'jamshid', 'patimat', 'snezhana', 'kira', 'alyona', 'grisha', 'vitya', 'prokhor', 'zakhar', 'ernest', 'styopa', 'klava', 'elvira', 'zhanna', 'nonna', 'zoya', 'larisa']) {
+      expect(ids.has(id), id).toBe(true)
+    }
   })
 
   it('the paper has no digits, like the morning paper (the shop name is filled in later)', () => {

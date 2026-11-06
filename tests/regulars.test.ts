@@ -76,7 +76,7 @@ describe('regulars content', () => {
 
   it('everyone who drops in on a schedule has things to bring and a few lines per warmth', () => {
     const scheduled = REGULARS.filter((r) => r.schedule)
-    expect(scheduled.length).toBeGreaterThanOrEqual(16)
+    expect(scheduled.length).toBeGreaterThanOrEqual(36) // M6: forty regulars, less Fedya, Eduard and Zhora (they come only for their arcs)
     for (const r of scheduled) {
       expect(r.items.length, r.id).toBeGreaterThanOrEqual(3)
       expect(r.lines.again.length + r.lines.warm.length + r.lines.cold.length, r.id).toBeGreaterThanOrEqual(6)

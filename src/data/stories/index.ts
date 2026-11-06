@@ -18,9 +18,12 @@ import ilya from './ilya'
 import stanislav from './stanislav'
 import zhenya from './zhenya'
 
+// M6: the twenty new regulars' small threads, after everything else (lowest beat priority).
+import { THREADS } from './threads'
+
 const SPECIALIST_ARCS = [faina, ilya, gennady, stanislav, zhenya]
 
-export const ARCS: readonly Arc[] = [medals, rolex, laptop, ...SPECIALIST_ARCS, protection, fence, collector, volkova].map((raw) => Arc.parse(raw))
+export const ARCS: readonly Arc[] = [medals, rolex, laptop, ...SPECIALIST_ARCS, protection, fence, collector, volkova, ...THREADS].map((raw) => Arc.parse(raw))
 
 const beats = new Map<string, Beat>(ARCS.flatMap((a) => a.beats.map((b) => [b.id, b] as const)))
 

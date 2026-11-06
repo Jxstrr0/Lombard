@@ -27,6 +27,8 @@
  * the icon in stock and him first in line with the hatbox (sell / return / police).
  * M5 Volkova's arc: ?scenario=volkova-intro (her courtesy call), and beats first in line (BEAT_SCENARIOS): volkova-father,
  * volkova-source, volkova-stakeout, volkova-short, volkova-personal, volkova-inform, volkova-leak, volkova-icon, stanislav-icon.
+ * M6 the twenty new regulars' threads: ?scenario=<regular id> (artur, bakhtiyor, … larisa; src/data/stories/threads) opens
+ * day 1 with that thread's first beat first in line.
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
@@ -52,6 +54,7 @@ import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
 import { beatVisit, regularCustomer, regularVisit } from './game/story/plan'
+import { THREADS } from './data/stories/threads'
 import { recordBeat, setMemory } from './game/story/progress'
 import { specialistCustomer } from './game/story/specialists'
 import { fenceGoods } from './game/crime/fence'
@@ -146,6 +149,8 @@ const BEAT_SCENARIOS: Record<string, string> = {
   'volkova-leak': 'volkova.leak',
   'volkova-icon': 'volkova.icon',
   'stanislav-icon': 'stanislav.icon',
+  // M6: each new regular's thread opens with its first beat (?scenario=grisha, ?scenario=alyona, …).
+  ...Object.fromEntries(THREADS.map((a) => [a.id, a.beats[0]!.id])),
 }
 
 /** Dev-only (?scenario=collector): his wish first, then Seryozha with the icon. */

@@ -26,7 +26,10 @@ import type { SoundSettings } from '../audio/settings'
 import type { Action } from '../game/actions'
 import type { GameState } from '../game/state'
 import type { Store } from '../game/store'
-import type { KeyName } from '../input/keyboard'
+import { KEY_ORBIT, KEY_ZOOM } from '../input/gestures'
+import { BUTTON_KEY_NAMES, type Command } from '../input/keymap'
+import { applyKeyHints, pressKey } from './keys'
+import './desktop.css'
 import { backupAgeText, backupReminderDue, lastBackupAt } from '../persist/safety'
 import { createButton, el } from './components/button'
 import { Hud } from './components/hud'
@@ -45,6 +48,22 @@ import { TitleScreen, type TitleDeps } from './screens/title'
 import type { SlotView } from '../game/save/slots'
 import { ShopSheet } from './screens/shop'
 import { WelcomeScreen } from './screens/welcome'
+
+/** The key name a command presses a button with (data-keys), or null for orbit / zoom / backspace. */
+function keyName(c: Command): string | null {
+  switch (c.kind) {
+    case 'digit':
+      return c.digit
+    case 'confirm':
+      return 'Enter'
+    case 'back':
+      return 'Escape'
+    case 'letter':
+      return BUTTON_KEY_NAMES[c.letter]
+    default:
+      return null
+  }
+}
 
 export type ScreenId = 'intro' | 'welcome' | 'news' | 'counter' | 'inspect' | 'offer' | 'sale' | 'redeem' | 'ledger' | 'ending'
 
@@ -90,6 +109,8 @@ export interface UiDeps {
 export interface UiLayout {
   /** Pixels covered by UI at the bottom of the counter view. */
   counterBottom: number
+  /** Landscape / desktop: pixels covered by the side column on the right (counter, sale, redeem, offer). */
+  counterRight: number
   inspectTop: number
   inspectBottom: number
   inspectLeft: number
@@ -240,6 +261,7 @@ export class Ui {
     this.reminder.hidden = true
     this.title.render(slots)
     this.title.root.hidden = false
+    applyKeyHints(this.title.root)
     document.body.dataset.screen = 'title'
     this.onScreenChange?.('counter')
   }
@@ -332,6 +354,7 @@ export class Ui {
       else this.office.close()
     }
     this.updateReminder(state, id)
+    applyKeyHints(this.mount)
     if (changed) this.onScreenChange?.(id)
   }
 
@@ -377,13 +400,23 @@ export class Ui {
     const h = window.innerHeight
     const w = window.innerWidth
     let counterBottom = this.lastLayout?.counterBottom ?? h * 0.33
+    let counterRight = this.lastLayout?.counterRight ?? 0
+    // Landscape and desktop put the strip in a side column on the right (M6), so it covers no bottom band.
+    const side = w > h && w >= 700
     const strip = this.current === 'counter' ? this.counter.strip : this.current === 'sale' ? this.sale.strip : this.current === 'redeem' ? this.redeem.strip : null
     if (strip) {
       const r = strip.getBoundingClientRect()
-      if (r.height > 0) counterBottom = w > h && w >= 700 ? 0 : h - r.top
+      if (r.height > 0) {
+        counterBottom = side ? 0 : h - r.top
+        counterRight = side ? Math.max(0, w - r.left) : 0
+      }
     } else if (this.current === 'offer') {
       const r = this.offer.root.querySelector('.offer-bubble')!.getBoundingClientRect()
       if (r.height > 0) counterBottom = w > h ? 0 : h - r.top
+      const p = this.offer.panel.getBoundingClientRect()
+      counterRight = side && p.width > 0 ? Math.max(0, w - p.left) : 0
+    } else if (this.current !== 'inspect') {
+      counterRight = 0
     }
     let band = this.lastLayout
       ? { top: this.lastLayout.inspectTop, bottom: this.lastLayout.inspectBottom, left: this.lastLayout.inspectLeft, right: this.lastLayout.inspectRight }
@@ -391,6 +424,7 @@ export class Ui {
     if (this.current === 'inspect' || !band) band = this.inspect.freeBand()
     const layout: UiLayout = {
       counterBottom,
+      counterRight,
       inspectTop: band.top,
       inspectBottom: band.bottom,
       inspectLeft: band.left,
@@ -401,44 +435,67 @@ export class Ui {
     return layout
   }
 
-  /** Desktop keys, routed to the visible screen / overlay. */
-  key(k: KeyName): boolean {
-    if (this.settings.isOpen) {
-      if (k === 'Escape') {
-        this.settings.close()
-        return true
-      }
-      return false
-    }
+  /**
+   * Desktop keys (input/keymap.ts), routed to the topmost layer: Settings, the title's
+   * load sheet, the office, the shop sheet, then the visible screen. Each layer's own
+   * handlers go first (number pads, tools, the evidence picker); otherwise the key
+   * presses the visible button marked for it (ui/keys.ts).
+   */
+  key(c: Command): boolean {
+    const name = keyName(c)
+    if (this.settings.isOpen) return c.kind === 'back' ? (this.settings.close(), true) : false
     if (this._mode === 'title') {
-      if (k === 'Escape' && this.title.loadOpen) {
-        this.title.closeLoad()
-        return true
-      }
-      return false
+      if (this.title.loadOpen) return c.kind === 'back' ? (this.title.closeLoad(), true) : false
+      return name !== null && pressKey(this.title.root, name)
     }
     if (this.office.isOpen) {
-      if (k === 'Escape') this.office.close()
-      return k === 'Escape'
+      if (c.kind === 'back' || (c.kind === 'letter' && c.letter === 'office')) {
+        this.office.close()
+        return true
+      }
+      return false
     }
-    if (this.shop.isOpen) return this.shop.keyPress(k)
+    if (this.shop.isOpen) {
+      if (c.kind === 'letter' && c.letter === 'shop') {
+        this.shop.close()
+        return true
+      }
+      const k = c.kind === 'digit' ? c.digit : c.kind === 'backspace' ? 'Backspace' : name
+      return k !== null && this.shop.keyPress(k)
+    }
+    if (!this.current) return false
+    const root = this.screens[this.current].root
     const s = this.deps.store
     switch (this.current) {
       case 'inspect':
-        if (k === 'Escape') return this.inspect.findings.isExpanded ? (this.inspect.findings.setExpanded(false), true) : false
-        return this.inspect.key(k)
+        if (c.kind === 'orbit' || c.kind === 'zoom') {
+          // The gesture layer's own handler (input/gestures.ts) drives the stage.
+          this.inspect.gestureLayer.dispatchEvent(new CustomEvent(c.kind === 'orbit' ? KEY_ORBIT : KEY_ZOOM, { detail: c }))
+          return true
+        }
+        if (c.kind === 'back' && this.inspect.findings.isExpanded) {
+          this.inspect.findings.setExpanded(false)
+          return true
+        }
+        if (c.kind === 'digit') return this.inspect.key(c.digit)
+        break
       case 'offer':
-        if (k === 'Escape') {
+        if (c.kind === 'back') {
           if (this.offer.closeOverlay()) return true
           s.dispatch({ type: 'inspect/back' })
           return true
         }
-        return this.offer.key(k)
-      case 'sale':
-        return this.sale.key(k)
-      default:
-        return false
+        if (c.kind === 'digit') return this.offer.key(c.digit)
+        if (c.kind === 'backspace') return this.offer.key('Backspace')
+        if (c.kind === 'confirm') return this.offer.key('Enter')
+        break
+      case 'sale': {
+        const k = c.kind === 'digit' ? c.digit : c.kind === 'backspace' ? 'Backspace' : name
+        if (k !== null && this.sale.key(k)) return true
+        break
+      }
     }
+    return name !== null && pressKey(root, name)
   }
 
   /** Elements whose size changes should re-frame the camera. */

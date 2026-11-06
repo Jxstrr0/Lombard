@@ -1,0 +1,256 @@
+/*
+ * M6 desktop layout pass: phone landscape and desktop adapt from the portrait
+ * layout (src/style.css stays the portrait source of truth).
+ *
+ *   landscape / desktop  the counter, sale and redeem strips move into a side column on
+ *                        the right, so the customer and the counter mat stay in view (the
+ *                        camera slides the view left of the column, render/camera.ts)
+ *   desktop (tall)       the offer bubble sits above the pad in the same column
+ *   fine pointer         hover states, and key hints (input/keymap.ts, ui/keys.ts)
+ */
+
+.inspect-hint-mouse {
+  display: none;
+}
+
+/* --- side column -------------------------------------------------------------------- */
+
+@media (orientation: landscape) and (min-width: 700px) {
+  :root {
+    --side-w: min(400px, 40vw);
+  }
+
+  .counter-screen,
+  .sale-screen,
+  .redeem-screen {
+    align-items: flex-end;
+  }
+
+  .counter-screen .strip,
+  .sale-screen .strip,
+  .redeem-screen .strip {
+    width: var(--side-w);
+    max-height: calc(100vh - var(--hud-h) - 12px);
+    max-height: calc(100dvh - var(--hud-h) - 12px);
+    overflow-y: auto;
+    margin: 0 calc(12px + env(safe-area-inset-right, 0px)) 12px 0;
+  }
+
+  /* the counter pad of a sale is wider than the column */
+  .sale-screen.is-countering .strip {
+    width: max(var(--side-w), min(460px, 60vw));
+  }
+
+  /* The column is narrow: the action row wraps its labels instead of clipping them. */
+  .counter-screen .counter-actions .btn-label {
+    white-space: normal;
+  }
+
+  /* the one-time look hint sits over the free part of the view */
+  .look-hint {
+    right: calc(var(--side-w) + 12px);
+  }
+}
+
+/* short landscape phones: a slimmer column */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --side-w: min(340px, 42vw);
+  }
+
+  .counter-screen .strip,
+  .sale-screen .strip,
+  .redeem-screen .strip {
+    padding: 10px 12px 10px;
+    gap: 8px;
+  }
+
+  .counter-screen .scene-choices {
+    margin-bottom: 4px;
+    gap: 6px;
+  }
+
+  .counter-screen .scene-choices > .btn-choice {
+    min-height: 42px;
+    font-size: 0.875rem;
+  }
+
+  /* the backup reminder: a narrow card in the corner, the receipt stays readable */
+  .backup-reminder {
+    left: auto;
+    right: 12px;
+    width: min(340px, 42vw);
+    transform: none;
+    animation: none;
+  }
+}
+
+/* --- desktop: wide and tall enough for a column of panels -------------------------- */
+
+@media (orientation: landscape) and (min-width: 1000px) and (min-height: 700px) {
+  :root {
+    --side-w: 420px;
+  }
+
+  /* the customer's line above the pad, in the same column */
+  .offer-screen {
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .offer-screen .offer-bubble {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: min(420px, 50vw);
+    margin: 0 12px 8px 0;
+  }
+
+  .offer-panel {
+    max-height: none;
+  }
+
+  /* a wider tool column: "Done — make an offer" on one line */
+  .inspect-panel {
+    width: 330px;
+  }
+
+  .inspect-header {
+    right: 350px;
+  }
+
+  /* the findings and the item name stay left of the tools */
+  .findings-list {
+    max-height: calc(100vh - var(--hud-h) - 40px);
+  }
+}
+
+/* --- mouse: hover states and key hints -------------------------------------------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .inspect-hint-touch {
+    display: none;
+  }
+
+  .inspect-hint-mouse {
+    display: block;
+  }
+
+  .btn:hover:not(:disabled) {
+    border-color: rgba(250, 249, 245, 0.32);
+    background-color: #36322d;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    border-color: var(--clay-light);
+    background-color: var(--clay-light);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: rgba(250, 249, 245, 0.06);
+    border-color: transparent;
+    color: var(--ivory);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background-color: rgba(217, 119, 87, 0.14);
+    border-color: var(--clay-light);
+  }
+
+  .scene-choices > .btn-choice:hover:not(:disabled) {
+    border-color: var(--clay-light);
+    background-color: rgba(239, 231, 212, 0.12);
+  }
+
+  .tool:hover:not(.is-locked) {
+    border-color: rgba(250, 249, 245, 0.32);
+    background-color: #36322d;
+  }
+
+  .tool.is-locked {
+    cursor: not-allowed;
+  }
+
+  .key:hover:not(:disabled):not([aria-hidden='true']) {
+    background-color: #36322d;
+  }
+
+  .key {
+    cursor: pointer;
+  }
+
+  /* inspect markers: the ring grows and brightens under the mouse, the label comes forward */
+  .hotspot:hover .hotspot-ring {
+    transform: scale(1.18);
+    border-color: var(--clay-light);
+    background: rgba(20, 19, 18, 0.78);
+    animation: none;
+  }
+
+  .hotspot-ring {
+    transition: transform 120ms ease, border-color 120ms ease;
+  }
+
+  .hotspot:hover .hotspot-label {
+    background: rgba(20, 19, 18, 0.95);
+    color: var(--clay-light);
+  }
+
+  .slot-main:hover:not(:disabled),
+  .picker-item:hover,
+  .finding-card:hover {
+    border-color: rgba(250, 249, 245, 0.32);
+  }
+
+  .passport-pill:not([aria-disabled='true']):hover {
+    border-color: var(--clay-light);
+  }
+
+  .findings-stack:hover {
+    filter: brightness(1.06);
+  }
+
+  /* key hints: a small worn keycap in the button's top-right corner, outside the layout */
+  .btn[data-key-hint],
+  .slot-main[data-key-hint] {
+    position: relative;
+  }
+
+  [data-key-hint]::after {
+    content: attr(data-key-hint);
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    padding: 0 3px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 0.5625rem;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .btn-primary[data-key-hint]::after {
+    opacity: 0.65;
+  }
+
+  .tool[data-key-hint]::after {
+    right: auto;
+    left: 5px;
+  }
+
+  .slot-main[data-key-hint]::after {
+    top: auto;
+    right: 10px;
+    bottom: 6px;
+  }
+
+  .tool.is-locked[data-key-hint]::after {
+    display: none;
+  }
+}

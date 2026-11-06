@@ -361,8 +361,10 @@ export const tuning = {
 
   /**
    * Specialists on retainer (definitions and lines in src/data/specialists.ts).
-   * A call within the allowance costs fee / calls ≈ 1,000–1,500 ₽, so a call is
-   * worth it on items over ~15k ₽ where a mistake costs 10k+.
+   * A call within the allowance costs fee / calls ≈ 450–2,250 ₽ (the electronics
+   * tech is cheap, the antiques dealer dear), so a call is worth it on items over
+   * ~15k ₽ where a mistake costs 10k+. A call takes inspect.toolSeconds.specialist
+   * unless the roster entry sets its own callSeconds.
    */
   specialists: {
     roster: {
@@ -370,7 +372,13 @@ export const tuning = {
       jeweler: { fee: 6_000, calls: 6, perCall: 1_500, accuracy: 0.88, honesty: 0.55 },
       /** Honest to a fault; his eyes are going. */
       watchmaker: { fee: 7_500, calls: 5, perCall: 2_000, accuracy: 0.74, honesty: 0.95 },
-    } as Record<string, { fee: number; calls: number; perCall: number; accuracy: number; honesty: number }>,
+      /** M4. Straight and sure on medals; wants first refusal, but rarely shades a price to get it. */
+      collector: { fee: 5_500, calls: 5, perCall: 1_500, accuracy: 0.85, honesty: 0.9 },
+      /** M4. Almost never wrong, and the least honest of them all: the good pieces "aren't worth much". */
+      antiquary: { fee: 9_000, calls: 4, perCall: 2_500, accuracy: 0.93, honesty: 0.35 },
+      /** M4. Cheap, quick on the phone (callSeconds), and a bit careless. */
+      technician: { fee: 3_500, calls: 8, perCall: 800, accuracy: 0.72, honesty: 0.8, callSeconds: 30 },
+    } as Record<string, { fee: number; calls: number; perCall: number; accuracy: number; honesty: number; callSeconds?: number }>,
     /** Relationship on first retaining; + perMonth at each month-end paid in full (cap 1). */
     relationshipStart: 0.1,
     relationshipPerMonth: 0.15,

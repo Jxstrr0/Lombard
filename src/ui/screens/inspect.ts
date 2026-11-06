@@ -13,7 +13,7 @@
 import { getItemDef } from '../../data/items'
 import { tuning } from '../../data/tuning'
 import type { Action } from '../../game/actions'
-import { availableTools, TOOLBAR } from '../../game/inspect/available'
+import { availableTools, TOOLBAR, type ToolAvailability } from '../../game/inspect/available'
 import { fakeProfileOf } from '../../game/items/generate'
 import type { ItemDef, ToolId } from '../../game/schema/item'
 import type { GameState } from '../../game/state'
@@ -170,7 +170,7 @@ export class InspectScreen {
   /** Toolbar from availableTools(): locked tools stay visible, greyed, with their note. */
   private renderToolbar(state: GameState): void {
     const insp = state.inspect!
-    const list = this.def ? availableTools(state, this.def) : TOOLBAR.map((tool) => ({ tool, usable: false, note: '' }))
+    const list: ToolAvailability[] = this.def ? availableTools(state, this.def) : TOOLBAR.map((tool) => ({ tool, usable: false, note: '' }))
     const order = list.map((t) => t.tool)
     if (order.join() !== this.toolOrder.join()) {
       this.toolOrder = order
@@ -200,7 +200,8 @@ export class InspectScreen {
       const noteEl = b.querySelector<HTMLElement>('.tool-note')!
       b.querySelector<HTMLElement>('.tool-secs')!.hidden = !t.usable && !!note
       setText(noteEl, note ? (t.usable ? ` · ${note}` : note) : '')
-      const secs = tuning.inspect.toolSeconds[t.tool]
+      const secs = t.seconds ?? tuning.inspect.toolSeconds[t.tool]
+      setText(b.querySelector<HTMLElement>('.tool-secs')!, `${secs} s`)
       b.setAttribute(
         'aria-label',
         `${TOOL_LABEL[t.tool]}, ${secs} seconds${t.tool === 'loupe' ? ', look over the whole item' : ''}${note ? `, ${note}` : ''}${t.usable ? '' : ', unavailable'}`,

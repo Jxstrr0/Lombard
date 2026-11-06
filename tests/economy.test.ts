@@ -8,8 +8,9 @@ import { chargeExpenses, daysToMonthEnd, isMonthEnd, upcomingBills } from '../sr
 import { callsLeft, releaseSpecialist, retainCost, retainSpecialist } from '../src/game/economy/specialists'
 import { buyUpgrade, hasUpgrade, refTier, restockAcid, upgradeStatus, visibilityBonus } from '../src/game/economy/upgrades'
 import { availableTools, payForTool, toolExtras } from '../src/game/inspect/available'
-import { ACID_TELL, REFERENCE_TELL, SPECIALIST_TELL, referenceRange, specialistOpinion, useTool } from '../src/game/inspect/tools'
+import { ACID_TELL, REFERENCE_TELL, SPECIALIST_TELL, referenceRange, specialistCallSeconds, specialistOpinion, useTool } from '../src/game/inspect/tools'
 import { generateItem } from '../src/game/items/generate'
+import { decodeSaveCode, encodeSaveCode } from '../src/game/save/code'
 import { Rng } from '../src/game/rng'
 import type { FakeProfile, ItemDef, ToolId } from '../src/game/schema/item'
 import { addDays, weekdayOf, type GameState } from '../src/game/state'
@@ -342,7 +343,8 @@ describe('specialist call', () => {
     const s1 = retainSpecialist(s0, 'jeweler')
     expect(call(s1, chain).usable).toBe(true)
     expect(call(s1, getItemDef('watch_pobeda_gold')).usable).toBe(false)
-    expect(call(s1, getItemDef('phone_mangosteen_m5'))).toMatchObject({ usable: false, note: 'nobody' })
+    expect(call(s1, getItemDef('phone_mangosteen_m5'))).toMatchObject({ usable: false, note: 'no retainer' })
+    expect(call(s1, { ...chain, category: 'tools' })).toMatchObject({ usable: false, note: 'nobody' })
     expect(toolExtras(s1, chain).specialist).toEqual({ id: 'jeweler', relationship: tuning.specialists.relationshipStart })
   })
 
@@ -397,7 +399,7 @@ describe('specialist call', () => {
           }
         }
       }
-      expect(right / total, spec.id).toBeGreaterThan(0.8)
+      if (total > 0) expect(right / total, spec.id).toBeGreaterThan(0.8)
     }
   })
 
@@ -441,5 +443,80 @@ describe('specialist call', () => {
       if (item.trueValue >= tuning.specialists.lowballMinValue) continue
       expect(specialistOpinion(ring, item, { id: 'jeweler', relationship: 0 }, new Rng(seed)).verdict).not.toBe('lowball')
     }
+  })
+
+  it('the antiques dealer lowballs most, the militaria collector hardly ever', () => {
+    const rate = (id: string) => {
+      let n = 0
+      let eligible = 0
+      for (let seed = 0; seed < 2000; seed++) {
+        const item = makeItem(chain, undefined, seed)
+        if (item.trueValue < tuning.specialists.lowballMinValue) continue
+        eligible++
+        if (specialistOpinion(chain, item, { id, relationship: 0.1 }, new Rng(seed)).verdict === 'lowball') n++
+      }
+      return n / eligible
+    }
+    expect(rate('antiquary')).toBeGreaterThan(rate('jeweler'))
+    expect(rate('collector')).toBeLessThan(0.1)
+  })
+
+  it('routes each category to its own specialist; the electronics tech answers faster', () => {
+    let s = closedOn('2014-03-03')
+    for (const spec of SPECIALISTS) s = retainSpecialist(s, spec.id)
+    expect(SPECIALISTS.every((spec) => s.specialists[spec.id]?.retained)).toBe(true)
+    const expected: Record<string, string> = {
+      gold_rope_chain_585: 'jeweler',
+      watch_pobeda_gold: 'watchmaker',
+      medal_for_courage: 'collector',
+      phone_mangosteen_m5: 'technician',
+      camera_zenit_e: 'technician',
+    }
+    for (const [defId, id] of Object.entries(expected)) expect(toolExtras(s, getItemDef(defId)).specialist?.id, defId).toBe(id)
+    expect(toolExtras(s, { ...chain, category: 'icons' }).specialist?.id).toBe('antiquary')
+    expect(toolExtras(s, { ...chain, category: 'electronics' }).specialist?.id).toBe('technician')
+
+    const phone = getItemDef('phone_mangosteen_m5')
+    const at = inspecting(s, makeItem(phone, undefined, 3))
+    const call = availableTools(at, phone).find((t) => t.tool === 'specialist')!
+    expect(call.seconds).toBe(tuning.specialists.roster.technician!.callSeconds)
+    expect(specialistCallSeconds('technician')).toBeLessThan(tuning.inspect.toolSeconds.specialist)
+    expect(specialistCallSeconds('jeweler')).toBe(tuning.inspect.toolSeconds.specialist)
+    expect(use(at, 'specialist').current!.elapsed).toBe(specialistCallSeconds('technician'))
+  })
+})
+
+describe('specialist roster', () => {
+  it('every specialist has tuning, nobody shares a category, and every item category has someone', () => {
+    const ids = SPECIALISTS.map((s) => s.id)
+    expect(ids).toHaveLength(5)
+    expect(Object.keys(tuning.specialists.roster).sort()).toEqual([...ids].sort())
+    const cats = SPECIALISTS.flatMap((s) => s.categories)
+    expect(new Set(cats).size).toBe(cats.length)
+    for (const def of ITEM_DEFS) expect(cats, def.id).toContain(def.category)
+    for (const r of Object.values(tuning.specialists.roster)) {
+      expect(r.calls).toBeGreaterThan(0)
+      expect(r.perCall).toBeGreaterThan(r.fee / r.calls) // extra calls cost more than allowance calls
+      expect(r.accuracy).toBeLessThan(tuning.specialists.maxAccuracy)
+    }
+  })
+
+  it('all five on retainer: five bills at month end, and the save code still round-trips', () => {
+    let s = closedOn('2014-03-30', 7, 200_000)
+    for (const spec of SPECIALISTS) s = retainSpecialist(s, spec.id)
+    const bills = upcomingBills(s)
+    for (const spec of SPECIALISTS) expect(bills.map((b) => b.label)).toContain(`Retainer: ${spec.short}`)
+    const fees = SPECIALISTS.reduce((a, spec) => a + tuning.specialists.roster[spec.id]!.fee, 0)
+    const before = s.cash
+    s = playEmptyDay({ ...s, calendar: { ...s.calendar, date: '2014-03-31' } })
+    expect(before - s.cash).toBe(monthly + fees)
+    for (const spec of SPECIALISTS) {
+      expect(callsLeft(s, spec.id)).toBe(tuning.specialists.roster[spec.id]!.calls)
+      expect(s.day.log.some((e) => e.text.startsWith(`Retainer: ${spec.name}, April`)), spec.id).toBe(true)
+    }
+    const none = encodeSaveCode(closedOn('2014-03-30', 7, 200_000))
+    const code = encodeSaveCode(s)
+    expect(decodeSaveCode(code).specialists).toEqual(s.specialists)
+    expect(code.length - none.length).toBeLessThan(600)
   })
 })

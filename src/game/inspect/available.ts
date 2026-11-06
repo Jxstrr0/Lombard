@@ -22,13 +22,15 @@ import { callsLeft, coversCategory, specialistFor } from '../economy/specialists
 import { hasUpgrade, refTier, toolUpgrade } from '../economy/upgrades'
 import { M1_TOOLS, type ItemDef, type ToolId } from '../schema/item'
 import type { GameState } from '../state'
-import type { ToolExtras } from './tools'
+import { specialistCallSeconds, type ToolExtras } from './tools'
 
 export interface ToolAvailability {
   tool: ToolId
   usable: boolean
   /** Why it is locked or what it costs, for the button sub-label (e.g. "3 left", "no retainer"). */
   note?: string
+  /** Seconds a use takes, if not tuning.inspect.toolSeconds[tool] (each specialist's own call time). */
+  seconds?: number
 }
 
 export const TOOLBAR: readonly ToolId[] = [...M1_TOOLS, 'acid', 'reference', 'specialist']
@@ -58,11 +60,12 @@ export function toolAvailability(state: GameState, tool: ToolId, def: ItemDef): 
       const id = specialistFor(state, def)
       if (!id) return { tool, usable: false, note: coversCategory(def) ? 'no retainer' : 'nobody' }
       if (usedThisVisit(state, tool)) return { tool, usable: false, note: 'called' }
+      const seconds = specialistCallSeconds(id)
       const left = callsLeft(state, id)
-      if (left > 0) return { tool, usable: true, note: `${left} left` }
+      if (left > 0) return { tool, usable: true, note: `${left} left`, seconds }
       const fee = tuning.specialists.roster[id]!.perCall
       if (state.cash < fee) return { tool, usable: false, note: `${rub(fee)} fee` }
-      return { tool, usable: true, note: rub(fee) }
+      return { tool, usable: true, note: rub(fee), seconds }
     }
     default:
       return M1_TOOLS.includes(tool) ? { tool, usable: true } : { tool, usable: false, note: 'later' }

@@ -83,19 +83,55 @@ Time pressure: a queue counter shows waiting customers. Each waiting customer lo
 
 Specialists are named characters, one per category group, hired on a monthly retainer:
 
-| Specialist group | Categories covered |
-|---|---|
-| Jeweler | gold, jewelry, coins |
-| Watchmaker | watches, small mechanisms |
-| Militaria collector | medals, Soviet militaria, banknotes |
-| Antiques dealer | icons, porcelain, antiques, instruments |
-| Electronics tech | phones, electronics, cameras |
+| Specialist group | Who (id) | Categories covered |
+|---|---|---|
+| Jeweler | Faina Gelfand (`jeweler`) | gold, jewelry, coins |
+| Watchmaker | Ilya Semyonovich Brodsky (`watchmaker`) | watches, small mechanisms |
+| Militaria collector | Gennady Pavlovich Shurygin (`collector`) | medals, Soviet militaria, banknotes |
+| Antiques dealer | Stanislav Edgarovich Lyubimov (`antiquary`) | icons, porcelain, antiques, instruments |
+| Electronics tech | Zhenya Kroshkina (`technician`) | phones, electronics, cameras |
+
+Porcelain sits in the `antiques` category; banknotes have no category yet and go to Gennady (`militaria`) when they arrive.
 
 - Retainer: a monthly fee buys a call allowance (e.g. 6 calls/month). Extra calls cost a per-call fee. Numbers live in `tuning.ts`.
 - Each specialist has hidden `accuracy`, `honesty`, and `relationship`. Accuracy is good but not perfect; honesty matters because some specialists will lowball an item so they can buy it from you themselves.
 - Relationship grows with steady payment and good referrals; it improves accuracy and unlocks favors (a quick verdict for free, a buyer for an odd item, a warning about a fake in circulation).
 - Firing or switching specialists is possible. Each has a small arc (the watchmaker with failing eyesight, the antiques dealer with mob ties).
 - Start of career: no retainers. The first one unlocks in week 1 as part of onboarding.
+
+#### Specialist small arcs (design notes for the story engine)
+
+Each arc is 3–4 beats. A trigger reads "retained N months" (months paid in full, counted from `sinceDay`), "relationship ≥ x" (`state.specialists[id].relationship`), or an event. A beat lands as a phone call between customers, a visit at the counter, or a note in the morning paper. Effects named here (accuracy, honesty, call time, fees, prices) are new tuning entries, not inline numbers. A beat whose specialist was released waits until they are retained again; a released specialist skips their last beat and gets their epilogue card from the beats played so far.
+
+**Faina Gelfand, jeweler (she'd like your best gold for herself).**
+1. *Retained 1 month* → she drops in on her way to the arcade, looks over your case, buys nothing: "Anything heavy in 585, you call me first."
+2. *She has lowballed a piece you then sold to her* → a regular comes in wearing that piece, bought in Faina's window at three times what you got. *Choice:* ring her and say you noticed (relationship −0.2, her lowball chance halves from then on) / say nothing (she sends you one gold buyer a month).
+3. *Relationship ≥ 0.5* → warning about a fake in circulation: plated chains with perfect 585 stamps are going round the district. Plated-chain fakes turn up more for two weeks, and she tells you the tell (the clasp is a different colour).
+4. *Retained 4 months* → she is giving up her bench at the arcade to a nephew and offers you her customer book. *Choice:* buy it (cash; more jewellery buyers) / decline (she retires; her epilogue card remembers how you treated her).
+
+**Ilya Semyonovich Brodsky, watchmaker (honest, his eyes are going).**
+1. *Retained 1 month* → a call where his granddaughter reads the dial out to him; he asks you to describe watches slowly from now on. Flavour only.
+2. *Retained 2 months, or his first wrong verdict on a watch you bought* → he rings back the next morning: "I think it was my eyes, not the watch." *Choice:* keep him (relationship +0.2; his accuracy slips a little each month until beat 4) / let him go gently (release with no relationship loss).
+3. *Relationship ≥ 0.4* → he comes to the counter with a widow's pocket watch he promised to finish and can no longer see, and asks you to read the movement for him. *Choice:* help (a customer walks out of the queue; heart +) / say you're busy (relationship −0.1).
+4. *Retained 4 months* → he needs a cataract operation and is short. *Choice:* advance him the money (cash out; he returns weeks later with his accuracy restored and a free call a month) / don't (he works on, worse each month, and retires at year's end).
+
+**Gennady Pavlovich Shurygin, militaria collector (straight about medals; wants first refusal).**
+1. *His first sound verdict on a piece worth ≥ 15k* → he asks for first refusal on anything good. *Choice:* grant it (after each sound call on militaria you bought, he phones that evening offering his mid-range price) / refuse (relationship −0.1; he stays straight with you).
+2. *The Grandmother's Medals arc is running* → he recognises the number on her husband's Order from an archive list and tells you the man's story. *Choice:* tell the grandmother (heart +, she remembers) / keep it to yourself.
+3. *Relationship ≥ 0.4* → warning about a fake in circulation: cast Orders of the Red Star with machine-pressed numbers, sold by a polite man in a good coat. Cast Orders turn up more for two weeks; he tells you the tell.
+4. *Retained 3 months and first refusal granted* → he wants a medal you hold, below market, to return it to a family that has been looking for it. *Choice:* sell at his price (heart +, relationship +0.2) / hold out for the market (cash; he understands, but no more first-refusal calls).
+
+**Stanislav Edgarovich Lyubimov, antiques dealer (never wrong, rarely honest, friends with the crew).**
+1. *Retained 1 month* → he visits, admires the shop, and mentions he knows "the gentlemen who look after this street". Leaves a card. Seeds Protection.
+2. *Retained 2 months* → he sends round a seller with "family silver" and a story that doesn't hold. *Choice:* buy it cheap (cash +, dirty +, heat +) / turn the seller away (relationship −0.15).
+3. *Protection arc running and relationship ≥ 0.4* → he offers to "have a word" with the crew: no pressure for a month. *Choice:* accept (you owe him one) / decline.
+4. *You owe him one, or Volkova has asked about an icon* → he asks you to put one of his icons through your books as an unredeemed pawn, to give it a past (ties to The Collector). *Choice:* do it (cash, dirty +, heat +, mob standing +) / refuse (he drops you and the crew notices) / tell Volkova (he vanishes for a while; heat −, pressure +).
+
+**Zhenya Kroshkina, electronics tech (cheap, fast, a bit careless).**
+1. *Retained 1 month* → she comes to the counter to buy your dead phones for parts at a fair parts price, eats your biscuits, and fixes the shop radio.
+2. *Her first sound verdict on a phone or camera that wasn't* → she rings, mortified, and offers next month's retainer free. *Choice:* take the free month / ask her to slow down (her calls take as long as anyone's from then on, but her accuracy rises for good).
+3. *Relationship ≥ 0.4* → warning: a batch of phones "fell off a lorry" and is going round with scratched serials; she tells you what to look for. Those phones turn up more for two weeks (feeds Heat from M5).
+4. *Retained 3 months* → the city is closing her underpass and she asks to rent a corner of your shop for a repair desk. *Choice:* yes (small rent in; phones and electronics sell faster; quick checks at the counter) / no (she moves across the river; her calls get slower).
 
 ### 3. Appraisal and offer
 

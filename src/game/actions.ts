@@ -165,18 +165,21 @@ export function reducer(state: GameState, action: Action): GameState {
       const c = state.current
       if (!c || c.phase !== 'resolved') return state
       const served = state.day.served + 1
+      const rng = lullRng(state, c.visitId)
       return {
         ...state,
         current: null,
         inspect: null,
         haggle: null,
-        day: { ...state.day, served },
-        narration: state.queue.length > 0 ? `${state.queue.length} waiting.` : 'That’s everyone for today. Time to close up.',
+        day: { ...state.day, served, nextArrival: state.day.clock + rng.range(...tuning.day.lullSeconds) },
+        narration: state.queue.length > 0 ? rng.pick(visitLines.lull) : 'That’s everyone for today. Time to close up.',
       }
     }
     case 'time/tick': {
       const c = state.current
-      if (state.day.phase !== 'open' || !c || c.phase === 'resolved' || action.seconds <= 0) return state
+      if (state.day.phase !== 'open' || action.seconds <= 0) return state
+      if (!c) return lullTick(state, action.seconds * tuning.day.realTimeScale)
+      if (c.phase === 'resolved') return state
       return advanceTime(state, action.seconds * tuning.day.realTimeScale)
     }
     case 'ledger/sell':
@@ -275,7 +278,7 @@ function openDay(state: GameState): GameState {
       current: null,
       inspect: null,
       haggle: null,
-      day: { ...s.day, total: queue.length, newsRead: market.news.length === 0 },
+      day: { ...s.day, total: queue.length, newsRead: market.news.length === 0, nextArrival: lullRng(s, 'open').range(...tuning.day.firstArrivalSeconds) },
       narration: `The shop is open. ${queue.length} people are waiting outside.`,
     }
   })
@@ -311,6 +314,26 @@ function closeDay(state0: GameState): GameState {
 }
 
 // --- counter ------------------------------------------------------------------
+
+/**
+ * A side stream for the lulls between visitors, forked from the game Rng
+ * without advancing it, so pacing never shifts what customers bring or say.
+ */
+function lullRng(state: GameState, label: string): Rng {
+  return Rng.from(state.meta.rng).fork(`lull:${state.calendar.day}:${label}`)
+}
+
+/**
+ * Time passing with nobody at the counter: the clock runs, but nobody is
+ * standing in line (the queue's patience doesn't drain), and the next person
+ * walks in once the lull is over. Nothing happens before the paper is read.
+ */
+function lullTick(state: GameState, seconds: number): GameState {
+  if (state.queue.length === 0 || !state.day.newsRead) return state
+  const clock = state.day.clock + seconds
+  const next: GameState = { ...state, day: { ...state.day, clock } }
+  return clock >= (state.day.nextArrival ?? 0) ? nextCustomer(next) : next
+}
 
 function nextCustomer(state: GameState): GameState {
   if (state.day.phase !== 'open' || state.current || state.queue.length === 0) return state

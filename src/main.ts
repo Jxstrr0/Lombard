@@ -209,11 +209,16 @@ async function boot(): Promise<void> {
   if (itemLoader && params.get('nocast') !== '1') {
     shop.setCast(new CustomerCast(itemLoader.gltf, import.meta.env.BASE_URL, __BUILD_SHA__), castOverride(params))
   }
+  // ?walk=0: customers appear at the counter instead of walking in from the door (screenshots).
+  if (params.get('walk') === '0') shop.setWalking(false)
   const stage = new ItemStage(shop.scene, shop.matPoint, itemLoader?.load)
 
   // --- UI --------------------------------------------------------------------
+  // ?lull=0: no waiting between customers; a Next customer button calls each one (review, screenshots).
+  const manualNext = params.get('lull') === '0'
   const ui = new Ui(app, {
     store,
+    manualNext,
     replaceState: (s) => store.replace(s),
     newCareer: () => {
       const old = store.get().meta.careerId
@@ -261,9 +266,12 @@ async function boot(): Promise<void> {
   ui.onScreenChange = () => requestAnimationFrame(resize)
 
   const sync = (state: GameState, prev: GameState | null) => {
-    ui.render(state, prev)
+    // The scene first: it knows whether a new customer is still walking in, which the UI waits for.
     shop.sync(state)
+    ui.setCustomerArrivedQuiet(shop.customerState !== 'arriving')
+    ui.render(state, prev)
     stage.sync(state)
+    stage.setWaiting(state.current?.phase === 'present' && shop.customerState === 'arriving')
     rig.reduceMotion = stage.reduceMotion = state.settings.reduceMotion
     // A new customer steps up: face the counter again.
     if (prev && state.current && state.current.visitId !== prev.current?.visitId) rig.recentre()
@@ -312,9 +320,12 @@ async function boot(): Promise<void> {
   window.setInterval(() => {
     if (document.hidden) return
     const s = store.get()
-    if (s.day.phase === 'open' && s.current && s.current.phase !== 'resolved') {
-      store.dispatch({ type: 'time/tick', seconds: 1 })
-    }
+    if (s.day.phase !== 'open') return
+    // At the counter the clock runs until the visit is resolved; with the counter
+    // empty it runs through the lull until the next person walks in.
+    const atCounter = s.current && s.current.phase !== 'resolved'
+    const lull = !s.current && s.queue.length > 0 && !manualNext
+    if (atCounter || lull) store.dispatch({ type: 'time/tick', seconds: 1 })
   }, 1000)
 
   // --- perf ------------------------------------------------------------------
@@ -348,7 +359,12 @@ async function boot(): Promise<void> {
     perf?.begin()
     shop.update(dt)
     const customerState = shop.customerState
-    if (document.body.dataset.customer !== customerState) document.body.dataset.customer = customerState
+    if (document.body.dataset.customer !== customerState) {
+      document.body.dataset.customer = customerState
+      ui.setCustomerArrived(customerState !== 'arriving')
+      const c = store.get().current
+      stage.setWaiting(c?.phase === 'present' && customerState === 'arriving')
+    }
     stage.update(dt, rig)
     rig.update(dt)
     shop.setInspectBlend(rig.inspectBlend)

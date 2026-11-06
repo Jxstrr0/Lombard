@@ -487,8 +487,9 @@ async function main() {
     page.on('console', (m) => {
       if (m.type() === 'error') errors.push(`[${name}] console: ${m.text()}`)
     })
-    // Pin the quality tier: Auto would step down on a slow headless GPU mid-run.
-    const pinned = /[?&]tier=/.test(url) ? url : `${url}${url.includes('?') ? '&' : '?'}tier=mid`
+    // Pin the quality tier (Auto would step down on a slow headless GPU mid-run)
+    // skip the lull between customers (a Next customer button calls each one), and no walk from the door.
+    const pinned = `${url}${url.includes('?') ? '&' : '?'}${/[?&]tier=/.test(url) ? '' : 'tier=mid&'}lull=0&walk=0`
     await page.goto(`${base}${pinned}`, { waitUntil: 'networkidle' })
     await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
     await page.waitForTimeout(400)

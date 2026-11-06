@@ -22,6 +22,14 @@ export const tuning = {
     realTimeScale: 1,
     /** In-game seconds each haggle round takes. */
     haggleRoundSeconds: 6,
+    /** Quiet before the first customer walks in after opening, in-game seconds [min, max]. */
+    firstArrivalSeconds: [4, 8] as [number, number],
+    /**
+     * The lull between one customer leaving and the next walking in, in-game
+     * seconds [min, max]. Colby (Nov 6): keep 8 sellers a day and add pauses
+     * rather than more customers; this is most of a day's length.
+     */
+    lullSeconds: [15, 35] as [number, number],
   },
 
   customers: {

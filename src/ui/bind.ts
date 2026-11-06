@@ -35,11 +35,16 @@ import { WelcomeScreen } from './screens/welcome'
 
 export type ScreenId = 'intro' | 'welcome' | 'news' | 'counter' | 'inspect' | 'offer' | 'sale' | 'redeem' | 'ledger'
 
-export function screenFor(state: GameState): ScreenId {
+/**
+ * `arrived` false: the current customer is still walking in from the door
+ * (render/scene.ts), so the counter shows the empty shop until they reach it.
+ */
+export function screenFor(state: GameState, arrived = true): ScreenId {
   if (state.meta.intro) return 'intro'
   if (state.day.phase === 'closed') return state.history.length > 0 ? 'ledger' : 'welcome'
   if (!state.day.newsRead) return 'news'
   const c = state.current
+  if (c?.phase === 'present' && !arrived) return 'counter'
   if (c?.phase === 'inspect') return 'inspect'
   if (c?.phase === 'offer') return 'offer'
   if (c?.phase === 'present' && c.kind === 'buyer') return 'sale'
@@ -58,6 +63,8 @@ export interface UiDeps {
   /** Device graphics quality (localStorage, not the career). */
   getGraphics(): GraphicsInfo
   setGraphics(choice: GraphicsChoice): void
+  /** `?lull=0`: a Next customer button instead of the lull between visitors. */
+  manualNext: boolean
 }
 
 export interface UiLayout {
@@ -87,6 +94,8 @@ export class Ui {
   private current: ScreenId | null = null
   private lastLayout: UiLayout | null = null
   private build!: HTMLElement
+  /** False while the current customer is still walking to the counter. */
+  private arrived = true
   /** Called when the visible screen changes (main re-measures the camera layout). */
   onScreenChange: ((id: ScreenId) => void) | null = null
 
@@ -103,7 +112,7 @@ export class Ui {
     const shopButton = (suffix: string) =>
       createButton({ id: `shop-${suffix}`, label: 'Shop', icon: 'tag', ariaLabel: 'Shop floor: display and price tags', className: 'btn-shop', onPress: () => this.shop.open() })
 
-    this.counter = new CounterScreen(dispatch, openSettings, gear('counter'), shopButton('counter'))
+    this.counter = new CounterScreen(dispatch, openSettings, gear('counter'), shopButton('counter'), deps.manualNext)
     this.inspect = new InspectScreen(dispatch)
     this.offer = new OfferScreen(dispatch)
     this.office = new OfficeSheet({ getState: () => deps.store.get(), dispatch })
@@ -155,10 +164,24 @@ export class Ui {
     this.build.textContent = `${__BUILD_SHA__} · ${__BUILD_DATE__} · ${text}`
   }
 
+  /** Same, without rendering (main renders right after). */
+  setCustomerArrivedQuiet(arrived: boolean): void {
+    this.arrived = arrived
+  }
+
+  /** The scene says whether the current customer has reached the counter; re-renders when that changes. */
+  setCustomerArrived(arrived: boolean): void {
+    if (arrived === this.arrived) return
+    this.arrived = arrived
+    const s = this.deps.store.get()
+    this.render(s, s)
+  }
+
   render(state: GameState, prev: GameState | null): void {
     document.documentElement.style.setProperty('--text-scale', String(state.settings.textScale))
     document.documentElement.classList.toggle('reduce-motion', state.settings.reduceMotion)
-    const id = screenFor(state)
+    const id = screenFor(state, this.arrived)
+    const changed = id !== this.current
     if (id !== this.current) {
       if (this.current) this.screens[this.current].root.hidden = true
       this.screens[id].root.hidden = false
@@ -169,7 +192,7 @@ export class Ui {
     this.hud.render(state)
     switch (id) {
       case 'counter':
-        this.counter.render(state)
+        this.counter.render(state, this.arrived)
         break
       case 'inspect':
         this.inspect.render(state, prev)
@@ -202,7 +225,7 @@ export class Ui {
       if (id === 'ledger') this.office.render(state)
       else this.office.close()
     }
-    if (prev === null || screenFor(prev) !== id) this.onScreenChange?.(id)
+    if (changed) this.onScreenChange?.(id)
   }
 
   /** The player dragged to look around (retires the one-time hint). */

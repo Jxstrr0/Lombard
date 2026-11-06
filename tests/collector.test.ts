@@ -15,6 +15,7 @@ import { claimedValue } from '../src/game/appraise/value'
 import { applyCollectorChange, COLLECTOR_ID, heldIcon } from '../src/game/crime/collector'
 import { TRAIL } from '../src/game/crime/events'
 import { useTool } from '../src/game/inspect/tools'
+import { epilogueCards } from '../src/game/endings/epilogue'
 import { Rng } from '../src/game/rng'
 import { scriptedItem } from '../src/game/story/scripted'
 import type { GameState } from '../src/game/state'
@@ -207,5 +208,21 @@ describe('the Collector: Stanislav and the offer', () => {
   it('the effect does nothing if you no longer hold her', () => {
     const s = startedState(52, 'collector-none')
     expect(applyCollectorChange(s, 'sold')).toBe(s)
+  })
+})
+
+describe('the Collector: what became of him', () => {
+  const card = (f: string[]) => {
+    const s = startedState(53, 'collector-card')
+    return epilogueCards({ ...s, story: { ...s.story, flags: f } }).find((c) => c.id === 'collector')
+  }
+
+  it('shows once he has asked, and reads how she left the shop', () => {
+    expect(card([])).toBeUndefined()
+    const texts = [[], ['collector.sold'], ['collector.returned'], ['collector.handed_in'], ['collector.missed'], ['collector.passed']].map(
+      (f) => card(['collector.asked', ...f])!.text,
+    )
+    expect(new Set(texts).size).toBe(texts.length)
+    expect(card(['collector.asked'])!.name).toBe(COLLECTOR.name)
   })
 })

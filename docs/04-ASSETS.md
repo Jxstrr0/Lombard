@@ -166,11 +166,39 @@ Plan A: 2–3 rigged CC0 humanoid bases (check Quaternius "Universal Base Charac
 
 Plan B (fallback if Plan A looks cheap on phone): no 3D customer; a hand-painted or AI-free illustrated portrait card in the dialogue strip, item appears on the counter from the right. Many successful shop games do this. Decide at M3 after a one-day test.
 
+**The 1-day test (Nov 5, 2026).** A survey found no fetchable CC0 / CC BY realistic everyday adults: Quaternius's free characters are superhero bodies under an unclear licence, OpenGameArt's are fantasy-styled, Mixamo needs an account, Sketchfab CC0 scans aren't rigged. Two sources were good enough to test, both built headless in Blender and dropped into the shop with `?customer=<name>` (review only; the glbs live in `public/assets/customer-test/` and load lazily, only with the flag):
+- `mpfb_middleaged_man`: MakeHuman system assets (CC0) assembled by the MPFB 2 add-on. 18.9k tris, 3 materials, 1.1 MB, no animation (posed arms-down). Only the CC0 system pack is used (the CC-BY packs are skipped). Two MakeHuman suits print the MakeHuman logo on the shirt, so they're avoided, and the suit used carries a tiny CC0/makehuman.org mark at the edge of its texture that isn't visible. MakeHuman took its asset repository offline in Oct 2026; the static pack site still works and local copies are kept. MPFB can generate any body, age and outfit from its parameters, so it scales to a cast.
+- `rocketbox_male_adult_03`: the Microsoft Rocketbox library (115 rigged avatars, MIT). 7.2k tris, 3 materials, 1.0 MB, a looping breathing idle. MIT isn't in the licence list above. It's permissive (attribution plus the notice, like CC BY), so Colby accepted it for the test; using it for real means adding it to the list.
+
+The silhouette stays the default without the flag. Hair cards use alpha test; `src/render/customerModel.ts` keeps their blend mode through the fade-in. See 05 for the decision.
+
 ## Audio
 
 - Ambience: canal water, distant trams, rain, wind for winter. Freesound CC0.
 - Foley: door bell, item set on glass, loupe click, scale beep, drawer, coins, cash register. Freesound CC0 or Kenney.
 - Music: optional, low-key. Only CC0 or CC BY tracks; prefer none over a license risk.
+
+### As built (decided Nov 2026, M3)
+
+Freesound and kenney.nl were not reachable from the build container (403), so every sound comes from **OpenGameArt**, each pack's page checked for a CC0 licence (Kenney's packs there carry CC0 licence files too). Rows per source in `ATTRIBUTION.md`.
+
+| File (`public/assets/audio/`) | What | Source | Plays on |
+|---|---|---|---|
+| `ambience.mp3` (54 s loop, 48 kbps, ~317 KB) | a street through the window, faint canal water, fridge hum as room tone | ignasd's street traffic + randommind's Vistula waves + LEGIT Audio's fridge drone | from the first tap, while sound is on |
+| `door_bell.mp3` | a small bell, three strikes | rubberduck `bell_03` | a customer steps up |
+| `set_down.mp3` | soft thud + faint glass tick | Kenney `bookPlace2` + rubberduck `glass_02` | their item lands on the mat (0.9 s after the bell); an item put in a display slot |
+| `cash.mp3` | cash drawer + coins | laleksic `drawer_open` + Kenney `handleCoins` | bought, pawned, sold, redeemed |
+| `coins.mp3` | coins | Kenney `handleCoins` | dealer sale, upgrade, acid refill, specialist retainer |
+| `tool_loupe` / `tool_magnet` / `tool_page` / `tool_acid` / `tool_switch` | metal click / latch / page flip / drop / switch | Kenney `metalClick`, `metalLatch`, `bookFlip1`; rubberduck `plop_01`; laleksic `switch_on` | loupe / magnet / reference / acid / UV |
+| `tool_scale.mp3`, `tool_phone.mp3` | a piezo beep; three keypad tones (DTMF 7-3-1) | generated from sine tones in `art/audio/build.py` (no third-party audio) | scale / phone and specialist |
+| `ui_tap.mp3` | a short click, very quiet | Kenney `click_001` | any button tap that made no other sound |
+
+- `art/audio/build.py` (system Python with numpy, plus ffmpeg with libmp3lame; needs the network) downloads the sources into `art/out/audio/` (gitignored), layers and filters them per its `RECIPES`, trims silence, and writes mono 44.1 kHz MP3s (80–96 kbps one-shots, 48 kbps ambience). Outputs are committed; CI never downloads anything.
+- Loudness: one-shots to −20 LUFS momentary (loudest 400 ms), with at most 6 dB of lookahead limiting on transients and peaks under −1 dBFS; very short clicks stay a few LU under. The ambience is −26 LUFS integrated. The mix between cues is runtime gain in `src/data/audio.ts`, so a level change never needs a rebuild.
+- The ambience is filtered to sound heard through glass (street low-passed to ~1.1 kHz, water to 650 Hz, hum to 380 Hz) and baked into a seamless loop (the last 3 s crossfaded, equal power, into the head). At runtime it still plays as overlapping passes with 2.5 s equal-power fades, so MP3 encoder padding can't click at the seam in any browser.
+- Whole set: 13 files, ~387 KB.
+- Add or change a sound: edit `RECIPES` (or `AMBIENCE`), run `python3 art/audio/build.py --only <name>`, add the id to `SOUND_IDS`/`SOUND_GAIN` in `src/data/audio.ts`, map it in `src/audio/cues.ts`, add its ATTRIBUTION line.
+- Not yet: seasonal ambience (rain, winter wind), trams (no CC0 tram recording found on OpenGameArt), music.
 
 ## UI
 
@@ -185,4 +213,5 @@ npm run assets:check      # verify every file in public/assets has an ATTRIBUTIO
 # canal backdrop: art/backdrop/build.py in Blender, then npm run backdrop:pack (see Canal backdrop above)
 # surface textures: python3 art/materials/prepare.py, then push (the bake runs; see Surface textures above)
 # props: art/props/prepare.py in Blender, then place them in bake/layout.json and push (see Props above)
+# audio: python3 art/audio/build.py [--only <name>], outputs in public/assets/audio/ (see Audio above)
 ```

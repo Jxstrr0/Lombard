@@ -17,6 +17,9 @@ import '@fontsource/ibm-plex-mono/500.css'
 import '@fontsource/ibm-plex-mono/600.css'
 import './style.css'
 import * as THREE from 'three'
+import { AudioEngine } from './audio/engine'
+import { cuesFor } from './audio/cues'
+import { loadSoundSettings, saveSoundSettings, type SoundSettings } from './audio/settings'
 import { tuning } from './data/tuning'
 import { AUTOSAVE_ACTIONS, reducer } from './game/actions'
 import { ITEM_DEFS } from './data/items'
@@ -34,6 +37,7 @@ import { PerfOverlay, TIER_SETTINGS, TierBenchmark, initialTier } from './render
 import { ShopScene } from './render/scene'
 import { ItemStage } from './render/stage'
 import { createItemLoader } from './render/loaders'
+import { customerTestName, loadCustomerModel } from './render/customerModel'
 import { Ui, screenFor, type ScreenId } from './ui/bind'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
@@ -166,6 +170,19 @@ async function boot(): Promise<void> {
   applyReduceMotion()
   reduceMotionQuery.addEventListener('change', applyReduceMotion)
 
+  // --- audio -----------------------------------------------------------------
+  // Nothing is created or fetched until the first gesture (mobile autoplay rules).
+  let sound: SoundSettings = loadSoundSettings()
+  const audio = new AudioEngine(import.meta.env.BASE_URL, sound)
+  for (const type of ['pointerup', 'touchend', 'click', 'keydown'] as const) {
+    window.addEventListener(type, () => audio.gesture(), { capture: true, passive: true })
+  }
+  // A soft tap for buttons; runs after the button's own handler, so a tap that
+  // already made a state sound (door, tool, cash) stays quiet.
+  document.addEventListener('click', (e) => {
+    if (e.target instanceof Element && e.target.closest('button:not(:disabled)')) audio.tap()
+  })
+
   // --- renderer --------------------------------------------------------------
   const renderer = createRenderer(tierSettings.antialias, tierSettings.pixelRatioCap)
   if (!renderer) return
@@ -200,6 +217,13 @@ async function boot(): Promise<void> {
       }
       store.dispatch({ type: 'settings/set', patch: { reduceMotion: on } })
     },
+    getSound: () => sound,
+    setSound: (patch) => {
+      sound = { ...sound, ...patch }
+      saveSoundSettings(sound)
+      audio.apply(sound)
+      audio.gesture()
+    },
   })
 
   const resize = () => {
@@ -224,6 +248,7 @@ async function boot(): Promise<void> {
   sync(store.get(), null)
   store.subscribe((state, prev, action) => {
     sync(state, prev)
+    audio.play(cuesFor(prev, state, action))
     if (action.type === 'inspect/useTool' && (state.inspect?.findings.length ?? 0) > (prev.inspect?.findings.length ?? 0)) {
       stage.playTool(action.tool, state)
     }
@@ -285,6 +310,16 @@ async function boot(): Promise<void> {
           if (m) ui.setBakeInfo(`bake ${m.quality}${m.commit ? ` ${m.commit}` : ''}`)
           return m
         })
+  // M3 customer test: ?customer=<name> stands a rigged test model at the counter.
+  const customerName = customerTestName(params)
+  if (customerName) {
+    loadCustomerModel(import.meta.env.BASE_URL, customerName, __BUILD_SHA__)
+      .then((model) => {
+        shop.setCustomerModel(model)
+        console.info(`[customer] ${customerName}: ${Math.round(model.triangles)} triangles, ${model.materials.length} materials${model.mixer ? ', idle clip' : ''}`)
+      })
+      .catch((err) => console.warn('[customer] test model failed to load, keeping the silhouette', err))
+  }
   // The canal outside the window comes after the shop; ?nobackdrop=1 keeps the old canvas card.
   const backdropLoad = params.get('nobackdrop') === '1' ? Promise.resolve(false) : bakeLoad.then(() => shop.loadBackdrop(renderer, import.meta.env.BASE_URL))
   void Promise.all([envLoad, bakeLoad, backdropLoad]).finally(() => {

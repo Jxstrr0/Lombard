@@ -13,6 +13,7 @@
  *   pawner redeeming       → redeem (until resolved)
  *   otherwise              → counter (incl. the resolved outcome + Next)
  */
+import type { SoundSettings } from '../audio/settings'
 import type { Action } from '../game/actions'
 import type { GameState } from '../game/state'
 import type { Store } from '../game/store'
@@ -51,6 +52,9 @@ export interface UiDeps {
   replaceState(state: GameState): void
   newCareer(): void
   setReduceMotion(on: boolean): void
+  /** Device sound settings (not part of the career). */
+  getSound(): SoundSettings
+  setSound(patch: Partial<SoundSettings>): void
 }
 
 export interface UiLayout {
@@ -112,6 +116,8 @@ export class Ui {
       replaceState: deps.replaceState,
       newCareer: deps.newCareer,
       setReduceMotion: deps.setReduceMotion,
+      getSound: deps.getSound,
+      setSound: deps.setSound,
     })
     this.screens = {
       counter: this.counter,

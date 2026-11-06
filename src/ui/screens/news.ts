@@ -6,13 +6,14 @@
  * the lead story big, the rest in a column below. Portrait first; the page scrolls if
  * a long day's paper does not fit.
  */
+import { t } from '../../data/strings'
 import type { Action } from '../../game/actions'
 import { BULLETIN, PAPER } from '../../data/news'
 import { bulletinToday } from '../../game/crime/bulletin'
 import type { GameState } from '../../game/state'
 import type { NewsItem } from '../../game/types'
 import { createButton, el, setText } from '../components/button'
-import { longDate, WEEKDAYS } from '../format'
+import { fullDate } from '../format'
 
 export class NewsScreen {
   readonly root: HTMLElement
@@ -37,7 +38,7 @@ export class NewsScreen {
     paper.append(mast, this.dateLine, this.stories, this.bulletin)
     scroll.append(paper)
     const footer = el('footer', 'news-actions actions')
-    footer.append(createButton({ id: 'news-done', label: 'Open the door', variant: 'primary', icon: 'door', onPress: () => dispatch({ type: 'news/dismiss' }) }))
+    footer.append(createButton({ id: 'news-done', label: t('news.openDoor'), variant: 'primary', icon: 'door', onPress: () => dispatch({ type: 'news/dismiss' }) }))
     root.append(scroll, footer)
     this.root = root
   }
@@ -47,8 +48,8 @@ export class NewsScreen {
     const key = `${state.calendar.date}|${state.market.news.map((n) => n.id).join(',')}|${lines.map((b) => b.id).join(',')}`
     if (key === this.key) return
     this.key = key
-    const { date, weekday, day } = state.calendar
-    setText(this.dateLine, `${WEEKDAYS[weekday]}, ${longDate(date)} · No. ${day} · ${PAPER.price}`)
+    const { date, day } = state.calendar
+    setText(this.dateLine, t('news.dateline', { date: fullDate(date), day, price: PAPER.price }))
     this.stories.replaceChildren(...state.market.news.map((n, i) => story(n, i === 0)))
     this.bulletin.hidden = lines.length === 0
     const list = el('ul', 'bulletin-lines')

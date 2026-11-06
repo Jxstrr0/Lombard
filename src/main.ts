@@ -55,6 +55,7 @@ import * as THREE from 'three'
 import { AudioEngine } from './audio/engine'
 import { cuesFor } from './audio/cues'
 import { loadSoundSettings, saveSoundSettings, type SoundSettings } from './audio/settings'
+import { t } from './data/strings'
 import { AUTOSAVE_ACTIONS } from './game/actions'
 import { createInitialState, type GameState } from './game/state'
 import type { EndingStep } from './ui/screens/ending'
@@ -156,7 +157,7 @@ function createRenderer(antialias: boolean, pixelRatioCap: number): THREE.WebGLR
   try {
     renderer = new THREE.WebGLRenderer({ antialias, powerPreference: 'high-performance' })
   } catch {
-    showFatal('This browser could not start WebGL. Try Chrome or Safari with hardware acceleration on.')
+    showFatal(t('fatal.webgl'))
     return null
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioCap))
@@ -309,7 +310,7 @@ async function boot(): Promise<void> {
       void putInSlot(s, slot).then((stored) => enter(stored ?? s))
     },
     mainMenu: () => void mainMenu(),
-    slotLabel: () => (activeSlot ? `slot ${activeSlot}` : null),
+    slotLabel: () => (activeSlot ? t('common.slotLower', { slot: activeSlot }) : null),
     setTextScale: (scale) => {
       saveTextScale(scale)
       store.dispatch({ type: 'settings/set', patch: { textScale: scale } })
@@ -573,5 +574,5 @@ async function boot(): Promise<void> {
 
 boot().catch((err) => {
   console.error('[boot] failed', err)
-  showFatal('The shop could not open. Check the connection and reload.')
+  showFatal(t('fatal.boot'))
 })

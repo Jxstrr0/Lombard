@@ -2,6 +2,7 @@
  * Calculator-style number pad: digits on three columns, a fourth column of
  * side keys (quick-chips or clear). One-handed, every key ≥ 44 px.
  */
+import { t } from '../../data/strings'
 import { icons } from '../icons'
 import { el } from './button'
 
@@ -36,7 +37,7 @@ export class NumPad {
         this.side.push(b)
       } else if (k === 'back') {
         b.innerHTML = icons.backspace
-        b.setAttribute('aria-label', 'Delete digit')
+        b.setAttribute('aria-label', t('numpad.backspace'))
         b.dataset.id = `${idPrefix}-key-back`
         b.addEventListener('click', () => this.backspace())
       } else {

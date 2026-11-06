@@ -3,6 +3,7 @@
  * gauge for the most impatient waiting customer, and cash.
  * The patience gauge uses length + a pattern + an alert icon when low, never colour alone.
  */
+import { t } from '../../data/strings'
 import { tuning } from '../../data/tuning'
 import type { GameState } from '../../game/state'
 import { rub, shopClock } from '../format'
@@ -34,7 +35,7 @@ export class Hud {
       <div class="hud-queue" data-ref="queue" data-id="hud-queue" role="status">
         ${icons.person}<span class="hud-queue-count" data-ref="count"></span>
         <span class="patience" data-ref="gauge"><i data-ref="fill"></i></span>
-        <span class="patience-low" data-ref="low">${icons.alert}<span>leaving</span></span>
+        <span class="patience-low" data-ref="low">${icons.alert}<span data-ref="low-text"></span></span>
       </div>
       <div class="hud-cash" data-ref="cash" data-id="hud-cash"></div>`
     const q = (r: string) => root.querySelector<HTMLElement>(`[data-ref="${r}"]`)!
@@ -47,10 +48,11 @@ export class Hud {
     this.gaugeFill = q('fill')
     this.lowIcon = q('low')
     this.cash = q('cash')
+    q('low-text').textContent = t('hud.leaving')
   }
 
   render(state: GameState): void {
-    setText(this.day, `Day ${state.calendar.day}`)
+    setText(this.day, t('common.dayN', { day: state.calendar.day }))
     setText(this.clock, shopClock(state.day.clock))
     setText(this.cash, rub(state.cash))
     const open = state.day.phase === 'open'
@@ -65,10 +67,7 @@ export class Hud {
     this.gaugeFill.style.width = `${Math.round(frac * 100)}%`
     this.gauge.classList.toggle('is-low', low)
     this.lowIcon.hidden = !low
-    const label =
-      n === 0
-        ? 'Nobody waiting'
-        : `${n} waiting${low ? ', someone is about to leave' : `, patience ${Math.round(frac * 100)}%`}`
+    const label = n === 0 ? t('hud.nobody') : low ? t('hud.waitingLow', { count: n }) : t('hud.waiting', { count: n, pct: Math.round(frac * 100) })
     if (this.queue.getAttribute('aria-label') !== label) this.queue.setAttribute('aria-label', label)
   }
 }

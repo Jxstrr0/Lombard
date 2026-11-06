@@ -14,6 +14,8 @@
  * summary (main loads it; the ending screen takes over). It offers New career
  * (confirm, then the slot is overwritten) as well as Delete. Continue skips it.
  */
+import type { PlainKey } from '../../data/strings'
+import { t } from '../../data/strings'
 import { decodeSaveCode, SaveCodeError } from '../../game/save/code'
 import type { SlotNo, SlotView } from '../../game/save/slots'
 import { mostRecentSlot } from '../../game/save/slots'
@@ -21,7 +23,7 @@ import type { CareerEndKind, GameState } from '../../game/state'
 import { backupAgeText, backupReminderDue, lastBackupAt, readBackupFile } from '../../persist/safety'
 import { createButton, el, setText } from '../components/button'
 import { icons } from '../icons'
-import { rub } from '../format'
+import { lastPlayedText, rub } from '../format'
 
 export const HUB_URL = 'https://jxstrr0.github.io/Kelbo.Website/games.html'
 
@@ -33,20 +35,15 @@ export interface TitleDeps {
   openSettings(): void
 }
 
-/** "Today, 14:05", "Yesterday, 09:12" or "3 Nov 2026". */
-export function lastPlayedText(savedAt: number, now = Date.now()): string {
-  const d = new Date(savedAt)
-  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-  const day = (t: number) => new Date(t).toDateString()
-  if (day(savedAt) === day(now)) return `Today, ${time}`
-  if (day(savedAt) === day(now - 86_400_000)) return `Yesterday, ${time}`
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+const END_LABEL: Record<CareerEndKind, PlainKey> = {
+  retired: 'title.end.retired',
+  evicted: 'title.end.evicted',
+  raided: 'title.end.raided',
+  pushedOut: 'title.end.pushedOut',
 }
 
-const END_LABEL: Record<CareerEndKind, string> = { retired: 'retired', evicted: 'evicted', raided: 'shut down', pushedOut: 'pushed out' }
-
 function shopLabel(c: NonNullable<SlotView['career']>): string {
-  return c.intro ? 'New shop (not named yet)' : c.shopName
+  return c.intro ? t('title.newShop') : c.shopName
 }
 
 export class TitleScreen {
@@ -82,17 +79,17 @@ export class TitleScreen {
     // --- brand
     const brand = el('header', 'title-brand')
     brand.append(
-      el('span', 'title-studio', 'Longlight Interactive'),
-      el('h1', 'title-name', 'Lombard'),
-      el('span', 'title-cyr', 'ЛОМБАРД · МОСТОГРАД'),
-      el('p', 'title-tag', 'A pawn shop on the canals of Mostograd.'),
+      el('span', 'title-studio', t('title.studio')),
+      el('h1', 'title-name', t('title.name')),
+      el('span', 'title-cyr', t('common.cyrCity')),
+      el('p', 'title-tag', t('title.tag')),
     )
 
     // --- continue
     const cont = el('button', 'btn btn-primary title-continue')
     cont.type = 'button'
     cont.dataset.id = 'title-continue'
-    const contLabel = el('span', 'title-continue-label', 'Continue')
+    const contLabel = el('span', 'title-continue-label', t('title.continue'))
     this.continueSub = el('span', 'title-continue-sub')
     cont.append(contLabel, this.continueSub)
     cont.addEventListener('click', () => {
@@ -107,19 +104,19 @@ export class TitleScreen {
 
     // --- careers
     const careers = el('div', 'title-careers')
-    careers.append(el('h2', 'title-h', 'Careers'))
+    careers.append(el('h2', 'title-h', t('title.careers')))
     this.list = el('ul', 'title-slots')
     careers.append(this.list)
 
     // --- actions
     const actions = el('div', 'actions title-actions')
     actions.append(
-      createButton({ id: 'title-load', label: 'Load save code', icon: 'doc', onPress: () => this.openLoad() }),
-      createButton({ id: 'title-settings', label: 'Settings', icon: 'gear', onPress: () => this.deps.openSettings() }),
+      createButton({ id: 'title-load', label: t('settings.loadCode'), icon: 'doc', onPress: () => this.openLoad() }),
+      createButton({ id: 'title-settings', label: t('common.settings'), icon: 'gear', onPress: () => this.deps.openSettings() }),
     )
 
     const foot = el('footer', 'title-foot')
-    const hub = el('a', 'title-hub', 'More from Longlight')
+    const hub = el('a', 'title-hub', t('title.hub'))
     hub.href = HUB_URL
     hub.target = '_blank'
     hub.rel = 'noopener'
@@ -140,21 +137,21 @@ export class TitleScreen {
     sheet.dataset.id = 'title-load-sheet'
     sheet.setAttribute('role', 'dialog')
     sheet.setAttribute('aria-modal', 'true')
-    sheet.setAttribute('aria-label', 'Load save code')
+    sheet.setAttribute('aria-label', t('settings.loadCode'))
     const head = el('div', 'sheet-head')
     head.append(
-      el('h2', '', 'Load save code'),
-      createButton({ id: 'title-load-close', label: '', icon: 'close', variant: 'ghost', ariaLabel: 'Close', onPress: () => this.closeLoad() }),
+      el('h2', '', t('settings.loadCode')),
+      createButton({ id: 'title-load-close', label: '', icon: 'close', variant: 'ghost', ariaLabel: t('common.close'), onPress: () => this.closeLoad() }),
     )
     const sec = el('div', 'settings-section')
-    sec.append(el('p', 'settings-text', 'Paste a save code from another device (or choose a backup file), then pick a slot for it.'))
+    sec.append(el('p', 'settings-text', t('title.loadText')))
     this.loadInput = el('textarea', 'code-box')
     this.loadInput.dataset.id = 'title-code-input'
     this.loadInput.rows = 3
-    this.loadInput.placeholder = 'LMB1.…'
+    this.loadInput.placeholder = t('settings.codePlaceholder')
     this.loadInput.spellcheck = false
     this.loadInput.autocapitalize = 'off'
-    this.loadInput.setAttribute('aria-label', 'Save code to load')
+    this.loadInput.setAttribute('aria-label', t('settings.codeAria'))
     this.loadError = el('p', 'settings-error')
     this.loadError.setAttribute('role', 'alert')
     this.fileInput = el('input', '')
@@ -164,8 +161,8 @@ export class TitleScreen {
     this.fileInput.addEventListener('change', () => void this.loadFile())
     const row = el('div', 'actions')
     row.append(
-      createButton({ id: 'title-code-read', label: 'Load', variant: 'primary', onPress: () => this.readCode(this.loadInput.value) }),
-      createButton({ id: 'title-code-file', label: 'Load file', ariaLabel: 'Load backup file', icon: 'doc', onPress: () => this.fileInput.click() }),
+      createButton({ id: 'title-code-read', label: t('common.load'), variant: 'primary', onPress: () => this.readCode(this.loadInput.value) }),
+      createButton({ id: 'title-code-file', label: t('common.loadFile'), ariaLabel: t('common.loadFileAria'), icon: 'doc', onPress: () => this.fileInput.click() }),
     )
     sec.append(this.loadInput, this.loadError, row, this.fileInput)
 
@@ -178,11 +175,11 @@ export class TitleScreen {
     this.replaceText = el('p', '')
     const replaceActions = el('div', 'actions')
     replaceActions.append(
-      createButton({ id: 'title-code-cancel', label: 'Cancel', onPress: () => this.cancelReplace() }),
-      createButton({ id: 'title-code-replace', label: 'Replace', variant: 'danger', onPress: () => this.confirmReplace() }),
+      createButton({ id: 'title-code-cancel', label: t('common.cancel'), onPress: () => this.cancelReplace() }),
+      createButton({ id: 'title-code-replace', label: t('title.replace'), variant: 'danger', onPress: () => this.confirmReplace() }),
     )
     this.replace.append(this.replaceText, replaceActions)
-    this.pick.append(el('h3', '', 'Load into'), this.pickText, this.pickSlots, this.replace)
+    this.pick.append(el('h3', '', t('title.loadInto')), this.pickText, this.pickSlots, this.replace)
     sheet.append(head, sec, this.pick)
     loadRoot.append(sheet)
     this.loadRoot = loadRoot
@@ -201,16 +198,13 @@ export class TitleScreen {
     this.busy.clear()
     const recent = mostRecentSlot(slots, true)
     this.continueBtn.hidden = !recent
-    if (recent?.career) setText(this.continueSub, `Slot ${recent.slot} · ${shopLabel(recent.career)} · Day ${recent.career.day}`)
+    if (recent?.career) setText(this.continueSub, t('title.continueSub', { slot: recent.slot, shop: shopLabel(recent.career), day: recent.career.day }))
 
     const last = lastBackupAt()
     const due = backupReminderDue(slots.some((s) => s.career?.progress), last, now)
     this.reminder.hidden = !due
     if (due) {
-      setText(
-        this.reminder,
-        `${last === null ? 'No backup yet.' : `Last backup: ${backupAgeText(last, now)}.`} If the browser clears its storage, a save code is the way back: in a career, open Settings → Save code.`,
-      )
+      setText(this.reminder, last === null ? t('title.reminderNever') : t('title.reminderLast', { age: backupAgeText(last, now) }))
     }
 
     this.list.replaceChildren(...slots.map((s) => this.card(s, now)))
@@ -223,39 +217,39 @@ export class TitleScreen {
     li.dataset.id = `slot-${slot}`
     const main = el('button', 'slot-main')
     main.type = 'button'
-    const no = el('span', 'slot-no', `Slot ${slot}`)
+    const no = el('span', 'slot-no', t('common.slotN', { slot }))
     if (career?.end) {
       li.classList.add('is-ended')
       main.dataset.id = `slot-ending-${slot}`
-      main.setAttribute('aria-label', `Slot ${slot}: ${shopLabel(career)}, ended: ${career.end.title}. View the summary`)
+      main.setAttribute('aria-label', t('title.endedAria', { slot, shop: shopLabel(career), title: career.end.title }))
       main.append(
         no,
         el('span', 'slot-shop', shopLabel(career)),
         el('span', 'slot-title', career.end.title),
-        el('span', 'slot-when', `Ended after ${career.end.daysRun} day${career.end.daysRun === 1 ? '' : 's'} · ${END_LABEL[career.end.kind]}`),
+        el('span', 'slot-when', t('title.ended', { count: career.end.daysRun, how: t(END_LABEL[career.end.kind]) })),
       )
       main.addEventListener('click', () => this.once(slot, () => this.deps.play(slot)))
     } else if (career) {
       main.dataset.id = `slot-play-${slot}`
-      main.setAttribute('aria-label', `Play slot ${slot}: ${shopLabel(career)}, day ${career.day}`)
+      main.setAttribute('aria-label', t('title.playAria', { slot, shop: shopLabel(career), day: career.day }))
       main.append(
         no,
         el('span', 'slot-shop', shopLabel(career)),
-        el('span', 'slot-stats', `Day ${career.day} · ${rub(career.cash)}`),
-        el('span', 'slot-when', `Last played ${lastPlayedText(career.savedAt, now)}`),
+        el('span', 'slot-stats', t('title.stats', { day: career.day, cash: rub(career.cash) })),
+        el('span', 'slot-when', t('title.lastPlayed', { when: lastPlayedText(career.savedAt, now) })),
       )
       main.addEventListener('click', () => this.once(slot, () => this.deps.play(slot)))
     } else if (view.damaged) {
       li.classList.add('is-damaged')
       main.disabled = true
-      main.append(no, el('span', 'slot-shop', 'This save can’t be read'), el('span', 'slot-when', 'Delete it to free the slot.'))
+      main.append(no, el('span', 'slot-shop', t('title.unreadable')), el('span', 'slot-when', t('title.unreadableHint')))
     } else {
       li.classList.add('is-empty')
       main.dataset.id = `slot-new-${slot}`
-      main.setAttribute('aria-label', `Slot ${slot}: empty. Start a new career`)
+      main.setAttribute('aria-label', t('title.emptyAria', { slot }))
       const plus = el('span', 'slot-plus')
       plus.innerHTML = icons.plus
-      main.append(no, el('span', 'slot-shop', 'Empty — new career'), plus)
+      main.append(no, el('span', 'slot-shop', t('title.empty')), plus)
       main.addEventListener('click', () => this.once(slot, () => this.deps.newCareer(slot)))
     }
     li.append(main)
@@ -269,29 +263,29 @@ export class TitleScreen {
       const side = el('div', 'slot-side')
       if (career?.end) {
         side.append(
-          createButton({ id: `slot-renew-${slot}`, label: 'New career', variant: 'ghost', className: 'slot-delete slot-renew', ariaLabel: `Start a new career in slot ${slot}`, onPress: () => ask('new') }),
+          createButton({ id: `slot-renew-${slot}`, label: t('title.newCareer'), variant: 'ghost', className: 'slot-delete slot-renew', ariaLabel: t('title.renewAria', { slot }), onPress: () => ask('new') }),
         )
       }
       side.append(
-        createButton({ id: `slot-delete-${slot}`, label: 'Delete', variant: 'ghost', className: 'slot-delete', ariaLabel: `Delete the career in slot ${slot}`, onPress: () => ask('delete') }),
+        createButton({ id: `slot-delete-${slot}`, label: t('common.delete'), variant: 'ghost', className: 'slot-delete', ariaLabel: t('title.deleteAria', { slot }), onPress: () => ask('delete') }),
       )
       li.append(side)
       if (this.confirm?.slot === slot) {
         const what = this.confirm.what
         const confirm = el('div', 'confirm slot-confirm')
         const text = !career
-          ? 'Delete this unreadable save?'
+          ? t('title.deleteUnreadable')
           : what === 'new'
-            ? `Start a new career in slot ${slot}? ${shopLabel(career)}’s ending and summary will be gone unless you kept its save code.`
+            ? t('title.renewConfirm', { slot, shop: shopLabel(career) })
             : career.end
-              ? `Delete ${shopLabel(career)} (${career.end.title})? It can’t be undone unless you kept its save code.`
-              : `Delete ${shopLabel(career)} (Day ${career.day}, ${rub(career.cash)})? It can’t be undone unless you kept its save code.`
+              ? t('title.deleteEnded', { shop: shopLabel(career), title: career.end.title })
+              : t('title.deleteCareer', { shop: shopLabel(career), day: career.day, cash: rub(career.cash) })
         confirm.append(el('p', '', text))
         const acts = el('div', 'actions')
         acts.append(
           createButton({
             id: `slot-confirm-cancel-${slot}`,
-            label: 'Cancel',
+            label: t('common.cancel'),
             onPress: () => {
               this.confirm = null
               redraw()
@@ -299,7 +293,7 @@ export class TitleScreen {
           }),
           createButton({
             id: what === 'new' ? `slot-renew-confirm-${slot}` : `slot-delete-confirm-${slot}`,
-            label: what === 'new' ? 'New career' : 'Delete',
+            label: t(what === 'new' ? 'title.newCareer' : 'common.delete'),
             variant: 'danger',
             onPress: () => {
               this.confirm = null
@@ -346,15 +340,15 @@ export class TitleScreen {
     this.fileInput.value = ''
     if (!file) return
     try {
-      this.readCode(await readBackupFile(file), 'That file is empty. Choose a Lombard backup file.')
+      this.readCode(await readBackupFile(file), t('settings.fileEmpty'))
     } catch (err) {
       this.pending = null
       this.pick.hidden = true
-      this.loadError.textContent = (err as Error).message || 'That file could not be read.'
+      this.loadError.textContent = (err as Error).message || t('settings.fileUnreadable')
     }
   }
 
-  private readCode(input: string, emptyMessage = 'Paste a save code first.'): void {
+  private readCode(input: string, emptyMessage = t('settings.pasteFirst')): void {
     const code = input.trim()
     this.loadError.textContent = ''
     this.pick.hidden = true
@@ -366,7 +360,7 @@ export class TitleScreen {
     try {
       this.pending = decodeSaveCode(code)
     } catch (err) {
-      this.loadError.textContent = err instanceof SaveCodeError ? err.message : 'That save code could not be loaded. Check that you copied all of it.'
+      this.loadError.textContent = err instanceof SaveCodeError ? err.message : t('settings.codeBad')
       return
     }
     this.pendingSlot = null
@@ -380,7 +374,7 @@ export class TitleScreen {
     if (!s) return
     setText(
       this.pickText,
-      `This code holds ${s.meta.intro ? 'a new shop' : s.shop.name}: Day ${s.calendar.day}, ${rub(s.cash)}, ${s.inventory.length} item${s.inventory.length === 1 ? '' : 's'} in stock. Which slot?`,
+      t('title.pick', { shop: s.meta.intro ? t('title.aNewShop') : s.shop.name, day: s.calendar.day, cash: rub(s.cash), count: s.inventory.length }),
     )
     this.pickSlots.replaceChildren(
       ...this.slots.map((v) => {
@@ -389,8 +383,8 @@ export class TitleScreen {
         b.dataset.id = `title-code-slot-${v.slot}`
         b.classList.toggle('is-selected', this.pendingSlot === v.slot)
         b.append(
-          el('span', 'title-pick-no', `Slot ${v.slot}`),
-          el('span', 'title-pick-what', v.career ? `${shopLabel(v.career)} · Day ${v.career.day}` : v.damaged ? 'Unreadable save' : 'Empty'),
+          el('span', 'title-pick-no', t('common.slotN', { slot: v.slot })),
+          el('span', 'title-pick-what', v.career ? t('title.pickCareer', { shop: shopLabel(v.career), day: v.career.day }) : t(v.damaged ? 'title.pickUnreadable' : 'title.pickEmpty')),
         )
         b.addEventListener('click', () => this.choose(v))
         return b
@@ -407,8 +401,8 @@ export class TitleScreen {
     this.pendingSlot = v.slot
     this.renderPick()
     this.replaceText.textContent = v.career
-      ? `Replace ${shopLabel(v.career)} (Day ${v.career.day}, ${rub(v.career.cash)}) in slot ${v.slot}? It’s gone unless you kept its save code.`
-      : `Replace the unreadable save in slot ${v.slot}?`
+      ? t('title.replaceCareer', { shop: shopLabel(v.career), day: v.career.day, cash: rub(v.career.cash), slot: v.slot })
+      : t('title.replaceUnreadable', { slot: v.slot })
     this.replace.hidden = false
     this.replace.querySelector<HTMLButtonElement>('[data-id="title-code-cancel"]')?.focus()
   }

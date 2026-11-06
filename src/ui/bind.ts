@@ -23,6 +23,7 @@
  * backup on this device or the last one is 14+ days old.
  */
 import type { SoundSettings } from '../audio/settings'
+import { t } from '../data/strings'
 import type { Action } from '../game/actions'
 import type { GameState } from '../game/state'
 import type { Store } from '../game/store'
@@ -157,11 +158,11 @@ export class Ui {
     // When Settings closes, the backup reminder gets its chance (it waits while Settings is open).
     const openSettings = () => this.settings.open(() => this.current && this.updateReminder(deps.store.get(), this.current))
     const gear = (suffix: string) => (onPress: () => void) =>
-      createButton({ id: `settings-${suffix}`, label: '', icon: 'gear', ariaLabel: 'Settings', className: 'btn-icon', onPress })
+      createButton({ id: `settings-${suffix}`, label: '', icon: 'gear', ariaLabel: t('common.settings'), className: 'btn-icon', onPress })
 
     this.shop = new ShopSheet({ getState: () => deps.store.get(), dispatch })
     const shopButton = (suffix: string) =>
-      createButton({ id: `shop-${suffix}`, label: 'Shop', icon: 'tag', ariaLabel: 'Shop floor: display and price tags', className: 'btn-shop', onPress: () => this.shop.open() })
+      createButton({ id: `shop-${suffix}`, label: t('shop.button'), icon: 'tag', ariaLabel: t('shop.buttonAria'), className: 'btn-shop', onPress: () => this.shop.open() })
 
     this.counter = new CounterScreen(dispatch, openSettings, gear('counter'), shopButton('counter'), deps.manualNext)
     this.inspect = new InspectScreen(dispatch)
@@ -218,10 +219,10 @@ export class Ui {
     this.reminderText = el('p', 'backup-reminder-text')
     const reminderActions = el('div', 'actions')
     reminderActions.append(
-      createButton({ id: 'backup-later', label: 'Not now', variant: 'ghost', onPress: () => this.hideReminder() }),
+      createButton({ id: 'backup-later', label: t('backup.later'), variant: 'ghost', onPress: () => this.hideReminder() }),
       createButton({
         id: 'backup-now',
-        label: 'Back up',
+        label: t('backup.now'),
         icon: 'doc',
         variant: 'primary',
         onPress: () => {
@@ -374,9 +375,7 @@ export class Ui {
     }
     if (!this.reminder.hidden) return
     this.reminderText.textContent =
-      last === null
-        ? 'No backup of this shop yet. If the phone runs low on space, the browser can clear saves. A backup file keeps it safe.'
-        : `Last backup: ${backupAgeText(last, now)}. Make a fresh one to keep this shop safe.`
+      last === null ? t('backup.reminderNever') : t('backup.reminderLast', { age: backupAgeText(last, now) })
     this.reminder.hidden = false
   }
 

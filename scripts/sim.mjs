@@ -30,6 +30,7 @@ const lines = [
   [policies.mobFriendly, {}, 'mobFriendly'],
   [policies.careless, {}, 'careless'],
   [policies.trader, {}, 'trader'],
+  [policies.appraiser, {}, 'appraiser'],
 ]
 for (const [policy, options, label] of lines) {
   const runs = Array.from({ length: seeds }, (_, i) => sim.simulate(1000 + i, policy, days, options))
@@ -82,6 +83,18 @@ for (const [policy, options, label] of lines) {
       `  father sold ${has('volkova.father_sold')}  honest ${branch(['volkova.source', 'volkova.rang'])}  bought ${branch(['dirty.volkova_loan', 'volkova.reported', 'dirty.volkova_audit'])}` +
       `  lied ${branch(['heart.volkova_truth', 'volkova.grudge'])}  informed ${has('volkova.informed')} leaked ${has('volkova.leaked')} crackdown ${has('volkova.crackdown')}`,
   )
+  // M6 the appraiser: shops that hired him, his record (averaged over those), and how his arc went.
+  const hired = runs.filter((r) => r.staff.hired || r.staff.gone)
+  if (hired.length) {
+    const per = (f) => (hired.reduce((a, r) => a + f(r), 0) / hired.length).toFixed(1)
+    console.log(
+      `          appraiser: hired ${hired.length}/${runs.length} (median day ${hired.map((r) => r.staff.sinceDay).sort((a, b) => a - b)[Math.floor(hired.length / 2)]})` +
+        `  served ${per((r) => r.staff.record.served)}  bought ${per((r) => r.staff.record.bought)}  lent ${per((r) => r.staff.record.lent)}` +
+        `  fakes ${per((r) => r.staff.record.fakes)}  insults ${per((r) => r.staff.record.insults)}  wages ₽${per((r) => r.staff.record.wages)}` +
+        `  | confided ${has('heart.appraiser_kept')} tin→crew ${has('appraiser.debt_paid')} yuri ${has('appraiser.yuri_home')} police ${has('appraiser.tin_police')} split ${has('dirty.appraiser_tin')}` +
+        `  vanished ${has('appraiser.vanished')} let go ${has('appraiser.told_go') + has('appraiser.let_go')}`,
+    )
+  }
   // M5 the Collector: how many shops he asked, bought his icon, and what became of her.
   console.log(
     `          collector: asked ${has('collector.asked')}  bought ${has('collector.bought')}  passed ${has('collector.passed')}` +

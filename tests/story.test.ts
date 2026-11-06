@@ -102,7 +102,9 @@ describe('story content', () => {
     for (const arc of ARCS) {
       if (arc.specialist) continue
       for (const beat of arc.beats.slice(1)) {
-        expect(beat.when.some((c) => c.if === 'beat' && c.beat.startsWith(`${arc.id}.`)), beat.id).toBe(true)
+        // Directly, or through an `any` whose every option is an earlier beat of the arc.
+        const ofArc = (c: Condition) => c.if === 'beat' && c.beat.startsWith(`${arc.id}.`)
+        expect(beat.when.some((c) => ofArc(c) || (c.if === 'any' && c.of.every(ofArc))), beat.id).toBe(true)
       }
     }
   })

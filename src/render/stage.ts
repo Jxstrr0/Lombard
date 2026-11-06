@@ -121,7 +121,8 @@ export class ItemStage {
     }
     if (c.visitId !== this.visitId) {
       this.visitId = c.visitId
-      this.setItem(c.item.defId)
+      // A story scene visitor (M4) brings nothing: the mat stays empty.
+      this.setItem(c.item?.defId ?? null)
       this.yaw = DEFAULT_YAW
       this.pitch = DEFAULT_PITCH
       this.zoom = 1
@@ -147,7 +148,7 @@ export class ItemStage {
   playTool(tool: ToolId, state: GameState): void {
     const c = state.current
     let magnetic = false
-    if (tool === 'magnet' && c) {
+    if (tool === 'magnet' && c?.item) {
       try {
         const def = getItemDef(c.item.defId)
         magnetic = fakeProfileOf(def, c.item)?.magnetic ?? def.magnetic
@@ -314,10 +315,11 @@ export class ItemStage {
     return out
   }
 
-  private setItem(defId: string): void {
+  private setItem(defId: string | null): void {
     if (this.model) this.pivot.remove(this.model)
     this.model = null
     this.def = null
+    if (defId === null) return
     let def: ItemDef
     try {
       def = getItemDef(defId)

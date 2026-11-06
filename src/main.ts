@@ -13,7 +13,8 @@
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
  * ?scenario=rolex / ?scenario=laptop / ?scenario=protection open day 1 with a beat of that arc first in line (BEAT_SCENARIOS;
- * protection: Eduard Lvovich's "insurance" offer);
+ * protection: Eduard Lvovich's "insurance" offer; fence: Venya Mostovoy's first visit, a choice, then him again with
+ * something to sell, M5);
  * ?scenario=specialist opens day 1 with Gennady's first-refusal phone call, then Ilya at the counter with the widow's watch (M4 specialists' arcs).
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
@@ -42,6 +43,7 @@ import { Rng } from './game/rng'
 import { beatVisit, regularCustomer, regularVisit } from './game/story/plan'
 import { setMemory } from './game/story/progress'
 import { specialistCustomer } from './game/story/specialists'
+import { fenceGoods } from './game/crime/fence'
 import type { QueuedVisit } from './game/types'
 import { getRegular } from './data/regulars'
 import { getBeat } from './data/stories'
@@ -62,6 +64,8 @@ import { CustomerCast, castOverride } from './render/customerModel'
 import type { ShopLife } from './render/life'
 import { clockForTime } from './render/life/timeOfDay'
 import { Ui, screenFor, type ScreenId } from './ui/bind'
+import { bindLoadingScreen } from './ui/loading'
+import { LoadProgress } from './render/loadProgress'
 
 const REDUCE_MOTION_KEY = 'lombard.reduceMotion'
 /** Text size is a device setting (M4), like reduce motion: the title screen has no career to hold it. */
@@ -105,7 +109,7 @@ function storyScenario(s0: GameState): GameState {
 }
 
 /** Dev-only (?scenario=<key>): the beat each arc scenario puts first in line on day 1. */
-const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent', protection: 'protection.offer' }
+const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent', protection: 'protection.offer', fence: 'fence.meet' }
 
 function beatScenario(s0: GameState, beatId: string): GameState {
   let s = reducer(s0, { type: 'career/begin', shopName: '' })
@@ -115,6 +119,13 @@ function beatScenario(s0: GameState, beatId: string): GameState {
   let n = 0
   const visit = beatVisit(s, beat, (prefix) => `${prefix}-dev-${n++}`)
   return visit ? { ...s, queue: [visit, ...s.queue], day: { ...s.day, total: s.day.total + 1 } } : s
+}
+
+/** Dev-only (?scenario=fence, after the meeting beat): the fence's next drop-in, with something to sell, second in line. */
+function fenceGoodsSecond(s: GameState): GameState {
+  const met = { ...s, crime: { ...s.crime, fence: { ...s.crime.fence, met: true } } }
+  const goods = fenceGoods(met, (prefix, who) => `${prefix}-dev-${who}`)
+  return { ...s, queue: [...s.queue.slice(0, 1), goods, ...s.queue.slice(1)], day: { ...s.day, total: s.day.total + 1 } }
 }
 
 /** Dev-only (?seed=N&scenario=specialist): a specialist's phone call (a choice), then a specialist at the counter (a choice). */
@@ -159,11 +170,18 @@ function lookParam(params: URLSearchParams): { yaw: number; pitch: number } | nu
   return { yaw: yaw!, pitch }
 }
 
+/**
+ * The loading screen from index.html. The bar runs over the boot steps: the
+ * bundle itself (it is running, so that much is done), the career slots, then
+ * the HDRI, the baked shop and its lightmap by bytes (LOAD_SHARE), then the
+ * canal backdrop and the first frames.
+ */
+const loading = bindLoadingScreen()
+const LOAD_SHARE = { bundle: 0.15, slots: 0.2, files: 0.9, backdrop: 0.95 } as const
+loading.progress(LOAD_SHARE.bundle)
+
 function showFatal(message: string): void {
-  const el = document.createElement('div')
-  el.className = 'fatal'
-  el.textContent = message
-  document.body.appendChild(el)
+  loading.fail(message)
 }
 
 /** Explicit reduce-motion choice from Settings (overrides the OS setting), or null. */
@@ -234,6 +252,7 @@ async function boot(): Promise<void> {
       loader?.load,
       () => {
         window.__lombardReady = true
+        loading.done()
       },
       params.get('item') ?? undefined,
     )
@@ -252,6 +271,7 @@ async function boot(): Promise<void> {
   let activeSlot: SlotNo | null = null
   let initial: GameState | null = null
   let slots = review ? [] : await listSlots()
+  loading.progress(LOAD_SHARE.slots)
   if (review) {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
@@ -259,6 +279,7 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'specialist') initial = specialistScenario(initial)
     const beatId = BEAT_SCENARIOS[params.get('scenario') ?? '']
     if (beatId) initial = beatScenario(initial, beatId)
+    if (params.get('scenario') === 'fence') initial = fenceGoodsSecond(initial)
     const regular = params.get('regular')
     if (regular) {
       const trust = params.has('trust') ? Number(params.get('trust')) : NaN
@@ -515,20 +536,31 @@ async function boot(): Promise<void> {
 
   // --- loop ------------------------------------------------------------------
   let envReady = false
+  // Byte progress of the big files drives the loading screen's bar.
+  const noBake = params.get('nobake') === '1'
+  const files = new LoadProgress(noBake ? ['env'] : ['env', 'glb', 'lightmap'])
+  files.onChange = () => loading.progress(LOAD_SHARE.slots + (LOAD_SHARE.files - LOAD_SHARE.slots) * files.fraction())
   const envLoad = shop
-    .loadEnvironment(renderer, { envUrl })
+    .loadEnvironment(renderer, { envUrl, onProgress: files.track('env') })
     .catch((err) => console.warn('[env] HDRI failed to load, continuing without it', err))
+    .finally(() => files.done('env'))
   // ?nobake=1 keeps the procedural grey box (for comparing against the bake).
-  const bakeLoad =
-    params.get('nobake') === '1'
-      ? Promise.resolve(null)
-      : shop.loadBaked(renderer, import.meta.env.BASE_URL).then((m) => {
+  const bakeLoad = noBake
+    ? Promise.resolve(null)
+    : shop
+        .loadBaked(renderer, import.meta.env.BASE_URL, { glb: files.track('glb'), lightmap: files.track('lightmap') })
+        .then((m) => {
           if (m) ui.setBakeInfo(`bake ${m.quality}${m.commit ? ` ${m.commit}` : ''}`)
           return m
+        })
+        .finally(() => {
+          files.done('glb')
+          files.done('lightmap')
         })
   // The canal outside the window comes after the shop; ?nobackdrop=1 keeps the old canvas card.
   const backdropLoad = params.get('nobackdrop') === '1' ? Promise.resolve(false) : bakeLoad.then(() => shop.loadBackdrop(renderer, import.meta.env.BASE_URL))
   void Promise.all([envLoad, bakeLoad, backdropLoad]).finally(() => {
+    loading.progress(LOAD_SHARE.backdrop)
     envReady = true
   })
   // Street life outside the window (render/street): loads only once the shop is on screen. ?street=0 turns it off.
@@ -589,6 +621,7 @@ async function boot(): Promise<void> {
     if (envReady && !window.__lombardReady && ++readyFrames > 2) {
       window.__lombardReady = true
       document.body.classList.add('ready')
+      loading.done()
       markReady()
       // Shop life comes after the shop is up, as its own chunk (?life=0 leaves it out).
       if (params.get('life') !== '0') {
@@ -605,4 +638,7 @@ async function boot(): Promise<void> {
   })
 }
 
-void boot()
+boot().catch((err) => {
+  console.error('[boot] failed', err)
+  showFatal('The shop could not open. Check the connection and reload.')
+})

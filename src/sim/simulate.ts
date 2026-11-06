@@ -36,12 +36,14 @@ export interface RunResult {
   stats: GameState['stats']
   /** Regulars' memory at the end (M4): visits and trust per regular met. */
   customers: GameState['customers']
+  /** M5: the crime dials and the fence at the end, and the ending axes. */
+  crime: GameState['crime']
+  axes: GameState['career']['axes']
   /** Actions dispatched (sanity: guards against a stuck policy). */
   steps: number
   /** M5: how the career ended (the run stops that day), or null. */
   end: GameState['career']['end']
-  /** M5: the ending axes, the crime dials and the story flags at the end (who paid, who held out). */
-  axes: GameState['career']['axes']
+  /** M5: the crime dials (also in `crime`) and the story flags at the end (who paid, who held out). */
   heat: number
   pressure: number
   flags: readonly string[]
@@ -122,6 +124,7 @@ export function simulate(seed: number, policy: Policy, days: number, options: Si
     finalWorth: worthOf(s),
     stats: s.stats,
     customers: s.customers,
+    crime: s.crime,
     steps,
     end: s.career.end,
     axes: s.career.axes,

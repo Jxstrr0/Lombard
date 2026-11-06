@@ -1,6 +1,7 @@
 /** Apply story effects (src/game/schema/story.ts) to the state. Pure. */
 import { addHeat, addPressure } from '../crime/dials'
 import { scheduleVandalism } from '../crime/vandalism'
+import { applyFenceChange } from '../crime/fence'
 import { flagAxis, nudgeAxis } from '../endings/axes'
 import { endCareer } from '../endings/end'
 import { tuning } from '../../data/tuning'
@@ -58,6 +59,9 @@ export function applyEffect(state: GameState, e: Effect, arc: string): GameState
       return scheduleVandalism(state, e.kind)
     case 'endCareer':
       return endCareer(state, e.kind)
+    // --- M5 the fence ---
+    case 'fence':
+      return applyFenceChange(state, e.change)
   }
 }
 

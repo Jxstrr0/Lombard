@@ -71,6 +71,12 @@ export function holds(c: Condition, state: GameState): boolean {
     // --- M5 ---
     case 'pressure':
       return within(state.crime.pressure, c)
+    // --- M5 the fence ---
+    case 'fence': {
+      const f = state.crime.fence
+      if (c.met !== undefined && f.met !== c.met) return false
+      return (!c.deals || within(f.deals, c.deals)) && (!c.refusals || within(f.refusals, c.refusals)) && (!c.trust || within(state.crime.fenceTrust, c.trust))
+    }
     case 'any':
       return c.of.some((x) => holds(x, state))
   }

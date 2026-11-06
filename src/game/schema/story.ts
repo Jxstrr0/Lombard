@@ -141,6 +141,9 @@ const BaseCondition = z.discriminatedUnion('if', [
   // --- M5 ---------------------------------------------------------------------------
   /** The hidden mob dial (crime.pressure, ≥ 0). */
   z.object({ if: z.literal('pressure'), ...cmp.shape }),
+  // --- M5 the fence (src/game/crime/fence.ts) -------------------------------------------
+  /** crime.fence: met (or not), deals and refusals on record, and fenceTrust (−1…1). */
+  z.object({ if: z.literal('fence'), met: z.boolean().optional(), deals: cmp.optional(), refusals: cmp.optional(), trust: cmp.optional() }),
 ])
 
 /** M4: at least one of these holds (one level: no `any` inside `any`). */
@@ -167,6 +170,7 @@ const changeName = z.string().refine((k) => k in tuning.specialistArcs.changes, 
 const boostName = z.string().refine((k) => k in tuning.specialistArcs.boosts, 'a tuning.specialistArcs.boosts key')
 const offerName = z.string().refine((k) => k in tuning.specialistArcs.offers, 'a tuning.specialistArcs.offers key')
 const axisWeight = z.string().refine((k) => k in tuning.axes, 'a tuning.axes key') as z.ZodType<keyof typeof tuning.axes>
+const fenceChange = z.string().refine((k) => k in tuning.fence.changes, 'a tuning.fence.changes key')
 
 export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('flag'), flag: z.string() }),
@@ -202,6 +206,9 @@ export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('vandalism'), kind: z.enum(['brick']) }),
   /** A forced ending (src/game/endings/end.ts). */
   z.object({ do: z.literal('endCareer'), kind: z.enum(['evicted', 'raided', 'pushedOut']) }),
+  // --- M5 the fence ---------------------------------------------------------------------
+  /** A named change to the fence relationship (tuning.fence.changes): met, trust, a refusal, the next contact. */
+  z.object({ do: z.literal('fence'), change: fenceChange }),
 ])
 export type Effect = z.infer<typeof Effect>
 

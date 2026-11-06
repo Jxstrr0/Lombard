@@ -10,6 +10,7 @@ import { getItemDef } from '../data/items'
 import type { Action } from '../game/actions'
 import { claimedValue } from '../game/appraise/value'
 import { BRICK, caseBroken } from '../game/crime/vandalism'
+import { fenceAsk, isFence } from '../game/crime/fence'
 import { upcomingBills } from '../game/economy/expenses'
 import { availableTools } from '../game/inspect/available'
 import type { ToolId } from '../game/schema/item'
@@ -70,6 +71,12 @@ export interface PolicyParams {
    * into the safe at closing, and nothing goes back in it until the glazier has been.
    */
   heedsThreats?: boolean
+  /**
+   * M5 the fence's calls and drop-ins: refuse every one, or deal (pay his price for what he brings
+   * unless a check says it's not genuine, take his offer for your problem pieces). Unset: treat him
+   * like anyone else at the counter.
+   */
+  fence?: 'refuse' | 'deal'
 }
 
 /** M5: a brick is due tonight, or the case has no glass yet. */
@@ -128,6 +135,15 @@ export function makePolicy(p: PolicyParams): Policy {
       }
       if (c.kind === 'scene') return { type: 'scene/next' }
       if (c.kind === 'redeem') return { type: 'loan/return' }
+      if (p.fence && isFence(c.customer)) {
+        if (p.fence === 'refuse') return { type: 'counter/pass' }
+        if (c.kind === 'buyer') return { type: 'sale/accept' }
+        if (c.phase === 'offer') {
+          const ask = fenceAsk(state, c.item)
+          const red = p.passOnRedFlags && (state.inspect?.findings ?? []).some(isRedFlag)
+          return red || ask > spendable(state, p) ? { type: 'counter/pass' } : { type: 'offer/make', amount: ask, approach: 'straight' }
+        }
+      }
       if (c.kind === 'buyer') {
         const sale = c.sale
         if (!sale || sale.status !== 'open') return { type: 'counter/pass' }
@@ -241,6 +257,8 @@ const CAREFUL: PolicyParams = {
   prefer: ['refuse'],
   // And when Eduard Lvovich says "lock up carefully tonight", it empties the counter case.
   heedsThreats: true,
+  // A clean shop says no to the fence too (M5).
+  fence: 'refuse',
 }
 
 export const careful = makePolicy(CAREFUL)
@@ -248,8 +266,15 @@ export const careful = makePolicy(CAREFUL)
 /**
  * M5: the same careful trader, mob-friendly. Pays the crew whenever asked, keeps their box, and buys
  * their deliveries like any other good deal (the M5 "done when": a mob-friendly run plays differently).
+ * The fence is a separate person: it still turns him down.
  */
 export const mobFriendly = makePolicy({ ...CAREFUL, name: 'mobFriendly', prefer: ['accept', 'pay', 'keep'] })
+
+/**
+ * M5 "done when": a fence-heavy run. The careful player, except that it keeps the fence's Tuesdays,
+ * buys what he brings at his price (unless a check flags it) and sells him its problem pieces.
+ */
+export const fenceFriend = makePolicy({ ...CAREFUL, name: 'fence', fence: 'deal', prefer: ['fence_yes', 'refuse'] })
 
 export const careless = makePolicy({
   name: 'careless',

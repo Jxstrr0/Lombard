@@ -23,8 +23,9 @@ const start = tuningMod.tuning.career.startingCash
 const lines = [
   [policies.careful, {}, 'careful'],
   [policies.careful, { protectionLadder: false }, 'trade'],
-  [policies.careless, {}, 'careless'],
+  [policies.fenceFriend, {}, 'fence'],
   [policies.mobFriendly, {}, 'mobFriendly'],
+  [policies.careless, {}, 'careless'],
 ]
 for (const [policy, options, label] of lines) {
   const runs = Array.from({ length: seeds }, (_, i) => sim.simulate(1000 + i, policy, days, options))
@@ -43,11 +44,19 @@ for (const [policy, options, label] of lines) {
   const ids = [...new Set(runs.flatMap((r) => Object.keys(r.customers)))].sort()
   const avg = (id) => runs.reduce((a, r) => a + (r.customers[id]?.visits ?? 0), 0) / runs.length
   console.log(`          regular visits in ${days} days: ` + ids.map((id) => `${id} ${avg(id).toFixed(1)}`).join('  '))
-  // Protection (M5): the crew's side of the ledger, averaged across seeds.
+  // M5: the crime dials and the ending axes, averaged across seeds.
+  console.log(
+    `          dials: heat ${mean((r) => r.crime.heat)}  pressure ${mean((r) => r.crime.pressure)}  clean ${mean((r) => r.axes.clean)}  heart ${mean((r) => r.axes.heart)}`,
+  )
+  // M5 the fence (Venya Mostovoy).
+  console.log(
+    `          fence: met ${runs.filter((r) => r.crime.fence.met).length}/${runs.length}  deals ${mean((r) => r.crime.fence.deals)}` +
+      `  refusals ${mean((r) => r.crime.fence.refusals)}  trust ${mean((r) => r.crime.fenceTrust)}`,
+  )
+  // M5 Protection: the crew's side of the ledger.
   const ends = runs.filter((r) => r.end).map((r) => `${r.seed}:${r.end.kind}@${r.end.day}`)
   console.log(
     `          crew: bricks ${mean((r) => r.crew.bricks)}  glaziers ${mean((r) => r.crew.glaziers)}  insurance ₽${mean((r) => r.crew.insurance)}` +
-      `  deliveries ${mean((r) => r.crew.deliveries)}  heat ${mean((r) => r.heat)}  pressure ${mean((r) => r.pressure)}` +
-      `  clean ${mean((r) => r.axes.clean)}  ended ${ends.length ? ends.join(' ') : '-'}`,
+      `  deliveries ${mean((r) => r.crew.deliveries)}  ended ${ends.length ? ends.join(' ') : '-'}`,
   )
 }

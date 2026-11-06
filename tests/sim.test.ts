@@ -38,8 +38,8 @@ describe('economy simulator (M2 tuning)', () => {
     const runs = SEEDS.map((seed) => simulate(seed, careful, DAYS))
     const s = summarize(runs, tuning.career.startingCash)
     expect(s.busted).toBe(0)
-    // Measured 6.4% on these seeds (11.7% over 200 seeds, 14.8% with the ladder held off): docs/05.
-    expect(s.medianGrowth).toBeGreaterThan(0.05)
+    // Measured 5.5% on these seeds with the fence in (6.4% before it; 8.9% with the ladder held off). docs/05.
+    expect(s.medianGrowth).toBeGreaterThan(0.04)
     // The ladder fires: most refusers get the brick, and the glazier after it.
     const bricked = runs.filter((r) => r.crew.bricks > 0 && r.crew.glaziers > 0).length
     expect(bricked).toBeGreaterThan(SEEDS.length / 2)

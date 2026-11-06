@@ -32,6 +32,8 @@ function serveCurrent(s0: GameState, wantBuy: boolean, multiple: number, stopAtO
     const c = s.current
     if (c.phase === 'present' && c.kind === 'redeem') s = step(s, { type: 'loan/return' })
     else if (c.phase === 'scene') s = playScene(s)
+    // A buyer (the M5 fence ringing about a piece in stock): this script doesn't sell at the counter.
+    else if (c.phase === 'present' && c.kind === 'buyer') s = step(s, { type: 'counter/pass' })
     else if (c.phase === 'present') s = step(s, { type: 'counter/inspect' })
     else if (c.phase === 'inspect') {
       for (const tool of TOOLS) s = step(s, { type: 'inspect/useTool', tool })

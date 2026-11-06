@@ -25,6 +25,8 @@ import * as THREE from 'three'
 const EYE = new THREE.Vector3(0, 1.62, -3.2)
 // Portrait looks further down: the counter sits just above the dialogue strip.
 const LOOK_PORTRAIT = new THREE.Vector3(0, 0.62, -0.9)
+/** Portrait: the counter-view look point never sits higher than this fraction of the screen height (keeps faces in frame). */
+const PORTRAIT_MIN_LOOK_Y = 0.38
 // Landscape/desktop: the strip is docked bottom-left, so frame counter and customer together.
 const LOOK_LANDSCAPE = new THREE.Vector3(0, 1.0, -0.9)
 // Offer view (portrait): the number pad covers most of the screen, so look up at the customer.
@@ -244,7 +246,9 @@ export class CameraRig {
     if (portrait) {
       // ~36° horizontal; the look target sits a bit below the centre of the free area.
       const free = Math.max(h * 0.3, h - layout.counterBottom)
-      this.counterLens = { f: w / 2 / Math.tan(THREE.MathUtils.degToRad(18)), cx: w / 2, cy: free * 0.6 }
+      // A tall strip (a scene's three choices) would lift the counter so high that the customer's head
+      // leaves the top of the screen: past this point the strip covers the counter instead.
+      this.counterLens = { f: w / 2 / Math.tan(THREE.MathUtils.degToRad(18)), cx: w / 2, cy: Math.max(free * 0.6, h * PORTRAIT_MIN_LOOK_Y) }
     } else {
       this.counterLens = { f: h / 2 / Math.tan(THREE.MathUtils.degToRad(25)), cx: w / 2, cy: h / 2 }
     }

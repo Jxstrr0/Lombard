@@ -1,4 +1,5 @@
 /** Evaluate story conditions (src/game/schema/story.ts) against the state. Pure. */
+import { repOf } from '../reputation'
 import type { Condition } from '../schema/story'
 import type { GameState } from '../state'
 import { beatRecord } from './progress'
@@ -40,7 +41,7 @@ export function holds(c: Condition, state: GameState): boolean {
     case 'cash':
       return within(state.cash, c)
     case 'rep':
-      return within(state.reputation.byGroup[c.group] ?? 0, c)
+      return within(repOf(state, c.group), c)
   }
 }
 

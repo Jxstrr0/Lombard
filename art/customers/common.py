@@ -287,7 +287,8 @@ def export_glb(path, objs, draco=False):
               export_apply=False, export_morph=False, export_texcoords=True, export_normals=True,
               export_tangents=False, export_materials='EXPORT', export_cameras=False, export_lights=False,
               export_animation_mode='ACTIONS', export_force_sampling=True, export_frame_step=1,
-              export_optimize_animation_size=True, export_def_bones=True,
+              export_optimize_animation_size=True, export_optimize_animation_keep_anim_armature=False,
+              export_def_bones=True,
               export_anim_slide_to_zero=True)
     if draco:
         kw.update(export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=6)

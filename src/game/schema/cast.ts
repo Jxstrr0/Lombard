@@ -12,5 +12,11 @@ export const CastEntry = z.object({
   gender: Gender,
   /** Walk-in archetype id (src/data/customers/walkins.ts) this person can turn up as. */
   archetype: z.string().min(1),
+  /**
+   * Ground speed of the glb's in-place `walk` clip, m/s (written by art/customers/build.py
+   * from the clip's root motion). Move the customer at this speed while it plays and the
+   * planted foot stays put; scale the clip's timeScale with any other speed.
+   */
+  walkSpeed: z.number().positive(),
 })
 export type CastEntry = z.infer<typeof CastEntry>

@@ -50,6 +50,13 @@ function helpers(page, name) {
     async click(dataId) {
       await id(dataId).click({ timeout: 10_000 })
       await page.waitForTimeout(120)
+      // The customer's strip and buttons wait until they stand at the counter (model loaded, faded in).
+      if (dataId === 'next-customer') {
+        await page
+          // 'in', not just "not arriving": until the next frame the body still says 'away' from the last visit.
+          .waitForFunction(() => document.body.dataset.customer === 'in', null, { timeout: 30_000 })
+          .catch(() => console.warn('customer never arrived'))
+      }
     },
     async visible(dataId) {
       return (await page.locator(`[data-id="${dataId}"]:visible`).count()) > 0
@@ -487,8 +494,9 @@ async function main() {
     page.on('console', (m) => {
       if (m.type() === 'error') errors.push(`[${name}] console: ${m.text()}`)
     })
-    // Pin the quality tier: Auto would step down on a slow headless GPU mid-run.
-    const pinned = /[?&]tier=/.test(url) ? url : `${url}${url.includes('?') ? '&' : '?'}tier=mid`
+    // Pin the quality tier (Auto would step down on a slow headless GPU mid-run)
+    // skip the lull between customers (a Next customer button calls each one), and no walk from the door.
+    const pinned = `${url}${url.includes('?') ? '&' : '?'}${/[?&]tier=/.test(url) ? '' : 'tier=mid&'}lull=0&walk=0`
     await page.goto(`${base}${pinned}`, { waitUntil: 'networkidle' })
     await page.waitForFunction(() => window.__lombardReady === true, null, { timeout: 30_000 })
     await page.waitForTimeout(400)

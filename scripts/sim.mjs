@@ -18,7 +18,7 @@ const { module: policies } = await runnerImport('/src/sim/policies.ts')
 const { module: tuningMod } = await runnerImport('/src/data/tuning.ts')
 const start = tuningMod.tuning.career.startingCash
 
-for (const policy of [policies.careful, policies.careless]) {
+for (const policy of [policies.careful, policies.fenceFriend, policies.careless]) {
   const runs = Array.from({ length: seeds }, (_, i) => sim.simulate(1000 + i, policy, days))
   const s = sim.summarize(runs, start)
   const pct = (x) => `${(x * 100).toFixed(1)}%`
@@ -34,4 +34,10 @@ for (const policy of [policies.careful, policies.careless]) {
   const ids = [...new Set(runs.flatMap((r) => Object.keys(r.customers)))].sort()
   const avg = (id) => runs.reduce((a, r) => a + (r.customers[id]?.visits ?? 0), 0) / runs.length
   console.log(`          regular visits in ${days} days: ` + ids.map((id) => `${id} ${avg(id).toFixed(1)}`).join('  '))
+  // M5: the fence and the crime dials, averaged across seeds.
+  const mean = (f) => (runs.reduce((a, r) => a + f(r), 0) / runs.length).toFixed(2)
+  console.log(
+    `          fence: met ${runs.filter((r) => r.crime.fence.met).length}/${runs.length}  deals ${mean((r) => r.crime.fence.deals)}  refusals ${mean((r) => r.crime.fence.refusals)}` +
+      `  trust ${mean((r) => r.crime.fenceTrust)}  heat ${mean((r) => r.crime.heat)}  clean ${mean((r) => r.axes.clean)}  heart ${mean((r) => r.axes.heart)}`,
+  )
 }

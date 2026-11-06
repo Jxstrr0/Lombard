@@ -9,6 +9,7 @@ import { tuning } from '../../data/tuning'
 import type { Beat } from '../schema/story'
 import type { GameState } from '../state'
 import type { NewsItem, QueuedVisit, SceneState, VisitOutcome, VisitState } from '../types'
+import { afterFenceVisit } from '../crime/fence'
 import { applyEffects } from './effects'
 import { notePawn, noteRedeemed } from './pledges'
 import { arcOf, clampTrust, memoryOf, recordBeat, setMemory } from './progress'
@@ -137,7 +138,8 @@ export function afterVisit(state: GameState): GameState {
       s = applyEffects(s, after.effects, arcOf(c.beatId))
     }
   }
-  return s
+  // M5: one of the fence's own contacts (not a beat): a deal or a no, remembered.
+  return afterFenceVisit(s)
 }
 
 /**

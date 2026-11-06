@@ -138,6 +138,9 @@ const BaseCondition = z.discriminatedUnion('if', [
   z.object({ if: z.literal('stock'), category: z.string(), genuine: z.boolean().optional() }),
   /** The calendar date (MM-DD) is within from…to (inclusive; may wrap the year end). */
   z.object({ if: z.literal('date'), from: z.string().regex(/^\d\d-\d\d$/), to: z.string().regex(/^\d\d-\d\d$/) }),
+  // --- M5 the fence (src/game/crime/fence.ts) -------------------------------------------
+  /** crime.fence: met (or not), deals and refusals on record, and fenceTrust (−1…1). */
+  z.object({ if: z.literal('fence'), met: z.boolean().optional(), deals: cmp.optional(), refusals: cmp.optional(), trust: cmp.optional() }),
 ])
 
 /** M4: at least one of these holds (one level: no `any` inside `any`). */
@@ -163,6 +166,7 @@ export type RedeemPlan = z.infer<typeof RedeemPlan>
 const changeName = z.string().refine((k) => k in tuning.specialistArcs.changes, 'a tuning.specialistArcs.changes key')
 const boostName = z.string().refine((k) => k in tuning.specialistArcs.boosts, 'a tuning.specialistArcs.boosts key')
 const offerName = z.string().refine((k) => k in tuning.specialistArcs.offers, 'a tuning.specialistArcs.offers key')
+const fenceChange = z.string().refine((k) => k in tuning.fence.changes, 'a tuning.fence.changes key')
 
 export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('flag'), flag: z.string() }),
@@ -191,6 +195,9 @@ export const Effect = z.discriminatedUnion('do', [
   z.object({ do: z.literal('walkout') }),
   /** A specialist buys from your stock (tuning.specialistArcs.offers). */
   z.object({ do: z.literal('sellTo'), id, offer: offerName }),
+  // --- M5 the fence ---------------------------------------------------------------------
+  /** A named change to the fence relationship (tuning.fence.changes): met, trust, a refusal, the next contact. */
+  z.object({ do: z.literal('fence'), change: fenceChange }),
 ])
 export type Effect = z.infer<typeof Effect>
 

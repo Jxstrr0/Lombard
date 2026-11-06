@@ -13,7 +13,8 @@
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
  * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
  * ?scenario=rolex / ?scenario=laptop / ?scenario=protection open day 1 with a beat of that arc first in line (BEAT_SCENARIOS;
- * protection: Eduard Lvovich's "insurance" offer);
+ * protection: Eduard Lvovich's "insurance" offer; fence: Venya Mostovoy's first visit, a choice, then him again with
+ * something to sell, M5);
  * ?scenario=specialist opens day 1 with Gennady's first-refusal phone call, then Ilya at the counter with the widow's watch (M4 specialists' arcs).
  * ?regular=<id> opens day 1 with that regular (src/data/regulars) first in line on an ordinary visit;
  * add &trust=<−1…1> to meet them as someone they already know (that trust, a few past visits), for their warm or cold lines.
@@ -42,6 +43,7 @@ import { Rng } from './game/rng'
 import { beatVisit, regularCustomer, regularVisit } from './game/story/plan'
 import { setMemory } from './game/story/progress'
 import { specialistCustomer } from './game/story/specialists'
+import { fenceGoods } from './game/crime/fence'
 import type { QueuedVisit } from './game/types'
 import { getRegular } from './data/regulars'
 import { getBeat } from './data/stories'
@@ -105,7 +107,7 @@ function storyScenario(s0: GameState): GameState {
 }
 
 /** Dev-only (?scenario=<key>): the beat each arc scenario puts first in line on day 1. */
-const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent', protection: 'protection.offer' }
+const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca', laptop: 'laptop.rent', protection: 'protection.offer', fence: 'fence.meet' }
 
 function beatScenario(s0: GameState, beatId: string): GameState {
   let s = reducer(s0, { type: 'career/begin', shopName: '' })
@@ -115,6 +117,13 @@ function beatScenario(s0: GameState, beatId: string): GameState {
   let n = 0
   const visit = beatVisit(s, beat, (prefix) => `${prefix}-dev-${n++}`)
   return visit ? { ...s, queue: [visit, ...s.queue], day: { ...s.day, total: s.day.total + 1 } } : s
+}
+
+/** Dev-only (?scenario=fence, after the meeting beat): the fence's next drop-in, with something to sell, second in line. */
+function fenceGoodsSecond(s: GameState): GameState {
+  const met = { ...s, crime: { ...s.crime, fence: { ...s.crime.fence, met: true } } }
+  const goods = fenceGoods(met, (prefix, who) => `${prefix}-dev-${who}`)
+  return { ...s, queue: [...s.queue.slice(0, 1), goods, ...s.queue.slice(1)], day: { ...s.day, total: s.day.total + 1 } }
 }
 
 /** Dev-only (?seed=N&scenario=specialist): a specialist's phone call (a choice), then a specialist at the counter (a choice). */
@@ -259,6 +268,7 @@ async function boot(): Promise<void> {
     if (params.get('scenario') === 'specialist') initial = specialistScenario(initial)
     const beatId = BEAT_SCENARIOS[params.get('scenario') ?? '']
     if (beatId) initial = beatScenario(initial, beatId)
+    if (params.get('scenario') === 'fence') initial = fenceGoodsSecond(initial)
     const regular = params.get('regular')
     if (regular) {
       const trust = params.has('trust') ? Number(params.get('trust')) : NaN

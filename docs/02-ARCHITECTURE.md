@@ -133,6 +133,11 @@ IndexedDB store `careers` keyed by careerId. Save = full `GameState` JSON plus `
 - Target: under ~20 KB of text for a 200-day career. Add a test that generates a long simulated career and checks code size.
 - UI: copy uses the Clipboard API with a fallback text box for manual copy on older mobile browsers.
 
+**Save safety:** `src/persist/safety.ts` (all of Longlight's games share one GitHub Pages origin, so one storage quota the browser can clear at once)
+- After the first successful autosave of a session with a finished day behind it (and after a backup or restore), `navigator.storage.persist()` is asked once per page load (skipped when `persisted()` is already true; feature-detected, never throws). Settings shows "Storage: protected on this device" or a "may clear saves" warning, hidden where the API is missing.
+- Settings → Save code also has **Save backup file** (the same `LMB1.` code in `lombard-backup-YYYY-MM-DD.txt`, through the share sheet where files can be shared, otherwise a download) and **Load backup file** (a `.txt` picker feeding the normal load path, so the same checks and confirm step run).
+- The last backup time (code copied or file saved) is a device key, `lombard.lastBackup` in localStorage, next to the sound settings; not in the career or the save code. With a finished day and no backup yet, or one older than `tuning.save.backupReminderDays` (14), a dismissible banner over the ledger suggests one, at most once per session.
+
 ## Audio
 
 Plain WebAudio, no library. Ambient loop (canal, trams, rain by season), bell on door, counter sounds, tool sounds. All CC0 (see Assets doc § Audio). Audio starts on first tap (mobile autoplay rules).

@@ -1,6 +1,7 @@
 /**
- * Settings sheet (Longlight palette): save code copy/load, new career,
- * sound and ambience level, graphics quality, reduce motion, text size. Loading a code and starting over both ask for
+ * Settings sheet (Longlight palette): save code copy/load, backup files,
+ * new career, sound and ambience level, graphics quality, reduce motion, text
+ * size. Loading a code (pasted or from a file) and starting over both ask for
  * confirmation inline (no browser dialogs).
  */
 import type { SoundSettings } from '../../audio/settings'
@@ -8,6 +9,7 @@ import { AMBIENCE_LEVELS } from '../../data/audio'
 import type { Action } from '../../game/actions'
 import { decodeSaveCode, encodeSaveCode, SaveCodeError } from '../../game/save/code'
 import type { GameState } from '../../game/state'
+import { backupAgeText, keepStorage, lastBackupAt, markBackedUp, readBackupFile, saveBackupFile, storageProtected } from '../../persist/safety'
 import { createButton, el, setText } from '../components/button'
 import { rub } from '../format'
 
@@ -59,6 +61,9 @@ export class SettingsSheet {
   private sheet: HTMLElement
   private copyStatus: HTMLElement
   private manual: HTMLTextAreaElement
+  private storageLine: HTMLElement
+  private backupLine: HTMLElement
+  private fileInput: HTMLInputElement
   private loadInput: HTMLTextAreaElement
   private loadError: HTMLElement
   private loadConfirm: HTMLElement
@@ -93,8 +98,12 @@ export class SettingsSheet {
     )
 
     // --- save code: copy
-    const copySec = this.section('Save code', 'Move this career to another device: copy the code, paste it into Notes or a message, then load it there.')
+    const copySec = this.section(
+      'Save code',
+      'Move this career to another device, or keep it safe: copy the code into Notes or a message, or save it as a backup file.',
+    )
     const copyBtn = createButton({ id: 'copy-code', label: 'Copy save code', icon: 'copy', variant: 'primary', onPress: () => void this.copy() })
+    const fileBtn = createButton({ id: 'save-file', label: 'Save backup file', icon: 'doc', onPress: () => void this.saveFile() })
     this.copyStatus = el('p', 'settings-status')
     this.copyStatus.setAttribute('role', 'status')
     this.manual = el('textarea', 'code-box')
@@ -104,7 +113,16 @@ export class SettingsSheet {
     this.manual.hidden = true
     this.manual.setAttribute('aria-label', 'Your save code')
     this.manual.addEventListener('focus', () => this.manual.select())
-    copySec.append(copyBtn, this.copyStatus, this.manual)
+    // Copied by hand from the fallback box: that counts as a backup too.
+    this.manual.addEventListener('copy', () => this.backedUp())
+    this.backupLine = el('p', 'settings-text settings-small')
+    this.backupLine.dataset.id = 'last-backup'
+    this.storageLine = el('p', 'settings-text settings-small')
+    this.storageLine.dataset.id = 'storage-status'
+    this.storageLine.hidden = true
+    const copyActions = el('div', 'actions actions-stack')
+    copyActions.append(copyBtn, fileBtn)
+    copySec.append(copyActions, this.copyStatus, this.manual, this.backupLine, this.storageLine)
 
     // --- save code: load
     const loadSec = this.section('Load save code', 'Paste a code from another device. It replaces the career on this one.')
@@ -117,7 +135,16 @@ export class SettingsSheet {
     this.loadInput.autocapitalize = 'off'
     this.loadError = el('p', 'settings-error')
     this.loadError.setAttribute('role', 'alert')
-    const loadBtn = createButton({ id: 'load-code', label: 'Load', onPress: () => this.tryLoad() })
+    const loadBtn = createButton({ id: 'load-code', label: 'Load', onPress: () => this.tryLoad(this.loadInput.value) })
+    this.fileInput = el('input', '')
+    this.fileInput.type = 'file'
+    this.fileInput.accept = '.txt,text/plain'
+    this.fileInput.hidden = true
+    this.fileInput.dataset.id = 'backup-file-input'
+    this.fileInput.addEventListener('change', () => void this.loadFile())
+    const loadFileBtn = createButton({ id: 'load-file', label: 'Load file', ariaLabel: 'Load backup file', icon: 'doc', onPress: () => this.fileInput.click() })
+    const loadRow = el('div', 'actions')
+    loadRow.append(loadBtn, loadFileBtn)
     this.loadConfirm = el('div', 'confirm')
     this.loadConfirm.hidden = true
     this.loadConfirmText = el('p', '')
@@ -127,7 +154,7 @@ export class SettingsSheet {
       createButton({ id: 'load-confirm', label: 'Replace career', variant: 'danger', onPress: () => this.confirmLoad() }),
     )
     this.loadConfirm.append(this.loadConfirmText, loadActions)
-    loadSec.append(this.loadInput, this.loadError, loadBtn, this.loadConfirm)
+    loadSec.append(this.loadInput, this.loadError, loadRow, this.fileInput, this.loadConfirm)
 
     // --- new career
     const newSec = this.section('New career', 'Start over on Day 1 with a new shop.')
@@ -247,6 +274,7 @@ export class SettingsSheet {
     this.cancelLoad()
     this.newConfirm.hidden = true
     this.render(this.deps.getState())
+    this.refreshSafety()
     this.root.hidden = false
     this.sheet.scrollTop = 0
     this.sheet.querySelector<HTMLButtonElement>('[data-id="settings-close"]')?.focus()
@@ -314,6 +342,7 @@ export class SettingsSheet {
       await navigator.clipboard.writeText(code)
       this.copyStatus.textContent = `Copied (${code.length.toLocaleString('en-US')} characters). Paste it somewhere safe.`
       this.manual.hidden = true
+      this.backedUp()
     } catch {
       // Older mobile browsers: show the code selected for a manual copy.
       this.copyStatus.textContent = 'Your browser blocked copying. Press and hold the code below, Select all, then Copy.'
@@ -323,12 +352,69 @@ export class SettingsSheet {
     }
   }
 
-  private tryLoad(): void {
-    const code = this.loadInput.value.trim()
+  /** Show when the last backup was made and whether the browser promised to keep the storage. */
+  private refreshSafety(): void {
+    setText(this.backupLine, `Last backup: ${backupAgeText(lastBackupAt(), Date.now())}.`)
+    void storageProtected().then((kept) => {
+      this.storageLine.hidden = kept === null
+      setText(
+        this.storageLine,
+        kept ? 'Storage: protected on this device.' : 'Storage: your browser may clear saves if the phone runs low on space. Keep a backup file.',
+      )
+    })
+  }
+
+  /** A backup was made: remember when, and ask the browser to keep the storage. */
+  private backedUp(): void {
+    markBackedUp()
+    void keepStorage().finally(() => this.refreshSafety())
+  }
+
+  private async saveFile(): Promise<void> {
+    let code: string
+    try {
+      code = encodeSaveCode(this.deps.getState())
+    } catch (err) {
+      this.copyStatus.textContent = `Could not make a save code: ${(err as Error).message}`
+      return
+    }
+    this.manual.hidden = true
+    const result = await saveBackupFile(code)
+    if (result === 'cancelled') {
+      this.copyStatus.textContent = ''
+      return
+    }
+    if (result === 'failed') {
+      this.copyStatus.textContent = 'This browser could not save a file. Copy the save code instead.'
+      return
+    }
+    this.copyStatus.textContent = result === 'shared' ? 'Backup file ready. Keep it somewhere safe, like Files.' : 'Backup file saved to your downloads.'
+    this.backedUp()
+  }
+
+  private async loadFile(): Promise<void> {
+    const file = this.fileInput.files?.[0]
+    // Clear the picker so choosing the same file again still fires "change".
+    this.fileInput.value = ''
+    if (!file) return
+    let text: string
+    try {
+      text = await readBackupFile(file)
+    } catch (err) {
+      this.loadConfirm.hidden = true
+      this.pending = null
+      this.loadError.textContent = (err as Error).message || 'That file could not be read.'
+      return
+    }
+    this.tryLoad(text, 'That file is empty. Choose a Lombard backup file.')
+  }
+
+  private tryLoad(input: string, emptyMessage = 'Paste a save code first.'): void {
+    const code = input.trim()
     this.loadError.textContent = ''
     this.loadConfirm.hidden = true
     if (!code) {
-      this.loadError.textContent = 'Paste a save code first.'
+      this.loadError.textContent = emptyMessage
       return
     }
     try {
@@ -359,6 +445,7 @@ export class SettingsSheet {
     this.loadConfirm.hidden = true
     this.loadInput.value = ''
     this.deps.replaceState(s)
+    void keepStorage()
     this.close()
   }
 

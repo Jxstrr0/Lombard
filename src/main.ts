@@ -31,7 +31,8 @@ import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
 import { bindKeyboard } from './input/keyboard'
 import { LookGestures } from './input/look'
-import { deleteCareer, loadLatestCareer, saveCareer } from './persist/autosave'
+import { deleteCareer, loadLatestCareer, onCareerSaved, saveCareer } from './persist/autosave'
+import { keepStorage } from './persist/safety'
 import { CameraRig } from './render/camera'
 import { MIN_FPS, PerfOverlay, TIER_SETTINGS, TierGovernor, initialTier, saveAutoTier, saveChoice, setTextureAnisotropy, type GraphicsChoice, type QualityTier } from './render/perf'
 import { ShopScene } from './render/scene'
@@ -161,6 +162,11 @@ async function boot(): Promise<void> {
     }
   }
   const store = new Store(initial)
+  // Once a career with real progress (a finished day) is safely written, ask the
+  // browser to keep the storage. keepStorage asks at most once per page load.
+  onCareerSaved((s) => {
+    if (s.history.length > 0) void keepStorage()
+  })
   window.__lombardState = () => store.get()
 
   const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')

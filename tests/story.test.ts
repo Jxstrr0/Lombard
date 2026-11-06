@@ -150,7 +150,7 @@ describe('planning', () => {
     const played = recordBeat(s, 'medals.roof', { day: 3, outcome: 'passed' })
     expect(pickBeats(played).some((b) => b.id === 'medals.roof')).toBe(false)
     const ended = { ...s, story: { ...s.story, arcs: { medals: { beats: {}, ended: true } } } }
-    expect(pickBeats(ended)).toEqual([])
+    expect(pickBeats(ended).filter((b) => b.id.startsWith('medals.'))).toEqual([])
   })
 
   it('a beat seller takes a walk-in place and the day keeps its length; planning is deterministic', () => {
@@ -199,7 +199,8 @@ describe('planning', () => {
     const fake = { customer: regularCustomer(def) } as unknown as GameState['loans'][number]
     s = { ...s, loans: [fake] }
     let id = 0
-    expect(planStory(s, (p) => `${p}${id++}`).visits).toEqual([])
+    // (Other arcs' beats may still come in; Zinaida doesn't.)
+    expect(planStory(s, (p) => `${p}${id++}`).visits.filter((v) => v.visit.customer.regularId === 'zinaida')).toEqual([])
   })
 })
 

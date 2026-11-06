@@ -65,7 +65,7 @@ Done when: screenshots look like a real shop and the phone still holds 30 fps.
 
 - 20 regulars with schedules, memory, and dialogue.
 - Remaining 3 specialists (militaria, antiques, electronics) with their small arcs. Specialists ✅ (Nov 6): Gennady Shurygin (militaria), Stanislav Lyubimov (antiques, icons, instruments), Zhenya Kroshkina (phones, cameras, electronics) are in the Office next to Faina and Ilya. Arcs: all five are written as design notes in GDD § 2b; wiring them onto the story engine is still to do.
-- Story engine and 4 arcs: Grandmother's Medals, Dubai Rolex Guy, The Student's Laptop, Protection (first half).
+- Story engine and 4 arcs: Grandmother's Medals, Dubai Rolex Guy, The Student's Laptop, Protection (first half). Dubai Rolex Guy ✅ (Nov 6): Edik Sorokin, three Dubai fakes, then Ramil's real Rolland to pawn; how you treated him decides whether he asks you to look properly or you can wave it away (see 05).
 - Reputation by group. Shoplifting and security upgrades. ✅ Done: five groups (neighbourhood, youth, police, mob, specialists) in `src/game/reputation.ts`, shown in the ledger as vague lines; shoplifting off open shelves from day 8; door chime, convex mirror, lockable wall case and security camera in the Office (see 05).
 - Title screen, career slots, settings (motion, text size), Longlight-branded menu. ✅ Done: title screen at boot over the dimmed shop, Continue, 3 slots (play, new career → intro, delete with confirm), Load save code / backup file into a chosen slot (replace confirm), device settings from the title, Settings → Main menu in game, the backup reminder, a "More from Longlight" link. The pre-M4 autosave migrates into slot 1. `?seed=N` skips the title.
 - Add to Kelbo.Website hub.

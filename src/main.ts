@@ -11,7 +11,8 @@
  * default look: positive yaw turns right, positive pitch looks up (e.g. look=180,0
  * faces the back wall, look=0,18 looks up at the window). For review and shots.
  * Dev only (a review career like ?seed, seed 1 unless given): ?scenario=redeem opens day 1 with a pawner back for a 12-day-old loan first in line;
- * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line.
+ * ?scenario=story opens day 1 with a regular's story scene (a choice) first in line;
+ * ?scenario=rolex / ?scenario=laptop open day 1 with a beat of that arc first in line (BEAT_SCENARIOS).
  * ?life=0 leaves out the shop life (render/life: clock, window light, dust, tube, tea);
  * ?time=HH:MM makes the room show that shop time (window light, wall clock, canal tint, street) for review.
  * Street outside the window (render/street): ?street=0 off, ?street=busy, ?weather=clear|rain|snow,
@@ -34,7 +35,7 @@ import { ITEM_DEFS } from './data/items'
 import { generateWalkIn } from './game/customers/walkins'
 import { generateItem } from './game/items/generate'
 import { Rng } from './game/rng'
-import { regularCustomer } from './game/story/plan'
+import { beatVisit, regularCustomer } from './game/story/plan'
 import type { QueuedVisit } from './game/types'
 import { getRegular } from './data/regulars'
 import { getBeat } from './data/stories'
@@ -95,6 +96,19 @@ function storyScenario(s0: GameState): GameState {
   if (!who || !beat) return s
   const visit: QueuedVisit = { visitId: 'v-dev-story', kind: 'scene', customer: regularCustomer(who), patience: tuning.story.patience, beatId: beat.id, line: beat.visit.scene?.lines[0] }
   return { ...s, queue: [visit, ...s.queue] }
+}
+
+/** Dev-only (?scenario=<key>): the beat each arc scenario puts first in line on day 1. */
+const BEAT_SCENARIOS: Record<string, string> = { rolex: 'rolex.omeca' }
+
+function beatScenario(s0: GameState, beatId: string): GameState {
+  let s = reducer(s0, { type: 'career/begin', shopName: '' })
+  s = reducer(s, { type: 'day/open' })
+  const beat = getBeat(beatId)
+  if (!beat) return s
+  let n = 0
+  const visit = beatVisit(s, beat, (prefix) => `${prefix}-dev-${n++}`)
+  return visit ? { ...s, queue: [visit, ...s.queue], day: { ...s.day, total: s.day.total + 1 } } : s
 }
 
 /** Screens that show the counter view and leave the 3D area free to drag. */
@@ -206,6 +220,8 @@ async function boot(): Promise<void> {
     initial = createInitialState(seedParam, `career-${seedParam.toString(36)}`)
     if (params.get('scenario') === 'redeem') initial = redeemScenario(initial)
     if (params.get('scenario') === 'story') initial = storyScenario(initial)
+    const beatId = BEAT_SCENARIOS[params.get('scenario') ?? '']
+    if (beatId) initial = beatScenario(initial, beatId)
   } else {
     const recent = mostRecentSlot(slots)
     if (recent) initial = await loadSlot(recent.slot)

@@ -84,7 +84,8 @@ export function pickBeats(state: GameState): Beat[] {
   return picked
 }
 
-function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string) => string): QueuedVisit | null {
+/** The visit that plays a beat: its person, and its scripted item or scene. Exported for dev scenarios. */
+export function beatVisit(state: GameState, beat: Beat, nextId: (prefix: string) => string): QueuedVisit | null {
   const who = REGULARS.find((r) => r.id === beat.visit.who)
   if (!who) return null
   const customer = regularCustomer(who)

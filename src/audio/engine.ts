@@ -15,6 +15,8 @@
  */
 import { AMBIENCE_FILE, AUDIO_DIR, AUDIO_MIX, SOUND_DETUNE, SOUND_GAIN, SOUND_IDS, type SoundId } from '../data/audio'
 import type { Cue } from './cues'
+import { VOICE_DIR, VOICE_MIX } from '../data/voice'
+import type { VoiceCue } from './voice'
 import type { SoundSettings } from './settings'
 
 type Ctx = AudioContext
@@ -51,6 +53,8 @@ export class AudioEngine {
   private ambienceNext = 0
   private ambienceTimer: number | null = null
   private settings: SoundSettings
+  /** Voice lines, fetched the first time each is needed (never at load). */
+  private voices = new Map<string, Promise<AudioBuffer | null>>()
 
   constructor(
     private readonly base: string,
@@ -114,6 +118,39 @@ export class AudioEngine {
       src.connect(g).connect(this.effects)
       src.start(at)
     }
+  }
+
+  /** Say a voice line (src/audio/voice.ts). Fetched on first use; dropped if it can't load in time. */
+  say(cue: VoiceCue | null): void {
+    const ctx = this.ctx
+    if (!cue || !ctx || !this.effects || !this.settings.enabled) return
+    const asked = ctx.currentTime
+    let p = this.voices.get(cue.file)
+    if (!p) {
+      p = fetch(`${this.base}${VOICE_DIR}${cue.file}`)
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          return res.arrayBuffer()
+        })
+        .then((data) => decode(ctx, data))
+        .catch((err: unknown) => {
+          console.warn(`[audio] could not load ${cue.file}`, err)
+          this.voices.delete(cue.file)
+          return null
+        })
+      this.voices.set(cue.file, p)
+    }
+    void p.then((buf) => {
+      if (!buf || !this.effects || !this.settings.enabled || ctx.state !== 'running') return
+      if (ctx.currentTime - asked > VOICE_MIX.maxLate) return
+      const src = ctx.createBufferSource()
+      src.buffer = buf
+      const g = ctx.createGain()
+      g.gain.value = VOICE_MIX.gain
+      src.connect(g).connect(this.effects)
+      src.start(Math.max(ctx.currentTime, asked + cue.delay))
+      this.lastCueAt = ctx.currentTime
+    })
   }
 
   /** A UI button tap; skipped when the tap already made a state sound (door, tool, cash…). */

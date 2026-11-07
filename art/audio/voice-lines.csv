@@ -1,0 +1,68 @@
+line_id,game,category,character,trigger,text,model,voice_id,takes,file_name,chars,est_credits,status,generation_id
+LOM-WALKIN-0001,LOM,bark,walkin_m,customer greeting (any),[polite] Good day. You buy things here?,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0001.mp3,30,,picked,0NfZx1t4t6ztuREDryT9
+LOM-WALKIN-0002,LOM,bark,walkin_m,customer greeting (any),[hesitant] Hello… are you open?,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0002.mp3,20,,picked,omMxiU219oA6znKTpU4h
+LOM-WALKIN-0003,LOM,bark,walkin_m,"haggle accept, stubborn",[flat] Fine. Done.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0003.mp3,11,,picked,gG21Cswv5krUQqwXRYaU
+LOM-WALKIN-0004,LOM,bark,walkin_m,"haggle accept, stubborn",[gruff] Hm. All right.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0004.mp3,14,,picked,gOUytxPRCqDp11w51Szl
+LOM-WALKIN-0005,LOM,bark,walkin_m,"haggle counter, stubborn",[flat] No. Again.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0005.mp3,10,,picked,MblWGzPIAYQd85i8qmZP
+LOM-WALKIN-0006,LOM,bark,walkin_m,"haggle counter, stubborn",[gruff] Try harder.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0006.mp3,11,,picked,0kbBNOXUjnACyw3MDIv6
+LOM-WALKIN-0007,LOM,bark,walkin_m,"haggle walk, stubborn",[flat] Waste of my time.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0007.mp3,17,,picked,MEmgjPiTopZhBPWJ6f5O
+LOM-WALKIN-0008,LOM,bark,walkin_m,"haggle walk, stubborn",[gruff] Forget it.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0008.mp3,10,,picked,5YiIOU1AZxJEGnpCiPlF
+LOM-WALKIN-0009,LOM,bark,walkin_m,"haggle accept, flexible",[cheerful] Deal! Everyone wins.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0009.mp3,20,,picked,RY80jxZe5CSnno12tkb2
+LOM-WALKIN-0010,LOM,bark,walkin_m,"haggle accept, flexible",[laughs] Why not. Life is short.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0010.mp3,23,,picked,JkuhNAaJAkRJB054A8l1
+LOM-WALKIN-0011,LOM,bark,walkin_m,"haggle counter, flexible","[amused] Ah, come on, meet me halfway.",eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0011.mp3,29,,picked,8PUAkiWBpkZAnLz3Tr5O
+LOM-WALKIN-0012,LOM,bark,walkin_m,"haggle counter, flexible",[chuckles] Close. Not quite.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0012.mp3,17,,picked,iXfbwR60xXyQ3m2eOMNO
+LOM-WALKIN-0013,LOM,bark,walkin_m,"haggle walk, flexible",[light sigh] Ah well. Another day.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0013.mp3,21,,picked,NGWcW2iOjCDrJpFrJTT1
+LOM-WALKIN-0014,LOM,bark,walkin_m,"haggle walk, flexible",[easygoing] No hard feelings.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0014.mp3,17,,picked,n6aESj4OTwYvlugoldIR
+LOM-WALKIN-0015,LOM,bark,walkin_m,"haggle accept, desperate","[relieved, shaky] Yes. Yes, okay. Thank you.",eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0015.mp3,26,,picked,pDgEnMY87iDkV65hiwFJ
+LOM-WALKIN-0016,LOM,bark,walkin_m,"haggle accept, desperate",[breathless] Thank you… really.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0016.mp3,18,,picked,mHEOz6e2KMawhqSqxjQs
+LOM-WALKIN-0017,LOM,bark,walkin_m,"haggle counter, desperate",[pleading] Please… a little more?,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0017.mp3,22,,picked,Fckk5SOFkPwAhDjRi8La
+LOM-WALKIN-0018,LOM,bark,walkin_m,"haggle counter, desperate",[nervous] I really need more than that.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0018.mp3,29,,picked,zOXUUIi0CpiXfun00w1s
+LOM-WALKIN-0019,LOM,bark,walkin_m,"haggle walk, desperate",[upset] I can’t… I’m sorry.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0019.mp3,19,,picked,ZdcT1TuDkUNTVK8F8heB
+LOM-WALKIN-0020,LOM,bark,walkin_m,"haggle walk, desperate",[quiet] I’ll try somewhere else.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0020.mp3,24,,picked,UrEQ9pjL4ZuWRoCKx9p5
+LOM-WALKIN-0021,LOM,bark,walkin_m,"haggle accept, proud",[dignified] Very well. Acceptable.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0021.mp3,22,,picked,LH4h1FuwdnCJRKU0PeL0
+LOM-WALKIN-0022,LOM,bark,walkin_m,"haggle accept, proud",[cool] Agreed. Treat it with respect.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0022.mp3,30,,picked,FOqIRL2rpFtUlxkSvVZP
+LOM-WALKIN-0023,LOM,bark,walkin_m,"haggle counter, proud",[offended] Surely you’re joking.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0023.mp3,21,,picked,jVQjqIDoNIBI41XCiZjW
+LOM-WALKIN-0024,LOM,bark,walkin_m,"haggle counter, proud",[stiff] I expected better.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0024.mp3,18,,picked,l9ryu5tE2n0hCuxuZYJB
+LOM-WALKIN-0025,LOM,bark,walkin_m,"haggle walk, proud",[cold] Good day.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0025.mp3,9,,picked,CfyD5ZM7qkTI1aDEIEWh
+LOM-WALKIN-0026,LOM,bark,walkin_m,"haggle walk, proud",[offended] My father would be ashamed of you.,eleven_v4,c1DsJsmpE3jFybtMpqIm,2,lom_walkin_m_lom-walkin-0026.mp3,34,,picked,U1cUs8e0y1n9ykcFdXjF
+LOM-WALKIN-0001,LOM,bark,walkin_f,customer greeting (any),[polite] Good day. You buy things here?,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0001.mp3,30,,picked,pIVXGtEoP5QXtrRQ4VRA
+LOM-WALKIN-0002,LOM,bark,walkin_f,customer greeting (any),[hesitant] Hello… are you open?,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0002.mp3,20,,picked,4xJrSupv6KDq4bQyfxbT
+LOM-WALKIN-0003,LOM,bark,walkin_f,"haggle accept, stubborn",[flat] Fine. Done.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0003.mp3,11,,picked,0zqjJjJk94B0P9FCV66Z
+LOM-WALKIN-0004,LOM,bark,walkin_f,"haggle accept, stubborn",[gruff] Hm. All right.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0004.mp3,14,,picked,Lq7IMaaJCxTrbm0jQOzr
+LOM-WALKIN-0005,LOM,bark,walkin_f,"haggle counter, stubborn",[flat] No. Again.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0005.mp3,10,,picked,B0SWBDKJofus7KowbiTN
+LOM-WALKIN-0006,LOM,bark,walkin_f,"haggle counter, stubborn",[gruff] Try harder.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0006.mp3,11,,picked,SpjjajI9pwixFhl0gHHg
+LOM-WALKIN-0007,LOM,bark,walkin_f,"haggle walk, stubborn",[flat] Waste of my time.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0007.mp3,17,,picked,7PQ4fQXPduhwQSMNLSAY
+LOM-WALKIN-0008,LOM,bark,walkin_f,"haggle walk, stubborn",[gruff] Forget it.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0008.mp3,10,,picked,bEe9VGLlqJy1G7zMWPbO
+LOM-WALKIN-0009,LOM,bark,walkin_f,"haggle accept, flexible",[cheerful] Deal! Everyone wins.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0009.mp3,20,,picked,8qRqMKERkSXBodmAJrxn
+LOM-WALKIN-0010,LOM,bark,walkin_f,"haggle accept, flexible",[laughs] Why not. Life is short.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0010.mp3,23,,picked,TTbg6LukJ78wT2GqWUH6
+LOM-WALKIN-0011,LOM,bark,walkin_f,"haggle counter, flexible","[amused] Ah, come on, meet me halfway.",eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0011.mp3,29,,picked,GaPr1dwAPGKlIXu63e9W
+LOM-WALKIN-0012,LOM,bark,walkin_f,"haggle counter, flexible",[chuckles] Close. Not quite.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0012.mp3,17,,picked,ImC51KXGanX4fQVXv8jf
+LOM-WALKIN-0013,LOM,bark,walkin_f,"haggle walk, flexible",[light sigh] Ah well. Another day.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0013.mp3,21,,picked,RKTCWISvxKvsy7zoWkKm
+LOM-WALKIN-0014,LOM,bark,walkin_f,"haggle walk, flexible",[easygoing] No hard feelings.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0014.mp3,17,,picked,BIFJnQY8zlwmEFrJlL2T
+LOM-WALKIN-0015,LOM,bark,walkin_f,"haggle accept, desperate","[relieved, shaky] Yes. Yes, okay. Thank you.",eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0015.mp3,26,,picked,k9hcFw6SdbntSf3I5hCc
+LOM-WALKIN-0016,LOM,bark,walkin_f,"haggle accept, desperate",[breathless] Thank you… really.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0016.mp3,18,,picked,PEsbtKIOz2m0zD6pnVo9
+LOM-WALKIN-0017,LOM,bark,walkin_f,"haggle counter, desperate",[pleading] Please… a little more?,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0017.mp3,22,,picked,NTfvLH2ZzFuMWfzcVeT0
+LOM-WALKIN-0018,LOM,bark,walkin_f,"haggle counter, desperate",[nervous] I really need more than that.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0018.mp3,29,,picked,JuxnivnxLPlVcEvurdMm
+LOM-WALKIN-0019,LOM,bark,walkin_f,"haggle walk, desperate",[upset] I can’t… I’m sorry.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0019.mp3,19,,picked,O6LfiTlguIZjizAazHLV
+LOM-WALKIN-0020,LOM,bark,walkin_f,"haggle walk, desperate",[quiet] I’ll try somewhere else.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0020.mp3,24,,picked,81Qly7B1GNlEDFB9WSRI
+LOM-WALKIN-0021,LOM,bark,walkin_f,"haggle accept, proud",[dignified] Very well. Acceptable.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0021.mp3,22,,picked,skVh2q51jay6GQGaLMYU
+LOM-WALKIN-0022,LOM,bark,walkin_f,"haggle accept, proud",[cool] Agreed. Treat it with respect.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0022.mp3,30,,picked,MivctsjeWVH6e2kgrtQq
+LOM-WALKIN-0023,LOM,bark,walkin_f,"haggle counter, proud",[offended] Surely you’re joking.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0023.mp3,21,,picked,xn4nqzSgb2WkuzwCYVgo
+LOM-WALKIN-0024,LOM,bark,walkin_f,"haggle counter, proud",[stiff] I expected better.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0024.mp3,18,,picked,6zypTcTBnNtSBQbhinL8
+LOM-WALKIN-0025,LOM,bark,walkin_f,"haggle walk, proud",[cold] Good day.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0025.mp3,9,,picked,3lUqrjmrZOsB06z4jG32
+LOM-WALKIN-0026,LOM,bark,walkin_f,"haggle walk, proud",[offended] My father would be ashamed of you.,eleven_v4,rl5Q2u6U81iTG1BKztyX,2,lom_walkin_f_lom-walkin-0026.mp3,34,,picked,KUL8hWC4J3xmGK4XyfMR
+LOM-EDUARD-0001,LOM,dialogue,eduard,first insurance visit (weeks 2–3),"[calm, polite] Eduard Lvovich. I look after the street. Small fee, monthly. Fires happen, you know.",eleven_v4,XaEUesE01wKIKaa0xI0h,2,lom_eduard_lom-eduard-0001.mp3,84,,picked,qisj76vRagEi5g5LhusH
+LOM-EDUARD-0002,LOM,dialogue,eduard,asks properly after a refusal,[softly] Last month you said no. This month I am asking you properly.,eleven_v4,XaEUesE01wKIKaa0xI0h,2,lom_eduard_lom-eduard-0002.mp3,60,,picked,VgfP2719OZ1vgC6QDzba
+LOM-EDUARD-0003,LOM,dialogue,eduard,ultimatum,"[quiet, very calm] Three months. Back pay. Or we stop being polite.",eleven_v4,XaEUesE01wKIKaa0xI0h,2,lom_eduard_lom-eduard-0003.mp3,48,,picked,xdR9lnDZ5KKLC92jh79w
+LOM-VOLKOV-0001,LOM,dialogue,volkova,courtesy call (days 8–20),[dry] Detective Volkova. Just a courtesy call. Keep your book tidy and we’ll get along.,eleven_v4,J60xcCIM7ET7HMi7hMZu,2,lom_volkova_lom-volkov-0001.mp3,81,,picked,4Lw9X4qoCjhRCTVMjBFa
+LOM-VOLKOV-0002,LOM,dialogue,volkova,asks about a bulletin piece,"[flat] I’m looking for a bracelet. Gold, a chipped clasp. You’ve seen it?",eleven_v4,J60xcCIM7ET7HMi7hMZu,2,lom_volkova_lom-volkov-0002.mp3,66,,picked,NWkK1vJqQgaEzbqzcl2J
+LOM-VOLKOV-0003,LOM,dialogue,volkova,refuses an envelope,[cold] Put that away before I write it down.,eleven_v4,J60xcCIM7ET7HMi7hMZu,2,lom_volkova_lom-volkov-0003.mp3,37,,picked,e88cvnHtnQCM7MfM8tsL
+LOM-VENYA-0001,LOM,dialogue,venya,first meeting (day 12+),"[easygoing] Venya. From the bridge. Tuesdays, remember? It’s not Tuesday. I’m flexible.",eleven_v4,fXya1gyEVUh4h5MzdoXO,2,lom_venya_lom-venya-0001.mp3,75,,picked,BTNtaPudgOoE37xQWAdQ
+LOM-VENYA-0002,LOM,dialogue,venya,drops in with goods,"[sleepy, cheerful] Quiet night on the river. Well. [short pause] Mostly quiet.",eleven_v4,fXya1gyEVUh4h5MzdoXO,2,lom_venya_lom-venya-0002.mp3,46,,picked,5LwNTukzv9OQ2OQZBMga
+LOM-VENYA-0003,LOM,dialogue,venya,after your refusals,"[sore] Another no. It’s all going in the notebook, you know.",eleven_v4,fXya1gyEVUh4h5MzdoXO,2,lom_venya_lom-venya-0003.mp3,53,,picked,IMiOOIvnxaEAuBHLhMe5
+LOM-EDIK-0001,LOM,dialogue,edik,brings a Dubai fake,"[enthusiastic] From a friend in Dubai! Real, one hundred percent. Look at the weight!",eleven_v4,kwajW3Xh5svCeKU5ky2S,2,lom_edik_lom-edik-0001.mp3,70,,picked,dk7DFbUeHncg4iqYPs8j
+LOM-EDIK-0002,LOM,dialogue,edik,caught out,"[laughs nervously] Okay, okay… maybe ninety percent.",eleven_v4,kwajW3Xh5svCeKU5ky2S,2,lom_edik_lom-edik-0002.mp3,33,,picked,lOZRv8TDk2YTLvvhr5Eb
+LOM-EDIK-0003,LOM,dialogue,edik,brings the real one,[serious for once] This one is real. Ramil’s. Please look properly.,eleven_v4,kwajW3Xh5svCeKU5ky2S,2,lom_edik_lom-edik-0003.mp3,48,,picked,9kjhj8eCCgpFWmeJtf20
+LOM-ZINAID-0001,LOM,dialogue,zinaida,first visit,"[warm, old] Good day. You’re the new one? The old one used to shout.",eleven_v4,ma6sA7ivnBiFB6LjpbVN,2,lom_zinaida_lom-zinaid-0001.mp3,56,,picked,dK7tpmm7conXFENXqBK1
+LOM-ZINAID-0002,LOM,dialogue,zinaida,sells earrings,[wry] My mother’s earrings. I never wear them now. My ears have given up.,eleven_v4,ma6sA7ivnBiFB6LjpbVN,2,lom_zinaida_lom-zinaid-0002.mp3,67,,picked,4aCwLC5xDvt7mjJGvOpJ
+LOM-ZINAID-0003,LOM,dialogue,zinaida,sells the ring,"[chuckles] His ring. It doesn’t fit anyone in the family. They have fat fingers, all of them.",eleven_v4,ma6sA7ivnBiFB6LjpbVN,2,lom_zinaida_lom-zinaid-0003.mp3,82,,picked,xX6IVFM6wIImdLJKzH5Y

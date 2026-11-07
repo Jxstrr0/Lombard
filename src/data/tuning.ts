@@ -620,6 +620,8 @@ export const tuning = {
       tools: { winter: 0.85, spring: 1.15, summer: 1.15, autumn: 0.95 },
       /** Long evenings, New Year presents for the in-laws. */
       antiques: { winter: 1.1, spring: 1, summer: 0.95, autumn: 1 },
+      /** M6 wave C. Hockey kit sells before the ice and through the winter; rods and footballs carry spring and summer. */
+      sports: { winter: 1.1, spring: 1, summer: 0.95, autumn: 1 },
     } as Readonly<Record<string, Readonly<Partial<Record<'winter' | 'spring' | 'summer' | 'autumn', number>>>>>,
     /**
      * Holidays as date windows (MM-DD, inclusive; a window may wrap the year end) that
@@ -627,7 +629,7 @@ export const tuning = {
      * first week (the career starts 3 March).
      */
     holidays: [
-      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, laptops: 1.1, cameras: 1.1, games: 1.3, vinyl: 1.1 } },
+      { id: 'new_year', from: '12-10', to: '01-07', boost: { gold: 1.2, jewelry: 1.25, watches: 1.25, luxury: 1.15, phones: 1.2, electronics: 1.15, laptops: 1.1, cameras: 1.1, games: 1.3, vinyl: 1.1, sports: 1.1 } },
       { id: 'defender_day', from: '02-16', to: '02-23', boost: { watches: 1.15, militaria: 1.1 } },
       { id: 'womens_day', from: '02-28', to: '03-08', boost: { jewelry: 1.35, gold: 1.2, watches: 1.05 } },
       { id: 'victory_day', from: '04-25', to: '05-10', boost: { militaria: 1.45, soviet: 1.15 } },
@@ -915,7 +917,7 @@ export const tuning = {
       /** Bulletin lines kept (and shown in the ledger) this many days. */
       keepDays: 21,
       /** Categories that get stolen and printed. */
-      categories: ['gold', 'watches', 'phones', 'cameras', 'electronics', 'militaria', 'coins', 'tools', 'silver', 'media'] as readonly string[],
+      categories: ['gold', 'watches', 'phones', 'cameras', 'electronics', 'militaria', 'coins', 'tools', 'silver', 'media', 'sports'] as readonly string[],
       /** Only everyday pieces get printed: an item def whose top value (baseValue.max) is over this never does. */
       maxValue: 30_000,
     },

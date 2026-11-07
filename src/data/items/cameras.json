@@ -559,5 +559,128 @@
         {"id": "mount", "label": "Mount", "position": [0, 0.018, -0.061]}
       ]
     }
+  },
+  {
+    "id": "camera_lyra_tlr",
+    "category": "cameras",
+    "name": "Lyra-2 twin-lens reflex camera",
+    "brand": "Lyra",
+    "era": "1980",
+    "baseValue": {"min": 1200, "max": 2500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 560, "tolerance": 20},
+    "magnetic": false,
+    "rarity": 0.08,
+    "fakeChance": 0.15,
+    "tells": [
+        {"id": "lenses", "tool": "loupe", "finding": "Two lenses stacked, the taking lens marked LYRA T-22 75 mm 1:4.5 with a serial, the glass clear.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "lenses"},
+        {"id": "hood", "tool": "loupe", "finding": "The folding hood springs up over a bright ground glass; the magnifier flips out.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "hood"},
+        {"id": "back", "tool": "loupe", "finding": "The back has the red film window and the factory mark moulded in, the latches tight.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "body", "tool": "loupe", "finding": "The bakelite body has a hairline at one corner and the strap lugs are worn bright.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "lenses"},
+        {"id": "heft", "tool": "scale", "finding": "Light for its size: the body is plastic.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_screws", "tool": "magnet", "finding": "The magnet finds only a screw or two.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "back"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "haze",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 2,
+          "tells": [
+            {"id": "lenses", "tool": "loupe", "finding": "The viewing lens is from a later model with a different serial, and the taking lens is hazy.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "lenses"}
+          ]
+        },
+        {
+          "id": "relabelled",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The leatherette is new and glued on crooked; the old factory mark is gone under it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "back"}
+          ]
+        }
+    ],
+    "demandTags": ["cameras", "soviet"],
+    "claims": [
+      "Medium format. The film is this wide. The photos are this good.",
+      "You look down into it, like into a well. The art students love that.",
+      "My grandfather photographed every wedding on our street with it."
+    ],
+    "model": {
+      "glb": "camera_lyra_tlr.glb",
+      "placeholder": "box",
+      "color": "#232220",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.09, 0.14, 0.1],
+      "inspectDistance": 0.4,
+      "hotspots": [
+        {"id": "lenses", "label": "Lenses", "position": [0.0, -0.0155, 0.048]},
+        {"id": "hood", "label": "Viewing hood", "position": [0.0, 0.07, 0.0]},
+        {"id": "back", "label": "Back", "position": [0.0, 0.0, -0.05]}
+      ]
+    }
+  },
+  {
+    "id": "camera_kanon_d70",
+    "category": "cameras",
+    "name": "Kanon D70 digital SLR body",
+    "brand": "Kanon",
+    "era": "2012",
+    "baseValue": {"min": 26000, "max": 36000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 910, "tolerance": 30},
+    "magnetic": true,
+    "rarity": 0.7,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "top", "tool": "loupe", "finding": "The top screen and the mode dial with its lock; KANON D70 crisp on the prism.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "top"},
+        {"id": "mount", "tool": "loupe", "finding": "The lens mount is bright and clean, the mirror without a speck, the contacts unscratched.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "mount"},
+        {"id": "shutter", "tool": "loupe", "finding": "The menu counts thirty-one thousand shutter clicks: a fifth of its life.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "screen"},
+        {"id": "base", "tool": "loupe", "finding": "The serial on the base plate matches the warranty card; the grip rubber is unpeeled.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "base"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy, a magnesium body and a big battery.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_body", "tool": "magnet", "finding": "The magnet catches at the mount screws and the tripod socket.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "base"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "worn_out",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 2,
+          "tells": [
+            {"id": "shutter", "tool": "loupe", "finding": "The counter says a hundred and ninety thousand; a new shutter is due, and someone fitted a cheap screen.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen"}
+          ]
+        },
+        {
+          "id": "opened",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "base", "tool": "loupe", "finding": "The base screws are chewed and the grip rubber has been glued back on: it’s been opened.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "base"}
+          ]
+        }
+    ],
+    "demandTags": ["cameras", "electronics"],
+    "claims": [
+      "The serious one. The Kanon D70. I did weddings with it for two years.",
+      "Body only. The lenses I’m keeping, I’ll be back for this.",
+      "It can shoot eight frames a second. My life is not that interesting."
+    ],
+    "model": {
+      "glb": "camera_kanon_d70.glb",
+      "placeholder": "box",
+      "color": "#151516",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.15, 0.115, 0.08],
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {"id": "top", "label": "Top plate", "position": [0.045, 0.0413, -0.01]},
+        {"id": "mount", "label": "Lens mount", "position": [0.004, 0.023, 0.0335]},
+        {"id": "screen", "label": "Rear screen", "position": [-0.01, -0.01, -0.0336]},
+        {"id": "base", "label": "Base plate", "position": [0.02, -0.0575, 0.0]}
+      ]
+    }
   }
 ]

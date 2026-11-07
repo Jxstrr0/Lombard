@@ -40,9 +40,9 @@ const militariaTags = getItemDef('medal_for_courage').demandTags
 const goldTags = getItemDef('gold_earrings_583').demandTags
 
 describe('item defs (M2)', () => {
-  it('all 120 raw defs validate against the schema', () => {
+  it('all 141 raw defs validate against the schema', () => {
     const raw = Object.values(RAW_ITEM_FILES).flat()
-    expect(raw).toHaveLength(120)
+    expect(raw).toHaveLength(141)
     for (const r of raw) {
       const res = ItemDef.safeParse(r)
       expect(res.success, `${(r as { id: string }).id}: ${res.success ? '' : res.error.message}`).toBe(true)

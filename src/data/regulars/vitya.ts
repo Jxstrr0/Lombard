@@ -2,7 +2,7 @@
  * Vitya Gruzdev: lift mechanic, Ruslan's younger brother (the same look, the hoodie in the
  * boy's team red), hockey father of Lyova, age eleven, a goalkeeper. Everything goes on ice
  * time and pads. Thread: the tournament (src/data/stories/threads). M6.
- * (No sports-gear category yet: skates and pads would be its natural items. docs/05 § Parked.)
+ * M6 items wave C: the sports category brought his natural items, Lyova's outgrown kit.
  */
 export default {
   id: 'vitya',
@@ -16,6 +16,10 @@ export default {
   schedule: { from: 17, every: [14, 19] },
   pawn: 0.3,
   items: [
+    // M6 items wave C: Lyova's outgrown kit (bought new, so clean; never heirlooms).
+    { defId: 'skates_ledokol_hockey', weight: 2, provenance: 'clean', story: ['Lyova’s skates. He grew two sizes over the winter break. The skates didn’t. Sharpened, ready to go.'] },
+    { defId: 'mask_ledokol_goalie', weight: 1, provenance: 'clean', story: ['Lyova’s old mask. Voronin painted it, the one who does the Burlaki goalies. Now his head’s too big for it. In every sense.'] },
+    { defId: 'stick_ledokol_composite', weight: 1, provenance: 'clean', story: ['Not Lyova’s: goalies use a different stick. This one’s mine. I played in the veterans’ league twice. Twice was enough.'] },
     { defId: 'phone_galaxia_nota3', weight: 2, provenance: 'clean', story: ['My phone. I film every game on it. I’ve backed it up. Lyova checked. Lyova checks everything; he’s a goalkeeper.'] },
     { defId: 'watch_poljot_strela', weight: 1, authenticity: 'genuine', provenance: 'heirloom', story: ['Grandad’s chronograph. He timed the trams with it. Lyova times his reactions with it. New pads cost more than the reactions.'] },
     { defId: 'camera_kanon_ae2', weight: 1, provenance: 'clean', story: ['I bought it to photograph Lyova’s games. Then he told me film cameras are embarrassing. He’s eleven. He knows everything.'] },

@@ -2,7 +2,8 @@
 Phones: Mangosteen m5 / m4S (fruit-logo phones), Galaxia Stella 4 / Nota 3
 (removable back cover; the Nota has a stylus), Severin K1 push-button phone. M6 wave B: Mangosteen m4 (the m4S body, own
 model number) and m3G (glossy plastic back), Galaxia Stella 3 Mini (the Stella
-body), Vertex Signature (steel, sapphire keys, leather back).
+body), Vertex Signature (steel, sapphire keys, leather back). M6 wave C: Galaxia
+Stella 5 (the Stella body, a big raised lens) and Mangosteen m5C (the m3G plastic body).
 
 Placeholder convention (src/render/items.ts): a 0.06 × 0.125 × 0.008 slab centred
 on the origin, screen +Z, back −Z (logo, camera at +X / top), bottom edge −Y
@@ -384,7 +385,7 @@ def mangosteen(it: lib.Item, m4s: bool, m4: bool = False) -> None:
 # Galaxia Stella 4 and Nota 3
 
 
-def galaxia(it: lib.Item, nota: bool, mini: bool = False) -> None:
+def galaxia(it: lib.Item, nota: bool, mini: bool = False, s5: bool = False) -> None:
     color = it.color
     if nota:
         cover = lib.material(it, "leather", color, rough=0.78)
@@ -442,13 +443,19 @@ def galaxia(it: lib.Item, nota: bool, mini: bool = False) -> None:
     # --- back: camera, flash, speaker, logo, small print, stitching (Nota)
     bz = -0.004
     cy = 0.0505 if nota else 0.051
-    camera(F("back", (0, cy, bz)), rim, dark, glass, r=0.0042 if nota else 0.0038, proud=0.0006, rim=0.0007)
-    disc(F("back", (0, cy - 0.0078, bz)), 0.0016, -0.00002, 0.00004, rim, n=24)
-    disc(F("back", (0, cy - 0.0078, bz)), 0.0011, 0.00004, 0.00006, ink, n=24)
+    if s5:
+        # wave C: the Stella 5's big round lens in a raised pod, flash and heart-rate window below
+        camera(F("back", (0, cy - 0.001, bz)), rim, dark, glass, r=0.0050, proud=0.0011, rim=0.0009)
+        for k, mat_ in ((0, rim), (1, glass)):
+            disc(F("back", (-0.0026 + 0.0052 * k, cy - 0.0105, bz)), 0.0013, -0.00002, 0.00005, mat_ if k else ink, n=20)
+    else:
+        camera(F("back", (0, cy, bz)), rim, dark, glass, r=0.0042 if nota else 0.0038, proud=0.0006, rim=0.0007)
+        disc(F("back", (0, cy - 0.0078, bz)), 0.0016, -0.00002, 0.00004, rim, n=24)
+        disc(F("back", (0, cy - 0.0078, bz)), 0.0011, 0.00004, 0.00006, ink, n=24)
     bmx = F("back", (0, 0, bz))
     text_on(bmx, "GALAXIA", 0.0042, ink, y=0.010, spacing=1.3, bold=0.6)
     text_on(bmx, "Galaxia Electronics, Mostograd", 0.0011, ink, y=-0.050)
-    text_on(bmx, "GX-N9005" if nota else "GX-I8190" if mini else "GX-I9505", 0.0011, ink, y=-0.0525)
+    text_on(bmx, "GX-N9005" if nota else "GX-I8190" if mini else "GX-G900" if s5 else "GX-I9505", 0.0011, ink, y=-0.0525)
     back_cuts = holes(F("back", (-0.019, -0.056, bz)), [(i * 0.0011, k * 0.0011) for i in range(-2, 3) for k in range(-1, 2)], 0.00032, 0.0006, dark, 8)
     if nota:
         stitch = rr(W - 0.0052, H - 0.0052, r - 0.0026, 10)
@@ -670,7 +677,7 @@ def severin(it: lib.Item) -> None:
 # M6 wave B: Mangosteen m3G (curved plastic back) and the Vertex Signature
 
 
-def m3g(it: lib.Item) -> None:
+def m3g(it: lib.Item, m5c: bool = False) -> None:
     """The plastic Mangosteen: a glossy soap-bar back, a chrome bezel round the glass,
     the SIM tray and the headphone jack on the top edge, the wide dock connector below."""
     color = it.color
@@ -703,7 +710,7 @@ def m3g(it: lib.Item) -> None:
     text_on(tm, "Mangosteen", 0.0036, ink, y=-0.020, bold=0.5)
     text_on(tm, "16GB", 0.0016, ink, y=-0.0265, spacing=1.2)
     text_on(tm, "Designed by Mangosteen in Mostograd", 0.00105, ink, y=-0.037)
-    text_on(tm, "Model MG-1241   FCC 0018-MG", 0.00105, ink, y=-0.0393)
+    text_on(tm, "Model MG-1529   FCC 0031-MG" if m5c else "Model MG-1241   FCC 0018-MG", 0.00105, ink, y=-0.0393)
 
     # sides
     sz = 0.0008
@@ -814,6 +821,8 @@ def build(it: lib.Item) -> None:
     pid = it.id
     if "m3g" in pid:
         m3g(it)
+    elif "m5c" in pid:
+        m3g(it, m5c=True)  # wave C: the colour-plastic m5C reuses the plastic soap-bar body
     elif "vertex" in pid:
         vertex(it)
     elif pid.endswith("mangosteen_m4"):
@@ -821,7 +830,7 @@ def build(it: lib.Item) -> None:
     elif "mangosteen" in pid:
         mangosteen(it, m4s="m4s" in pid)
     elif "galaxia" in pid:
-        galaxia(it, nota="nota" in pid, mini="mini" in pid)
+        galaxia(it, nota="nota" in pid, mini="mini" in pid, s5="stella5" in pid)
     elif "severin" in pid:
         severin(it)
     else:

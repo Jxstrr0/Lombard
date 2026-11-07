@@ -232,6 +232,11 @@ export const HINT_NEWS: Readonly<Record<string, { up: readonly NewsTemplate[]; d
     up: [{ id: 'hint_antiq_up', headline: 'Moscow buyers seen on the embankment', body: 'Visitors in good coats are asking after samovars and porcelain. The flea market has raised its prices by lunchtime.' }],
     down: [{ id: 'hint_antiq_down', headline: 'Grandmother’s sideboard goes out of fashion', body: 'Young couples want white walls and flat-pack shelves, an antiques dealer sighs. Crystal is out. So is he.' }],
   },
+  // M6 wave C
+  sports: {
+    up: [{ id: 'hint_sports_up', headline: 'Burlaki fever: the yards flood their rinks', body: 'Every courtyard with a hose has a rink by Sunday. Fathers are hunting for skates in sizes their sons will grow into.' }],
+    down: [{ id: 'hint_sports_down', headline: 'Sports shops can’t give skates away', body: 'The thaw has turned the yard rinks to puddles. A trader on Zatonnaya is offering a free stick with every pair.' }],
+  },
 }
 
 export const HINT_ALIAS: Readonly<Record<string, string>> = {

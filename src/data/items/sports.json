@@ -1,0 +1,693 @@
+[
+  {
+    "id": "skates_ledokol_hockey",
+    "category": "sports",
+    "name": "Ledokol Vector 70 hockey skates (pair)",
+    "brand": "Ledokol",
+    "era": "2012",
+    "baseValue": {"min": 4000, "max": 7000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 1700, "tolerance": 60},
+    "magnetic": true,
+    "rarity": 0.48,
+    "fakeChance": 0.2,
+    "tells": [
+        {"id": "runner", "tool": "loupe", "finding": "The steel runners are stamped LEDOKOL STEEL and a size, sharpened recently with an even hollow.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "runner"},
+        {"id": "holder", "tool": "loupe", "finding": "The white holders carry the moulded Ledokol icebreaker, and the rivets are flush and factory-round.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "holder"},
+        {"id": "tongue", "tool": "loupe", "finding": "Felt tongues with a stitched label: VECTOR 70, size 8, a batch number on the inside.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "tongue"},
+        {"id": "liner", "tool": "loupe", "finding": "The liners are worn shiny at the heel, the eyelets all there.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.35, "hotspot": "quarter"},
+        {"id": "heft", "tool": "scale", "finding": "Light for a pair of skates, the weight low in the steel.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_runner", "tool": "magnet", "finding": "The magnet snaps onto both runners and nowhere else.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "runner"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "market_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 2,
+          "weightFactor": 1.15,
+          "tells": [
+            {"id": "holder", "tool": "loupe", "finding": "The holders are grey brittle plastic, the icebreaker logo a sticker, the rivets lumpy.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "holder"},
+            {"id": "runner", "tool": "loupe", "finding": "The runners are stamped LEDOKOI, the hollow ground crooked along the edge.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "runner"},
+            {"id": "heft", "tool": "scale", "finding": "Heavy and clumsy, the weight all in the boot.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "odd_runners",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "runner", "tool": "loupe", "finding": "One runner is a duller steel with a different stamp; the rivets on that holder are new.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "runner"}
+          ]
+        }
+    ],
+    "demandTags": ["sports"],
+    "claims": [
+      "My son’s feet grew two sizes this winter. The skates did not grow at all.",
+      "Vector 70. The good ones. I bought them for the veterans’ league and went twice.",
+      "Sharpened last week. You can shave with them. Please don’t."
+    ],
+    "model": {
+      "glb": "skates_ledokol_hockey.glb",
+      "placeholder": "box",
+      "color": "#1b1c22",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.3, 0.25, 0.22],
+      "inspectDistance": 0.75,
+      "hotspots": [
+        {"id": "runner", "label": "Runner", "position": [0.02, -0.118, 0.056]},
+        {"id": "holder", "label": "Holder", "position": [0.04, -0.09, 0.07]},
+        {"id": "tongue", "label": "Tongue", "position": [0.054, 0.108, 0.055]},
+        {"id": "quarter", "label": "Boot", "position": [-0.06, 0.0, 0.104]}
+      ]
+    }
+  },
+  {
+    "id": "skates_snegurka_figure",
+    "category": "sports",
+    "name": "Snegurka white figure skates (pair)",
+    "brand": "Snegurka",
+    "era": "2006",
+    "baseValue": {"min": 1500, "max": 3000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 1500, "tolerance": 55},
+    "magnetic": true,
+    "rarity": 0.14,
+    "fakeChance": 0.15,
+    "tells": [
+        {"id": "blade", "tool": "loupe", "finding": "Chromed blades with a crisp toe pick and SNEGURKA etched by the heel, the chrome unbroken.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "blade"},
+        {"id": "boot", "tool": "loupe", "finding": "White leather boots, creased at the ankle, polish over the scuffs.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.35, "hotspot": "boot"},
+        {"id": "sole", "tool": "loupe", "finding": "Leather soles, the blade plates held by six screws each, all matching.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "sole"},
+        {"id": "laces", "tool": "loupe", "finding": "Hooks at the top, eyelets below, laces a little frayed.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "laces"},
+        {"id": "heft", "tool": "scale", "finding": "Solid, the leather boots heavier than they look.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_blade", "tool": "magnet", "finding": "The magnet clings to the blades and their screws.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "blade"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "vinyl_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 2,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "boot", "tool": "loupe", "finding": "The boots are white vinyl over cardboard; it cracks at the ankle instead of creasing.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "boot"},
+            {"id": "blade", "tool": "loupe", "finding": "The etching is a printed transfer, half rubbed off, and the toe pick is blunt and cast.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "blade"},
+            {"id": "heft", "tool": "scale", "finding": "Light and hollow for leather skates.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "ground_thin",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "blade", "tool": "loupe", "finding": "The blades have been ground so often the toe pick nearly meets the edge; fresh chrome hides it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "blade"}
+          ]
+        }
+    ],
+    "demandTags": ["sports"],
+    "claims": [
+      "My daughter wanted to be a figure skater for one winter. Then she wanted a hamster.",
+      "Real leather. The rink on Zatonnaya rents worse ones for two hundred an hour.",
+      "Worn three times. Four. Once in the kitchen."
+    ],
+    "model": {
+      "glb": "skates_snegurka_figure.glb",
+      "placeholder": "box",
+      "color": "#eeeae2",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.27, 0.27, 0.2],
+      "inspectDistance": 0.72,
+      "hotspots": [
+        {"id": "blade", "label": "Blade", "position": [0.02, -0.124, 0.05]},
+        {"id": "boot", "label": "Boot", "position": [-0.05, 0.0, 0.096]},
+        {"id": "sole", "label": "Sole and screws", "position": [0.08, -0.103, 0.05]},
+        {"id": "laces", "label": "Laces", "position": [0.0366, 0.05, 0.052]}
+      ]
+    }
+  },
+  {
+    "id": "stick_ledokol_composite",
+    "category": "sports",
+    "name": "Ledokol Strela composite hockey stick",
+    "brand": "Ledokol",
+    "era": "2013",
+    "baseValue": {"min": 2500, "max": 4500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 430, "tolerance": 16},
+    "magnetic": false,
+    "rarity": 0.14,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "shaft", "tool": "loupe", "finding": "The shaft graphics read STRELA, FLEX 75, GRIP, under a clear coat with no bubbles.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "shaft"},
+        {"id": "blade", "tool": "loupe", "finding": "The blade’s carbon weave shows through the black, curve P92 printed at the heel.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "blade"},
+        {"id": "butt", "tool": "loupe", "finding": "A rubber end plug with the Ledokol mark, tape wound over it by somebody careful.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "butt"},
+        {"id": "tape", "tool": "loupe", "finding": "Black tape on the blade, worn through at the toe from pucks.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "blade"},
+        {"id": "heft", "tool": "scale", "finding": "Feather light for its length.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_none", "tool": "magnet", "finding": "The magnet finds nothing in it, end to end.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.25, "hotspot": "shaft"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "glass_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.1,
+          "weight": 2,
+          "weightFactor": 1.45,
+          "tells": [
+            {"id": "shaft", "tool": "loupe", "finding": "FLEX 75 is a sticker under the lacquer, and the paint has a seam down the side.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "shaft"},
+            {"id": "blade", "tool": "loupe", "finding": "The weave at the heel is painted on; where it chipped there is fibreglass and wood.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "blade"},
+            {"id": "heft", "tool": "scale", "finding": "Half again too heavy: wood inside.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "glued_heel",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "blade", "tool": "loupe", "finding": "Under fresh tape the heel has been cracked and glued; a ridge of epoxy runs round it.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "blade"}
+          ]
+        }
+    ],
+    "demandTags": ["sports"],
+    "claims": [
+      "Composite. You can’t break it. Well, you can, but not easily.",
+      "Strela, flex seventy-five. I’m more of a fifty, it turns out.",
+      "My son has a new one. He says this one is too slow. It’s a stick."
+    ],
+    "model": {
+      "glb": "stick_ledokol_composite.glb",
+      "placeholder": "box",
+      "color": "#202024",
+      "scale": 1,
+      "size": [1.42, 0.13, 0.03],
+      "inspectDistance": 1.6,
+      "hotspots": [
+        {"id": "shaft", "label": "Shaft", "position": [0.2, 0.0145, 0.011]},
+        {"id": "blade", "label": "Blade", "position": [-0.58, -0.035, 0.0085]},
+        {"id": "butt", "label": "Butt end", "position": [0.705, 0.042, 0.0]}
+      ]
+    }
+  },
+  {
+    "id": "puck_signed_burlaki",
+    "category": "sports",
+    "name": "Puck signed by the Burlaki Mostograd 1994 champions",
+    "brand": "Burlaki",
+    "era": "1994",
+    "baseValue": {"min": 5000, "max": 11000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 165, "tolerance": 6},
+    "magnetic": false,
+    "rarity": 0.42,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "signatures", "tool": "loupe", "finding": "Nineteen signatures in silver marker, each in its own hand and pressure, faded unevenly.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "top"},
+        {"id": "logo", "tool": "loupe", "finding": "The old Burlaki barge-hauler badge, the one from before 2001, worn on the high spots.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "logo"},
+        {"id": "edge", "tool": "loupe", "finding": "Diamond knurling round the edge, a stick scar or two, OFFICIAL 1993–94 moulded in.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "edge"},
+        {"id": "ink", "tool": "loupe", "finding": "The marker sits on the rubber, not under any lacquer, and has rubbed off where thumbs went.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "top"},
+        {"id": "heft", "tool": "scale", "finding": "Exactly what a game puck weighs.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.25},
+        {"id": "magnet_none", "tool": "magnet", "finding": "Vulcanised rubber: the magnet ignores it.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.2, "hotspot": "edge"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "printed",
+          "kind": "fake",
+          "valueMultiplier": 0.1,
+          "weight": 2,
+          "tells": [
+            {"id": "ink", "tool": "loupe", "finding": "The signatures are printed: under the loupe every stroke is the same dotted silver, under a clear coat.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "top"},
+            {"id": "signatures", "tool": "loupe", "finding": "All nineteen names lean the same way and end in the same little flick.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "top"}
+          ]
+        },
+        {
+          "id": "later_puck",
+          "kind": "fake",
+          "valueMultiplier": 0.15,
+          "weight": 1,
+          "tells": [
+            {"id": "logo", "tool": "loupe", "finding": "The badge is the round one the club took in 2001, years after these men won anything.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "logo"},
+            {"id": "edge", "tool": "loupe", "finding": "The edge says OFFICIAL 2005–06.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "edge"}
+          ]
+        }
+    ],
+    "demandTags": ["sports"],
+    "claims": [
+      "Ninety-four. The year Burlaki won the league. I was twelve and I cried.",
+      "Every one of them signed it. Kozyrev twice, because he was drunk.",
+      "My father caught it in the stands. Well, a man next to him caught it. Then my father had it."
+    ],
+    "model": {
+      "glb": "puck_signed_burlaki.glb",
+      "placeholder": "box",
+      "color": "#111111",
+      "scale": 1,
+      "size": [0.076, 0.076, 0.0254],
+      "inspectDistance": 0.22,
+      "hotspots": [
+        {"id": "top", "label": "Signatures", "position": [0.008, 0.012, 0.0127]},
+        {"id": "logo", "label": "Badge", "position": [0.0, 0.0, -0.0127]},
+        {"id": "edge", "label": "Edge", "position": [0.038, 0.0, 0.0]}
+      ]
+    }
+  },
+  {
+    "id": "mask_ledokol_goalie",
+    "category": "sports",
+    "name": "Ledokol Pro goalie mask, hand-painted",
+    "brand": "Ledokol",
+    "era": "2010",
+    "baseValue": {"min": 6000, "max": 11000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 900, "tolerance": 32},
+    "magnetic": true,
+    "rarity": 0.48,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "cage", "tool": "loupe", "finding": "A cat-eye cage, the welds smooth, a certification sticker on the chin: LEDOKOL PRO, 2010.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "cage"},
+        {"id": "paint", "tool": "loupe", "finding": "Hand-painted bridges and a river in airbrush, signed ‘R. Voronin’ small on the chin.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "chin"},
+        {"id": "shell", "tool": "loupe", "finding": "Inside, the shell shows woven fibreglass and carbon at the edges, the foam pads replaceable.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "inside"},
+        {"id": "scuffs", "tool": "loupe", "finding": "Puck marks on the forehead, polished out and painted over by the same hand.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.35, "hotspot": "forehead"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy for a helmet, light for armour.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_cage", "tool": "magnet", "finding": "The magnet clamps onto the cage bars; the shell lets it fall.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "cage"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "abs_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 2,
+          "weightFactor": 0.65,
+          "tells": [
+            {"id": "shell", "tool": "loupe", "finding": "Inside is smooth grey ABS, no weave at all, and the pads are glued in for good.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "inside"},
+            {"id": "cage", "tool": "loupe", "finding": "The cage is thin chromed wire with blobby welds and no sticker.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "cage"},
+            {"id": "heft", "tool": "scale", "finding": "Light as a carnival mask.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "cage_swap",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 1,
+          "tells": [
+            {"id": "cage", "tool": "loupe", "finding": "The cage is another maker’s; the old screw holes beside the new ones have been filled and painted.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "cage"}
+          ]
+        }
+    ],
+    "demandTags": ["sports"],
+    "claims": [
+      "My son keeps goal. His head grew. The mask didn’t.",
+      "Hand-painted by Voronin. He does the Burlaki goalies. He did ours for half price.",
+      "It’s stopped about four thousand pucks. And one bottle, at an away game."
+    ],
+    "model": {
+      "glb": "mask_ledokol_goalie.glb",
+      "placeholder": "box",
+      "color": "#d8dcdf",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.22, 0.3, 0.25],
+      "inspectDistance": 0.75,
+      "hotspots": [
+        {"id": "cage", "label": "Cage", "position": [0.0, 0.011, 0.1176]},
+        {"id": "chin", "label": "Chin", "position": [0.0241, -0.1124, 0.0784]},
+        {"id": "inside", "label": "Inside the shell", "position": [0.0, 0.03, -0.105]},
+        {"id": "forehead", "label": "Forehead", "position": [0.0, 0.1121, 0.0537]}
+      ]
+    }
+  },
+  {
+    "id": "gloves_udar_boxing",
+    "category": "sports",
+    "name": "Udar 12 oz leather boxing gloves",
+    "brand": "Udar",
+    "era": "2011",
+    "baseValue": {"min": 1500, "max": 2800},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 760, "tolerance": 28},
+    "magnetic": false,
+    "rarity": 0.14,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "logo", "tool": "loupe", "finding": "UDAR is stamped into the leather over the knuckles, not printed, the edges of the letters sharp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "logo"},
+        {"id": "stitching", "tool": "loupe", "finding": "Double stitching round the thumb, even and tight, no glue showing.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "thumb"},
+        {"id": "cuff", "tool": "loupe", "finding": "The wrist straps still grip; the label inside says 12 oz, leather, Mostograd.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "cuff"},
+        {"id": "smell", "tool": "loupe", "finding": "Cracked a little at the knuckles; they have been used, and they smell like it.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "logo"},
+        {"id": "heft", "tool": "scale", "finding": "Twelve ounces each, give or take a season of sweat.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_none", "tool": "magnet", "finding": "Leather and foam: nothing for the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.2, "hotspot": "cuff"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "pu_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 2,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "logo", "tool": "loupe", "finding": "The logo is printed, flaking, and the leather is plastic with a pressed grain.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "logo"},
+            {"id": "stitching", "tool": "loupe", "finding": "Single stitching with glue squeezing out at the thumb.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "thumb"}
+          ]
+        },
+        {
+          "id": "repacked",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "cuff", "tool": "loupe", "finding": "Someone has opened the cuffs and stuffed in new foam; the padding is lumpy and the new thread white.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "cuff"}
+          ]
+        }
+    ],
+    "demandTags": ["sports"],
+    "claims": [
+      "I took up boxing after the divorce. Then I took up not boxing.",
+      "Leather. Twelve ounces. Feel. No, put your hand in. That’s what they’re for.",
+      "My nephew’s. He’s at college now. He says he’s a lover, not a fighter. He isn’t either."
+    ],
+    "model": {
+      "glb": "gloves_udar_boxing.glb",
+      "placeholder": "box",
+      "color": "#8c1b1b",
+      "scale": 1,
+      "size": [0.3, 0.3, 0.13],
+      "inspectDistance": 0.7,
+      "hotspots": [
+        {"id": "logo", "label": "Knuckles", "position": [0.0601, 0.05, 0.0563]},
+        {"id": "thumb", "label": "Thumb", "position": [-0.0242, -0.0152, 0.0449]},
+        {"id": "cuff", "label": "Cuff", "position": [-0.0153, -0.0838, 0.048]}
+      ]
+    }
+  },
+  {
+    "id": "chessclock_ladya",
+    "category": "sports",
+    "name": "Ladya mechanical chess clock",
+    "brand": "Ladya",
+    "era": "1984",
+    "baseValue": {"min": 1200, "max": 2500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 600, "tolerance": 22},
+    "magnetic": true,
+    "rarity": 0.08,
+    "fakeChance": 0.1,
+    "tells": [
+        {"id": "faces", "tool": "loupe", "finding": "Two dials marked ЛАДЬЯ, each with a little red flag at twelve that drops on the minute.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "faces"},
+        {"id": "buttons", "tool": "loupe", "finding": "The two plungers rock a seesaw that stops one clock and starts the other, cleanly.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "buttons"},
+        {"id": "back", "tool": "loupe", "finding": "On the back, two winding keys and two setting knobs, and a stamped price: 18 r. 50 k.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "case", "tool": "loupe", "finding": "The plastic case is scratched where hands slapped it, the crystal clear.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "faces"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy for its size: two mechanisms inside.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_works", "tool": "magnet", "finding": "The magnet catches at the back plate over the works.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "back"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "one_dead",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 2,
+          "tells": [
+            {"id": "faces", "tool": "loupe", "finding": "The right-hand dial is a different shade of cream, and its flag is missing; it runs slow.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "faces"}
+          ]
+        },
+        {
+          "id": "repainted",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "case", "tool": "loupe", "finding": "The case has been sprayed glossy black over old scratches; paint has crept onto the crystals.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "faces"}
+          ]
+        }
+    ],
+    "demandTags": ["sports", "soviet"],
+    "claims": [
+      "Every club in the city had one of these. They lasted longer than the clubs.",
+      "My grandfather lost on time to a man who later lost on time to a grandmaster.",
+      "It still ticks. Two ticks. Like an argument."
+    ],
+    "model": {
+      "glb": "chessclock_ladya.glb",
+      "placeholder": "box",
+      "color": "#3a2a20",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.19, 0.11, 0.07],
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {"id": "faces", "label": "Dials", "position": [-0.045, 0.0089, 0.0255]},
+        {"id": "buttons", "label": "Plungers", "position": [0.045, 0.055, -0.011]},
+        {"id": "back", "label": "Back", "position": [0.0, 0.0, -0.029]}
+      ]
+    }
+  },
+  {
+    "id": "medal_mostograd_marathon",
+    "category": "sports",
+    "name": "White Nights Marathon finisher’s medal, 1989",
+    "brand": "Mostosport",
+    "era": "1989",
+    "baseValue": {"min": 600, "max": 1200},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 38, "tolerance": 1.5},
+    "magnetic": false,
+    "rarity": 0.08,
+    "fakeChance": 0.1,
+    "tells": [
+        {"id": "obverse", "tool": "loupe", "finding": "A runner over the Lion Bridge in relief, BELYE NOCHI 1989 round the rim, the blue enamel unchipped.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "obverse"},
+        {"id": "reverse", "tool": "loupe", "finding": "On the back, engraved by hand: 3 h 41 m, and a name half polished away.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "ribbon", "tool": "loupe", "finding": "A faded blue and white ribbon through a soldered loop.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.35, "hotspot": "ribbon"},
+        {"id": "strike", "tool": "loupe", "finding": "Struck brass, the field smooth and the edges crisp, a maker’s mark ‘MZ’ by the loop.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "reverse"},
+        {"id": "heft", "tool": "scale", "finding": "Solid brass weight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_none", "tool": "magnet", "finding": "No pull at all from the magnet.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.2, "hotspot": "obverse"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "restrike",
+          "kind": "fake",
+          "valueMultiplier": 0.15,
+          "weight": 2,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "strike", "tool": "loupe", "finding": "Cast, not struck: the field is pitted and the rim soft, and there is no maker’s mark.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "reverse"},
+            {"id": "heft", "tool": "scale", "finding": "Light for brass: some cheaper alloy.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "new_ribbon",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "ribbon", "tool": "loupe", "finding": "The ribbon is brand new polyester, and the old loop has been re-soldered with grey solder.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "ribbon"}
+          ]
+        }
+    ],
+    "demandTags": ["sports", "soviet"],
+    "claims": [
+      "Three hours forty-one. My father ran it in 1989. I can’t run for a bus.",
+      "The first White Nights Marathon. Everybody got one. Not everybody kept it.",
+      "Real enamel. The new ones are stickers."
+    ],
+    "model": {
+      "glb": "medal_mostograd_marathon.glb",
+      "placeholder": "box",
+      "color": "#b8913d",
+      "scale": 1,
+      "size": [0.06, 0.1, 0.006],
+      "inspectDistance": 0.22,
+      "hotspots": [
+        {"id": "obverse", "label": "Face", "position": [0.006, -0.025, 0.0024]},
+        {"id": "reverse", "label": "Back", "position": [0.0, -0.02, -0.0024]},
+        {"id": "ribbon", "label": "Ribbon", "position": [0.0, 0.035, 0.0006]}
+      ]
+    }
+  },
+  {
+    "id": "reel_kasatka_3000",
+    "category": "sports",
+    "name": "Kasatka 3000 spinning reel",
+    "brand": "Kasatka",
+    "era": "2012",
+    "baseValue": {"min": 2000, "max": 4000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 290, "tolerance": 10},
+    "magnetic": true,
+    "rarity": 0.14,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "spool", "tool": "loupe", "finding": "The spool is machined aluminium, KASATKA 3000 engraved, the line still on it neatly laid.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "spool"},
+        {"id": "bail", "tool": "loupe", "finding": "The bail flips over with a firm snap; the line roller turns freely.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "bail"},
+        {"id": "foot", "tool": "loupe", "finding": "The foot is stamped with the model and a serial; the rod seat’s marks are honest wear.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "foot"},
+        {"id": "handle", "tool": "loupe", "finding": "The handle folds, its knob worn smooth by a thumb.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "handle"},
+        {"id": "heft", "tool": "scale", "finding": "Dense: metal gears in it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_shaft", "tool": "magnet", "finding": "The magnet catches at the main shaft and the bail spring.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "spool"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "market_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.1,
+          "weight": 2,
+          "weightFactor": 0.75,
+          "tells": [
+            {"id": "spool", "tool": "loupe", "finding": "The spool is plastic painted silver, the name a sticker, and the line lumped on unevenly.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "spool"},
+            {"id": "heft", "tool": "scale", "finding": "Light and rattly: plastic gears.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "odd_spool",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "spool", "tool": "loupe", "finding": "The spool is a 2500, a size smaller than the body, and wobbles on the shaft.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "spool"}
+          ]
+        }
+    ],
+    "demandTags": ["sports"],
+    "claims": [
+      "Caught a pike on it this long. Longer. Longer than that.",
+      "The wife said it’s the reel or the boat. I kept the boat. No, I didn’t.",
+      "Japanese style, Mostograd price. Smooth as anything."
+    ],
+    "model": {
+      "glb": "reel_kasatka_3000.glb",
+      "placeholder": "box",
+      "color": "#4a4c52",
+      "scale": 1,
+      "size": [0.14, 0.12, 0.08],
+      "inspectDistance": 0.38,
+      "hotspots": [
+        {"id": "spool", "label": "Spool", "position": [0.04, 0.0, 0.03]},
+        {"id": "bail", "label": "Bail", "position": [0.0683, 0.0295, 0.0]},
+        {"id": "foot", "label": "Foot", "position": [-0.02, 0.06, 0.0]},
+        {"id": "handle", "label": "Handle", "position": [-0.03, -0.04, -0.04]}
+      ]
+    }
+  },
+  {
+    "id": "stopwatch_sekunda",
+    "category": "sports",
+    "name": "Sekunda mechanical stopwatch",
+    "brand": "Sekunda",
+    "era": "1982",
+    "baseValue": {"min": 1500, "max": 3000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 95, "tolerance": 3.5},
+    "magnetic": true,
+    "rarity": 0.14,
+    "fakeChance": 0.15,
+    "tells": [
+        {"id": "dial", "tool": "loupe", "finding": "A white dial to a fifth of a second, a 30-minute counter, СЕКУНДА and ‘made in the USSR’ crisp.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "dial"},
+        {"id": "crown", "tool": "loupe", "finding": "The crown starts, stops and returns the hand to zero with three clean clicks.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "crown"},
+        {"id": "back", "tool": "loupe", "finding": "The chromed back is stamped with the factory mark, a serial and ‘7 jewels’.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "case", "tool": "loupe", "finding": "Chrome rubbed through to brass at the edge, the crystal scratched.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "dial"},
+        {"id": "heft", "tool": "scale", "finding": "A solid little brass weight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_case", "tool": "magnet", "finding": "The magnet tugs at the case back; the steel works are inside.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "back"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "quartz_copy",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 2,
+          "weightFactor": 0.6,
+          "tells": [
+            {"id": "crown", "tool": "loupe", "finding": "The crown is a push button; the hand jumps in steps instead of sweeping, and it hums.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "crown"},
+            {"id": "heft", "tool": "scale", "finding": "Light: a plastic case under the chrome.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "redial",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "dial", "tool": "loupe", "finding": "The dial has been repainted: the fifths are thick and uneven, the letters a different font.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "dial"}
+          ]
+        }
+    ],
+    "demandTags": ["sports", "soviet"],
+    "claims": [
+      "My grandfather timed the school sports day with it for thirty years.",
+      "Soviet. Seven jewels. It’s never been a second out. It’s been minutes out, but never a second.",
+      "A coach’s stopwatch. He blew a whistle with his other hand."
+    ],
+    "model": {
+      "glb": "stopwatch_sekunda.glb",
+      "placeholder": "box",
+      "color": "#c9c8c2",
+      "scale": 1,
+      "size": [0.056, 0.07, 0.016],
+      "inspectDistance": 0.2,
+      "hotspots": [
+        {"id": "dial", "label": "Dial", "position": [0.008, -0.004, 0.0075]},
+        {"id": "crown", "label": "Crown", "position": [0.0, 0.034, 0.0]},
+        {"id": "back", "label": "Back", "position": [0.0, -0.004, -0.0075]}
+      ]
+    }
+  },
+  {
+    "id": "football_signed_rechnik",
+    "category": "sports",
+    "name": "Football signed by Rechnik Mostograd, 2008 cup squad",
+    "brand": "Rechnik",
+    "era": "2008",
+    "baseValue": {"min": 4000, "max": 9000},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 430, "tolerance": 16},
+    "magnetic": false,
+    "rarity": 0.42,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "signatures", "tool": "loupe", "finding": "Twenty signatures in black marker, crowding the panels, each pressed differently.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "signatures"},
+        {"id": "panel", "tool": "loupe", "finding": "One panel is printed RECHNIK, CUP FINAL 2008 and the stadium’s name, the print cracked by kicks.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "panel"},
+        {"id": "valve", "tool": "loupe", "finding": "The valve is ringed with the maker’s size and pressure, and the ball holds its air.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "valve"},
+        {"id": "scuffs", "tool": "loupe", "finding": "Scuffed on one side as if someone did kick it, after.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "panel"},
+        {"id": "heft", "tool": "scale", "finding": "A match ball’s weight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.25},
+        {"id": "magnet_none", "tool": "magnet", "finding": "Leather and air: the magnet has nothing to say.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.2, "hotspot": "valve"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "printed",
+          "kind": "fake",
+          "valueMultiplier": 0.1,
+          "weight": 2,
+          "tells": [
+            {"id": "signatures", "tool": "loupe", "finding": "The signatures are printed, sharp-edged and glossy, laid over the panel seams without a skip.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "signatures"}
+          ]
+        },
+        {
+          "id": "one_hand",
+          "kind": "fake",
+          "valueMultiplier": 0.15,
+          "weight": 1,
+          "tells": [
+            {"id": "signatures", "tool": "loupe", "finding": "Twenty names in one pen and one hand: the same loops, the same pressure, the same slant.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.45, "hotspot": "signatures"},
+            {"id": "panel", "tool": "loupe", "finding": "The cup final print is a sticker, and the ball is a 2012 model.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "panel"}
+          ]
+        }
+    ],
+    "demandTags": ["sports"],
+    "claims": [
+      "Rechnik won the cup in 2008. Then they got relegated, and the cup went somewhere.",
+      "I waited four hours outside the hotel. The goalkeeper signed twice. He was very kind.",
+      "My son kicked it once in the yard. I nearly sold him."
+    ],
+    "model": {
+      "glb": "football_signed_rechnik.glb",
+      "placeholder": "box",
+      "color": "#f2f0ea",
+      "scale": 1,
+      "size": [0.22, 0.22, 0.22],
+      "inspectDistance": 0.62,
+      "hotspots": [
+        {"id": "signatures", "label": "Signatures", "position": [0.0, 0.05, 0.098]},
+        {"id": "panel", "label": "Printed panel", "position": [0.069, -0.0198, 0.0821]},
+        {"id": "valve", "label": "Valve", "position": [-0.078, 0.0, 0.078]}
+      ]
+    }
+  }
+]

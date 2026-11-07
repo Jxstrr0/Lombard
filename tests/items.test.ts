@@ -35,6 +35,20 @@ const ALLOWED_BRANDS = new Set([
   'Kosmo',
   'Mostizdat',
   'Kanal',
+  // M6 wave C (invented)
+  'Ledokol',
+  'Snegurka',
+  'Burlaki',
+  'Udar',
+  'Ladya',
+  'Mostosport',
+  'Kasatka',
+  'Sekunda',
+  'Rechnik',
+  'Kniga',
+  'Priboy',
+  'Basstone',
+  'Lyra',
   // M6 wave A (invented)
   'Brunnhofer',
   'Prizyv',
@@ -137,16 +151,16 @@ describe('item definitions', () => {
     }
   })
 
-  it('ships 120 defs across 13 categories with unique ids', () => {
-    expect(ITEM_DEFS).toHaveLength(120)
+  it('ships 141 defs across 14 categories with unique ids', () => {
+    expect(ITEM_DEFS).toHaveLength(141)
     const count = (c: string) => ITEM_DEFS.filter((d) => d.category === c).length
     expect(count('gold')).toBe(10)
     expect(count('watches')).toBe(11)
-    expect(count('phones')).toBe(9)
-    expect(count('cameras')).toBe(9)
+    expect(count('phones')).toBe(11) // 9 + 2 in M6 wave C
+    expect(count('cameras')).toBe(11) // 9 + 2 in M6 wave C
     expect(count('militaria')).toBe(10)
     expect(count('coins')).toBe(10)
-    expect(count('electronics')).toBe(5)
+    expect(count('electronics')).toBe(11) // 5 + 6 in M6 wave C
     expect(count('icons')).toBe(1) // M5: the Collector's, story-only
     expect(count('media')).toBe(11) // M6 wave B
     // M6 wave A
@@ -154,7 +168,8 @@ describe('item definitions', () => {
     expect(count('tools')).toBe(11)
     expect(count('silver')).toBe(11)
     expect(count('antiques')).toBe(11)
-    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(120)
+    expect(count('sports')).toBe(11) // M6 wave C
+    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(141)
     expect(getItemDef('gold_band_583').category).toBe('gold')
   })
 

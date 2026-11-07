@@ -283,6 +283,13 @@ const CONDITION_TEXT: Record<string, Record<Band, string>> = {
     worn: 'Flaking paint along the joins, the cover rubbed thin at the corners.',
     poor: 'Paint lost in patches, the panel split, the cover bent away from it.',
   },
+  // M6 wave C
+  sports: {
+    mint: 'Hardly used: no scuffs, the edges sharp, the labels and stitching like new.',
+    good: 'A season or two of honest use: scuffs where it was played with, nothing split or loose.',
+    worn: 'Scuffed all over, worn shiny where hands and boots went, a loose stitch or a dull edge.',
+    poor: 'Cracked, split or bent. It played its last game some time ago.',
+  },
 }
 const CONDITION_FALLBACK = CONDITION_TEXT.gold!
 
@@ -414,6 +421,8 @@ function magnetFinding(def: ItemDef, profile: FakeProfile | undefined): Omit<Fin
     text = pulls ? 'It jumps to the magnet and holds on.' : 'No pull at all from the magnet.'
   } else if (def.category === 'tools') {
     text = pulls ? 'The magnet clamps onto steel in it.' : 'Hardly a tug anywhere: alloy, brass and plastic.'
+  } else if (def.category === 'sports') {
+    text = pulls ? 'The magnet clamps onto the steel in it and nowhere else.' : 'Rubber, leather and composite: the magnet finds nothing.'
   } else if (def.category === 'instruments') {
     text = pulls ? 'The magnet catches on steel somewhere: screws, reeds or strings.' : 'Wood, brass and gut: the magnet finds nothing to hold.'
   } else {

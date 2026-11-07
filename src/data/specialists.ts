@@ -82,9 +82,9 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
     id: 'collector',
     name: 'Gennady Pavlovich Shurygin',
     short: 'Gennady',
-    role: 'Militaria, Old Bridge flea market',
-    categories: ['militaria'],
-    blurb: 'Retired river-fleet bosun with a folding table under the Old Bridge. Straight as a ruler about medals, and he would like first refusal on the good ones.',
+    role: 'Militaria and sports kit, Old Bridge flea market',
+    categories: ['militaria', 'sports'],
+    blurb: 'Retired river-fleet bosun with a folding table under the Old Bridge. Straight as a ruler about medals, coached boys’ hockey for twenty winters, and he would like first refusal on the good ones.',
     hello: '“Five calls. And if a good one comes in, I hear about it first. Agreed?”',
     lines: {
       sound: [
@@ -105,6 +105,22 @@ export const SPECIALISTS: readonly SpecialistDef[] = [
       lowball: [
         'Gennady clears his throat: “Common enough, these. {lo}–{hi}. I’d find room for it on my table, mind.”',
       ],
+    },
+    // M6 wave C: sports gear. He coached boys' hockey on the Zaton rink for twenty winters.
+    categoryLines: {
+      sports: {
+        sound: [
+          'Gennady, pleased: “Proper kit, honestly used. My boys would have fought over it. {lo}–{hi}.”',
+          'Gennady: “Right weight, right stamp, signatures each in their own hand. {lo}–{hi}.”',
+        ],
+        redone: ['Gennady sniffs: “Somebody’s ground it, glued it, painted it pretty. {lo}–{hi}, and say so on the tag.”'],
+        mixed: ['Gennady: “Half of this came off another one. They don’t match, son. {lo}–{hi}.”'],
+        doubt: [
+          'Gennady, flatly: “Market copy. The name’s right and nothing else is. {lo}–{hi}, no more.”',
+          'Gennady snorts: “One pen signed all of those. Nobody on that team wrote so neatly. {lo}–{hi}.”',
+        ],
+        lowball: ['Gennady: “Every yard in the city has one of these in a cupboard. {lo}–{hi}. I could take it off you.”'],
+      },
     },
   },
   {

@@ -345,5 +345,378 @@
         {"id": "mount", "label": "Mount rail", "position": [0, 0.024, 0]}
       ]
     }
+  },
+  {
+    "id": "tablet_mangosteen_pad_air",
+    "category": "electronics",
+    "name": "Mangosteen Pad Air tablet, 32 GB",
+    "brand": "Mangosteen",
+    "era": "2013",
+    "baseValue": {"min": 15000, "max": 20000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 470, "tolerance": 16},
+    "magnetic": true,
+    "rarity": 1.0,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "back", "tool": "loupe", "finding": "The thin aluminium back is engraved: fruit logo, ‘Pad Air’, ‘32 GB’ and a serial that matches Settings.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "screen", "tool": "loupe", "finding": "The narrow-bezel screen lights evenly; the home button clicks short and firm.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "screen"},
+        {"id": "account", "tool": "loupe", "finding": "It starts at the welcome screen: signed out of the old owner’s account.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "screen"},
+        {"id": "port", "tool": "loupe", "finding": "The slim connector at the bottom, a row of speaker holes either side, clean.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "port"},
+        {"id": "heft", "tool": "scale", "finding": "Startlingly light for a tablet this size.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_cover", "tool": "magnet", "finding": "The magnet snaps to the left edge, where a cover would hold on.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "back"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 2,
+          "weightFactor": 1.25,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The back is painted plastic and the engraving is print; ‘Pad Air’ sits a millimetre off centre.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "back"},
+            {"id": "heft", "tool": "scale", "finding": "Too heavy for a Pad Air: a fat cheap battery.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "locked",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.35,
+          "weight": 1.5,
+          "tells": [
+            {"id": "account", "tool": "loupe", "finding": "It wakes up asking for the previous owner’s password. Without it, it’s a tray.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics"],
+    "claims": [
+      "The Air. The light one. My husband bought it to read the news, and reads it on his phone.",
+      "Thirty-two gigs. I’ve signed out of everything. I think.",
+      "Barely a year old. It was a present from someone I no longer speak to."
+    ],
+    "model": {
+      "glb": "tablet_mangosteen_pad_air.glb",
+      "placeholder": "box",
+      "color": "#c3c4c6",
+      "scale": 1,
+      "size": [0.17, 0.24, 0.0075],
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {"id": "back", "label": "Back", "position": [0.0, 0.02, -0.00375]},
+        {"id": "screen", "label": "Screen", "position": [0.0, 0.03, 0.00375]},
+        {"id": "port", "label": "Bottom edge", "position": [0.0, -0.12, 0.0]}
+      ]
+    }
+  },
+  {
+    "id": "ereader_kniga_lumen",
+    "category": "electronics",
+    "name": "Kniga Lumen 6 e-reader with light",
+    "brand": "Kniga",
+    "era": "2013",
+    "baseValue": {"min": 2500, "max": 4000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 185, "tolerance": 7},
+    "magnetic": true,
+    "rarity": 0.14,
+    "fakeChance": 0.2,
+    "tells": [
+        {"id": "screen", "tool": "loupe", "finding": "The grey e-ink screen holds a book cover with the power off, and the front light spreads evenly.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "screen"},
+        {"id": "back", "tool": "loupe", "finding": "The soft-touch back is stamped KNIGA LUMEN 6 with a serial; the cover clip is intact.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "buttons", "tool": "loupe", "finding": "Page buttons on both edges press with a quiet click.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "buttons"},
+        {"id": "bezel", "tool": "loupe", "finding": "The bezel is shiny where thumbs held it on the metro.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "screen"},
+        {"id": "heft", "tool": "scale", "finding": "Light as a paperback.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_cover", "tool": "magnet", "finding": "The magnet finds a spot at the top corner: the sleep sensor for a cover.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "back"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "ghosting",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 1,
+          "tells": [
+            {"id": "screen", "tool": "loupe", "finding": "A cracked e-ink panel from another reader: last page’s words ghost under this one.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen"}
+          ]
+        },
+        {
+          "id": "knockoff",
+          "kind": "fake",
+          "valueMultiplier": 0.12,
+          "weight": 1,
+          "weightFactor": 1.2,
+          "tells": [
+            {"id": "screen", "tool": "loupe", "finding": "The screen is a cheap backlit LCD pretending: it glows, and the picture vanishes when it sleeps.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "screen"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics", "books"],
+    "claims": [
+      "Two thousand books on it. I’ve read three.",
+      "It has a light. You can read under the blanket. Like a child. Like a happy child.",
+      "My wife prefers paper. My wife prefers lots of things."
+    ],
+    "model": {
+      "glb": "ereader_kniga_lumen.glb",
+      "placeholder": "box",
+      "color": "#2b2c2f",
+      "scale": 1,
+      "size": [0.114, 0.164, 0.0095],
+      "inspectDistance": 0.32,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0.0, 0.01, 0.00475]},
+        {"id": "back", "label": "Back", "position": [0.0, 0.0, -0.00475]},
+        {"id": "buttons", "label": "Page buttons", "position": [0.052, -0.02, 0.00475]}
+      ]
+    }
+  },
+  {
+    "id": "navigator_severin_navi5",
+    "category": "electronics",
+    "name": "Severin Navi 5 car navigator",
+    "brand": "Severin",
+    "era": "2012",
+    "baseValue": {"min": 1200, "max": 2200},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 175, "tolerance": 7},
+    "magnetic": true,
+    "rarity": 0.08,
+    "fakeChance": 0.2,
+    "tells": [
+        {"id": "screen", "tool": "loupe", "finding": "The five-inch screen boots to a map of Mostograd and finds the shop from the window.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "screen"},
+        {"id": "back", "tool": "loupe", "finding": "The back sticker has the model, a serial and the map licence code, all matching the menu.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "mount", "tool": "loupe", "finding": "The windscreen bracket clips on; the sucker is still tacky.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.35, "hotspot": "mount"},
+        {"id": "slot", "tool": "loupe", "finding": "A memory card slot on the side, with the map card in it.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "slot"},
+        {"id": "heft", "tool": "scale", "finding": "Light, plastic, about right.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_speaker", "tool": "magnet", "finding": "The magnet catches at the speaker grille on the back.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "back"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.1,
+          "weight": 2,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "No map licence on the sticker; the menu is in broken English and the maps are pirated, years old.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "back"}
+          ]
+        },
+        {
+          "id": "dead_battery",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "screen", "tool": "loupe", "finding": "It dies the moment the charger comes out; the battery has been swapped for a smaller one.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics"],
+    "claims": [
+      "The voice is a woman who has never once been wrong. Unlike some.",
+      "Everyone has it on their phone now. My phone takes me into the canal.",
+      "The maps are 2012. The city hasn’t changed. The roads have just got worse."
+    ],
+    "model": {
+      "glb": "navigator_severin_navi5.glb",
+      "placeholder": "box",
+      "color": "#1a1a1c",
+      "scale": 1,
+      "size": [0.135, 0.085, 0.016],
+      "inspectDistance": 0.32,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [-0.004, 0.0, 0.008]},
+        {"id": "back", "label": "Back", "position": [0.0, 0.0, -0.008]},
+        {"id": "mount", "label": "Bracket socket", "position": [0.0, -0.017, -0.008]},
+        {"id": "slot", "label": "Card slot", "position": [0.0675, 0.0, 0.0]}
+      ]
+    }
+  },
+  {
+    "id": "radio_priboy_209",
+    "category": "electronics",
+    "name": "Priboy-209 transistor radio",
+    "brand": "Priboy",
+    "era": "1984",
+    "baseValue": {"min": 1200, "max": 2500},
+    "valueCurve": "collector",
+    "weightGrams": {"expected": 1300, "tolerance": 48},
+    "magnetic": true,
+    "rarity": 0.08,
+    "fakeChance": 0.15,
+    "tells": [
+        {"id": "dial", "tool": "loupe", "finding": "The tuning scale lists the long waves by city: Moskva, Riga, Mostograd, and the shortwave bands.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "dial"},
+        {"id": "badge", "tool": "loupe", "finding": "A chrome ПРИБОЙ-209 badge and the factory mark in the grille, the chrome pitted with age.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "badge"},
+        {"id": "back", "tool": "loupe", "finding": "The back plate is screwed shut, the paper label printed with the price: 64 roubles.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "back"},
+        {"id": "case", "tool": "loupe", "finding": "The leatherette is scuffed and the handle has been re-riveted at one end.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "badge"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy, solid, a Soviet weight.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_speaker", "tool": "magnet", "finding": "The magnet jumps to the speaker behind the grille.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.25, "hotspot": "badge"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "gutted",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.4,
+          "weight": 2,
+          "weightFactor": 0.7,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "Behind the back plate a modern little Chinese receiver is taped where the boards were.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "back"}
+          ]
+        },
+        {
+          "id": "repainted",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "case", "tool": "loupe", "finding": "The case has been resprayed, glossy over old dents; paint has run onto the badge.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "badge"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics", "soviet", "retro"],
+    "claims": [
+      "My father listened to the forbidden stations on it, under a blanket.",
+      "It still plays. Mostly the weather. The weather doesn’t change.",
+      "Batteries are the big ones. Nobody sells them. I put two in."
+    ],
+    "model": {
+      "glb": "radio_priboy_209.glb",
+      "placeholder": "box",
+      "color": "#5b3b2b",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.27, 0.17, 0.08],
+      "inspectDistance": 0.55,
+      "hotspots": [
+        {"id": "dial", "label": "Tuning scale", "position": [0.03, 0.045, 0.04]},
+        {"id": "badge", "label": "Grille", "position": [-0.06, -0.03, 0.04]},
+        {"id": "back", "label": "Back plate", "position": [0.0, 0.0, -0.04]}
+      ]
+    }
+  },
+  {
+    "id": "headphones_basstone_studio",
+    "category": "electronics",
+    "name": "Basstone Studio headphones",
+    "brand": "Basstone",
+    "era": "2013",
+    "baseValue": {"min": 4500, "max": 7500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 260, "tolerance": 10},
+    "magnetic": true,
+    "rarity": 0.48,
+    "fakeChance": 0.4,
+    "tells": [
+        {"id": "band", "tool": "loupe", "finding": "BASSTONE is printed crisp along the headband; the hinges carry a serial on the inside.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "band"},
+        {"id": "cups", "tool": "loupe", "finding": "The ear cups carry a little ‘b’ in relief, the leatherette pads unsplit.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "cup"},
+        {"id": "cable", "tool": "loupe", "finding": "The cable unplugs from the left cup; the plug has a gold contact and a metal collar.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "cup"},
+        {"id": "pads", "tool": "loupe", "finding": "The pads are worn shiny and flattened on one side.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "cup"},
+        {"id": "heft", "tool": "scale", "finding": "Solid, with metal in the hinges.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_drivers", "tool": "magnet", "finding": "The magnet jumps to both ear cups: big driver magnets inside.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.25, "hotspot": "cup"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 3,
+          "weightFactor": 0.75,
+          "tells": [
+            {"id": "band", "tool": "loupe", "finding": "The headband says BASSTONE but the hinges have no serial, and the plastic creaks.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "band"},
+            {"id": "cups", "tool": "loupe", "finding": "The ‘b’ is a sticker, and the pads are glued on.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "cup"},
+            {"id": "heft", "tool": "scale", "finding": "Light: plastic hinges, small drivers.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "odd_cable",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.45,
+          "weight": 1,
+          "tells": [
+            {"id": "cable", "tool": "loupe", "finding": "The cable is soldered straight into the cup where the socket used to be.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "cup"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics"],
+    "claims": [
+      "Everyone on the metro has them. Most of them aren’t these.",
+      "From the official shop on Mostovaya. I’ve got the receipt somewhere. Somewhere.",
+      "The bass is so strong my neighbour complains, and I wear them."
+    ],
+    "model": {
+      "glb": "headphones_basstone_studio.glb",
+      "placeholder": "box",
+      "color": "#c01822",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.19, 0.19, 0.08],
+      "inspectDistance": 0.45,
+      "hotspots": [
+        {"id": "band", "label": "Headband", "position": [0.0, 0.085, 0.0]},
+        {"id": "cup", "label": "Ear cup", "position": [0.0692, -0.0298, 0.0387]}
+      ]
+    }
+  },
+  {
+    "id": "speaker_tosaki_boom2",
+    "category": "electronics",
+    "name": "Tosaki Boom 2 portable speaker",
+    "brand": "Tosaki",
+    "era": "2013",
+    "baseValue": {"min": 2500, "max": 4500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 540, "tolerance": 20},
+    "magnetic": true,
+    "rarity": 0.14,
+    "fakeChance": 0.25,
+    "tells": [
+        {"id": "grille", "tool": "loupe", "finding": "The wraparound grille is metal mesh, TOSAKI stamped in it, the fabric behind unfaded.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "grille"},
+        {"id": "buttons", "tool": "loupe", "finding": "Rubber buttons on top: power, the two volumes, the pairing key with its blue light.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "buttons"},
+        {"id": "base", "tool": "loupe", "finding": "The rubber foot carries the model, a serial and the battery rating.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "base"},
+        {"id": "scuffs", "tool": "loupe", "finding": "Scuffed at the ends; it has been to the beach and the dacha.", "reveals": "condition", "polarity": "neutral", "difficulty": 0.3, "hotspot": "grille"},
+        {"id": "heft", "tool": "scale", "finding": "Heavy for its size, all magnet and battery.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_driver", "tool": "magnet", "finding": "The magnet jumps to the grille over the drivers.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.25, "hotspot": "grille"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.1,
+          "weight": 2,
+          "weightFactor": 0.7,
+          "tells": [
+            {"id": "grille", "tool": "loupe", "finding": "The grille is plastic painted grey, TOSAKI printed on it, and it rattles at volume.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "grille"},
+            {"id": "heft", "tool": "scale", "finding": "Light: small drivers and a small battery.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "dead_cell",
+          "kind": "frankenstein",
+          "valueMultiplier": 0.5,
+          "weight": 1,
+          "tells": [
+            {"id": "base", "tool": "loupe", "finding": "The base has been prised off and glued back; the battery inside is a different, smaller one.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "base"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics"],
+    "claims": [
+      "Loud enough for the whole courtyard. The courtyard agreed.",
+      "Bluetooth. You just put your phone near it and it plays. Like magic, but louder.",
+      "My son’s. He’s in the army now. They have their own music."
+    ],
+    "model": {
+      "glb": "speaker_tosaki_boom2.glb",
+      "placeholder": "box",
+      "color": "#3a3f45",
+      "scale": 1,
+      "rest": "upright",
+      "size": [0.2, 0.08, 0.07],
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {"id": "grille", "label": "Grille", "position": [0.03, 0.0, 0.035]},
+        {"id": "buttons", "label": "Buttons", "position": [0.0, 0.04, 0.0]},
+        {"id": "base", "label": "Base", "position": [0.0, -0.04, 0.0]}
+      ]
+    }
   }
 ]

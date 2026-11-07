@@ -303,6 +303,21 @@ Freesound and kenney.nl were not reachable from the build container (403), so ev
 - Add or change a sound: edit `RECIPES` (or `AMBIENCE`), run `python3 art/audio/build.py --only <name>`, add the id to `SOUND_IDS`/`SOUND_GAIN` in `src/data/audio.ts`, map it in `src/audio/cues.ts`, add its ATTRIBUTION line.
 - Not yet: seasonal ambience (rain, winter wind), trams (no CC0 tram recording found on OpenGameArt), music.
 
+### Voice (pilot, Nov 2026)
+
+| Files (`public/assets/audio/voice/`) | Who | Plays on |
+|---|---|---|
+| `lom_walkin_m_*` / `lom_walkin_f_*` (26 each) | any walk-in, by the gender of their first name | a hello as they step up (half of them), then a bark for each haggle or sale answer, by temperament |
+| `lom_eduard_*` (3) | Eduard Lvovich | `protection.offer`, `protection.properly`, `protection.ultimatum` |
+| `lom_volkova_*` (3) | Detective Volkova | her introduction, a police visit about a piece, a refused envelope |
+| `lom_venya_*` (3) | Venya Mostovoy | `fence.meet`, dropping in to sell, `fence.notebook` |
+| `lom_edik_*` (3) | Edik Sorokin | `rolex.dubai`, caught out by evidence, `rolex.real` |
+| `lom_zinaida_*` (3) | Zinaida Petrovna | her first visit, the earrings, the ring |
+
+- Made with ElevenLabs text to speech from the script sheet `art/audio/voice-lines.csv` (line id, character, trigger, text, voice id, the picked generation). Generating costs ElevenLabs credits, so every batch is quoted and approved by Kelbo first.
+- `art/audio/voice.py` takes the downloaded takes from `art/out/voice/` (gitignored), trims silence, normalises to −18 LUFS integrated (true peak −1.5 dB) and writes mono 44.1 kHz 64 kbps MP3s. 67 files, about 1.4 MB.
+- Loaded per line on first use (never at page load). Which line plays when is `src/data/voice.ts`; a new line is a row in the sheet, a run of the script, and an entry there.
+
 ## UI
 
 Space Grotesk for menus (Longlight brand). A receipt-style mono font for tags and ledger. Paper/plastic textures from ambientCG for tag and card backgrounds. Icons: Kenney game icons or Lucide (ISC license, fine).

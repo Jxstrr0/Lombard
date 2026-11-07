@@ -54,6 +54,7 @@ import './style.css'
 import * as THREE from 'three'
 import { AudioEngine } from './audio/engine'
 import { cuesFor } from './audio/cues'
+import { voiceFor } from './audio/voice'
 import { loadSoundSettings, saveSoundSettings, type SoundSettings } from './audio/settings'
 import { t } from './data/strings'
 import { AUTOSAVE_ACTIONS } from './game/actions'
@@ -415,6 +416,7 @@ async function boot(): Promise<void> {
   store.subscribe((state, prev, action) => {
     sync(state, prev)
     audio.play(cuesFor(prev, state, action))
+    audio.say(voiceFor(prev, state, action))
     if (action.type === 'inspect/useTool' && (state.inspect?.findings.length ?? 0) > (prev.inspect?.findings.length ?? 0)) {
       stage.playTool(action.tool, state)
     }

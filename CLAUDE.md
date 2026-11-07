@@ -86,3 +86,12 @@ In-game UI should feel like the shop (paper tags, receipt fonts, worn plastic), 
 - Do not use real-time shadows or post-processing on the phone path without a perf measurement showing it's affordable.
 - Do not invent item values or probabilities inline; add them to data/tuning files.
 - Do not expand scope beyond the current milestone. Park ideas in `docs/05-OPEN-DECISIONS.md` § Parked.
+
+## Studio catalogue
+
+`LONGLIGHT-STUDIO.md` (repo root) covers every Longlight game: looks, names
+already taken, storage and cache prefixes on the shared origin, a reuse map and
+improvement ideas. Read it before pitching new ideas, names or looks, and
+before building a system another Longlight game may already have. This file
+wins where the two disagree. Don't edit the copy here: the master is
+`.github/LONGLIGHT-STUDIO.md` in Jxstrr0/Kelbo.Website; it gets recopied.

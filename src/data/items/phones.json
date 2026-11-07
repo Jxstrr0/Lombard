@@ -581,5 +581,130 @@
         {"id": "battery", "label": "Battery (under cover)", "position": [0, -0.012, -0.0035]}
       ]
     }
+  },
+  {
+    "id": "phone_galaxia_stella5",
+    "category": "phones",
+    "name": "Galaxia Stella 5",
+    "brand": "Galaxia",
+    "era": "2014",
+    "baseValue": {"min": 17000, "max": 23000},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 145, "tolerance": 5},
+    "magnetic": true,
+    "rarity": 1.0,
+    "fakeChance": 0.35,
+    "tells": [
+        {"id": "logo", "tool": "loupe", "finding": "GALAXIA sharp on the dimpled back, the model code GX-G900 in fine print beneath.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3, "hotspot": "logo"},
+        {"id": "camera", "tool": "loupe", "finding": "A big round camera stands proud at the top, the heart-rate sensor and flash under it.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "logo"},
+        {"id": "screen", "tool": "loupe", "finding": "Deep blacks, the glass meeting the bezel cleanly, the home key firm.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "screen"},
+        {"id": "port", "tool": "loupe", "finding": "A flap over the wide charging port at the bottom, the seal still soft: it’s the waterproof one.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.4, "hotspot": "bottom"},
+        {"id": "heft", "tool": "scale", "finding": "Light and well balanced.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_speaker", "tool": "magnet", "finding": "The magnet tugs at the earpiece end.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "screen"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 3,
+          "weightFactor": 0.85,
+          "tells": [
+            {"id": "logo", "tool": "loupe", "finding": "The back is smooth, not dimpled, and the model code is GX-G9OO with letter O’s.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "logo"},
+            {"id": "port", "tool": "loupe", "finding": "No flap over the port; just a hole.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "bottom"},
+            {"id": "heft", "tool": "scale", "finding": "Hollow-feeling for a flagship.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "aftermarket_screen",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1.5,
+          "tells": [
+            {"id": "screen", "tool": "loupe", "finding": "Washed-out colours and a thin line of glue at the glass edge: a cheap new screen.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "screen"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics", "phones"],
+    "claims": [
+      "The new one. The five. It’s waterproof. I haven’t tested that.",
+      "My boss gave it to me instead of a bonus. I need the bonus.",
+      "Three months old. I paid in instalments. I’m still paying."
+    ],
+    "model": {
+      "glb": "phone_galaxia_stella5.glb",
+      "placeholder": "phone",
+      "color": "#1e2a3a",
+      "scale": 1,
+      "inspectDistance": 0.3,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0, 0.01, 0.0041]},
+        {"id": "logo", "label": "Logo", "position": [0, 0.01, -0.0041]},
+        {"id": "bottom", "label": "Bottom edge", "position": [0, -0.0626, 0]}
+      ]
+    }
+  },
+  {
+    "id": "phone_mangosteen_m5c",
+    "category": "phones",
+    "name": "Mangosteen m5C",
+    "brand": "Mangosteen",
+    "era": "2013",
+    "baseValue": {"min": 8000, "max": 11500},
+    "valueCurve": "linear",
+    "weightGrams": {"expected": 132, "tolerance": 5},
+    "magnetic": true,
+    "rarity": 1.0,
+    "fakeChance": 0.3,
+    "tells": [
+        {"id": "back", "tool": "loupe", "finding": "The hard coloured plastic back is one piece; the logo and lettering are printed under the gloss.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.35, "hotspot": "logo"},
+        {"id": "simtray", "tool": "loupe", "finding": "The SIM tray on the right edge opens with a pin; its serial matches the phone’s.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.45, "hotspot": "simtray"},
+        {"id": "screen", "tool": "loupe", "finding": "The screen lights evenly and the round home button clicks firmly.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.35, "hotspot": "screen"},
+        {"id": "port", "tool": "loupe", "finding": "The slim reversible connector at the bottom is clean, the speaker holes clear.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.4, "hotspot": "bottom"},
+        {"id": "heft", "tool": "scale", "finding": "Dense for plastic, about right.", "reveals": "authenticity", "polarity": "positive", "difficulty": 0.3},
+        {"id": "magnet_speaker", "tool": "magnet", "finding": "The magnet pulls faintly at the earpiece and the speaker.", "reveals": "authenticity", "polarity": "neutral", "difficulty": 0.3, "hotspot": "bottom"}
+    ],
+    "fakeProfiles": [
+        {
+          "id": "clone",
+          "kind": "fake",
+          "valueMultiplier": 0.06,
+          "weight": 2,
+          "weightFactor": 0.8,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The plastic is thin and flexes, the logo a sticker, and the colour is not quite any of theirs.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.35, "hotspot": "logo"},
+            {"id": "simtray", "tool": "loupe", "finding": "The SIM tray has no serial at all.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "simtray"},
+            {"id": "heft", "tool": "scale", "finding": "Light and rattly.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.3}
+          ]
+        },
+        {
+          "id": "new_shell",
+          "kind": "restored",
+          "valueMultiplier": 0.55,
+          "weight": 1,
+          "tells": [
+            {"id": "back", "tool": "loupe", "finding": "The coloured shell is spotless while the screen glass is worn dull: a replacement housing.", "reveals": "authenticity", "polarity": "negative", "difficulty": 0.4, "hotspot": "logo"}
+          ]
+        }
+    ],
+    "demandTags": ["electronics", "phones"],
+    "claims": [
+      "The colourful one. My daughter chose yellow. Then she chose a boyfriend with a better phone.",
+      "It’s plastic but it’s good plastic. Mangosteen plastic.",
+      "Hardly a scratch. I kept it in a case shaped like a cat."
+    ],
+    "model": {
+      "glb": "phone_mangosteen_m5c.glb",
+      "placeholder": "phone",
+      "color": "#e8c93c",
+      "scale": 1,
+      "inspectDistance": 0.3,
+      "hotspots": [
+        {"id": "screen", "label": "Screen", "position": [0, 0.01, 0.0041]},
+        {"id": "logo", "label": "Logo", "position": [0, 0.01, -0.0041]},
+        {"id": "simtray", "label": "SIM tray", "position": [0.0305, 0.012, 0]},
+        {"id": "bottom", "label": "Bottom edge", "position": [0, -0.0626, 0]}
+      ]
+    }
   }
 ]

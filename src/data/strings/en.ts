@@ -359,6 +359,7 @@ export const en = {
   'category.media': 'records & media',
   'category.silver': 'silver & amber',
   'category.tools': 'tools',
+  'category.sports': 'sports gear',
 
   // --- settings
   'settings.closeAria': 'Close settings',

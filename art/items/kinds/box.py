@@ -923,5 +923,9 @@ def build(it: lib.Item) -> None:
         it.size = tuple(it.model.get("size", (0.1, 0.1, 0.1)))
     fn = BUILDERS.get(it.id)
     if fn is None:
+        from kinds import box_c  # M6 items wave C
+
+        fn = box_c.BUILDERS.get(it.id)
+    if fn is None:
         raise KeyError(f"box.py has no builder for {it.id}")
     fn(it)

@@ -44,6 +44,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   media: t('category.media'),
   silver: t('category.silver'),
   tools: t('category.tools'),
+  sports: t('category.sports'),
 }
 
 /** Categories some item def belongs to (a specialist whose line never walks in yet says so). */

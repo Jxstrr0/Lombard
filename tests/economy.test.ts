@@ -344,7 +344,8 @@ describe('specialist call', () => {
     expect(call(s1, chain).usable).toBe(true)
     expect(call(s1, getItemDef('watch_pobeda_gold')).usable).toBe(false)
     expect(call(s1, getItemDef('phone_mangosteen_m5'))).toMatchObject({ usable: false, note: 'no retainer' })
-    expect(call(s1, { ...chain, category: 'sports' })).toMatchObject({ usable: false, note: 'nobody' })
+    // 'luxury' is in the schema but no specialist takes it (sports went to Gennady in M6 wave C).
+    expect(call(s1, { ...chain, category: 'luxury' })).toMatchObject({ usable: false, note: 'nobody' })
     expect(toolExtras(s1, chain).specialist).toEqual({ id: 'jeweler', relationship: tuning.specialists.relationshipStart, mods: {} })
   })
 

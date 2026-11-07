@@ -375,7 +375,9 @@ describe('at the counter', () => {
       s = { ...s, queue: [{ ...v, wants: 'sell' }, ...s.queue.filter((x) => x !== v)] }
       s = run(s, { type: 'counter/next' }, { type: 'counter/inspect' }, { type: 'inspect/done' }, { type: 'offer/estimate', value: 10_000 })
       s = run(s, { type: 'offer/make', amount: 1, approach: 'straight' })
-      return s.haggle?.status === 'open' ? s.haggle.ask : null
+      // The opening ask is set before her answer, so a walk-out at the lowball (an insult draw that moves
+      // whenever the item list reshuffles the RNG; M6 wave C) still shows it.
+      return s.haggle?.ask ?? null
     }
     const cold = askWith(0)
     const warm = askWith(1)

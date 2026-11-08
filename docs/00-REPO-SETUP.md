@@ -3,7 +3,7 @@
 Written for doing everything from a phone. Most settings live on **github.com in your phone's browser**; the GitHub mobile app hides a lot of them. If a menu below is missing, open the browser menu and switch on **"Desktop site"**.
 
 Repo URL: `https://github.com/Jxstrr0/Lombard`
-Game URL once deployed: `https://jxstrr0.github.io/Lombard/` (the `/Lombard/` path is case-sensitive and must match Vite's `base`).
+Game URL once deployed: `https://jxstrr0.github.io/Lombard/` (the `/Lombard/` path is case-sensitive). Vite's `base` is `./` (relative), so the build works at that address and at the root of a custom domain.
 
 ---
 
@@ -100,7 +100,7 @@ On the repo's main page, tap the gear next to **About**:
 
 Paste this into the first session:
 
-> Read `CLAUDE.md`. Then move `00-REPO-SETUP.md` and `01`–`05-*.md` into a `docs/` folder, fix any links, and record the repo visibility in `docs/05-OPEN-DECISIONS.md` (it's [public/private]). Then start M0 from `docs/03-ROADMAP.md`. Set Vite `base` to `/Lombard/`, deploy with a `deploy.yml` workflow using GitHub Pages' official Actions deploy (Pages source is already set to GitHub Actions). Work in small commits. When M0's definition of done is met, stop and give me the deployed URL and a short "how to test on a phone" checklist.
+> Read `CLAUDE.md`. Then move `00-REPO-SETUP.md` and `01`–`05-*.md` into a `docs/` folder, fix any links, and record the repo visibility in `docs/05-OPEN-DECISIONS.md` (it's [public/private]). Then start M0 from `docs/03-ROADMAP.md`. Set Vite `base` to `./` (relative), deploy with a `deploy.yml` workflow using GitHub Pages' official Actions deploy (Pages source is already set to GitHub Actions). Work in small commits. When M0's definition of done is met, stop and give me the deployed URL and a short "how to test on a phone" checklist.
 
 ## After M0 lands — quick check
 

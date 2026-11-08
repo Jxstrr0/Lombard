@@ -47,8 +47,10 @@ const sum = async (list) => (await Promise.all(list.map(size))).reduce((a, b) =>
 const fmt = (b) => (b >= MiB ? `${(b / MiB).toFixed(2)} MiB` : `${(b / 1000).toFixed(1)} kB`)
 
 const html = await readFile(path.join(DIST, 'index.html'), 'utf8')
-const base = '/Lombard/'
-const eager = [...html.matchAll(/<(?:script[^>]*\ssrc|link[^>]*\shref)="([^"]+\.(?:js|css))"/g)].map((m) => path.join(DIST, m[1].replace(base, '')))
+// vite.config.ts uses a relative base ('./'), so index.html links read ./assets/...;
+// strip that (or an old absolute /Lombard/ prefix) to get the path inside dist/.
+const local = (u) => u.replace(/^(?:\.\/|\/Lombard\/)/, '')
+const eager = [...html.matchAll(/<(?:script[^>]*\ssrc|link[^>]*\shref)="([^"]+\.(?:js|css))"/g)].map((m) => path.join(DIST, local(m[1])))
 const entry = html.match(/<script type="module"[^>]*\ssrc="([^"]+)"/)?.[1]
 if (!entry || eager.length === 0) throw new Error('check-bundle: could not read the eager files from dist/index.html')
 
@@ -75,7 +77,7 @@ if (worst > LIMITS.firstLoad) console.warn(`  warning: the worst-case first day 
 if (total > LIMITS.firstLoad) problems.push(`first load ${fmt(total)} is over ${fmt(LIMITS.firstLoad)}`)
 for (const f of eager.filter((f) => f.endsWith('.js'))) {
   const s = await size(f)
-  const isEntry = f.endsWith(entry.replace(base, '').split('/').pop())
+  const isEntry = f.endsWith(local(entry).split('/').pop())
   const limit = isEntry ? LIMITS.entry : LIMITS.chunk
   console.log(`  ${isEntry ? 'entry' : 'eager'} ${path.basename(f)} ${fmt(s)}`)
   if (s > limit) problems.push(`${path.basename(f)} is ${fmt(s)}, over its ${fmt(limit)} limit`)

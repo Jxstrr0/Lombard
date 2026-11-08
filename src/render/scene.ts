@@ -85,6 +85,8 @@ export class ShopScene {
   private walkPhase: 'out' | 'entering' | 'here' | 'leaving' = 'out'
   /** ?walk=0: customers fade in at the counter as before (screenshots). */
   private walking = true
+  /** Called once the leaving customer is out of the door (the door-close sound). */
+  private outWaiters: (() => void)[] = []
   /** Stand-in drawn when there's no cast, or a cast model fails to load. */
   private silhouette!: THREE.Group
   private silhouetteMats: THREE.Material[] = []
@@ -253,6 +255,17 @@ export class ShopScene {
     return ready ? 'in' : 'arriving'
   }
 
+  /**
+   * Run `cb` when the customer who is leaving now has walked out of the street
+   * door (call right after sync() let them go): at once when customers don't
+   * walk, never when nobody was in the shop.
+   */
+  whenCustomerOut(cb: () => void): void {
+    if (this.walkPhase === 'out') return
+    if (!this.walking) cb()
+    else this.outWaiters.push(cb)
+  }
+
   /** false: customers appear at the counter without walking (?walk=0). */
   setWalking(on: boolean): void {
     this.walking = on
@@ -383,6 +396,9 @@ export class ShopScene {
       if (this.walkT <= 0) {
         this.walkPhase = 'out'
         this.model?.play('idle', 0)
+        const waiters = this.outWaiters
+        this.outWaiters = []
+        for (const cb of waiters) cb()
       }
     }
     this.customer.position.lerpVectors(WALK.door, WALK.spot, this.walkT)

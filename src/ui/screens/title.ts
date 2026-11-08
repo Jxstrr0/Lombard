@@ -25,7 +25,7 @@ import { createButton, el, setText } from '../components/button'
 import { icons } from '../icons'
 import { lastPlayedText, rub } from '../format'
 
-export const HUB_URL = 'https://jxstrr0.github.io/Kelbo.Website/games.html'
+export const HUB_URL = 'https://longlight.games/games.html'
 
 export interface TitleDeps {
   play(slot: SlotNo): void

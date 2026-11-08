@@ -296,13 +296,23 @@ Freesound and kenney.nl were not reachable from the build container (403), so ev
 | `tool_loupe` / `tool_magnet` / `tool_page` / `tool_acid` / `tool_switch` | metal click / latch / page flip / drop / switch | Kenney `metalClick`, `metalLatch`, `bookFlip1`; rubberduck `plop_01`; laleksic `switch_on` | loupe / magnet / reference / acid / UV |
 | `tool_scale.mp3`, `tool_phone.mp3` | a piezo beep; three keypad tones (DTMF 7-3-1) | generated from sine tones in `art/audio/build.py` (no third-party audio) | scale / phone and specialist |
 | `ui_tap.mp3` | a short click, very quiet | Kenney `click_001` | any button tap that made no other sound |
+| `lazy/door_close.mp3` | the street door shutting, its bell jingling | ElevenLabs Sound Effects v2 (Nov 2026) | a walk-in leaves, when they reach the door |
+| `lazy/phone_ring.mp3` | a phone ringing (the take's silent tail trimmed) | ElevenLabs | an incoming phone visit (`via: 'phone'`) |
+| `lazy/stamp.mp3` | rubber stamp + receipt torn off | ElevenLabs | a pawn is written (the cash drawer follows 0.6 s later) |
+| `lazy/shutter_up.mp3` / `lazy/shutter_down.mp3` | the roller shutter going up / down (ends in a bang) | ElevenLabs | the day opens / closes |
+| `lazy/newspaper.mp3` | the paper unfolded | ElevenLabs | the morning paper, 1.6 s into the shutter |
+| `lazy/watch_wind.mp3` / `lazy/camera_shutter.mp3` | winding and ticking / a film camera's shutter | ElevenLabs | picking a watch / a camera up to inspect (`INSPECT_SOUND`), quiet |
+| `lazy/tram_bell.mp3` | a tram passing far off with its bell, muffled | ElevenLabs | now and then while the shop is open (`src/audio/tram.ts`) |
+| `lazy/rain_loop.mp3` (18 s loop, 48 kbps) | rain on the street and the window | ElevenLabs | a bed under the ambience while the street shows rain |
+| `lazy/flood_loop.mp3` (18 s loop, 48 kbps) | drips and lapping water | ElevenLabs | a bed while the Flood's water stands in the shop |
 
 - `art/audio/build.py` (system Python with numpy, plus ffmpeg with libmp3lame; needs the network) downloads the sources into `art/out/audio/` (gitignored), layers and filters them per its `RECIPES`, trims silence, and writes mono 44.1 kHz MP3s (80–96 kbps one-shots, 48 kbps ambience). Outputs are committed; CI never downloads anything.
 - Loudness: one-shots to −20 LUFS momentary (loudest 400 ms), with at most 6 dB of lookahead limiting on transients and peaks under −1 dBFS; very short clicks stay a few LU under. The ambience is −26 LUFS integrated. The mix between cues is runtime gain in `src/data/audio.ts`, so a level change never needs a rebuild.
 - The ambience is filtered to sound heard through glass (street low-passed to ~1.1 kHz, water to 650 Hz, hum to 380 Hz) and baked into a seamless loop (the last 3 s crossfaded, equal power, into the head). At runtime it still plays as overlapping passes with 2.5 s equal-power fades, so MP3 encoder padding can't click at the seam in any browser.
-- Whole set: 13 files, ~387 KB.
-- Add or change a sound: edit `RECIPES` (or `AMBIENCE`), run `python3 art/audio/build.py --only <name>`, add the id to `SOUND_IDS`/`SOUND_GAIN` in `src/data/audio.ts`, map it in `src/audio/cues.ts`, add its ATTRIBUTION line.
-- Not yet: seasonal ambience (rain, winter wind), trams (no CC0 tram recording found on OpenGameArt), music.
+- Whole set: 13 preloaded files, ~387 KB, plus 11 lazy ones (`lazy/`), ~430 KB.
+- **The ElevenLabs effects and beds (Nov 2026) load lazily.** The first load is close to its 15 MB budget, so nothing in `lazy/` joins the first-tap preload (and `scripts/check-bundle.mjs` counts only the top-level files). Each is fetched the first time its cue fires, or prefetched as its moment nears (`prefetchFor` in `src/audio/cues.ts`); a cue whose file arrives more than `AUDIO_MIX.lazyMaxLate` late is dropped. The raw takes are committed in `art/audio/src/elevenlabs/` (the generation links expire); `build.py` reads them like a source (`elevenlabs` in `SOURCES`, recipes with `"dir": "lazy"`, beds in `BEDS`), so swapping a take is replacing one file and rerunning `--only <name>`. The beds are made seamless by crossfading their last 2 s into the head (the build prints the seam step; about 1 or less is click-free) and play as the same overlapping passes as the ambience, on its bus, so the ambience level covers them.
+- Add or change a sound: edit `RECIPES` (or `AMBIENCE`, `BEDS`), run `python3 art/audio/build.py --only <name>`, add the id to `SOUND_IDS` (preloaded) or `LAZY_SOUND_IDS` (fetched on demand) and `SOUND_GAIN` in `src/data/audio.ts`, map it in `src/audio/cues.ts`, add its ATTRIBUTION line.
+- Not yet: winter wind, music. (Rain and a distant tram came with the ElevenLabs effects, Nov 2026.)
 
 ### Voice (pilot, Nov 2026)
 

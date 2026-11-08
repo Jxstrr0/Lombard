@@ -53,7 +53,9 @@ import '@fontsource/ibm-plex-mono/600.css'
 import './style.css'
 import * as THREE from 'three'
 import { AudioEngine } from './audio/engine'
-import { cuesFor } from './audio/cues'
+import { bedsFor, cuesFor, prefetchFor } from './audio/cues'
+import { TramSchedule } from './audio/tram'
+import { AUDIO_MIX } from './data/audio'
 import { voiceFor } from './audio/voice'
 import { loadSoundSettings, saveSoundSettings, type SoundSettings } from './audio/settings'
 import { t } from './data/strings'
@@ -400,6 +402,8 @@ async function boot(): Promise<void> {
     shop.sync(state)
     life?.sync(state)
     street?.sync(state)
+    // Rain while the street shows it, canal water while the Flood stands in the shop.
+    audio.setBeds(bedsFor(state, street?.todaysWeather ?? null))
     ui.setCustomerArrivedQuiet(shop.customerState !== 'arriving')
     ui.render(state, prev)
     stage.sync(state)
@@ -415,7 +419,18 @@ async function boot(): Promise<void> {
   else ui.showTitle(slots)
   store.subscribe((state, prev, action) => {
     sync(state, prev)
-    audio.play(cuesFor(prev, state, action))
+    const cues = cuesFor(prev, state, action)
+    audio.play(cues.filter((c) => !c.atDoor))
+    // The door shuts behind a leaving walk-in once they reach it (the scene's walk-out).
+    const door = cues.filter((c) => c.atDoor)
+    if (door.length > 0) {
+      const asked = performance.now()
+      shop.whenCustomerOut(() => {
+        if (performance.now() - asked < AUDIO_MIX.doorCloseTimeout * 1000) audio.play(door)
+      })
+    }
+    // Lazy sounds wait for the game screen (the title stays at the preload).
+    audio.prefetch(ui.mode === 'game' ? prefetchFor(state) : [])
     audio.say(voiceFor(prev, state, action))
     if (action.type === 'inspect/useTool' && (state.inspect?.findings.length ?? 0) > (prev.inspect?.findings.length ?? 0)) {
       stage.playTool(action.tool, state)
@@ -512,6 +527,7 @@ async function boot(): Promise<void> {
         life?.sunlight.setFakePassers(false)
         street.setTier(governor.current)
         street.sync(store.get())
+        audio.setBeds(bedsFor(store.get(), street.todaysWeather))
         document.body.dataset.street = 'ready' // for screenshot scripts
       })
       .catch((err) => console.info('[street] staying quiet:', err instanceof Error ? err.message : err))
@@ -519,6 +535,8 @@ async function boot(): Promise<void> {
 
   const clock = new THREE.Clock()
   let readyFrames = 0
+  // Now and then a distant tram while the shop is open (seeded per day; see src/audio/tram.ts).
+  const trams = new TramSchedule()
   renderer.setAnimationLoop(() => {
     const raw = clock.getDelta()
     const dt = Math.min(raw, 0.1)
@@ -528,6 +546,10 @@ async function boot(): Promise<void> {
     if (life && street) life.setWeather(street.todaysWeather)
     life?.update(dt, renderer.domElement.height)
     street?.update(dt)
+    const now = store.get()
+    if (trams.update(dt, now.meta.seed, now.calendar.day, ui.mode === 'game' && now.day.phase === 'open' && !now.career.end)) {
+      audio.play([{ sound: 'tram_bell', lateOk: true }])
+    }
     // M6: where the appraiser is (hidden / closed / serving / counter / idle / walking), for shots.
     const staffState = shop.staffState
     if (document.body.dataset.staff !== staffState) document.body.dataset.staff = staffState

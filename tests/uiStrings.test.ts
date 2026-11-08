@@ -20,7 +20,7 @@ const UI = join(ROOT, 'src', 'ui')
 /** Literals that look like words but are not player-facing text. Keep this short and explain each. */
 const ALLOWED = new Set<string>([
   // Not text: the Longlight hub URL and an input accept filter.
-  'https://jxstrr0.github.io/Kelbo.Website/games.html',
+  'https://longlight.games/games.html',
   '.txt,text/plain',
 ])
 

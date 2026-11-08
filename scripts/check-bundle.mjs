@@ -11,8 +11,10 @@
  * - the boot assets main.ts loads behind the title screen: the baked shop, the
  *   HDRI, the Draco and Basis decoders, the canal backdrop, the street (one
  *   people sheet, the larger), the Latin and Latin Extended font files (the
- *   ones our text's unicode ranges pull) and every sound (the first tap starts
- *   audio);
+ *   ones our text's unicode ranges pull) and every preloaded sound (the first
+ *   tap starts audio): the top-level files in assets/audio/ only. The voice
+ *   lines (voice/) and the ElevenLabs effects and beds (lazy/) are fetched on
+ *   first use, so they are not counted;
  * - the first customer and the one queued behind them, and the first item: these
  *   are random, so the check counts two median avatar glbs and a median item glb,
  *   and prints the worst case (the largest of each) as a warning when that would
@@ -58,7 +60,7 @@ const parts = {
   decoders: await sum([...(await files(a('decoders/draco'))), ...(await files(a('decoders/basis')))]),
   'backdrop + street': (await sum(await files(a('backdrop')))) + (await sum(await files(a('street'), /^(?!people_)/))) + (await largest(await files(a('street'), /^people_/))),
   fonts: await sum(await files(a(''), /-latin-(ext-)?\d+-normal-.*\.woff2$/)),
-  audio: await sum(await files(a('audio'))),
+  audio: await sum(await files(a('audio'), /\.mp3$/)),
   'two avatars': 2 * (await median(await files(a('customers'), /\.glb$/))),
   'first item': await median(await files(a('items'), /\.glb$/)),
 }

@@ -9,6 +9,14 @@ silence, normalises loudness and writes mono MP3s to public/assets/audio/.
 Two cues (the scale beep and the phone keypad) are generated here from sine
 tones, with no third-party audio.
 
+The ElevenLabs sound effects (Sound Effects v2, generated from Longlight's own
+prompts on a paid plan) are committed as raw takes in art/audio/src/elevenlabs/
+(the generation URLs expire), so their recipes read local files: swapping a
+take is replacing that one file and rerunning `--only <name>`. They are
+written to public/assets/audio/lazy/, which the game fetches the first time
+each is needed (or when its context starts), never in the first-tap preload.
+The two beds there (rain, flood) are seamless loops like the ambience.
+
 Loudness: one-shots are normalised to a loudest-400 ms (momentary) loudness of
 ONE_SHOT_LUFS (a lookahead limiter shaves at most MAX_LIMIT_DB off transient
 peaks to get there; very short clicks stay a little under), the ambience to an
@@ -77,6 +85,12 @@ SOURCES: dict[str, dict[str, str]] = {
         "page": "https://opengameart.org/content/high-traffic-road-sounds",
         "author": "ignasd",
     },
+    # Local raw takes (ElevenLabs Sound Effects v2, Longlight's prompts, paid plan): never downloaded.
+    "elevenlabs": {
+        "dir": "art/audio/src/elevenlabs",
+        "page": "https://elevenlabs.io/sound-effects",
+        "author": "Longlight Interactive (generated with ElevenLabs Sound Effects v2)",
+    },
     "vistula": {
         "url": "https://opengameart.org/sites/default/files/VistulaShort_0.mp3",
         "page": "https://opengameart.org/content/sea-and-river-wave-sounds",
@@ -122,6 +136,37 @@ RECIPES: dict[str, dict] = {
     "tool_phone": {"generate": "keypad", "bitrate": "80k"},
     # UI button tap.
     "ui_tap": {"layers": [("kenney_interface", "Audio/click_001.ogg", 0.0, 0.0, "")], "bitrate": "80k"},
+    # --- ElevenLabs sound effects, loaded lazily (written to lazy/). ---
+    # A walk-in leaves: the street door swings shut, its bell jingling.
+    "door_close": {"layers": [("elevenlabs", "door_close.mp3", 0.0, 0.0, "highpass=f=60")], "bitrate": "96k", "dir": "lazy"},
+    # An incoming call: the ring (the take's silent tail is trimmed off).
+    "phone_ring": {"layers": [("elevenlabs", "phone_ring.mp3", 0.0, 0.0, "highpass=f=120")], "bitrate": "96k", "dir": "lazy"},
+    # A pawn ticket: rubber stamp, then the receipt torn off.
+    "stamp": {"layers": [("elevenlabs", "stamp.mp3", 0.0, 0.0, "highpass=f=60")], "bitrate": "96k", "dir": "lazy"},
+    # The shop's roller shutter going up in the morning / down at night (ends in a bang).
+    "shutter_up": {"layers": [("elevenlabs", "shutter_up.mp3", 0.0, 0.0, "highpass=f=50")], "bitrate": "80k", "dir": "lazy"},
+    "shutter_down": {"layers": [("elevenlabs", "shutter_down.mp3", 0.0, 0.0, "highpass=f=50")], "bitrate": "80k", "dir": "lazy"},
+    # The morning paper unfolded.
+    "newspaper": {"layers": [("elevenlabs", "newspaper.mp3", 0.0, 0.0, "highpass=f=80")], "bitrate": "80k", "dir": "lazy"},
+    # A mechanical watch being wound, steady ticking (inspecting a watch).
+    "watch_wind": {"layers": [("elevenlabs", "watch_wind.mp3", 0.0, 0.0, "highpass=f=150")], "bitrate": "80k", "dir": "lazy"},
+    # A film camera's shutter (inspecting a camera).
+    "camera_shutter": {"layers": [("elevenlabs", "camera_shutter.mp3", 0.0, 0.0, "highpass=f=80")], "bitrate": "80k", "dir": "lazy"},
+    # A tram passing in the distance, its bell, muffled by the glass.
+    "tram_bell": {"layers": [("elevenlabs", "tram_bell.mp3", 0.0, 0.0, "highpass=f=60,lowpass=f=5000")], "bitrate": "80k", "dir": "lazy"},
+}
+
+# Beds under the ambience, from one take each (generated loopable): filtered, the last BED_XFADE s
+# crossfaded (equal power) into the head so the seam is continuous whatever the take did, then
+# normalised like the ambience. Written to lazy/.
+BED_XFADE = 2.0
+BEDS: dict[str, dict] = {
+    # Rain on the street and the window: the very top rolled off so it sits behind the glass.
+    "rain_loop": {"src": ("elevenlabs", "rain_loop.mp3"), "af": "highpass=f=70,lowpass=f=7000", "bitrate": "48k"},
+    # Canal water in the shop on the Flood's days: drips and lapping. The take is very quiet
+    # (about -41 LUFS), so it is raised ~15 dB; a gentle FFT denoise and a rumble/hiss band-limit
+    # keep the raised noise floor from turning into a hiss bed.
+    "flood_loop": {"src": ("elevenlabs", "flood_loop.mp3"), "af": "highpass=f=90,lowpass=f=9000,afftdn=nr=8:nf=-60", "bitrate": "48k"},
 }
 
 # The ambience: quiet room tone, a street heard through the window, canal water.
@@ -144,6 +189,11 @@ AMBIENCE = {
 
 def fetch(src_id: str, member: str, cache: Path) -> Path:
     src = SOURCES[src_id]
+    if "dir" in src:  # committed local takes
+        p = ROOT / src["dir"] / member
+        if not p.exists():
+            raise SystemExit(f"missing {p}")
+        return p
     d = cache / src_id
     d.mkdir(parents=True, exist_ok=True)
     name = Path(urllib.request.url2pathname(src["url"].rsplit("/", 1)[1])).name.replace(" ", "_")
@@ -303,21 +353,27 @@ def normalise(x: np.ndarray, kind: str) -> tuple[np.ndarray, dict[str, float]]:
             x = limit(x * db_to_gain(g), PEAK_DBFS - 0.6)
         else:
             x = x * db_to_gain(g)
-        return x, loudness(x)
+        m = loudness(x)
+        # A sharp click can still overshoot between samples after the limiter: pull it back under.
+        if m["peak"] > PEAK_DBFS - 0.5:
+            x = x * db_to_gain(PEAK_DBFS - 0.5 - m["peak"])
+            m = loudness(x)
+        return x, m
     for _ in range(3):
         m = loudness(x)
         g = AMBIENCE_LUFS - m["I"]
-        if m["peak"] + g > PEAK_DBFS:
-            g = PEAK_DBFS - m["peak"]
+        if m["peak"] + g > PEAK_DBFS - 0.5:  # headroom for the MP3 encoder's overshoot
+            g = PEAK_DBFS - 0.5 - m["peak"]
         if abs(g) < 0.1:
             break
         x = x * db_to_gain(g)
     return x, loudness(x)
 
 
-def encode(x: np.ndarray, name: str, bitrate: str) -> Path:
-    OUT.mkdir(parents=True, exist_ok=True)
-    dst = OUT / f"{name}.mp3"
+def encode(x: np.ndarray, name: str, bitrate: str, sub: str = "") -> Path:
+    out = OUT / sub if sub else OUT
+    out.mkdir(parents=True, exist_ok=True)
+    dst = out / f"{name}.mp3"
     with tempfile.TemporaryDirectory() as td:
         w = Path(td) / "a.wav"
         write_wav(w, x)
@@ -359,6 +415,24 @@ def build_ambience(cache: Path) -> np.ndarray:
     return y
 
 
+def build_bed(r: dict, cache: Path) -> np.ndarray:
+    src_id, member = r["src"]
+    x = decode(fetch(src_id, member, cache), r["af"])
+    F = int(BED_XFADE * SR)
+    L = len(x) - F
+    y = x[:L].copy()
+    th = np.linspace(0, np.pi / 2, F)
+    y[:F] = x[:F] * np.sin(th) + x[L:] * np.cos(th)
+    return y
+
+
+def seam_jump(x: np.ndarray) -> float:
+    """How big the step from the last sample back to the first is, against the loop's typical
+    sample-to-sample step (about 1 = no click)."""
+    d = np.abs(np.diff(x))
+    return float(abs(x[0] - x[-1]) / (np.percentile(d, 99) + 1e-12))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", default="")
@@ -372,14 +446,23 @@ def main() -> None:
         x = generate(r["generate"]) if "generate" in r else mix_layers(r["layers"], cache)
         x = trim(x)
         x, m = normalise(x, "one_shot")
-        dst = encode(x, name, r["bitrate"])
+        dst = encode(x, name, r["bitrate"], r.get("dir", ""))
         print(f"{name:<12} {len(x)/SR:5.2f}s  M {m['M']:6.1f}  peak {m['peak']:5.1f}  {dst.stat().st_size:7d} B")
     if not only or "ambience" in only:
         x = build_ambience(cache)
         x, m = normalise(x, "ambience")
         dst = encode(x, "ambience", AMBIENCE["bitrate"])
         print(f"{'ambience':<12} {len(x)/SR:5.2f}s  I {m['I']:6.1f}  peak {m['peak']:5.1f}  {dst.stat().st_size:7d} B")
+    for name, r in BEDS.items():
+        if only and name not in only:
+            continue
+        x = build_bed(r, cache)
+        x, m = normalise(x, "ambience")
+        dst = encode(x, name, r["bitrate"], "lazy")
+        print(f"{name:<12} {len(x)/SR:5.2f}s  I {m['I']:6.1f}  peak {m['peak']:5.1f}  seam {seam_jump(x):4.2f}  {dst.stat().st_size:7d} B")
     total = sum(f.stat().st_size for f in OUT.glob("*.mp3"))
+    lazy = sum(f.stat().st_size for f in (OUT / "lazy").glob("*.mp3"))
+    print(f"lazy {lazy} B in {OUT / 'lazy'}")
     print(f"total {total} B in {OUT}")
 
 

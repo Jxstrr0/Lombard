@@ -25,8 +25,8 @@ if (!/^\d+\.\d+\.\d+\.\d+$/.test(gameVersion)) {
 
 export default defineConfig({
   // Relative base: every asset path in the build is relative to index.html, so the same
-  // dist/ works under a sub-path (jxstrr0.github.io/Lombard/) and at a domain's root
-  // (lombard.longlight.games). import.meta.env.BASE_URL is './' at runtime.
+  // dist/ works at the root of lombard.longlight.games (the live address) and under any
+  // sub-path. import.meta.env.BASE_URL is './' at runtime.
   base: './',
   define: {
     __BUILD_SHA__: JSON.stringify(shortSha()),

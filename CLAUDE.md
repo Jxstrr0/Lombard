@@ -11,7 +11,7 @@ Repo settings are documented in `docs/00-REPO-SETUP.md`; don't change them from 
 - Physics: none. Item inspection is an orbit camera on a single mesh, not a physics object.
 - Save: IndexedDB via `idb` for autosave (localStorage fallback for settings only), plus a copy-paste **save code** for moving careers between devices. No cloud sync, ever.
 - Assets: glTF (.glb) with Draco compression; textures KTX2 (Basis) where possible, otherwise WebP. HDRI environment from Poly Haven (small 1k version).
-- Hosting: GitHub Pages at `https://jxstrr0.github.io/Lombard/` (Vite `base: './'`, relative, so the same build also works at the root of `lombard.longlight.games` once the domain moves), deployed by a GitHub Actions workflow using the official Pages deploy actions (Pages source = GitHub Actions). Static. No server, no API keys, no backend. All dialogue and content is authored data in `src/data/`.
+- Hosting: GitHub Pages at `https://lombard.longlight.games/` (the custom domain; the old `https://jxstrr0.github.io/Lombard/` address forwards there; Vite `base: './'`, relative, so the build works at any address), deployed by a GitHub Actions workflow using the official Pages deploy actions (Pages source = GitHub Actions). Static. No server, no API keys, no backend. All dialogue and content is authored data in `src/data/`.
 - Tests: Vitest for pure logic (appraisal, haggling, economy, RNG). No tests for rendering.
 - Shop lighting: Blender (headless, Python-scripted) bakes a Cycles lightmap in GitHub Actions. No one opens the Blender UI as part of the pipeline. See `docs/04-ASSETS.md` § Bake pipeline.
 
@@ -90,7 +90,7 @@ In-game UI should feel like the shop (paper tags, receipt fonts, worn plastic), 
 ## Studio catalogue
 
 `LONGLIGHT-STUDIO.md` (repo root) covers every Longlight game: looks, names
-already taken, storage and cache prefixes on the shared origin, a reuse map and
+already taken, storage and cache prefixes (kept from the shared-origin days), a reuse map and
 improvement ideas. Read it before pitching new ideas, names or looks, and
 before building a system another Longlight game may already have. This file
 wins where the two disagree. Don't edit the copy here: the master is

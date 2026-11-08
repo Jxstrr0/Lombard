@@ -51,6 +51,11 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser()
     p.add_argument("--only", default="", help="comma-separated item ids")
     p.add_argument("--kind", default="", help="only defs with this placeholder kind")
+    p.add_argument(
+        "--opted-in",
+        action="store_true",
+        help="only defs that set model.glb (what the items workflow builds, so it never packs a model no def uses)",
+    )
     p.add_argument("--out", default=str(ROOT / "art" / "out" / "items"))
     p.add_argument("--preview", action="store_true", help="also render <id>.png")
     p.add_argument("--no-ao", action="store_true", help="skip the AO bake (fast geometry check)")
@@ -195,6 +200,8 @@ def main() -> None:
         if only and d["id"] not in only:
             continue
         if args.kind and kind != args.kind:
+            continue
+        if args.opted_in and not d["model"].get("glb"):
             continue
         mod = builder(kind)
         if mod is None:

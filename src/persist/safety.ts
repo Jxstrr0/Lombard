@@ -2,9 +2,9 @@
  * Save safety in the browser: ask it to keep our storage, remember when the
  * player last made a backup, and write / read backup files.
  *
- * Every Longlight game lives on the same GitHub Pages origin, so they share one
- * storage quota: if the phone runs low, the browser can wipe the whole origin
- * at once. A save code (or a backup file holding one) is the way back.
+ * Lombard has its own origin (lombard.longlight.games), but the browser can
+ * still wipe its storage when the phone runs low. A save code (or a backup
+ * file holding one) is the way back.
  *
  * Nothing here throws to callers. Missing APIs (old browsers, Node in tests)
  * read as "unknown" and are skipped quietly.

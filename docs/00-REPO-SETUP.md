@@ -3,7 +3,7 @@
 Written for doing everything from a phone. Most settings live on **github.com in your phone's browser**; the GitHub mobile app hides a lot of them. If a menu below is missing, open the browser menu and switch on **"Desktop site"**.
 
 Repo URL: `https://github.com/Jxstrr0/Lombard`
-Game URL once deployed: `https://jxstrr0.github.io/Lombard/` (the `/Lombard/` path is case-sensitive). Vite's `base` is `./` (relative), so the build works at that address and at the root of a custom domain.
+Game URL: `https://lombard.longlight.games/` (custom domain, set in Settings → Pages; the old `https://jxstrr0.github.io/Lombard/` forwards there). Vite's `base` is `./` (relative), so the build works at any address.
 
 ---
 
@@ -93,7 +93,7 @@ If a later session reports that a download was blocked (for example Playwright's
 On the repo's main page, tap the gear next to **About**:
 
 - Description: `A pawn shop sim on the canals of Mostograd. A Longlight Interactive game.`
-- Website: `https://jxstrr0.github.io/Lombard/` (tick "Use your GitHub Pages website" once it's live)
+- Website: `https://lombard.longlight.games/` (tick "Use your GitHub Pages website" once it's live)
 - Topics: `game`, `threejs`, `typescript`, `simulation`, `longlight`
 
 ## Step 10 — First Claude Code prompt
@@ -105,6 +105,6 @@ Paste this into the first session:
 ## After M0 lands — quick check
 
 - [ ] Actions tab shows a green `deploy` run.
-- [ ] `https://jxstrr0.github.io/Lombard/` opens on your phone and shows the placeholder shop.
+- [ ] `https://lombard.longlight.games/` opens on your phone and shows the placeholder shop.
 - [ ] The build number in the corner matches the latest commit's short hash.
 - [ ] Settings → Pages shows "Your site is live".

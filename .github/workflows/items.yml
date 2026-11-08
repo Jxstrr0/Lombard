@@ -71,7 +71,10 @@ jobs:
         run: npm ci
 
       - name: Build models
-        run: ~/blender/blender --background --factory-startup --python art/items/build.py -- --strict
+        # --opted-in: only defs that set model.glb. A def can use a kind that has a
+        # builder and still keep its code-drawn placeholder (the wave A silver
+        # signet, chain and earrings); building those would pack glbs no def uses.
+        run: ~/blender/blender --background --factory-startup --python art/items/build.py -- --strict --opted-in
 
       - name: Pack (Draco + KTX2)
         run: node scripts/items-pack.mjs

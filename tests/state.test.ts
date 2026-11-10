@@ -4,7 +4,7 @@ import { reducer, type Action } from '../src/game/actions'
 import { seasonOf, weekdayOf, type GameState } from '../src/game/state'
 import { tuning } from '../src/data/tuning'
 import { getItemDef } from '../src/data/items'
-import { claimedValue } from '../src/game/appraise/value'
+import { claimedValue, dealerQuote } from '../src/game/appraise/value'
 import type { ItemInstance } from '../src/game/types'
 
 /** Customers anchor on claimedValue (fakes included), so a generous offer is measured against that. */
@@ -108,7 +108,10 @@ describe('day loop', () => {
     const item = s.inventory[0]!
     const cash = s.cash
     const before = s.inventory.length // includes the previous owner's leftovers
+    const quote = dealerQuote(s.meta.rng, item)
     s = reducer(s, { type: 'ledger/sell', itemId: item.id })
+    // The ledger shows the dealer's price before the tap; the sale pays exactly that.
+    expect(s.cash).toBe(cash + quote)
     expect(s.inventory).toHaveLength(before - 1)
     expect(s.inventory.some((i) => i.id === item.id)).toBe(false)
     expect(s.cash).toBeGreaterThanOrEqual(cash)

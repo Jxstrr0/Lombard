@@ -36,6 +36,12 @@ export const INTRO_CARDS: readonly IntroCard[] = [
     title: "What's in the safe",
     body: 'The safe opened on the third try. Inside: a few things he never sold. Some may be worth something. Some certainly are not. He was not a careful man, so look closely before you price them.',
   },
+  {
+    id: 'queue',
+    kicker: 'Opening hours',
+    title: 'Nobody waits forever',
+    body: 'The shop opens at ten. People queue for an hour or two by the shop clock, then give up and go, and they tell their friends. Every look with the loupe or the scale costs minutes, and the tool says how many.',
+  },
 ]
 
 /** The story leftover items carry (shown nowhere yet; kept for the item's record). */

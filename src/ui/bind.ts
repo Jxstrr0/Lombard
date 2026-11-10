@@ -250,6 +250,11 @@ export class Ui {
     return this._mode
   }
 
+  /** The shop sheet is open: the door is held (no lull time passes, nobody walks in). */
+  get shopOpen(): boolean {
+    return this.shop.isOpen
+  }
+
   /** Title screen over the dimmed shop: hide every game screen and sheet. */
   showTitle(slots: SlotView[]): void {
     this._mode = 'title'

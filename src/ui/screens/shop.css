@@ -43,6 +43,18 @@
   color: var(--muted);
 }
 
+.shop-help.is-nudge {
+  display: block;
+  color: inherit;
+  font-weight: 600;
+}
+
+.shop-door {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 .shop-area {
   margin-bottom: 12px;
   padding: 8px 8px 10px;
@@ -445,7 +457,7 @@
     min-height: 46px;
   }
 
-  .shop-help {
+  .shop-help:not(.is-nudge) {
     display: none;
   }
 

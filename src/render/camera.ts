@@ -25,8 +25,11 @@ import * as THREE from 'three'
 const EYE = new THREE.Vector3(0, 1.62, -3.2)
 // Portrait looks further down: the counter sits just above the dialogue strip.
 const LOOK_PORTRAIT = new THREE.Vector3(0, 0.62, -0.9)
-/** Portrait: the counter-view look point never sits higher than this fraction of the screen height (keeps faces in frame). */
-const PORTRAIT_MIN_LOOK_Y = 0.38
+/**
+ * Portrait: the counter-view look point never sits higher than this fraction of the screen height
+ * (keeps faces in frame). 0.38 put a tall customer's eyes under the top HUD (playtest, Nov 10).
+ */
+const PORTRAIT_MIN_LOOK_Y = 0.43
 // Landscape/desktop: the strip is docked bottom-left, so frame counter and customer together.
 const LOOK_LANDSCAPE = new THREE.Vector3(0, 1.0, -0.9)
 /**
@@ -36,8 +39,9 @@ const LOOK_LANDSCAPE = new THREE.Vector3(0, 1.0, -0.9)
 const LANDSCAPE_SUBJECT_HALF = 0.32
 /** How fast the landscape view slides when the side column changes width, 1/s. */
 const LENS_SLIDE_RATE = 5
-// Offer view (portrait): the number pad covers most of the screen, so look up at the customer.
-const LOOK_OFFER = new THREE.Vector3(0, 1.35, -0.9)
+// Offer view (portrait): the number pad and the speech box cover most of the screen, so the face
+// has to sit in the band between the HUD and the speech box. 1.35 tilted it down behind the box.
+const LOOK_OFFER = new THREE.Vector3(0, 0.78, -0.9)
 
 /** Where the item floats while inspected: just in front of the player's eyes, over the counter. */
 export const INSPECT_POINT = new THREE.Vector3(0, 1.5, -2.7)

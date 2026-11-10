@@ -7,7 +7,7 @@
  * collectorExponent first, so collectors pay a premium for mint and punish wear.
  */
 import { tuning } from '../../data/tuning'
-import type { Rng } from '../rng'
+import { Rng, type RngState } from '../rng'
 import type { FakeProfile, ItemDef } from '../schema/item'
 import type { ItemInstance } from '../types'
 
@@ -48,4 +48,13 @@ export function claimedValue(def: ItemDef, item: ItemInstance): number {
 export function dealerPrice(item: ItemInstance, rng: Rng): number {
   const noise = rng.range(-tuning.appraise.dealerNoise, tuning.appraise.dealerNoise)
   return tidyPrice(item.trueValue * tuning.appraise.dealerRate * (1 + noise))
+}
+
+/**
+ * The dealer's offer right now: the same draw the sale will take, peeked from the game's Rng
+ * state without advancing it, so the ledger can show the price and the sale pays exactly that.
+ * Selling something moves the Rng on, so the other offers are re-quoted after each sale.
+ */
+export function dealerQuote(rngState: RngState, item: ItemInstance): number {
+  return dealerPrice(item, Rng.from(rngState))
 }

@@ -211,6 +211,7 @@ export const en = {
   'offer.offerLabel': 'Your offer',
   'offer.estimateNote': 'Your own estimate. The customer never sees it.',
   'offer.estimateNoteRange': 'The book says {lo}–{hi} in good condition. Your estimate stays yours; the customer never sees it.',
+  'offer.estimateNoteFree': 'First one\'s on the house: the book says {lo}–{hi} in good condition. After this, open the reference book yourself.',
   'offer.estimateNoteRef': 'Your own estimate; the customer never sees it. Not sure? Go back and open the reference book: it gives a price range.',
   'offer.overCash': 'More than your cash ({cash})',
   'offer.cash': 'Cash {cash}',

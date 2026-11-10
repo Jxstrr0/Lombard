@@ -210,8 +210,11 @@ export class OfferScreen {
     // No reference-book look yet: point at the one tool that gives a price range.
     const noRef = !s.inspect.findings.some((f) => f.tool === 'reference')
     // After the book has been read, keep its range on screen while you type (playtest: people forgot it).
-    const range = !noRef && s.current.item ? referenceRange(getItemDef(s.current.item.defId), refTier(s)) : null
-    if (estimating && range) setText(this.tagNote, t('offer.estimateNoteRange', { lo: rub(range.lo), hi: rub(range.hi) }))
+    // Playtest: the very first price is a blind guess, so until the first buy on day 1 the range is free.
+    const firstFree = noRef && s.calendar.day === 1 && s.stats.itemsBought === 0
+    const range = (!noRef || firstFree) && s.current.item ? referenceRange(getItemDef(s.current.item.defId), refTier(s)) : null
+    if (estimating && range && firstFree) setText(this.tagNote, t('offer.estimateNoteFree', { lo: rub(range.lo), hi: rub(range.hi) }))
+    else if (estimating && range) setText(this.tagNote, t('offer.estimateNoteRange', { lo: rub(range.lo), hi: rub(range.hi) }))
     else if (estimating) setText(this.tagNote, t(noRef ? 'offer.estimateNoteRef' : 'offer.estimateNote'))
     else if (over) setText(this.tagNote, t('offer.overCash', { cash: rub(s.cash) }))
     else setText(this.tagNote, t('offer.cash', { cash: rub(s.cash) }))

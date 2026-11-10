@@ -182,6 +182,10 @@ export function useTool(input: UseToolInput): UseToolResult {
 
   if (findings.length === 0) {
     add({ text: NOTHING_NEW[tool] ?? 'Nothing new.', polarity: 'neutral', ...(hotspot ? { hotspot } : {}) })
+  } else if (hotspot && !findings.some((f) => f.hotspot === hotspot)) {
+    // Aimed at a marker but only the general note came up: still mark that spot as looked at,
+    // so the player isn't tempted to pay for the same look twice.
+    add({ text: NOTHING_AT_SPOT, polarity: 'neutral', hotspot })
   }
   const seconds = tool === 'specialist' && input.extras?.specialist ? specialistCallSeconds(input.extras.specialist.id, input.extras.specialist.mods) : tuning.inspect.toolSeconds[tool]
   return { findings, seconds }
@@ -193,6 +197,8 @@ export function specialistCallSeconds(id: string, mods?: SpecialistMods): number
 }
 
 // --- text ---------------------------------------------------------------------
+
+const NOTHING_AT_SPOT = 'Nothing out of place right there.'
 
 const NOTHING_NEW: Partial<Record<ToolId, string>> = {
   loupe: 'Nothing new under the loupe.',

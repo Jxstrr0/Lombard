@@ -276,6 +276,49 @@ html {
   border: 1px solid var(--strip-edge);
 }
 
+.hud-queue {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.hud-queue:focus-visible {
+  outline: 2px solid var(--clay-light);
+  outline-offset: 2px;
+}
+
+/* Tap the queue: one patience bar per waiting customer (hud.ts renderList). */
+.hud > .hud-waitlist {
+  position: absolute;
+  top: calc(100% - 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 10px;
+  list-style: none;
+  border-radius: 10px;
+  background: rgba(20, 19, 18, 0.92);
+  border: 1px solid var(--strip-edge);
+  pointer-events: auto;
+}
+
+.hud-waitlist li {
+  display: grid;
+  grid-template-columns: 3.5em 64px auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-waitlist .patience {
+  width: 64px;
+}
+
+.hud-wl-mins {
+  font-family: var(--mono);
+  color: var(--paper);
+}
+
 .hud-queue-count {
   font-family: var(--mono);
   font-weight: 600;

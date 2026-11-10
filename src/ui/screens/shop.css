@@ -55,6 +55,15 @@
   font-weight: 600;
 }
 
+/* A customer is at the door: a bar, not just a line of small print. */
+.shop-door.is-waiting {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border-left: 4px solid var(--clay);
+  background: rgba(217, 119, 87, 0.14);
+  font-size: 0.8125rem;
+}
+
 .shop-area {
   margin-bottom: 12px;
   padding: 8px 8px 10px;

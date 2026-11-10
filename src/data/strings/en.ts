@@ -74,6 +74,9 @@ export const en = {
   // --- HUD
   'hud.leaving': 'leaving',
   'hud.nobody': 'Nobody waiting',
+  'hud.next': 'Next',
+  'hud.nth': 'No. {n}',
+  'hud.waitMins': '~{mins} min',
   'hud.waitingLow': { other: '{count} waiting, someone is about to leave' },
   'hud.waiting': { other: '{count} waiting, patience {pct}%' },
 
@@ -476,6 +479,7 @@ export const en = {
   'shop.title': 'Shop floor',
   'shop.closeAria': 'Close shop',
   'shop.help': 'Buyers ask about tagged items on display. No tag, or in the safe: not for sale.',
+  'shop.doorWaiting': { one: '{count} customer waiting at the door. They come in when you close this.', other: '{count} customers waiting at the door. The next one comes in when you close this.' },
   'shop.doorHeld': 'The door is held while you arrange. Nobody comes in until you close this.',
   'shop.pickFirst': 'Pick an item first, from the safe or a shelf, then tap an empty slot to put it there.',
   'shop.safe': 'Safe',

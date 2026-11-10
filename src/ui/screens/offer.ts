@@ -205,7 +205,9 @@ export class OfferScreen {
     setText(this.tagValue, v > 0 ? rub(v) : t('common.noAmount'))
     const over = !estimating && v > s.cash
     this.root.classList.toggle('is-over', over)
-    if (estimating) setText(this.tagNote, t('offer.estimateNote'))
+    // No reference-book look yet: point at the one tool that gives a price range.
+    const noRef = !s.inspect.findings.some((f) => f.tool === 'reference')
+    if (estimating) setText(this.tagNote, t(noRef ? 'offer.estimateNoteRef' : 'offer.estimateNote'))
     else if (over) setText(this.tagNote, t('offer.overCash', { cash: rub(s.cash) }))
     else setText(this.tagNote, t('offer.cash', { cash: rub(s.cash) }))
 

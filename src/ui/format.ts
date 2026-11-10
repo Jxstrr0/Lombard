@@ -59,6 +59,11 @@ export const OPENING_MINUTES = 10 * 60
  */
 export const CLOCK_MINUTES_PER_SECOND = 1
 
+/** In-game seconds → whole minutes on the shop clock (what a tool use really costs the day). */
+export function shopMinutes(seconds: number): number {
+  return Math.max(1, Math.round(seconds * CLOCK_MINUTES_PER_SECOND))
+}
+
 /** day.clock (in-game seconds since opening) → "HH:MM" (a 24-hour shop clock in every language). */
 export function shopClock(clockSeconds: number): string {
   const total = OPENING_MINUTES + Math.floor(clockSeconds * CLOCK_MINUTES_PER_SECOND)

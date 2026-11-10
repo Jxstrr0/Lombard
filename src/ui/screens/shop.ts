@@ -4,7 +4,9 @@
  * move it there; "To safe" takes it off display. "Price tag" opens a number
  * pad for the tag (chips are multiples of what you paid; the true value is
  * never shown). Opens from the ledger (closed) and from the counter when
- * nobody is there; closes itself if a customer steps up.
+ * nobody is there; closes itself if a customer steps up. While it's open in
+ * opening hours the door is held (main.ts stops the lull clock), so the next
+ * customer waits until it's closed.
  *
  * Local UI state (selection, pad mode) lives here; the game only changes
  * through shop/place and shop/price.
@@ -52,6 +54,8 @@ export class ShopSheet {
   private toSafe: HTMLButtonElement
   private priceBtn: HTMLButtonElement
   private pricer: HTMLElement
+  private help: HTMLElement
+  private door: HTMLElement
   private priceName: HTMLElement
   private priceValue: HTMLElement
   private priceNote: HTMLElement
@@ -84,9 +88,19 @@ export class ShopSheet {
     titles.append(el('h2', '', t('shop.title')), this.summary)
     head.append(titles, createButton({ id: 'shop-close', label: '', icon: 'close', variant: 'ghost', ariaLabel: t('shop.closeAria'), onPress: () => this.close() }))
 
-    // --- arrange view
+    // --- arrange view (the safe first: that's where new stock waits to go out)
     this.body = el('div', 'shop-body')
-    this.body.append(el('p', 'shop-help', t('shop.help')))
+    this.help = el('p', 'shop-help', t('shop.help'))
+    this.door = el('p', 'shop-door', t('shop.doorHeld'))
+    this.door.dataset.id = 'shop-door'
+    this.body.append(this.help, this.door)
+    const safe = el('section', 'shop-area area-safe')
+    const sh = el('h3', 'shop-area-h')
+    sh.append(el('span', '', t('shop.safe')), el('span', 'shop-area-hint', t('shop.safeHint')))
+    this.safeList = el('div', 'safe-list')
+    this.safeList.dataset.id = 'safe'
+    safe.append(sh, this.safeList)
+    this.body.append(safe)
     for (const a of AREAS) {
       const sec = el('section', `shop-area area-${a.id}`)
       const h = el('h3', 'shop-area-h')
@@ -98,13 +112,6 @@ export class ShopSheet {
       this.grids.set(a.id, grid)
       this.body.append(sec)
     }
-    const safe = el('section', 'shop-area area-safe')
-    const sh = el('h3', 'shop-area-h')
-    sh.append(el('span', '', t('shop.safe')), el('span', 'shop-area-hint', t('shop.safeHint')))
-    this.safeList = el('div', 'safe-list')
-    this.safeList.dataset.id = 'safe'
-    safe.append(sh, this.safeList)
-    this.body.append(safe)
 
     // --- selection tray
     this.tray = el('div', 'shop-tray')
@@ -196,9 +203,11 @@ export class ShopSheet {
       this.selected = null
       this.pricing = false
     }
+    this.door.hidden = state.day.phase !== 'open'
     const key = JSON.stringify([state.shop.slots, state.shop.prices, state.inventory.map((i) => i.id), this.selected, this.pricing])
     if (key === this.key) return
     this.key = key
+    this.nudge(false)
 
     const items = new Map(state.inventory.map((i) => [i.id, i]))
     const onDisplay = new Set(state.shop.slots.map((s) => s.itemId).filter((x): x is string => !!x))
@@ -235,6 +244,7 @@ export class ShopSheet {
       b.setAttribute('aria-label', t(this.selected ? 'shop.slotEmptyMoveAria' : 'shop.slotEmptyAria', { area: t(AREA_NAME[slot.area]), n }))
       b.addEventListener('click', () => {
         if (this.selected) this.place(slot.id)
+        else this.nudge(true)
       })
       return b
     }
@@ -275,6 +285,12 @@ export class ShopSheet {
     this.trayTag.classList.toggle('no-tag', !price)
     this.toSafe.disabled = !slot
     setButtonLabel(this.priceBtn, t(price ? 'shop.changeTag' : 'shop.priceTag'), 'tag')
+  }
+
+  /** An empty slot tapped with nothing picked: say what to do instead of doing nothing. */
+  private nudge(on: boolean): void {
+    setText(this.help, t(on ? 'shop.pickFirst' : 'shop.help'))
+    this.help.classList.toggle('is-nudge', on)
   }
 
   private select(id: string | null): void {

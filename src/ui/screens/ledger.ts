@@ -2,7 +2,7 @@
  * Ledger (day closed, after at least one day): the day's receipt with a
  * summary, today's log with signed amounts, the word on the street (reputation
  * by group as vague lines, never numbers), stock with what you paid and a
- * "Sell to dealer" button per item, then "Open shop — Day N".
+ * "Dealer pays X" button per item (tap once to ask, again to sell), then "Open shop — Day N".
  *
  * M5: while the landlord's final notice stands, a line under the summary says so. From
  * tuning.endings.retireDay a "Hand back the keys" section closes the receipt: Retire asks
@@ -10,6 +10,7 @@
  */
 import { t, type PlainKey } from '../../data/strings'
 import type { Action } from '../../game/actions'
+import { dealerQuote } from '../../game/appraise/value'
 import { canRetire, daysRun } from '../../game/endings/end'
 import { hasNotice } from '../../game/endings/eviction'
 import { LANDLORD } from '../../data/endings/landlord'
@@ -59,6 +60,8 @@ export class LedgerScreen {
   private loans = new LedgerLoans()
   private key = ''
   private shopNameText = ''
+  /** The stock row whose "Sell" was tapped once and now asks to confirm. */
+  private armed: { id: string; button: HTMLButtonElement; price: number } | null = null
 
   constructor(
     private readonly dispatch: (a: Action) => void,
@@ -186,9 +189,10 @@ export class LedgerScreen {
     if (retire) setText(this.retireText, t('ledger.retireText', { days: daysRun(state) }))
     else this.closeConfirm()
     const last = state.history[state.history.length - 1]
-    const key = JSON.stringify([state.cash, state.day.log.length, state.inventory.map((i) => i.id), last, state.reputation.byGroup, state.crime.heat, state.crime.bulletin.map((b) => b.id)])
+    const key = JSON.stringify([state.meta.rng, state.cash, state.day.log.length, state.inventory.map((i) => i.id), last, state.reputation.byGroup, state.crime.heat, state.crime.bulletin.map((b) => b.id)])
     if (key === this.key) return
     this.key = key
+    this.armed = null
     if (!last) return
     const closedDate = state.calendar.date
     // The calendar has already moved to tomorrow; the receipt is for the day just closed.
@@ -254,10 +258,33 @@ export class LedgerScreen {
       info.append(el('span', 'stock-name', itemNameOf(item.defId)))
       const paid = state.paid[item.id]
       info.append(el('span', 'stock-paid', paid !== undefined ? t('ledger.paid', { amount: rub(paid) }) : t('ledger.oldStock')))
-      const sell = createButton({ id: `sell-${item.id}`, label: t('ledger.sellDealer'), className: 'btn-sell', onPress: () => this.dispatch({ type: 'ledger/sell', itemId: item.id }) })
+      // The dealer's offer is shown up front; the first tap asks, the second sells.
+      const price = dealerQuote(state.meta.rng, item)
+      const sell: HTMLButtonElement = createButton({ id: `sell-${item.id}`, label: t('ledger.sellDealer', { amount: rub(price) }), className: 'btn-sell', onPress: () => this.pressSell(item.id, sell, price) })
       sell.insertAdjacentHTML('afterbegin', icons.coins)
       li.append(info, sell)
       this.stock.append(li)
     }
+  }
+
+  /** First tap: ask "Sell for X?". Second tap on the same row: sell. Tapping another row moves the question there. */
+  private pressSell(itemId: string, button: HTMLButtonElement, price: number): void {
+    if (this.armed?.id === itemId) {
+      this.armed = null
+      this.dispatch({ type: 'ledger/sell', itemId })
+      return
+    }
+    this.disarm()
+    this.armed = { id: itemId, button, price }
+    button.classList.add('armed')
+    setButtonLabel(button, t('ledger.sellConfirm', { amount: rub(price) }), 'coins')
+  }
+
+  private disarm(): void {
+    const a = this.armed
+    if (!a) return
+    this.armed = null
+    a.button.classList.remove('armed')
+    setButtonLabel(a.button, t('ledger.sellDealer', { amount: rub(a.price) }), 'coins')
   }
 }

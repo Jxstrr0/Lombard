@@ -52,3 +52,7 @@ jobs:
       - uses: actions/configure-pages@v6
       - id: deployment
         uses: actions/deploy-pages@v5
+        # The upload (all the item models) now takes over the default 10 minutes;
+        # 1.4.3.0's deploy timed out mid-sync. Give it 30.
+        with:
+          timeout: 1800000

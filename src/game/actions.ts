@@ -377,8 +377,8 @@ function openDay(state: GameState): GameState {
     later.push(...brought.extra)
     if (police.visit && police.first) first.unshift(police.visit)
     else if (police.visit) later.push(police.visit)
-    // Neighbourhood standing stretches (or shortens) how long people wait. No draws.
-    const patience = patienceRepFactor(s)
+    // Neighbourhood standing stretches (or shortens) how long people wait, on top of the base scale. No draws.
+    const patience = patienceRepFactor(s) * tuning.day.queuePatienceScale
     const walkIns = mergeQueue(sellers, [...buyers, ...redeemers], rng)
     const queue = [...first, ...mergeQueue(walkIns, later, storyRng(s, 'queue'))].map((v) =>
       patience === 1 ? v : { ...v, patience: Math.round(v.patience * patience) },

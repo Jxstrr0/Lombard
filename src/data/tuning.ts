@@ -58,6 +58,12 @@ export const tuning = {
     customersPerDay: 8,
     /** In-game seconds a customer will wait in the queue, [min, max]. */
     queuePatience: [140, 260] as [number, number],
+    /**
+     * Everyone in the line waits this much longer than queuePatience (and the
+     * other patience numbers) say. Playtest (Nov 10 2026): careful appraisals
+     * lost too many customers. 1.5 pushed a careful shop to ~48% a month in the sim; 1.2 (~17%) keeps the ~15% target (Kelbo, Nov 10). No draws.
+     */
+    queuePatienceScale: 1.2,
     /** Reputation lost when someone gives up waiting. */
     walkoutRepPenalty: 1,
     /** In-game seconds that pass per real second while a customer is at the counter. */

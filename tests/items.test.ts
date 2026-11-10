@@ -47,6 +47,7 @@ const ALLOWED_BRANDS = new Set([
   'Rechnik',
   'Kniga',
   'Priboy',
+  'Mostpribor',
   'Basstone',
   'Lyra',
   // M6 wave A (invented)
@@ -151,25 +152,25 @@ describe('item definitions', () => {
     }
   })
 
-  it('ships 141 defs across 14 categories with unique ids', () => {
-    expect(ITEM_DEFS).toHaveLength(141)
+  it('ships 144 defs across 14 categories with unique ids', () => {
+    expect(ITEM_DEFS).toHaveLength(144)
     const count = (c: string) => ITEM_DEFS.filter((d) => d.category === c).length
     expect(count('gold')).toBe(10)
     expect(count('watches')).toBe(11)
     expect(count('phones')).toBe(11) // 9 + 2 in M6 wave C
     expect(count('cameras')).toBe(11) // 9 + 2 in M6 wave C
-    expect(count('militaria')).toBe(10)
+    expect(count('militaria')).toBe(11) // 10 + the 1.4 binoculars
     expect(count('coins')).toBe(10)
-    expect(count('electronics')).toBe(11) // 5 + 6 in M6 wave C
+    expect(count('electronics')).toBe(12) // 5 + 6 in M6 wave C + the 1.4 calculator
     expect(count('icons')).toBe(1) // M5: the Collector's, story-only
     expect(count('media')).toBe(11) // M6 wave B
     // M6 wave A
     expect(count('instruments')).toBe(11)
     expect(count('tools')).toBe(11)
     expect(count('silver')).toBe(11)
-    expect(count('antiques')).toBe(11)
+    expect(count('antiques')).toBe(12) // 11 + the 1.4 barometer
     expect(count('sports')).toBe(11) // M6 wave C
-    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(141)
+    expect(new Set(ITEM_DEFS.map((d) => d.id)).size).toBe(144)
     expect(getItemDef('gold_band_583').category).toBe('gold')
   })
 

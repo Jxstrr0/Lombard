@@ -110,3 +110,4 @@ Done when: it ships on the hub as 1.0.
 More categories, a second shop district, Steam build via Electron/Tauri, achievements, seasonal events.
 
 - Items wave C (1.1.0.0, built Nov 7): 120 → 141 defs. The new sports category (11, Gennady the militaria collector takes it; Vitya Gruzdev brings it), electronics +6, phones +2, cameras +2, every one with a scripted model (`box_c.py`). Sim neutral. See 05.
+- Three new items (1.4.0.0, built Nov 10): 141 → 144 defs, each with a scripted Blender model: army 8×30 field binoculars (militaria), a Mostpribor ship's aneroid barometer (antiques) and a Priboy PM-61 programmable calculator (electronics). Two fake profiles each.

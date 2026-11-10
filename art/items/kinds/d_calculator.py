@@ -275,7 +275,7 @@ def build(it: lib.Item) -> None:
         txt(lm, body_s, size, ink, y=y, z=lz, depth=INK, bold=bold)
         y -= size * 1.55 + 0.0006
         if k == 0:  # a rule under the title
-            line_on(lm, [(-0.022, y + 0.0016), (0.022, y + 0.0016)], 0.0003, INK, ink, z=lz)
+            line_on(lm, [(-0.022, y + 0.0030), (0.022, y + 0.0030)], 0.0003, INK, ink, z=lz)
     line_on(lm, [(x, y) for x, y in rr(0.049, 0.031, 0.0009, 3)], 0.00025, INK, ink, z=lz, closed=True)
 
     # --- centre the bounding box on the origin

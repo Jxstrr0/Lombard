@@ -84,7 +84,8 @@ export async function runGallery(
       scene.add(holder)
     }
   })
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50)
+  // Far plane well past the grid: at 141+ items the camera backs off more than 50 m.
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 400)
   const gridW = cols * 0.5
   const gridH = rows * 0.55
   const resize = () => {

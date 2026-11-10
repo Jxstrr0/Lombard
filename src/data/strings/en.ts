@@ -58,6 +58,7 @@ export const en = {
   'fmt.fullDate': '{weekday}, {date}',
   'fmt.range': '{low}–{high}',
   'fmt.percent': '{n}%',
+  'loading.last': 'Last touches, nearly open',
   'fmt.times': '×{n}',
   'fmt.seconds': '{n} s',
   'fmt.shopMinutes': '{n} min',

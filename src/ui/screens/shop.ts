@@ -204,6 +204,10 @@ export class ShopSheet {
       this.pricing = false
     }
     this.door.hidden = state.day.phase !== 'open'
+    // Someone at the door gets a bar of its own, so arranging never forgets them (playtest).
+    const waiting = state.queue.length
+    this.door.classList.toggle('is-waiting', waiting > 0)
+    setText(this.door, waiting > 0 ? t('shop.doorWaiting', { count: waiting }) : t('shop.doorHeld'))
     const key = JSON.stringify([state.shop.slots, state.shop.prices, state.inventory.map((i) => i.id), this.selected, this.pricing])
     if (key === this.key) return
     this.key = key

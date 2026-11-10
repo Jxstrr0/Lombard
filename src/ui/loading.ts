@@ -9,6 +9,9 @@ import { t } from '../data/strings'
 
 /** Fade length in ms; matches the transition in index.html. */
 const FADE_MS = 400
+/** Where the bar starts creeping by itself, and the most it creeps to. */
+const CREEP_FROM = 0.9
+const CREEP_TO = 0.99
 
 export interface LoadingScreen {
   /** Move the bar to 0…1. It never goes backwards. */
@@ -26,8 +29,10 @@ export function bindLoadingScreen(doc: Document = document): LoadingScreen {
   const fill = root?.querySelector<HTMLElement>('.ld-fill') ?? null
   const bar = root?.querySelector<HTMLElement>('.ld-bar') ?? null
   const pct = root?.querySelector<HTMLElement>('.ld-pct') ?? null
+  const footLabel = root?.querySelector<HTMLElement>('.ld-foot span') ?? null
   let shown = 0
   let finished = !root
+  let creep = 0
 
   const set = (f: number) => {
     shown = Math.max(shown, Math.min(1, Math.max(0, f)))
@@ -37,6 +42,16 @@ export function bindLoadingScreen(doc: Document = document): LoadingScreen {
     if (fill) fill.style.transform = `scaleX(${shown})`
     if (pct) pct.textContent = t('fmt.percent', { n: whole })
     bar?.setAttribute('aria-valuenow', String(whole))
+    // The last stretch (the canal outside, the first frames) reports no bytes, so the
+    // bar used to sit at 90% and look frozen. From there it creeps on its own, slower
+    // and slower, never reaching 100% until done().
+    if (shown >= CREEP_FROM && !creep && !finished) {
+      if (footLabel) footLabel.textContent = t('loading.last')
+      creep = window.setInterval(() => {
+        if (finished) return window.clearInterval(creep)
+        set(shown + (CREEP_TO - shown) * 0.08)
+      }, 400)
+    }
   }
 
   return {
@@ -50,6 +65,7 @@ export function bindLoadingScreen(doc: Document = document): LoadingScreen {
     done() {
       if (finished || !root) return
       finished = true
+      window.clearInterval(creep)
       set(1)
       root.classList.add('ld-out')
       root.setAttribute('aria-busy', 'false')
@@ -73,6 +89,7 @@ export function bindLoadingScreen(doc: Document = document): LoadingScreen {
         return
       }
       finished = true
+      window.clearInterval(creep)
       root.classList.add('ld-failed')
       root.setAttribute('aria-busy', 'false')
       const err = root.querySelector<HTMLElement>('.ld-error')

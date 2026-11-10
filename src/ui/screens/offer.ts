@@ -18,6 +18,8 @@ import { archetypeLabel, itemNameOf, percent, rub } from '../format'
 import type { IconName } from '../icons'
 import { dayLabel, monthlyRateLabel } from '../loanFormat'
 import { loanTerms } from '../../game/loans/loans'
+import { refTier } from '../../game/economy/upgrades'
+import { referenceRange } from '../../game/inspect/tools'
 import '../loans.css'
 
 const CHIPS = [0.25, 0.4, 0.6] as const
@@ -207,7 +209,10 @@ export class OfferScreen {
     this.root.classList.toggle('is-over', over)
     // No reference-book look yet: point at the one tool that gives a price range.
     const noRef = !s.inspect.findings.some((f) => f.tool === 'reference')
-    if (estimating) setText(this.tagNote, t(noRef ? 'offer.estimateNoteRef' : 'offer.estimateNote'))
+    // After the book has been read, keep its range on screen while you type (playtest: people forgot it).
+    const range = !noRef && s.current.item ? referenceRange(getItemDef(s.current.item.defId), refTier(s)) : null
+    if (estimating && range) setText(this.tagNote, t('offer.estimateNoteRange', { lo: rub(range.lo), hi: rub(range.hi) }))
+    else if (estimating) setText(this.tagNote, t(noRef ? 'offer.estimateNoteRef' : 'offer.estimateNote'))
     else if (over) setText(this.tagNote, t('offer.overCash', { cash: rub(s.cash) }))
     else setText(this.tagNote, t('offer.cash', { cash: rub(s.cash) }))
 

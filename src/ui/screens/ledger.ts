@@ -18,11 +18,19 @@ import { standingLines } from '../../game/reputation'
 import { heatWords } from '../../data/police'
 import { tuning } from '../../data/tuning'
 import type { GameState } from '../../game/state'
-import type { LedgerEntry } from '../../game/types'
+import type { Authenticity, LedgerEntry } from '../../game/types'
 import { createButton, el, setButtonLabel, setText } from '../components/button'
 import { count, fullDate, itemNameOf, rub, signedRub } from '../format'
 import { icons } from '../icons'
 import { LedgerLoans } from './ledgerLoans'
+
+/** What a bought piece really was, for the receipt's after-closing line. */
+const TRUTH_LABEL: Record<Authenticity, PlainKey> = {
+  genuine: 'ledger.truthGenuine',
+  fake: 'ledger.truthFake',
+  frankenstein: 'ledger.truthFrankenstein',
+  restored: 'ledger.truthRestored',
+}
 
 const KIND_LABEL: Record<LedgerEntry['kind'], PlainKey> = {
   buy: 'ledger.kind.buy',
@@ -225,6 +233,13 @@ export class LedgerScreen {
     for (const e of state.day.log) {
       const li = el('li', `log-${e.kind}`)
       li.append(el('span', 'log-kind', t(KIND_LABEL[e.kind])), el('span', 'log-text', e.text), el('span', 'log-amt', e.amount === 0 ? t('common.dash') : signedRub(e.amount)))
+      // Playtest: after closing, a buy still on the shelf tells you what it really was and what it is worth.
+      const bought = e.kind === 'buy' && e.itemId ? state.inventory.find((i) => i.id === e.itemId) : undefined
+      if (bought) {
+        const truth = el('span', `log-truth is-${bought.authenticity}`, t('ledger.truth', { what: t(TRUTH_LABEL[bought.authenticity]), value: rub(bought.trueValue) }))
+        truth.dataset.id = `truth-${bought.id}`
+        li.append(truth)
+      }
       this.log.append(li)
     }
 

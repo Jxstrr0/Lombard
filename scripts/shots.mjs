@@ -497,6 +497,11 @@ async function playEconomy(page, h) {
     await h.click('findings-stack')
     await page.waitForTimeout(200)
     await h.shot('findings-m2', 'findings expanded: acid, reference and specialist slips')
+    await h.click('findings-list')
+    await h.click('inspect-done')
+    await h.screen('offer')
+    await page.waitForTimeout(500)
+    await h.shot('offer-estimate-range', 'estimate pad after the reference book: its price range')
     break
   }
 }

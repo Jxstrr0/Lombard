@@ -1615,6 +1615,20 @@ html {
   border-bottom: 1px dotted rgba(42, 36, 28, 0.3);
 }
 
+/* The after-closing truth about a buy, under its line (ledger.ts). Words, not colour alone. */
+.log-truth {
+  grid-column: 2 / -1;
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.log-truth.is-fake,
+.log-truth.is-frankenstein {
+  font-weight: 600;
+  color: var(--ink);
+}
+
 .log-kind {
   font-size: 0.6875rem;
   font-weight: 600;

@@ -1735,6 +1735,11 @@ html {
   font-weight: 600;
 }
 
+.btn-sell.armed {
+  background: var(--ink);
+  color: var(--paper, #faf9f5);
+}
+
 .btn-sell .icon {
   width: 18px;
   height: 18px;

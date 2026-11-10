@@ -474,7 +474,8 @@ async function boot(): Promise<void> {
     // At the counter the clock runs until the visit is resolved; with the counter
     // empty it runs through the lull until the next person walks in.
     const atCounter = s.current && s.current.phase !== 'resolved'
-    const lull = !s.current && s.queue.length > 0 && !manualNext
+    // The shop sheet holds the door: arranging the floor between customers costs no time.
+    const lull = !s.current && s.queue.length > 0 && !manualNext && !ui.shopOpen
     if (atCounter || lull) store.dispatch({ type: 'time/tick', seconds: 1 })
   }, 1000)
 

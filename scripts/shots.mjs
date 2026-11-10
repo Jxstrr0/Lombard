@@ -290,6 +290,10 @@ async function playPortrait(page, h) {
   }
   const sell = page.locator('[data-id^="sell-"]:visible').first()
   if ((await sell.count()) > 0) {
+    // First tap asks "Sell for X?", the second sells.
+    await sell.click()
+    await page.waitForTimeout(150)
+    await h.shot('ledger-sell-confirm', 'ledger: dealer price shown, first tap asks to confirm')
     await sell.click()
     await page.waitForTimeout(300)
     await h.shot('ledger-sold', 'ledger after selling one item: sale in the log')

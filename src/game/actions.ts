@@ -758,6 +758,7 @@ function sellToDealer(state: GameState, itemId: string): GameState {
   const item = state.inventory.find((i) => i.id === itemId)
   if (!item) return state
   return withRng(state, (s, rng) => {
+    // Pays the quote the ledger showed (dealerQuote peeks this same draw).
     const price = dealerPrice(item, rng)
     const history = s.history.slice()
     const last = history[history.length - 1]

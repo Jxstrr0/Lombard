@@ -22,7 +22,7 @@ import type { GameState } from '../../game/state'
 import type { Finding } from '../../game/types'
 import { createButton, el, setText } from '../components/button'
 import { FindingStack } from '../components/findings'
-import { toolLabel } from '../format'
+import { shopMinutes, toolLabel } from '../format'
 import { icons, type IconName } from '../icons'
 
 export interface HotspotView {
@@ -198,7 +198,7 @@ export class InspectScreen {
         b.dataset.id = `tool-${tool}`
         b.innerHTML = `${icons[tool as IconName] ?? icons.doc}<span class="tool-name"></span><span class="tool-cost"><span class="tc-clock">${icons.clock}</span><span class="tc-lock">${icons.lock}</span><span class="tool-secs"></span><span class="tool-note"></span></span><span class="tool-uses" hidden></span>`
         b.querySelector<HTMLElement>('.tool-name')!.textContent = toolLabel(tool)
-        b.querySelector<HTMLElement>('.tool-secs')!.textContent = t('fmt.seconds', { n: tuning.inspect.toolSeconds[tool] })
+        b.querySelector<HTMLElement>('.tool-secs')!.textContent = t('fmt.shopMinutes', { n: shopMinutes(tuning.inspect.toolSeconds[tool]) })
         if (tool === 'loupe') b.classList.add('is-selected')
         b.addEventListener('click', () => {
           if (this.toolUsable.get(tool)) this.useTool(tool)
@@ -213,13 +213,14 @@ export class InspectScreen {
       b.classList.toggle('is-locked', !t.usable)
       b.setAttribute('aria-disabled', String(!t.usable))
       const note = t.note ?? ''
-      // Locked: the note replaces the time ("no kit"). Usable: "20 s · 9 left".
+      // Locked: the note replaces the time ("no kit"). Usable: "20 min · 9 left".
       const noteEl = b.querySelector<HTMLElement>('.tool-note')!
       b.querySelector<HTMLElement>('.tool-secs')!.hidden = !t.usable && !!note
       setText(noteEl, note ? (t.usable ? tr('inspect.toolNote', { note }) : note) : '')
       const secs = t.seconds ?? tuning.inspect.toolSeconds[t.tool]
-      setText(b.querySelector<HTMLElement>('.tool-secs')!, tr('fmt.seconds', { n: secs }))
-      const aria = [tr('inspect.toolAria', { tool: toolLabel(t.tool), secs })]
+      const mins = shopMinutes(secs)
+      setText(b.querySelector<HTMLElement>('.tool-secs')!, tr('fmt.shopMinutes', { n: mins }))
+      const aria = [tr('inspect.toolAria', { tool: toolLabel(t.tool), mins })]
       if (t.tool === 'loupe') aria.push(tr('inspect.toolAriaLoupe'))
       if (note) aria.push(note)
       if (!t.usable) aria.push(tr('inspect.toolAriaLocked'))
@@ -231,7 +232,7 @@ export class InspectScreen {
     }
   }
 
-  /** "Passport? 2 s" until asked, then what the book says: noted, or none shown. */
+  /** "Passport? 2 min" until asked, then what the book says: noted, or none shown. */
   private renderPassport(state: GameState): void {
     const avail = this.def ? toolAvailability(state, 'passport', this.def) : { tool: 'passport' as const, usable: false, note: '' }
     const asked = state.inspect?.findings.find((f) => f.tool === 'passport')
@@ -243,11 +244,11 @@ export class InspectScreen {
     this.passport.innerHTML = `${icons.passport}<span class="passport-label"></span>${asked ? '' : '<span class="passport-secs"></span>'}`
     this.passport.querySelector('.passport-label')!.textContent = label
     const secsEl = this.passport.querySelector('.passport-secs')
-    if (secsEl) secsEl.textContent = t('fmt.seconds', { n: secs })
+    if (secsEl) secsEl.textContent = t('fmt.shopMinutes', { n: shopMinutes(secs) })
     this.passport.classList.toggle('is-noted', asked?.tellId === PASSPORT_TELL)
     this.passport.classList.toggle('is-refused', !!asked && asked.tellId !== PASSPORT_TELL)
     this.passport.setAttribute('aria-disabled', String(!avail.usable))
-    this.passport.setAttribute('aria-label', asked ? label : t('inspect.passportAria', { secs }))
+    this.passport.setAttribute('aria-label', asked ? label : t('inspect.passportAria', { mins: shopMinutes(secs) }))
   }
 
   private useTool(tool: ToolId, hotspot?: string): void {
@@ -268,7 +269,7 @@ export class InspectScreen {
         b = el('button', 'hotspot')
         b.type = 'button'
         b.dataset.id = `hotspot-${h.id}`
-        b.setAttribute('aria-label', t('inspect.hotspotAria', { label: h.label, secs: tuning.inspect.toolSeconds.loupe }))
+        b.setAttribute('aria-label', t('inspect.hotspotAria', { label: h.label, mins: shopMinutes(tuning.inspect.toolSeconds.loupe) }))
         b.innerHTML = `<span class="hotspot-ring">${icons.loupe}</span><span class="hotspot-label"></span>`
         b.querySelector('.hotspot-label')!.textContent = h.label
         const id = h.id

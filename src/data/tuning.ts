@@ -68,6 +68,15 @@ export const tuning = {
     walkoutRepPenalty: 1,
     /** In-game seconds that pass per real second while a customer is at the counter. */
     realTimeScale: 1,
+    /**
+     * The clock while you're looking an item over or typing a price (the
+     * inspect and offer steps): stopped on the first `calmDays` days, then this
+     * share of real time. Playtest (Nov 10 2026): the line drained while a new
+     * player read the findings and worked the keypad. Haggle rounds still cost
+     * haggleRoundSeconds as before.
+     */
+    thinkingTimeScale: 0.5,
+    calmDays: 1,
     /** In-game seconds each haggle round takes. */
     haggleRoundSeconds: 6,
     /** Quiet before the first customer walks in after opening, in-game seconds [min, max]. */

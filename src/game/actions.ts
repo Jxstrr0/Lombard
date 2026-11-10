@@ -228,7 +228,10 @@ export function reducer(state: GameState, action: Action): GameState {
       if (state.day.phase !== 'open' || action.seconds <= 0) return state
       if (!c) return lullTick(state, action.seconds * tuning.day.realTimeScale)
       if (c.phase === 'resolved') return state
-      return advanceTime(state, action.seconds * tuning.day.realTimeScale)
+      // Reading the findings or typing a price runs a slower clock (none on the first days).
+      const thinking = c.phase === 'inspect' || c.phase === 'offer'
+      const scale = !thinking ? 1 : state.calendar.day <= tuning.day.calmDays ? 0 : tuning.day.thinkingTimeScale
+      return scale > 0 ? advanceTime(state, action.seconds * tuning.day.realTimeScale * scale) : state
     }
     case 'ledger/sell':
       return sellToDealer(state, action.itemId)

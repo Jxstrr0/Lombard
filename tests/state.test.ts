@@ -80,6 +80,14 @@ describe('day loop', () => {
     expect(reducer(s, { type: 'offer/make', amount: s.cash + 1, approach: 'straight' })).toBe(s)
   })
 
+  it('the clock stops while you inspect or price on day 1, and slows after', () => {
+    let s = run(startedState(3, 'c1'), { type: 'day/open' }, { type: 'counter/next' }, { type: 'counter/inspect' })
+    expect(s.current?.phase).toBe('inspect')
+    expect(reducer(s, { type: 'time/tick', seconds: 10 }).day.clock).toBe(s.day.clock)
+    s = { ...s, calendar: { ...s.calendar, day: tuning.day.calmDays + 1 } }
+    expect(reducer(s, { type: 'time/tick', seconds: 10 }).day.clock).toBe(s.day.clock + 10 * tuning.day.thinkingTimeScale)
+  })
+
   it('waiting customers walk out when patience runs out', () => {
     let s = run(startedState(3, 'c1'), { type: 'day/open' }, { type: 'counter/next' })
     const waiting = s.queue.length

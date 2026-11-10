@@ -138,7 +138,7 @@ export class Ui {
   readonly title: TitleScreen
   private _mode: 'title' | 'game' = 'title'
   private lastLayout: UiLayout | null = null
-  private build!: HTMLElement
+  private buildMore!: HTMLElement
   /** False while the current customer is still walking to the counter. */
   private arrived = true
   /** Where the ending opens when it comes into view: the paper for an ending reached in play. */
@@ -235,15 +235,17 @@ export class Ui {
     mount.appendChild(reminder)
     this.reminder = reminder
 
-    const build = el('div', 'build-number', `v${__GAME_VERSION__} · ${__BUILD_SHA__} · ${__BUILD_DATE__}`)
+    // In play only the version shows (small, top right); the title screen adds the commit, date and bake.
+    const build = el('div', 'build-number')
+    this.buildMore = el('span', 'build-more', ` · ${__BUILD_SHA__} · ${__BUILD_DATE__}`)
+    build.append(el('span', 'build-ver', `v${__GAME_VERSION__}`), this.buildMore)
     build.dataset.id = 'build'
     mount.appendChild(build)
-    this.build = build
   }
 
   /** Appends which lightmap is live (preview / full bake) to the build number. */
   setBakeInfo(text: string): void {
-    this.build.textContent = `v${__GAME_VERSION__} · ${__BUILD_SHA__} · ${__BUILD_DATE__} · ${text}`
+    this.buildMore.textContent = ` · ${__BUILD_SHA__} · ${__BUILD_DATE__} · ${text}`
   }
 
   get mode(): 'title' | 'game' {
@@ -382,6 +384,9 @@ export class Ui {
     this.reminderText.textContent =
       last === null ? t('backup.reminderNever') : t('backup.reminderLast', { age: backupAgeText(last, now) })
     this.reminder.hidden = false
+    // Sit just above the ledger's buttons, so the top of the receipt (the day's results) stays readable.
+    const foot = this.mount.querySelector<HTMLElement>('.ledger-screen .ledger-actions')
+    this.reminder.style.bottom = `${(foot?.offsetHeight ?? 0) + 10}px`
   }
 
   private hideReminder(): void {

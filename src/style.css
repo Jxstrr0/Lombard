@@ -2205,7 +2205,8 @@ html {
 .backup-reminder {
   position: fixed;
   left: 50%;
-  top: calc(12px + var(--safe-top));
+  /* bottom is set in bind.ts to clear the ledger's buttons */
+  bottom: calc(12px + var(--safe-bottom));
   z-index: 15;
   width: min(460px, calc(100vw - 24px));
   transform: translateX(-50%);
@@ -2928,6 +2929,15 @@ html {
 
 body[data-screen='title'] .build-number {
   z-index: 15;
+}
+
+/* The commit, date and bake only on the title screen; in play just the version. */
+.build-more {
+  display: none;
+}
+
+body[data-screen='title'] .build-more {
+  display: inline;
 }
 
 .title-scroll {

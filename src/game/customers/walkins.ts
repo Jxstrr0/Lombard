@@ -2,9 +2,10 @@
 import { archetypes, firstNames } from '../../data/customers/walkins'
 import { SPAWN_DEFS } from '../../data/items'
 import { tuning } from '../../data/tuning'
+import { fitClaim } from '../items/claims'
 import { generateItem, pickItemDef } from '../items/generate'
 import { pawnChance, pawnOpeningLine } from '../loans/loans'
-import { pickLook } from './look'
+import { genderOf, pickLook } from './look'
 import type { Rng } from '../rng'
 import type { QueuedVisit, Temperament, WalkIn } from '../types'
 
@@ -37,7 +38,10 @@ export function generateDayQueue(rng: Rng, count: number, nextId: (prefix: strin
   for (let i = 0; i < count; i++) {
     const customer = generateWalkIn(rng, nextId('c'), queue[queue.length - 1]?.customer.portraitKey)
     const def = pickItemDef(SPAWN_DEFS, rng)
-    const item = generateItem(def, rng, nextId('i'))
+    const generated = generateItem(def, rng, nextId('i'))
+    // A claim like "from my first husband" only fits some people; swap it from a fork so no other draw moves.
+    const story = fitClaim(def, generated.story, genderOf(customer.name), rng.fork(`claim:${generated.id}`))
+    const item = story === generated.story ? generated : { ...generated, story }
     // People further back in the line have waited less when you reach them; give them more patience.
     const patience = Math.round(rng.range(pMin, pMax) + i * 25)
     const visitId = nextId('v')

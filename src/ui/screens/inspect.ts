@@ -282,11 +282,49 @@ export class InspectScreen {
       b.classList.toggle('is-done', this.examined.has(h.id))
       b.classList.toggle('label-left', h.x > window.innerWidth * 0.62)
     }
+    this.untangleLabels(list)
     for (const [id, b] of this.hotspotEls) {
       if (!seen.has(id)) {
         b.remove()
         this.hotspotEls.delete(id)
       }
+    }
+  }
+
+  /**
+   * Two markers close together (the Strela's dial and pushers) would print their
+   * labels on top of each other: flip a clashing label to the other side, or
+   * failing that drop it a line. Widths are measured once per label.
+   */
+  private untangleLabels(list: HotspotView[]): void {
+    const boxes: { l: number; r: number; t: number; b: number }[] = []
+    const visible = list.filter((h) => h.visible).sort((a, b) => a.y - b.y)
+    for (const h of visible) {
+      const b = this.hotspotEls.get(h.id)!
+      const label = b.querySelector<HTMLElement>('.hotspot-label')!
+      if (!label.dataset.w) label.dataset.w = String(label.offsetWidth || 60)
+      const w = Number(label.dataset.w)
+      const box = (left: boolean, dy: number) => {
+        const t = h.y - 10 + dy
+        return left ? { l: h.x - 18 - w, r: h.x - 18, t, b: t + 18 } : { l: h.x + 18, r: h.x + 18 + w, t, b: t + 18 }
+      }
+      const clash = (c: { l: number; r: number; t: number; b: number }) => boxes.some((o) => c.l < o.r && c.r > o.l && c.t < o.b && c.b > o.t)
+      let left = b.classList.contains('label-left')
+      let dy = 0
+      let c = box(left, dy)
+      if (clash(c)) {
+        const flipped = box(!left, 0)
+        if (!clash(flipped) && (left ? flipped.r < window.innerWidth : flipped.l > 0)) {
+          left = !left
+          c = flipped
+        } else {
+          for (dy = 20; dy <= 60 && clash(box(left, dy)); dy += 20);
+          c = box(left, dy)
+        }
+      }
+      b.classList.toggle('label-left', left)
+      label.style.transform = dy ? `translateY(${dy}px)` : ''
+      boxes.push(c)
     }
   }
 

@@ -718,5 +718,176 @@
         {"id": "base", "label": "Base", "position": [0.0, -0.04, 0.0]}
       ]
     }
+  },
+  {
+    "id": "calculator_priboy_pm61",
+    "category": "electronics",
+    "name": "Priboy PM-61 programmable calculator",
+    "brand": "Priboy",
+    "era": "1986",
+    "baseValue": {
+      "min": 1200,
+      "max": 2600
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 250,
+      "tolerance": 10
+    },
+    "magnetic": true,
+    "rarity": 0.1,
+    "fakeChance": 0.2,
+    "tells": [
+      {
+        "id": "display",
+        "tool": "loupe",
+        "finding": "Twelve green digits glow behind the tinted window, every segment even, no dim corners.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "display"
+      },
+      {
+        "id": "keys",
+        "tool": "loupe",
+        "finding": "Thirty keys with their second functions printed above in yellow and blue. The legends are worn, never repainted.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "keys"
+      },
+      {
+        "id": "label",
+        "tool": "loupe",
+        "finding": "The back label gives ПРИБОЙ ПМ-61, a serial, 1986 and the price: 85 roubles.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "label"
+      },
+      {
+        "id": "case",
+        "tool": "loupe",
+        "finding": "The case corners are rubbed pale; the battery door still clicks shut on its own catch.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "label"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "A quarter of a kilo with its three cells in.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_springs",
+        "tool": "magnet",
+        "finding": "The magnet finds the battery springs through the door and nothing else.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "label"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "dead_digits",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.4,
+        "weight": 2,
+        "tells": [
+          {
+            "id": "display",
+            "tool": "loupe",
+            "finding": "Three digits on the left never light, and the rest flicker when the case is squeezed.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "display"
+          },
+          {
+            "id": "label",
+            "tool": "loupe",
+            "finding": "The battery springs are green with old leak, and the board behind them has been scraped.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "label"
+          }
+        ]
+      },
+      {
+        "id": "mixed_keys",
+        "kind": "restored",
+        "valueMultiplier": 0.55,
+        "weight": 1,
+        "tells": [
+          {
+            "id": "keys",
+            "tool": "loupe",
+            "finding": "Six keys are a whiter plastic with a thinner font: borrowed from a simpler model, in the wrong places.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "keys"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "electronics",
+      "soviet",
+      "retro"
+    ],
+    "claims": [
+      "You could land on the Moon with it. There was a program in a magazine. I crashed every time.",
+      "My husband was an engineer. This was most of his salary and all of his evenings.",
+      "It remembers ninety-eight steps. That is more than I do."
+    ],
+    "model": {
+      "glb": "calculator_priboy_pm61.glb",
+      "placeholder": "box",
+      "color": "#2b2a28",
+      "scale": 1,
+      "rest": "flat",
+      "size": [
+        0.078,
+        0.167,
+        0.034
+      ],
+      "inspectDistance": 0.4,
+      "hotspots": [
+        {
+          "id": "display",
+          "label": "Display",
+          "position": [
+            0.0,
+            0.058,
+            0.014
+          ]
+        },
+        {
+          "id": "keys",
+          "label": "Keys",
+          "position": [
+            0.0,
+            -0.02,
+            0.012
+          ]
+        },
+        {
+          "id": "label",
+          "label": "Back label",
+          "position": [
+            0.0,
+            0.01,
+            -0.016
+          ]
+        }
+      ]
+    }
   }
 ]

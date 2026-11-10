@@ -927,5 +927,9 @@ def build(it: lib.Item) -> None:
 
         fn = box_c.BUILDERS.get(it.id)
     if fn is None:
+        from kinds import box_d  # 1.4: binoculars, barometer, calculator
+
+        fn = box_d.BUILDERS.get(it.id)
+    if fn is None:
         raise KeyError(f"box.py has no builder for {it.id}")
     fn(it)

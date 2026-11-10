@@ -664,5 +664,192 @@
         {"id": "nut", "label": "Nut", "position": [0.0125, 0, -0.0095]}
       ]
     }
+  },
+  {
+    "id": "binoculars_army_8x30",
+    "category": "militaria",
+    "name": "Army field binoculars 8×30",
+    "era": "1978",
+    "baseValue": {
+      "min": 3500,
+      "max": 6000
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 610,
+      "tolerance": 22
+    },
+    "magnetic": false,
+    "rarity": 0.28,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "plate",
+        "tool": "loupe",
+        "finding": "The prism cover is engraved БПЦ 8×30, a factory mark, a serial starting 78 and a tiny hammer and sickle.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "plate"
+      },
+      {
+        "id": "objective",
+        "tool": "loupe",
+        "finding": "The front lenses carry an even blue-violet coating. No haze behind them, one speck of dust.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "objective"
+      },
+      {
+        "id": "eyepiece",
+        "tool": "loupe",
+        "finding": "Through the right eyepiece a fine rangefinder grid floats in the view, sharp to the edge.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.45,
+        "hotspot": "eyepiece"
+      },
+      {
+        "id": "body",
+        "tool": "loupe",
+        "finding": "The black grain covering is worn smooth at the thumbs; the paint on the bridge is chipped to bare metal.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "plate"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Six hundred grams: cast body, glass prisms, nothing hollow.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_screws",
+        "tool": "magnet",
+        "finding": "The body ignores the magnet. Only the small cover screws answer it.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "plate"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "market_copy",
+        "kind": "fake",
+        "valueMultiplier": 0.12,
+        "weight": 2,
+        "weightFactor": 0.62,
+        "tells": [
+          {
+            "id": "plate",
+            "tool": "loupe",
+            "finding": "The cover is printed, not engraved: БПЦ 8×30 in a modern font, no serial, the ink lifting at one corner.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "plate"
+          },
+          {
+            "id": "objective",
+            "tool": "loupe",
+            "finding": "The front lenses glare ruby red, a coating no army ever ordered.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3,
+            "hotspot": "objective"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Light. The body rings like plastic when tapped.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          }
+        ]
+      },
+      {
+        "id": "knocked",
+        "kind": "restored",
+        "valueMultiplier": 0.45,
+        "weight": 1.5,
+        "tells": [
+          {
+            "id": "eyepiece",
+            "tool": "loupe",
+            "finding": "The two halves do not agree: a far rooftop shows twice, one above the other.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "eyepiece"
+          },
+          {
+            "id": "body",
+            "tool": "loupe",
+            "finding": "A cover screw is chewed and the seal under it is fresh black paint: it has been opened.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "plate"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "militaria",
+      "soviet"
+    ],
+    "claims": [
+      "My father brought them home from the service. He watched the neighbours with them for thirty years.",
+      "Army issue, eight times. You can read a number plate from the bridge.",
+      "They were for hunting. I never hunted. I looked at ducks and felt sorry for them."
+    ],
+    "model": {
+      "glb": "binoculars_army_8x30.glb",
+      "placeholder": "box",
+      "color": "#1c1c1e",
+      "scale": 1,
+      "rest": "flat",
+      "size": [
+        0.18,
+        0.118,
+        0.051
+      ],
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {
+          "id": "plate",
+          "label": "Prism cover",
+          "position": [
+            0.064,
+            -0.0257,
+            0.0
+          ]
+        },
+        {
+          "id": "objective",
+          "label": "Front lens",
+          "position": [
+            0.058,
+            0.0552,
+            0.0
+          ]
+        },
+        {
+          "id": "eyepiece",
+          "label": "Eyepiece",
+          "position": [
+            0.032,
+            -0.0547,
+            0.0
+          ]
+        }
+      ]
+    }
   }
 ]

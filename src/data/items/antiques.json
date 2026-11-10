@@ -1867,5 +1867,203 @@
         }
       ]
     }
+  },
+  {
+    "id": "barometer_mostpribor_ship",
+    "category": "antiques",
+    "name": "Mostpribor ship’s aneroid barometer",
+    "brand": "Mostpribor",
+    "era": "1960s",
+    "baseValue": {
+      "min": 4000,
+      "max": 7500
+    },
+    "valueCurve": "collector",
+    "weightGrams": {
+      "expected": 820,
+      "tolerance": 30
+    },
+    "magnetic": false,
+    "rarity": 0.3,
+    "fakeChance": 0.3,
+    "tells": [
+      {
+        "id": "dial",
+        "tool": "loupe",
+        "finding": "A silvered dial in millimetres of mercury, 700 to 800, the weather words engraved and filled with black wax.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.35,
+        "hotspot": "dial"
+      },
+      {
+        "id": "needle",
+        "tool": "loupe",
+        "finding": "The blued needle creeps when the case is tapped. A brass marker on the glass sets by its own knob.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "needle"
+      },
+      {
+        "id": "back",
+        "tool": "loupe",
+        "finding": "The back is stamped МОСТПРИБОР, a serial and 1964. A small hole gives a screwdriver the adjusting screw.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.4,
+        "hotspot": "back"
+      },
+      {
+        "id": "case",
+        "tool": "loupe",
+        "finding": "The brass has gone brown where hands never reached; the bevelled glass has one flea-bite chip.",
+        "reveals": "condition",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "dial"
+      },
+      {
+        "id": "heft",
+        "tool": "scale",
+        "finding": "Over eight hundred grams of turned brass.",
+        "reveals": "authenticity",
+        "polarity": "positive",
+        "difficulty": 0.3
+      },
+      {
+        "id": "magnet_none",
+        "tool": "magnet",
+        "finding": "The case ignores the magnet. The needle does not even twitch.",
+        "reveals": "authenticity",
+        "polarity": "neutral",
+        "difficulty": 0.3,
+        "hotspot": "back"
+      }
+    ],
+    "fakeProfiles": [
+      {
+        "id": "souvenir",
+        "kind": "fake",
+        "valueMultiplier": 0.1,
+        "weight": 2,
+        "weightFactor": 0.45,
+        "magnetic": true,
+        "tells": [
+          {
+            "id": "dial",
+            "tool": "loupe",
+            "finding": "The dial is printed paper under the glass, the dots of the print visible, one edge curling.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "dial"
+          },
+          {
+            "id": "back",
+            "tool": "loupe",
+            "finding": "The back is a pressed tin plate with no stamp at all and a keyhole slot for a nail.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.35,
+            "hotspot": "back"
+          },
+          {
+            "id": "heft",
+            "tool": "scale",
+            "finding": "Less than half the weight a brass case should be.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.3
+          },
+          {
+            "id": "magnet_none",
+            "tool": "magnet",
+            "finding": "The magnet takes hold of the case: lacquered steel under the brass colour.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.25,
+            "hotspot": "back"
+          }
+        ]
+      },
+      {
+        "id": "dead_capsule",
+        "kind": "frankenstein",
+        "valueMultiplier": 0.4,
+        "weight": 1.5,
+        "tells": [
+          {
+            "id": "needle",
+            "tool": "loupe",
+            "finding": "Tapping the case does nothing. The needle sits at 760 as if painted there.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.4,
+            "hotspot": "needle"
+          },
+          {
+            "id": "back",
+            "tool": "loupe",
+            "finding": "The adjusting screw is wound to its stop and its slot is torn: someone chased a needle that had stopped.",
+            "reveals": "authenticity",
+            "polarity": "negative",
+            "difficulty": 0.45,
+            "hotspot": "back"
+          }
+        ]
+      }
+    ],
+    "demandTags": [
+      "antiques",
+      "soviet"
+    ],
+    "claims": [
+      "From a river tug. The captain took it home when they scrapped her. Then he was scrapped.",
+      "It says rain. It has said rain since 1991. It has mostly been right.",
+      "Brass, all of it. Hold it. That is what things used to weigh."
+    ],
+    "model": {
+      "glb": "barometer_mostpribor_ship.glb",
+      "placeholder": "box",
+      "color": "#b8893a",
+      "scale": 1,
+      "rest": "flat",
+      "size": [
+        0.14,
+        0.166,
+        0.056
+      ],
+      "inspectDistance": 0.42,
+      "hotspots": [
+        {
+          "id": "dial",
+          "label": "Dial",
+          "position": [
+            0.03,
+            -0.04,
+            0.012
+          ]
+        },
+        {
+          "id": "needle",
+          "label": "Needle and marker",
+          "position": [
+            0.0,
+            -0.013,
+            0.027
+          ]
+        },
+        {
+          "id": "back",
+          "label": "Back",
+          "position": [
+            0.0,
+            -0.013,
+            -0.027
+          ]
+        }
+      ]
+    }
   }
 ]

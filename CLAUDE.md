@@ -46,6 +46,7 @@ Design every screen portrait-first. Landscape and desktop adapt from the portrai
 - The game version has four numbers, Major.Minor.Patch.Build (for example `0.1.0.0`), the same scheme as every Longlight game. It lives in the `VERSION` file at the repo root; `vite.config.ts` reads it as `__GAME_VERSION__` and the build fails if it isn't four numbers.
 - It shows in the corner build number (`v0.1.0.0 · <sha> · <date>`) and in the Settings footer. The short commit hash and date stay so a fresh deploy is easy to spot.
 - Bump rule: **Major** = overhaul, **Minor** = a milestone or feature batch, **Patch** = a fix, **Build** = a republish with no gameplay change. Bump `VERSION` in the PR that makes the change.
+- `.github/workflows/publish-release.yml` publishes a GitHub Release (`v<version>`) whenever `VERSION` changes on `main`; the studio site reads that release for this game's version number and "what's new" line. Free, no keys, and it doesn't touch the deploy.
 - `package.json` keeps a three-part semver (`0.1.0`, npm requires it); it isn't shown to players and doesn't need to track `VERSION`.
 
 ## Branding

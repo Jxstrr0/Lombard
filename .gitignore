@@ -12,3 +12,8 @@ bake/out/*
 !bake/out/preview-*.jpg
 __pycache__/
 art/out/
+
+# Key files never go in the repo
+.env
+.env.*
+!.env.example

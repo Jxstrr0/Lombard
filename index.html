@@ -177,7 +177,7 @@
           'error',
           function (e) {
             var t = e.target
-            if (!t || t.tagName !== 'SCRIPT' || !document.getElementById('loading')) return
+            if (!t || t.tagName !== 'SCRIPT' || t.hasAttribute('data-cf-beacon') || !document.getElementById('loading')) return
             root.classList.add('ld-failed')
             root.querySelector('.ld-error-text').textContent = 'Part of the game did not download. Check the connection and reload.'
             root.querySelector('.ld-error').hidden = false
@@ -189,5 +189,7 @@
     <div id="scene" aria-hidden="true"></div>
     <main id="app"></main>
     <script type="module" src="/src/main.ts"></script>
+    <!-- Cloudflare Web Analytics: cookieless visit counts for Longlight (no personal data). -->
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "4cba16164f194b79a8223281c676f40a"}'></script>
   </body>
 </html>

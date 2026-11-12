@@ -50,7 +50,10 @@ const html = await readFile(path.join(DIST, 'index.html'), 'utf8')
 // vite.config.ts uses a relative base ('./'), so index.html links read ./assets/...;
 // strip that (or an old absolute /Lombard/ prefix) to get the path inside dist/.
 const local = (u) => u.replace(/^(?:\.\/|\/Lombard\/)/, '')
-const eager = [...html.matchAll(/<(?:script[^>]*\ssrc|link[^>]*\shref)="([^"]+\.(?:js|css))"/g)].map((m) => path.join(DIST, local(m[1])))
+// Outside scripts (the Cloudflare Web Analytics beacon) aren't part of the bundle.
+const eager = [...html.matchAll(/<(?:script[^>]*\ssrc|link[^>]*\shref)="([^"]+\.(?:js|css))"/g)]
+  .filter((m) => !/^https?:/.test(m[1]))
+  .map((m) => path.join(DIST, local(m[1])))
 const entry = html.match(/<script type="module"[^>]*\ssrc="([^"]+)"/)?.[1]
 if (!entry || eager.length === 0) throw new Error('check-bundle: could not read the eager files from dist/index.html')
 

@@ -82,7 +82,7 @@ In-game UI should feel like the shop (paper tags, receipt fonts, worn plastic), 
 
 ## Things not to do
 
-- Do not add a backend, analytics, ads, payments, accounts, or external API calls. Lombard is free forever.
+- Do not add a backend, ads, payments, accounts, or external API calls. Lombard is free forever. The one exception is Cloudflare Web Analytics (Kelbo, Nov 12, 2026): the cookieless beacon at the end of `index.html` counts visits and load speed. Add no other analytics.
 - Do not introduce a UI framework.
 - Do not use real-time shadows or post-processing on the phone path without a perf measurement showing it's affordable.
 - Do not invent item values or probabilities inline; add them to data/tuning files.

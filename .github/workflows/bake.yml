@@ -46,7 +46,7 @@ jobs:
     # A full bake ran just over 2 h (lightmap, props, two preview renders).
     timeout-minutes: 180
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Decide whether to bake
         id: plan
@@ -66,7 +66,7 @@ jobs:
       - name: Cache Blender
         if: steps.plan.outputs.run == 'true'
         id: blender-cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/blender
           key: blender-${{ env.BLENDER_VERSION }}-linux-x64
@@ -84,7 +84,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends libxi6 libxxf86vm1 libxfixes3 libxrender1 libxkbcommon0 libsm6 libice6 libgl1 libegl1 libx11-6
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         if: steps.plan.outputs.run == 'true'
         with:
           node-version: 22
@@ -106,7 +106,7 @@ jobs:
 
       - name: Upload bake output
         if: steps.plan.outputs.run == 'true'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: bake-${{ steps.plan.outputs.quality }}
           path: |

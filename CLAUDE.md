@@ -79,6 +79,7 @@ In-game UI should feel like the shop (paper tags, receipt fonts, worn plastic), 
 - Kelbo reviews on a phone via GitHub Pages and does not run anything locally. Every change must be reviewable from the deployed build.
 - Before pushing, run `npm run test`, `npm run lint`, and `npm run shots`, and look at the screenshots yourself. Don't push a build you haven't seen.
 - The build number (short commit hash + date) is shown small in a screen corner so Kelbo can tell a fresh deploy from a cached one.
+- **Merging on green is allowed** (Kelbo, 2026-11-18). Work on a branch and open a pull request into `main`; once the `deploy` workflow's check on the pull request is green and you have looked at the screenshots, merge it yourself without asking (squash is fine), then check the deploy to Pages went green and the live build number changed.
 
 ## Things not to do
 

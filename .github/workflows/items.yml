@@ -28,6 +28,9 @@ env:
   # Same pin as bake.yml (and the same cache).
   BLENDER_VERSION: '4.5.15'
   BLENDER_SERIES: '4.5'
+  # Blender's own published checksum for this exact file (download.blender.org/release/Blender4.5/blender-4.5.15.sha256).
+  # The download is refused unless it matches. Change it together with BLENDER_VERSION.
+  BLENDER_SHA256: 0d2b8bb2efe97e6c8eb57de6b7322f8800e1984e3125b60decca5f6771e4773e
 
 jobs:
   items:
@@ -54,8 +57,10 @@ jobs:
         if: steps.blender-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p ~/blender
-          curl -fsSL --retry 3 "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
-            | tar -xJ -C ~/blender --strip-components=1
+          curl -fsSL --retry 3 -o /tmp/blender.tar.xz "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          echo "${BLENDER_SHA256}  /tmp/blender.tar.xz" | sha256sum -c -
+          tar -xJf /tmp/blender.tar.xz -C ~/blender --strip-components=1
+          rm /tmp/blender.tar.xz
 
       - name: Blender system libraries
         run: |
@@ -68,7 +73,7 @@ jobs:
           cache: npm
 
       - name: npm ci
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build models
         # --opted-in: only defs that set model.glb. A def can use a kind that has a

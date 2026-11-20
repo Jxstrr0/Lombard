@@ -2259,6 +2259,27 @@ html {
 }
 
 /* Quiet backup reminder over the ledger (between days); dismissible, never over play. */
+/* Two tabs: this career was saved in another tab. Over everything; one button. */
+.elsewhere-overlay {
+  z-index: 40;
+}
+
+.elsewhere {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 18px;
+}
+
+.elsewhere h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.elsewhere .btn {
+  min-height: 48px;
+}
+
 .backup-reminder {
   position: fixed;
   left: 50%;

@@ -66,7 +66,7 @@ import { Store } from './game/store'
 import { OrbitGestures } from './input/gestures'
 import { bindKeyboard } from './input/keyboard'
 import { LookGestures } from './input/look'
-import { deleteSlot, flushSaves, listSlots, loadSlot, onCareerSaved, putInSlot, saveCareer } from './persist/autosave'
+import { deleteSlot, flushSaves, listSlots, loadSlot, onCareerSaved, onSavedElsewhere, putInSlot, savedElsewhere, saveCareer } from './persist/autosave'
 import { mostRecentSlot, type SlotNo } from './game/save/slots'
 import { keepStorage } from './persist/safety'
 import { CameraRig } from './render/camera'
@@ -208,6 +208,8 @@ async function boot(): Promise<void> {
   const seedParam = seedGiven ? seedRaw : 1
   /** The slot being played; null on the title screen and for a review career (nothing is saved then). */
   let activeSlot: SlotNo | null = null
+  /** Another tab saved the career being played: this tab's copy is old, and nothing here is saved until the newer save is loaded. */
+  let movedOn = false
   let initial: GameState | null = null
   let slots = review ? [] : await listSlots()
   loading.progress(LOAD_SHARE.slots)
@@ -357,6 +359,7 @@ async function boot(): Promise<void> {
   }
   const start = (state: GameState, slot: SlotNo) => {
     activeSlot = slot
+    movedOn = false
     enter(state) // store/replace autosaves it into the slot (and makes it the most recent)
     ui.showGame()
   }
@@ -376,9 +379,37 @@ async function boot(): Promise<void> {
     void keepStorage()
     start(stored ?? state, slot)
   }
+  // --- two tabs: never write this tab's older copy over a newer save ---------------
+  const loadNewer = async (slot: SlotNo) => {
+    const s = await loadSlot(slot)
+    if (s) return start(s, slot)
+    // The slot is empty now (deleted in the other tab): back to the title screen.
+    activeSlot = null
+    movedOn = false
+    slots = await listSlots()
+    ui.showTitle(slots)
+  }
+  const savedInAnotherTab = (careerId: string) => {
+    const slot = activeSlot
+    if (!slot || movedOn || ui.mode !== 'game' || store.get().meta.careerId !== careerId) return
+    movedOn = true
+    ui.showSavedElsewhere(slot, () => void loadNewer(slot))
+  }
+  // An autosave was refused because the stored career is newer than this tab's copy.
+  onSavedElsewhere(savedInAnotherTab)
+  // Coming back to this tab: look before the player plays on from an old copy.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden || !activeSlot || movedOn) return
+    const careerId = store.get().meta.careerId
+    void savedElsewhere(careerId).then((moved) => {
+      if (moved) savedInAnotherTab(careerId)
+    })
+  })
+
   const mainMenu = async () => {
     const slot = activeSlot
     activeSlot = null
+    movedOn = false
     if (slot) {
       saveCareer(store.get(), slot).catch(() => {})
       await flushSaves()
@@ -435,7 +466,7 @@ async function boot(): Promise<void> {
     if (action.type === 'inspect/useTool' && (state.inspect?.findings.length ?? 0) > (prev.inspect?.findings.length ?? 0)) {
       stage.playTool(action.tool, state)
     }
-    if (activeSlot && (action.type === 'store/replace' || AUTOSAVE_ACTIONS.has(action.type))) autosave(state, activeSlot)
+    if (activeSlot && !movedOn && (action.type === 'store/replace' || AUTOSAVE_ACTIONS.has(action.type))) autosave(state, activeSlot)
   })
 
   resize()
@@ -468,7 +499,7 @@ async function boot(): Promise<void> {
 
   // --- time pressure: one in-game tick per real second at the counter --------
   window.setInterval(() => {
-    if (document.hidden || ui.mode !== 'game') return
+    if (document.hidden || ui.mode !== 'game' || movedOn) return
     const s = store.get()
     if (s.day.phase !== 'open') return
     // At the counter the clock runs until the visit is resolved; with the counter

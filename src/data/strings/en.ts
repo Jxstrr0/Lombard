@@ -84,6 +84,9 @@ export const en = {
   // --- buttons shared by screens (ui/bind.ts)
   'shop.button': 'Shop',
   'shop.buttonAria': 'Shop floor: display and price tags',
+  'elsewhere.title': 'This shop moved on in another tab',
+  'elsewhere.text': 'Slot {slot} was played and saved in another tab or window after this one opened. To keep that progress safe, this tab has stopped saving.',
+  'elsewhere.load': 'Load the newer save',
   'backup.later': 'Not now',
   'backup.now': 'Back up',
   'backup.reminderNever': 'No backup of this shop yet. If the phone runs low on space, the browser can clear saves. A backup file keeps it safe.',

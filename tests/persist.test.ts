@@ -3,7 +3,7 @@ import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { openDB } from 'idb'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { closeAutosave, deleteCareer, deleteSlot, flushSaves, listCareers, listSlots, loadLatestCareer, loadSlot, putInSlot, saveCareer } from '../src/persist/autosave'
+import { closeAutosave, deleteCareer, deleteSlot, flushSaves, listCareers, listSlots, loadLatestCareer, loadSlot, onSavedElsewhere, putInSlot, savedElsewhere, saveCareer } from '../src/persist/autosave'
 import { reducer } from '../src/game/actions'
 import { CURRENT_VERSION } from '../src/game/save/migrations'
 import { type GameState } from '../src/game/state'
@@ -22,6 +22,7 @@ beforeEach(() => {
 })
 
 afterEach(async () => {
+  onSavedElsewhere(null)
   await closeAutosave()
   vi.restoreAllMocks()
 })
@@ -271,6 +272,94 @@ describe('career slots (M4)', () => {
     await deleteSlot(1)
     await flushSaves()
     expect((await listSlots())[0]!.career).toBeNull()
+  })
+})
+
+describe('two tabs (1.4.7.0)', () => {
+  /** What another tab's autosave leaves behind: the same career, saved again with its own savedAt. */
+  const otherTabSaves = (id: string, cash: number, savedAt: number, slot = 1) =>
+    putRaw({ careerId: id, savedAt, version: CURRENT_VERSION, slot, state: career(id, 1, cash) })
+
+  it("an autosave never lands on top of another tab's newer save, and main is told", async () => {
+    await putInSlot(career('shop', 1, 100), 1)
+    expect(await loadSlot(1)).not.toBeNull()
+    const told: string[] = []
+    onSavedElsewhere((id) => told.push(id))
+    await otherTabSaves('shop', 900, Date.now() + 60_000)
+    expect(await savedElsewhere('shop')).toBe(true)
+    await saveCareer(career('shop', 1, 150), 1)
+    expect((await listSlots())[0]!.career).toMatchObject({ careerId: 'shop', cash: 900 })
+    expect(told).toEqual(['shop'])
+    // Still refused on the next try: this tab's copy stays old until it loads the newer save.
+    await saveCareer(career('shop', 1, 160), 1)
+    expect((await listSlots())[0]!.career?.cash).toBe(900)
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('loading the newer save lets this tab save again', async () => {
+    await putInSlot(career('shop', 1, 100), 1)
+    await otherTabSaves('shop', 900, Date.now() + 60_000)
+    await saveCareer(career('shop', 1, 150), 1)
+    expect((await loadSlot(1))?.cash).toBe(900)
+    expect(await savedElsewhere('shop')).toBe(false)
+    await saveCareer(career('shop', 1, 950), 1)
+    expect((await listSlots())[0]!.career?.cash).toBe(950)
+  })
+
+  it("is caught even when the other tab's clock is behind", async () => {
+    await putInSlot(career('shop', 1, 100), 1)
+    await otherTabSaves('shop', 900, 1000) // a savedAt from 1970
+    expect(await savedElsewhere('shop')).toBe(true)
+    await saveCareer(career('shop', 1, 150), 1)
+    expect((await listSlots())[0]!.career?.cash).toBe(900)
+  })
+
+  it("this tab's own saves, and the slot list's rewrite, never trip it", async () => {
+    const told: string[] = []
+    onSavedElsewhere((id) => told.push(id))
+    await putInSlot(career('shop', 1, 100), 2)
+    await saveCareer(career('shop', 1, 110))
+    await listSlots()
+    await saveCareer(career('shop', 1, 120))
+    expect(await savedElsewhere('shop')).toBe(false)
+    expect((await listSlots())[1]!.career?.cash).toBe(120)
+    expect(told).toEqual([])
+  })
+
+  it('a career this tab never read saves as before', async () => {
+    await otherTabSaves('shop', 900, Date.now() - 60_000)
+    expect(await savedElsewhere('shop')).toBe(false)
+    await saveCareer(career('shop', 1, 150), 1)
+    expect((await listSlots())[0]!.career?.cash).toBe(150)
+  })
+
+  it('a record that is gone (deleted elsewhere, or cleared by the browser) can still be saved', async () => {
+    await putInSlot(career('shop', 1, 100), 1)
+    const db = await openDB('lombard', 1)
+    await db.delete('careers', 'shop')
+    db.close()
+    expect(await savedElsewhere('shop')).toBe(false)
+    await saveCareer(career('shop', 1, 150), 1)
+    expect((await listSlots())[0]!.career?.cash).toBe(150)
+  })
+
+  it("a deliberate replace (new career, loaded save code) still goes over another tab's save", async () => {
+    await putInSlot(career('shop', 1, 100), 1)
+    await otherTabSaves('shop', 900, Date.now() + 60_000)
+    await putInSlot(career('shop', 1, 5), 1)
+    expect((await listSlots())[0]!.career?.cash).toBe(5)
+    await saveCareer(career('shop', 1, 6), 1)
+    expect((await listSlots())[0]!.career?.cash).toBe(6)
+  })
+
+  it('a failing hook never breaks saving', async () => {
+    await putInSlot(career('shop', 1, 100), 1)
+    onSavedElsewhere(() => {
+      throw new Error('boom')
+    })
+    await otherTabSaves('shop', 900, Date.now() + 60_000)
+    await expect(saveCareer(career('shop', 1, 150), 1)).resolves.toBeUndefined()
+    expect((await listSlots())[0]!.career?.cash).toBe(900)
   })
 })
 

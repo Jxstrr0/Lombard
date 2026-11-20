@@ -12,6 +12,12 @@
  * game/save/slots.ts `assignSlots`) and writes the slot back. The object store
  * and its key are unchanged, so no database version bump is needed and an
  * older build can still read every record.
+ *
+ * Two tabs (1.4.7.0): this tab remembers the `savedAt` of each career it last
+ * read or wrote (`seen`). An autosave that finds a different `savedAt` in the
+ * database means another tab saved the career since; the write is refused, so
+ * this tab's older copy never lands on top of the newer one, and
+ * `onSavedElsewhere` tells main, which offers to load the newer save.
  */
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 import { migrate } from '../game/save/migrations'
@@ -85,6 +91,7 @@ function getDb(): Promise<IDBPDatabase<LombardDB>> {
 export async function closeAutosave(): Promise<void> {
   const pending = dbPromise
   dbPromise = null
+  seen.clear()
   if (!pending) return
   try {
     ;(await pending).close()
@@ -95,6 +102,32 @@ export async function closeAutosave(): Promise<void> {
 
 function warn(what: string, err: unknown): void {
   console.warn(`Lombard: autosave ${what} failed`, err)
+}
+
+// --- two tabs -------------------------------------------------------------------
+
+/** The `savedAt` this tab last read or wrote for each career. Equality is the test, so a wrong clock can't hide a change. */
+const seen = new Map<string, number>()
+let elsewhere: ((careerId: string) => void) | null = null
+
+/** Run `fn` when an autosave is refused because another tab saved that career after this tab last read it. */
+export function onSavedElsewhere(fn: ((careerId: string) => void) | null): void {
+  elsewhere = fn
+}
+
+/** True when the stored career is not the copy this tab last read or wrote (another tab saved it since). Never throws. */
+export async function savedElsewhere(careerId: string): Promise<boolean> {
+  const mine = seen.get(careerId)
+  if (mine === undefined) return false
+  try {
+    await flushSaves()
+    const rec = await (await getDb()).get(STORE, careerId)
+    // A record that is gone (deleted in another tab, or cleared by the browser) is not "newer": a save here is still wanted.
+    return rec !== undefined && rec.savedAt !== seen.get(careerId)
+  } catch (err) {
+    warn('check', err)
+    return false
+  }
 }
 
 // --- save (coalesced) ---------------------------------------------------------
@@ -119,15 +152,34 @@ function makeRecord(state: GameState, slot: SlotNo | undefined): CareerRecord {
 }
 
 async function writeOne(state: GameState, slot: SlotNo | undefined): Promise<void> {
+  const careerId = state.meta.careerId
+  let refused = false
   try {
     const db = await getDb()
     const tx = db.transaction(STORE, 'readwrite')
     // Keep the record's slot unless told otherwise.
-    const existing = await tx.store.get(state.meta.careerId)
-    await tx.store.put(makeRecord(state, slot ?? (isSlotNo(existing?.slot) ? existing.slot : undefined)))
-    await tx.done
+    const existing = await tx.store.get(careerId)
+    const mine = seen.get(careerId)
+    if (existing && mine !== undefined && existing.savedAt !== mine) {
+      // Another tab saved this career after this tab last read it: leave the newer save alone.
+      refused = true
+      await tx.done
+    } else {
+      const rec = makeRecord(state, slot ?? (isSlotNo(existing?.slot) ? existing.slot : undefined))
+      await tx.store.put(rec)
+      await tx.done
+      seen.set(careerId, rec.savedAt)
+    }
   } catch (err) {
     warn('save', err)
+    return
+  }
+  if (refused) {
+    try {
+      elsewhere?.(careerId)
+    } catch (err) {
+      console.warn('Lombard: saved-elsewhere hook failed', err)
+    }
     return
   }
   try {
@@ -192,7 +244,10 @@ export async function loadLatestCareer(): Promise<GameState | null> {
     let cursor = await db.transaction(STORE).store.index('savedAt').openCursor(null, 'prev')
     while (cursor) {
       const state = readRecord(cursor.value)
-      if (state) return state
+      if (state) {
+        seen.set(cursor.value.careerId, cursor.value.savedAt)
+        return state
+      }
       cursor = await cursor.continue()
     }
     return null
@@ -224,6 +279,7 @@ export async function listCareers(): Promise<CareerSummary[]> {
 export async function deleteCareer(careerId: string): Promise<void> {
   // Drop a queued save of this career so it cannot resurrect it after the delete.
   queued.delete(careerId)
+  seen.delete(careerId)
   try {
     // Let an in-flight write finish first so the delete is the last word.
     await writer
@@ -281,7 +337,11 @@ export async function loadSlot(slot: SlotNo): Promise<GameState | null> {
     const records = (await db.getAll(STORE)).filter((r) => r.slot === slot).sort((a, b) => b.savedAt - a.savedAt)
     for (const rec of records) {
       const state = readRecord(rec)
-      if (state) return state
+      if (state) {
+        // From here on this tab's copy is the one in the database (two tabs, see the top of the file).
+        seen.set(rec.careerId, rec.savedAt)
+        return state
+      }
     }
     return null
   } catch (err) {
@@ -309,12 +369,16 @@ export async function putInSlot(state: GameState, slot: SlotNo): Promise<GameSta
     for (const r of all) {
       if (r.slot === slot && r.careerId !== stored.meta.careerId) {
         queued.delete(r.careerId)
+        seen.delete(r.careerId)
         writes.push(tx.store.delete(r.careerId))
       }
     }
-    writes.push(tx.store.put(makeRecord(stored, slot)))
+    const rec = makeRecord(stored, slot)
+    writes.push(tx.store.put(rec))
     await Promise.all(writes)
     await tx.done
+    // A deliberate replace (new career, loaded save code): this tab's copy is now the stored one.
+    seen.set(rec.careerId, rec.savedAt)
     return stored
   } catch (err) {
     warn('slot write', err)
@@ -333,6 +397,7 @@ export async function deleteSlot(slot: SlotNo): Promise<void> {
     for (const r of all) {
       if (r.slot !== slot) continue
       queued.delete(r.careerId)
+      seen.delete(r.careerId)
       writes.push(tx.store.delete(r.careerId))
     }
     await Promise.all(writes)

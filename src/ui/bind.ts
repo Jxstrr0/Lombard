@@ -147,6 +147,10 @@ export class Ui {
   private reminderText: HTMLElement
   /** The backup reminder already had its one showing this session. */
   private reminderDone = false
+  /** The two-tab notice: over everything, one button (see `showSavedElsewhere`). */
+  private elsewhere: HTMLElement
+  private elsewhereText: HTMLElement
+  private elsewhereLoad: (() => void) | null = null
   /** Called when the visible screen changes (main re-measures the camera layout). */
   onScreenChange: ((id: ScreenId) => void) | null = null
 
@@ -235,6 +239,24 @@ export class Ui {
     mount.appendChild(reminder)
     this.reminder = reminder
 
+    // --- two tabs: this career was saved in another tab, so this copy is old. Nothing behind the notice can be pressed.
+    const elsewhere = el('div', 'overlay elsewhere-overlay')
+    elsewhere.dataset.id = 'elsewhere'
+    elsewhere.hidden = true
+    const card = el('section', 'sheet menu settings elsewhere')
+    card.setAttribute('role', 'alertdialog')
+    card.setAttribute('aria-modal', 'true')
+    card.setAttribute('aria-label', t('elsewhere.title'))
+    this.elsewhereText = el('p', 'settings-text')
+    const elsewhereActions = el('div', 'actions')
+    elsewhereActions.append(
+      createButton({ id: 'elsewhere-load', label: t('elsewhere.load'), variant: 'primary', onPress: () => this.elsewhereLoad?.() }),
+    )
+    card.append(el('h2', '', t('elsewhere.title')), this.elsewhereText, elsewhereActions)
+    elsewhere.append(card)
+    mount.appendChild(elsewhere)
+    this.elsewhere = elsewhere
+
     // In play only the version shows (small, top right); the title screen adds the commit, date and bake.
     const build = el('div', 'build-number')
     this.buildMore = el('span', 'build-more', ` · ${__BUILD_SHA__} · ${__BUILD_DATE__}`)
@@ -257,9 +279,26 @@ export class Ui {
     return this.shop.isOpen
   }
 
+  /**
+   * This slot's career was saved in another tab after this one read it. A notice
+   * covers the game until the player loads the newer save (`load`).
+   */
+  showSavedElsewhere(slot: number, load: () => void): void {
+    this.elsewhereText.textContent = t('elsewhere.text', { slot })
+    this.elsewhereLoad = load
+    this.elsewhere.hidden = false
+    this.elsewhere.querySelector<HTMLButtonElement>('[data-id="elsewhere-load"]')?.focus()
+  }
+
+  hideSavedElsewhere(): void {
+    this.elsewhere.hidden = true
+    this.elsewhereLoad = null
+  }
+
   /** Title screen over the dimmed shop: hide every game screen and sheet. */
   showTitle(slots: SlotView[]): void {
     this._mode = 'title'
+    this.hideSavedElsewhere()
     if (this.current) this.screens[this.current].root.hidden = true
     this.current = null
     this.hud.root.hidden = true
@@ -280,6 +319,7 @@ export class Ui {
    */
   showGame(endingStep: EndingStep = 'summary'): void {
     this._mode = 'game'
+    this.hideSavedElsewhere()
     this.title.closeLoad()
     this.title.root.hidden = true
     this.endingStep = endingStep
@@ -452,6 +492,8 @@ export class Ui {
    */
   key(c: Command): boolean {
     const name = keyName(c)
+    // The two-tab notice is over everything: no key reaches the game behind it.
+    if (!this.elsewhere.hidden) return false
     if (this.settings.isOpen) return c.kind === 'back' ? (this.settings.close(), true) : false
     if (this._mode === 'title') {
       if (this.title.loadOpen) return c.kind === 'back' ? (this.title.closeLoad(), true) : false

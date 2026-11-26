@@ -25,11 +25,11 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Same pin as bake.yml (and the same cache).
+  # Same pin as bake.yml (and the same cached download).
   BLENDER_VERSION: '4.5.15'
   BLENDER_SERIES: '4.5'
   # Blender's own published checksum for this exact file (download.blender.org/release/Blender4.5/blender-4.5.15.sha256).
-  # The download is refused unless it matches. Change it together with BLENDER_VERSION.
+  # The download is refused unless it matches, on every run. Change it together with BLENDER_VERSION.
   BLENDER_SHA256: 0d2b8bb2efe97e6c8eb57de6b7322f8800e1984e3125b60decca5f6771e4773e
 
 jobs:
@@ -46,21 +46,29 @@ jobs:
           echo "hash=$hash" >> "$GITHUB_OUTPUT"
           echo "inputs $hash"
 
-      - name: Cache Blender
+      # The cache holds Blender's download as it came (the .tar.xz), never an unpacked
+      # copy. Any job in this repo can fill a cache, so what comes out of it is checked
+      # against Blender's published checksum on every run, before it is unpacked and run.
+      - name: Cache the Blender download
         id: blender-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ~/blender
-          key: blender-${{ env.BLENDER_VERSION }}-linux-x64
+          path: ~/blender-dl
+          key: blender-dl-${{ env.BLENDER_VERSION }}-linux-x64
 
       - name: Download Blender ${{ env.BLENDER_VERSION }}
         if: steps.blender-cache.outputs.cache-hit != 'true'
         run: |
+          mkdir -p ~/blender-dl
+          curl -fsSL --retry 3 -o ~/blender-dl/blender.tar.xz "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          echo "${BLENDER_SHA256}  $HOME/blender-dl/blender.tar.xz" | sha256sum -c -
+
+      - name: Check and unpack Blender
+        run: |
+          # Every run, also when the file came from the cache. A mismatch stops the job here.
+          echo "${BLENDER_SHA256}  $HOME/blender-dl/blender.tar.xz" | sha256sum -c -
           mkdir -p ~/blender
-          curl -fsSL --retry 3 -o /tmp/blender.tar.xz "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
-          echo "${BLENDER_SHA256}  /tmp/blender.tar.xz" | sha256sum -c -
-          tar -xJf /tmp/blender.tar.xz -C ~/blender --strip-components=1
-          rm /tmp/blender.tar.xz
+          tar -xJf ~/blender-dl/blender.tar.xz -C ~/blender --strip-components=1
 
       - name: Blender system libraries
         run: |
